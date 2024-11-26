@@ -251,7 +251,7 @@ fn make_vault(
         );
         let uv = fixtures::vault::create_person(conn, is_live);
         let uvid = uv.id.clone();
-        let sv = fixtures::scoped_vault::create(conn, &uvid, &ob_config.id);
+        let sv = fixtures::scoped_vault::create(conn, &uvid, tenant_id);
         if let Some(ob_decision_made_at) = ob_decision_made_at {
             let wf = fixtures::workflow::create(conn, &sv.id, &ob_config.id, None);
 

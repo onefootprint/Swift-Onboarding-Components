@@ -14,10 +14,8 @@ use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::ob_configuration;
-use db_schema::schema::ob_configuration::BoxedQuery;
 use db_schema::schema::playbook;
 use db_schema::schema::tenant;
-use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::Insertable;
 use diesel::Queryable;
@@ -54,15 +52,18 @@ pub type IsLive = bool;
 
 /// An ObConfiguration (onboarding configuration) is in most places synonymous with a playbook. In
 /// the data model, it represents a discrete version of a Playbook.
-#[derive(Debug, Clone, Queryable)]
+#[derive(Debug, Clone, Queryable, Selectable)]
 #[diesel(table_name = ob_configuration)]
 pub struct ObConfiguration {
     pub id: ObConfigurationId,
+    // #[deprecated(note = "Use playbook(key) instead")]
     pub key: PublishablePlaybookKey,
     pub name: String,
+    #[deprecated(note = "Use playbook(tenant_id) instead")]
     pub tenant_id: TenantId,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
+    #[deprecated(note = "Use playbook(is_live) instead")]
     pub is_live: IsLive,
     pub status: ApiKeyStatus,
     pub created_at: DateTime<Utc>,
@@ -115,6 +116,7 @@ impl ObConfiguration {
     // returns a map of country -> supported document types
     pub fn supported_country_mapping_for_document(
         &self,
+        tenant_id: &TenantId,
         residential_country: Option<Iso3166TwoDigitCountryCode>,
     ) -> SupportedDocumentAndCountryMappingForBifrost {
         if let Some(cip) = self.cip_kind.as_ref() {
@@ -159,7 +161,7 @@ impl ObConfiguration {
             IdDocKind::iter().collect()
         };
 
-        let doc_country_mapping_helper = self.get_supported_country_struct();
+        let doc_country_mapping_helper = self.get_supported_country_struct(tenant_id);
 
         // For each id doc kind configured, compute which countries we support
         let countries_and_doc_types: Vec<(Iso3166TwoDigitCountryCode, IdDocKind)> = id_doc_kinds
@@ -246,10 +248,10 @@ impl ObConfiguration {
     }
 
     // Assumes you've checked if the document type is supported already
-    fn get_supported_country_struct(&self) -> Box<dyn SupportedCountriesForDocType> {
-        if self.tenant_id.is_findigs() {
+    fn get_supported_country_struct(&self, tenant_id: &TenantId) -> Box<dyn SupportedCountriesForDocType> {
+        if tenant_id.is_findigs() {
             Box::new(Findigs)
-        } else if self.tenant_id.is_coba() {
+        } else if tenant_id.is_coba() {
             Box::new(Coba)
         } else {
             Box::new(Default)
@@ -317,6 +319,7 @@ impl ObConfiguration {
             playbook_id,
         } = new_obc;
 
+        #[allow(deprecated)]
         Self {
             id: ObConfigurationId::test_data("preview".to_owned()),
             _created_at: Utc::now(),
@@ -512,40 +515,45 @@ pub type ObConfigInfo = (ObConfiguration, Option<SaturatedActor>, Option<RuleSet
 
 pub type TenantObConfigCounts = HashMap<TenantId, i64>;
 
-impl ObConfiguration {
-    fn list_query(filters: &ObConfigurationQuery) -> BoxedQuery<Pg> {
+// It's hard to type this query in Rust, so we use a macro to share its logic.
+macro_rules! list_query {
+    ($filters:ident) => {{
         let mut query = ob_configuration::table
-            .filter(ob_configuration::tenant_id.eq(&filters.tenant_id))
-            .filter(ob_configuration::is_live.eq(filters.is_live))
+            .inner_join(playbook::table)
+            .filter(playbook::tenant_id.eq(&$filters.tenant_id))
+            .filter(playbook::is_live.eq($filters.is_live))
+            .select(ObConfiguration::as_select())
             .into_boxed();
 
-        if let Some(playbook_id) = filters.playbook_id.as_ref() {
+        if let Some(playbook_id) = $filters.playbook_id.as_ref() {
             query = query.filter(ob_configuration::playbook_id.eq(playbook_id));
         }
 
-        if !filters.include_deactivated_versions {
+        if !$filters.include_deactivated_versions {
             query = query.filter(ob_configuration::deactivated_at.is_null());
         }
 
-        if let Some(status) = filters.status.as_ref() {
+        if let Some(status) = $filters.status.as_ref() {
             query = query.filter(ob_configuration::status.eq(status))
         }
-        if let Some(search) = filters.search.as_ref() {
+        if let Some(search) = $filters.search.as_ref() {
             query = query.filter(ob_configuration::name.ilike(format!("%{}%", search)));
         }
-        if let Some(kinds) = filters.kinds.as_ref() {
+        if let Some(kinds) = $filters.kinds.as_ref() {
             query = query.filter(ob_configuration::kind.eq_any(kinds));
         }
         query
-    }
+    }};
+}
 
+impl ObConfiguration {
     #[tracing::instrument("ObConfiguration::list", skip_all)]
     pub fn list(
         conn: &mut PgConn,
-        query: &ObConfigurationQuery,
+        filters: &ObConfigurationQuery,
         pagination: OffsetPagination,
     ) -> FpResult<(Vec<ObConfigInfo>, NextPage)> {
-        let mut query = Self::list_query(query)
+        let mut query = list_query!(filters)
             .order_by(ob_configuration::created_at.desc())
             .limit(pagination.limit());
 
@@ -569,7 +577,7 @@ impl ObConfiguration {
 
     #[tracing::instrument("ObConfiguration::count", skip_all)]
     pub fn count(conn: &mut PgConn, query: &ObConfigurationQuery) -> FpResult<i64> {
-        let count = Self::list_query(query).count().get_result(conn)?;
+        let count = list_query!(query).count().get_result(conn)?;
         Ok(count)
     }
 
@@ -579,13 +587,11 @@ impl ObConfiguration {
         is_live: bool,
     ) -> FpResult<TenantObConfigCounts> {
         let counts: Vec<_> = ob_configuration::table
-            .filter(ob_configuration::is_live.eq(is_live))
-            .filter(ob_configuration::tenant_id.eq_any(&tenant_ids))
-            .group_by(ob_configuration::tenant_id)
-            .select((
-                ob_configuration::tenant_id,
-                diesel::dsl::count(ob_configuration::id),
-            ))
+            .inner_join(playbook::table)
+            .filter(playbook::is_live.eq(is_live))
+            .filter(playbook::tenant_id.eq_any(&tenant_ids))
+            .group_by(playbook::tenant_id)
+            .select((playbook::tenant_id, diesel::dsl::count(ob_configuration::id)))
             .load(conn)?;
 
         Ok(counts.into_iter().collect())
@@ -610,8 +616,8 @@ impl ObConfiguration {
             } => {
                 query = query
                     .filter(ob_configuration::id.eq(id))
-                    .filter(ob_configuration::tenant_id.eq(tenant_id))
-                    .filter(ob_configuration::is_live.eq(is_live))
+                    .filter(playbook::tenant_id.eq(tenant_id))
+                    .filter(playbook::is_live.eq(is_live))
             }
             ObConfigIdentifier::Workflow(id) => {
                 use db_schema::schema::workflow;
@@ -622,11 +628,11 @@ impl ObConfiguration {
             }
         }
 
-        let (playbook, obc): (Playbook, ObConfiguration) = query
+        let result: (Playbook, ObConfiguration) = query
             .select((playbook::all_columns, ob_configuration::all_columns))
             .first(conn)?;
 
-        Ok((playbook, obc))
+        Ok(result)
     }
 
     #[tracing::instrument("ObConfiguration::get_bulk", skip_all)]
@@ -680,6 +686,7 @@ impl ObConfiguration {
     pub fn into_copy_args(self, author: DbActor) -> NewObConfigurationArgs {
         let verification_checks = VerificationChecks::from_existing(&self);
 
+        #[allow(deprecated)]
         let ObConfiguration {
             must_collect_data,
             can_access_data,
@@ -753,8 +760,7 @@ impl ObConfiguration {
     ) -> FpResult<Self> {
         let results: Vec<Self> = diesel::update(ob_configuration::table)
             .filter(ob_configuration::id.eq(id))
-            .filter(ob_configuration::tenant_id.eq(&playbook.tenant_id))
-            .filter(ob_configuration::is_live.eq(playbook.is_live))
+            .filter(ob_configuration::playbook_id.eq(&playbook.id))
             .filter(ob_configuration::deactivated_at.is_null())
             .set(update)
             .load(conn.conn())?;

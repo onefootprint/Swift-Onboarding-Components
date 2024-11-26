@@ -9,6 +9,7 @@ use crate::auth::IsGuardMet;
 use crate::auth::SessionContext;
 use crate::FpResult;
 use db::models::ob_configuration::ObConfiguration;
+use db::models::playbook::Playbook;
 use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::workflow::Workflow;
@@ -26,6 +27,7 @@ pub struct UserWfSession {
     #[deref]
     pub user_session: UserSessionContext,
     pub scoped_user: ScopedVault,
+    pub playbook: Playbook,
     pub ob_config: ObConfiguration,
     /// The tenant from the SV, not necessarily the tenant from the OBC, but should always be
     pub tenant: Tenant,
@@ -66,11 +68,12 @@ impl ExtractableAuthSession for ParsedUserWfSession {
         let tenant = Tenant::get(conn, &scoped_user.tenant_id)?;
 
         // Get the obc and confirm it is active
-        let (_, ob_config) = ObConfiguration::get_enabled(conn, &workflow.ob_configuration_id)?;
+        let (playbook, ob_config) = ObConfiguration::get_enabled(conn, &workflow.ob_configuration_id)?;
 
         let onboarding_session = UserWfSession {
             user_session,
             scoped_user,
+            playbook,
             ob_config,
             tenant,
             workflow,

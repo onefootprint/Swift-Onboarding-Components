@@ -120,13 +120,13 @@ impl IncodeStateTransition for FetchScores {
         let wf_id = ctx.wf_id.clone();
         let sv_id = ctx.sv_id.clone();
         let id_doc_id = ctx.id_doc_id.clone();
-        let (obc, vw, id_doc, doc_uploads) = db_pool
+        let (playbook, obc, vw, id_doc, doc_uploads) = db_pool
             .db_query(move |conn| {
-                let (_, obc) = ObConfiguration::get(conn, &wf_id)?;
+                let (playbook, obc) = ObConfiguration::get(conn, &wf_id)?;
                 let vw = VaultWrapper::build_for_tenant(conn, &sv_id)?;
                 let (id_doc, _) = Document::get(conn, &id_doc_id)?;
                 let doc_uploads = id_doc.images(conn, DocumentImageArgs::default())?;
-                Ok((obc, vw, id_doc, doc_uploads))
+                Ok((playbook, obc, vw, id_doc, doc_uploads))
             })
             .await?;
 
@@ -240,6 +240,7 @@ impl IncodeStateTransition for FetchScores {
 
 
         let args = PreCompleteArgs {
+            playbook: &playbook,
             obc: &obc,
             id_doc: &id_doc,
             dk,

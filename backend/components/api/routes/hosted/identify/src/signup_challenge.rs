@@ -65,7 +65,7 @@ pub async fn post(
 
     let is_fixture = phone.as_ref().is_some_and(|p| p.value.is_fixture_phone_number())
         || email.as_ref().is_some_and(|e| e.value.is_fixture());
-    if ob_context.ob_config().is_live && is_fixture {
+    if ob_context.playbook().is_live && is_fixture {
         return Err(UserError::FixtureCIInLive.into());
     }
 
@@ -149,7 +149,7 @@ async fn make_vault_context(
     sandbox_id: Option<newtypes::SandboxId>,
     is_components_sdk: bool,
 ) -> FpResult<VaultContext> {
-    if ob_pk_auth.ob_config().is_live != sandbox_id.is_none() {
+    if ob_pk_auth.playbook().is_live != sandbox_id.is_none() {
         return BadRequestInto("Sandbox ID must be provided if and only if using a sandbox playbook");
     }
 
@@ -174,7 +174,7 @@ async fn make_vault_context(
         phone.map(|p| (IDK::PhoneNumber.into(), p.value.e164())),
     )
     .collect();
-    let args = ValidateArgs::for_bifrost(ob_pk_auth.ob_config().is_live);
+    let args = ValidateArgs::for_bifrost(ob_pk_auth.playbook().is_live);
     let data = DataRequest::clean_and_validate_str(data, args)?;
     let data = FingerprintedDataRequest::build_for_new_user(state, data, &ob_pk_auth.tenant().id).await?;
 
@@ -184,6 +184,7 @@ async fn make_vault_context(
         data,
         keypair,
         sandbox_id,
+        playbook: ob_pk_auth.playbook().clone(),
         obc: ob_pk_auth.ob_config().clone(),
         sources,
     })

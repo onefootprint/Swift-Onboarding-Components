@@ -4,7 +4,6 @@ use crate::utils::vault_wrapper::FingerprintedDataRequest;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use db::models::fingerprint::Fingerprint;
-use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::test_helpers::assert_have_same_elements;
 use db::tests::fixtures;
@@ -158,17 +157,17 @@ type InputData = (V, T, Vec<(IDK, &'static str)>);
     }; "only latest data is considered")]
 #[tokio::test]
 async fn test_get_dupes(state: &mut State, data: Vec<InputData>, expected: ExpectedDupes) {
-    // create an obc for every tenant and create a T->OBC mapping
-    let obc_map = state
+    // create a tenant for every T
+    let tenant_map = state
         .db_transaction(move |conn| {
-            let obc_map: HashMap<T, ObConfiguration> = T::iter()
+            let tenant_map: HashMap<_, _> = T::iter()
                 .map(|t| {
                     let tenant = fixtures::tenant::create(conn);
-                    let (_, obc) = fixtures::ob_configuration::create(conn, &tenant.id, true);
-                    (t, obc)
+                    (t, tenant)
                 })
                 .collect();
-            Ok(obc_map)
+
+            Ok(tenant_map)
         })
         .await
         .unwrap();
@@ -191,7 +190,7 @@ async fn test_get_dupes(state: &mut State, data: Vec<InputData>, expected: Expec
                         vault_id_map.insert(v.clone(), uv.id.clone());
                         uv.id.clone()
                     };
-                    let sv = fixtures::scoped_vault::create(conn, &v_id, &obc_map.get(t).unwrap().id.clone());
+                    let sv = fixtures::scoped_vault::create(conn, &v_id, &tenant_map.get(t).unwrap().id);
                     ((v.clone(), t.clone()), sv.into_inner())
                 })
                 .collect();

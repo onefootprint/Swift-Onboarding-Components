@@ -251,7 +251,7 @@ impl IncodeStateMachine {
     #[tracing::instrument(skip_all)]
     pub async fn init_from_existing(state: &State, ivs: IncodeVerificationSession) -> FpResult<Self> {
         let idi = ivs.identity_document_id.clone();
-        let (di, id_doc, doc_req, obc, uvw) = state
+        let (di, id_doc, doc_req, playbook, obc, uvw) = state
             .db_transaction(move |conn| {
                 let (id_doc, doc_req) = Document::get(conn, &idi)?;
 
@@ -264,9 +264,9 @@ impl IncodeStateMachine {
 
                 let uvw: VaultWrapper<Person> =
                     VaultWrapper::build(conn, VwArgs::Tenant(&doc_req.scoped_vault_id))?;
-                let (_, obc) = ObConfiguration::get(conn, &doc_req.workflow_id)?;
+                let (playbook, obc) = ObConfiguration::get(conn, &doc_req.workflow_id)?;
 
-                Ok((di, id_doc, doc_req, obc, uvw))
+                Ok((di, id_doc, doc_req, playbook, obc, uvw))
             })
             .await?;
 
@@ -274,7 +274,7 @@ impl IncodeStateMachine {
         let vault_country = uvw.get_decrypted_country(state).await?;
         let disable_selfie = state
             .ff_client
-            .flag(feature_flag::BoolFlag::DisableSelfieChecking(&obc.tenant_id));
+            .flag(feature_flag::BoolFlag::DisableSelfieChecking(&playbook.tenant_id));
 
         let should_collect_selfie = doc_req.should_collect_selfie() && !id_doc.should_skip_selfie();
         let ctx = IncodeContext {
@@ -288,7 +288,7 @@ impl IncodeStateMachine {
             vault_country,
             doc_request_id: doc_req.id,
             state: state.clone(),
-            tenant_id: obc.tenant_id.clone(),
+            tenant_id: playbook.tenant_id.clone(),
             ff_client: state.ff_client.clone(),
             failed_attempts_for_side: 0, /* !! this is the one thing that is hard coded here that would
                                           * differ from the existing code path that inits a IVS. We could
@@ -302,8 +302,14 @@ impl IncodeStateMachine {
         let is_sandbox = id_doc.fixture_result.is_some();
         Self::init(
             state,
-            obc.tenant_id.clone(),
-            get_config_id(state, should_collect_selfie, is_sandbox, &obc.tenant_id, None),
+            playbook.tenant_id.clone(),
+            get_config_id(
+                state,
+                should_collect_selfie,
+                is_sandbox,
+                &playbook.tenant_id,
+                None,
+            ),
             ctx,
             is_sandbox,
         )

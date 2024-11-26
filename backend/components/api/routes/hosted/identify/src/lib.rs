@@ -152,11 +152,11 @@ async fn get_identify_challenge_context(
     } = args;
     tracing::info!(identifiers=?Csv(identifiers.iter().map(IdentifyIdKind::from).collect()), has_user_auth=%user_auth.is_some(), has_ob_context=%obc.is_some(), has_sandbox_id=%sandbox_id.is_some(), "Getting identify challenge context");
 
-    // Get the OBC from either user auth or obc auth, preferring to extract from the auth token
-    let obc = (user_auth.as_ref().and_then(|ua| ua.obc.as_ref()))
-        .or(obc.as_ref().map(|ob| ob.ob_config()))
+    // Get the Playbook from either user auth or obc auth, preferring to extract from the auth token
+    let playbook = (user_auth.as_ref().and_then(|ua| ua.playbook.as_ref()))
+        .or(obc.as_ref().map(|ob| ob.playbook()))
         .cloned();
-    let t_id = obc.as_ref().map(|obc| &obc.tenant_id);
+    let t_id = playbook.as_ref().map(|playbook| &playbook.tenant_id);
     // Look up existing user vault by identifier
     let (existing_user_id, sv_id, matching_fps) = match (user_auth.as_ref(), identifiers) {
         // Identified via phone or email
@@ -185,7 +185,7 @@ async fn get_identify_challenge_context(
                 root_span.record_su(&sv);
                 let tenant = Tenant::get(conn, &sv.tenant_id)?;
                 (Some(tenant), Some(sv))
-            } else if let Some(obc) = obc {
+            } else if let Some(obc) = playbook {
                 root_span.record("tenant_id", obc.tenant_id.to_string());
                 root_span.record("is_live", obc.is_live);
                 let t_id = &obc.tenant_id;

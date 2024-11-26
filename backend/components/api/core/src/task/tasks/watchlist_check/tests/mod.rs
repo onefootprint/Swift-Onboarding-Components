@@ -72,7 +72,7 @@ async fn create_user_and_task(
                 VaultKind::NonPortable => {
                     let tenant = fixtures::tenant::create(conn);
                     let (_uv, sv) = crate::tests::fixtures::lib::create_user_and_populate_vault(
-                        conn, is_live, tenant.id, None, idks,
+                        conn, is_live, tenant.id, false, idks,
                     );
                     sv
                 }

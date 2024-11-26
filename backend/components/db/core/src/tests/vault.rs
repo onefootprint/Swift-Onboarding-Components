@@ -20,10 +20,9 @@ use std::time::Duration;
 #[db_test_case(true, true => false; "cant-find-portablized-deactivated")]
 fn test_find_portable(conn: &mut TestPgConn, is_portablized: bool, is_deactivated: bool) -> bool {
     let tenant = fixtures::tenant::create(conn);
-    let (_, ob_config) = fixtures::ob_configuration::create(conn, &tenant.id, true);
     let uv = fixtures::vault::create_person(conn, true).into_inner();
     Vault::mark_verified(conn, &uv.id).unwrap();
-    let sv = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
+    let sv = fixtures::scoped_vault::create(conn, &uv.id, &tenant.id);
 
     let sv_txn = DataLifetime::new_sv_txn(conn, &sv).unwrap();
     let (dl, _) = DataLifetime::create(

@@ -21,6 +21,7 @@ use paperclip::actix::Apiv2Security;
 )]
 pub struct ParsedOnboardingSession {
     pub tenant: Tenant,
+    pub playbook: Playbook,
     pub ob_config: ObConfiguration,
     pub data: OnboardingSession,
 }
@@ -44,21 +45,22 @@ impl ExtractableAuthSession for ParsedOnboardingSession {
                 return Err(AuthError::SessionTypeError.into());
             }
         };
-        let (_, ob_config, tenant) = Playbook::get_latest_version_if_enabled(conn, &data.key)?;
+        let (playbook, ob_config, tenant) = Playbook::get_latest_version_if_enabled(conn, &data.key)?;
 
         // TODO log token hash here
         tracing::info!(tenant_id=%tenant.id, ob_config_id=%ob_config.id, "ob_session authenticated");
 
         Ok(ParsedOnboardingSession {
-            ob_config,
             tenant,
+            playbook,
+            ob_config,
             data,
         })
     }
 
     fn log_authed_principal(&self, root_span: tracing_actix_web::RootSpan) {
         root_span.record("tenant_id", &self.tenant.id.to_string());
-        root_span.record("is_live", self.ob_config.is_live);
+        root_span.record("is_live", self.playbook.is_live);
         root_span.record("auth_method", "ob_session");
     }
 }

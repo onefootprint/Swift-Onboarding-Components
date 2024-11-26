@@ -31,6 +31,7 @@ use newtypes::PiiJsonValue;
 use newtypes::PiiString;
 use newtypes::PreviewApi;
 use newtypes::ScopedVaultId;
+use newtypes::TenantId;
 use newtypes::VaultKind;
 use newtypes::VerificationCheck;
 use newtypes::VerificationCheckKind;
@@ -69,10 +70,11 @@ pub async fn create_user_and_onboarding(
             // create things like OBC's and such
             rule_engine::default_rules::save_default_rules_for_obc(conn, &playbook, &obc.id).unwrap();
 
-            let (uv, su) = create_user_and_populate_vault(conn, obc.clone(), kyc_fixture_result);
+            let (uv, su) = create_user_and_populate_vault(conn, &tenant.id, kyc_fixture_result);
             let su = su.into_inner();
 
             let common_args = CommonWfArgs {
+                playbook: &playbook,
                 obc: &obc,
                 insight_event: Some(CreateInsightEvent { ..Default::default() }),
                 source: WorkflowSource::Hosted,
@@ -97,7 +99,7 @@ pub async fn create_user_and_onboarding(
             let biz_wf = if create_business {
                 let sandbox_id = uv.sandbox_id.as_ref().map(|id| id.to_string());
                 let bv = fixtures::vault::create(conn, VaultKind::Business, sandbox_id, true);
-                let sb = fixtures::scoped_vault::create(conn, &bv.id, &obc.id).into_inner();
+                let sb = fixtures::scoped_vault::create(conn, &bv.id, &tenant.id).into_inner();
                 let ob_create_args = OnboardingWorkflowArgs {
                     scoped_vault_id: sb.id.clone(),
                     ob_configuration_id: obc.id.clone(),
@@ -175,12 +177,12 @@ pub async fn create_kyb_user_and_onboarding(
 
 pub fn create_user_and_populate_vault(
     conn: &mut TxnPgConn,
-    ob_config: ObConfiguration,
+    tenant_id: &TenantId,
     fixture_result: Option<WorkflowFixtureResult>,
 ) -> (Vault, Locked<ScopedVault>) {
     let sandbox_id = fixture_result.map(|f| format!("{}_sandbox", f.as_ref()));
     let uv = fixtures::vault::create(conn, VaultKind::Person, sandbox_id, true);
-    let su = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
+    let su = fixtures::scoped_vault::create(conn, &uv.id, tenant_id);
 
     let update = vec![
         (

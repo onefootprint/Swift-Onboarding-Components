@@ -1,16 +1,16 @@
 use super::list::List;
 use super::list_entry::ListEntry;
 use super::list_entry_creation::ListEntryCreation;
+use super::ob_configuration::ObConfiguration;
+use super::scoped_vault::ScopedVault;
 use crate::actor::saturate_actors_nullable;
 use crate::actor::HasActor;
 use crate::actor::SaturatedActor;
 use crate::models::document_data::DocumentData;
 use crate::models::insight_event::CreateInsightEvent;
 use crate::models::insight_event::InsightEvent;
-use crate::models::ob_configuration::ObConfiguration;
 use crate::models::onboarding_decision::OnboardingDecision;
 use crate::models::onboarding_decision::SaturatedOnboardingDecisionInfo;
-use crate::models::scoped_vault::*;
 use crate::models::tenant::Tenant;
 use crate::models::tenant_api_key::TenantApiKey;
 use crate::models::tenant_role::TenantRole;
@@ -481,7 +481,6 @@ impl AuditEventBulkSecondaryData {
 mod tests {
     use super::*;
     use crate::models::tenant_role::ImmutableRoleKind;
-    use crate::tests::fixtures::ob_configuration::ObConfigurationOpts;
     use crate::tests::prelude::*;
     use itertools::sorted;
     use itertools::Itertools;
@@ -493,13 +492,8 @@ mod tests {
     #[db_test]
     fn test_create_audit_event(conn: &mut TestPgConn) {
         let tenant = tests::fixtures::tenant::create(conn);
-        let (_, obc) = tests::fixtures::ob_configuration::create_with_opts(
-            conn,
-            &tenant.id,
-            ObConfigurationOpts { ..Default::default() },
-        );
         let vault = tests::fixtures::vault::create_person(conn, false);
-        let scoped_vault = tests::fixtures::scoped_vault::create(conn, &vault.id, &obc.id);
+        let scoped_vault = tests::fixtures::scoped_vault::create(conn, &vault.id, &tenant.id);
         let insight_event = tests::fixtures::insight_event::create(conn);
 
         let event = NewAuditEvent {
@@ -536,27 +530,13 @@ mod tests {
         let tenant = tests::fixtures::tenant::create(conn);
         let other_tenant = tests::fixtures::tenant::create(conn);
 
-        let (_, obc) = tests::fixtures::ob_configuration::create_with_opts(
-            conn,
-            &tenant.id,
-            ObConfigurationOpts {
-                is_live: true,
-                ..Default::default()
-            },
-        );
         let vault_1 = tests::fixtures::vault::create_person(conn, true);
-        let scoped_vault_1 = tests::fixtures::scoped_vault::create(conn, &vault_1.id, &obc.id);
+        let scoped_vault_1 = tests::fixtures::scoped_vault::create(conn, &vault_1.id, &tenant.id);
         let vault_2 = tests::fixtures::vault::create_person(conn, true);
-        let scoped_vault_2 = tests::fixtures::scoped_vault::create(conn, &vault_2.id, &obc.id);
+        let scoped_vault_2 = tests::fixtures::scoped_vault::create(conn, &vault_2.id, &tenant.id);
 
-        let (_, obc_sandbox) = tests::fixtures::ob_configuration::create_with_opts(
-            conn,
-            &tenant.id,
-            ObConfigurationOpts { ..Default::default() },
-        );
         let vault_sandbox = tests::fixtures::vault::create_person(conn, false);
-        let scoped_vault_sandbox =
-            tests::fixtures::scoped_vault::create(conn, &vault_sandbox.id, &obc_sandbox.id);
+        let scoped_vault_sandbox = tests::fixtures::scoped_vault::create(conn, &vault_sandbox.id, &tenant.id);
 
         let insight_event = tests::fixtures::insight_event::create(conn);
 

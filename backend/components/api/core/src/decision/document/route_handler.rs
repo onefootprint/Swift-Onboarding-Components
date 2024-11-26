@@ -126,6 +126,7 @@ pub async fn handle_document_create(
                 country_code.ok_or(BadRequest("Identity document requires country code"))?;
             let (_, obc) = ObConfiguration::get(conn, &wf_id)?;
             crate::decision::vendor::incode::validate_doc_type_is_allowed(
+                &tenant_id,
                 &obc,
                 document_type,
                 residential_country,
@@ -296,7 +297,7 @@ pub async fn handle_document_process(
     let su_id = sv_id.clone();
     let wf_id2 = wf_id.clone();
     let wf_id3 = wf_id.clone();
-    let (di, id_doc, dr, failed_attempts, uvw, missing_sides, should_collect_selfie, obc) = state
+    let (di, id_doc, dr, failed_attempts, uvw, missing_sides, should_collect_selfie, playbook, obc) = state
         .db_transaction(move |conn| {
             let di = DecisionIntent::get_or_create_for_workflow(
                 conn,
@@ -305,7 +306,7 @@ pub async fn handle_document_process(
                 DecisionIntentKind::DocScan,
             )?;
 
-            let (_, obc) = ObConfiguration::get(conn, &wf_id)?;
+            let (playbook, obc) = ObConfiguration::get(conn, &wf_id)?;
             let (id_doc, dr) = Document::get(conn, &doc_id)?;
             let side_from_session: Option<DocumentSide> = IncodeVerificationSession::get(conn, &id_doc.id)?
                 .and_then(|session| session.side_from_session());
@@ -323,6 +324,7 @@ pub async fn handle_document_process(
                 uvw,
                 missing_sides,
                 should_collect_selfie,
+                playbook,
                 obc,
             ))
         })
@@ -369,6 +371,7 @@ pub async fn handle_document_process(
                     state,
                     &sv_id,
                     &wf_id2,
+                    playbook,
                     obc,
                     id_doc,
                     should_collect_selfie,

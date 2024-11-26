@@ -20,6 +20,7 @@ use api_errors::ServerErrInto;
 use db::models::billing_event::BillingEvent;
 use db::models::decision_intent::DecisionIntent;
 use db::models::ob_configuration::ObConfiguration;
+use db::models::playbook::Playbook;
 use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::VReqIdentifier;
 use db::models::waterfall_execution::UpdateWaterfallExecution;
@@ -39,13 +40,13 @@ use std::collections::HashMap;
 pub async fn run_kyc_waterfall(state: &State, di: &DecisionIntent, wf: &Workflow) -> FpResult<VendorResult> {
     let svid = di.scoped_vault_id.clone();
     let wf_id = wf.id.clone();
-    let (tenant_id, vw, obc) = state
+    let (tenant_id, vw, playbook, obc) = state
         .db_query(move |conn| {
             let sv = ScopedVault::get(conn, &svid)?;
             let vw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv.id))?;
-            let (_, obc) = ObConfiguration::get(conn, &wf_id)?;
+            let (playbook, obc) = ObConfiguration::get(conn, &wf_id)?;
 
-            Ok((sv.tenant_id, vw, obc))
+            Ok((sv.tenant_id, vw, playbook, obc))
         })
         .await?;
     let ob_configuration_key = obc.key.clone();
@@ -89,7 +90,7 @@ pub async fn run_kyc_waterfall(state: &State, di: &DecisionIntent, wf: &Workflow
     // it. Eventually we might want to try re-running rules and re-running the waterfall but for
     // now, we just exit early
     if let Some(already_have_success_vr) =
-        choose_best_waterfall_vendor_response(existing_successful_results, &vw, &obc)
+        choose_best_waterfall_vendor_response(existing_successful_results, &vw, &playbook, &obc)
     {
         complete_waterfall_execution(state, wf, &obc.id, &waterfall_execution.id).await?;
 
@@ -131,7 +132,7 @@ pub async fn run_kyc_waterfall(state: &State, di: &DecisionIntent, wf: &Workflow
 
         // evaluate WF Rules and determine the next (control flow action, rule action)
         let step_result = if let Some(vr) = vendor_result.clone() {
-            match eval_waterfall_rules(vr, &vw, &obc) {
+            match eval_waterfall_rules(vr, &vw, &playbook, &obc) {
                 Ok(action) => action,
                 // we should never err from evaluating rules in theory
                 Err(_) => {
@@ -173,8 +174,12 @@ pub async fn run_kyc_waterfall(state: &State, di: &DecisionIntent, wf: &Workflow
     }
 
     complete_waterfall_execution(state, wf, &obc.id, &waterfall_execution.id).await?;
-    let final_result =
-        choose_best_waterfall_vendor_response(final_results.into_iter().flatten().collect(), &vw, &obc);
+    let final_result = choose_best_waterfall_vendor_response(
+        final_results.into_iter().flatten().collect(),
+        &vw,
+        &playbook,
+        &obc,
+    );
 
     if let Some(vr) = final_result {
         Ok(vr)
@@ -190,12 +195,13 @@ pub async fn run_kyc_waterfall(state: &State, di: &DecisionIntent, wf: &Workflow
 fn choose_best_waterfall_vendor_response(
     final_results: Vec<VendorResult>,
     vw: &VaultWrapper,
+    playbook: &Playbook,
     obc: &ObConfiguration,
 ) -> Option<VendorResult> {
     final_results
         .into_iter()
         .filter_map(|vr| {
-            eval_waterfall_rules(vr.clone(), vw, obc)
+            eval_waterfall_rules(vr.clone(), vw, playbook, obc)
                 .ok()
                 .map(|result| (vr, result))
         })
@@ -291,6 +297,7 @@ impl WaterfallStepResult {
 pub(super) fn eval_waterfall_rules(
     res: VendorResult,
     vw: &VaultWrapper,
+    playbook: &Playbook,
     obc: &ObConfiguration,
 ) -> FpResult<WaterfallStepResult> {
     let vendor_api = res.vendor_api();
@@ -343,7 +350,7 @@ pub(super) fn eval_waterfall_rules(
     tracing::info!(
         %vendor_api,
         %vault_id,
-        tenant_id=%obc.tenant_id,
+        tenant_id=%playbook.tenant_id,
         obc_id=%obc.id,
         obc_key=%obc.key,
         ?reason_codes,

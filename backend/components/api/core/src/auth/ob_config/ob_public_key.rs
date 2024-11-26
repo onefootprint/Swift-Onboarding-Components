@@ -26,6 +26,7 @@ use tracing::Instrument;
 )]
 pub struct PublicOnboardingContext {
     pub tenant: Tenant,
+    pub playbook: Playbook,
     pub ob_config: ObConfiguration,
     phantom: PhantomData<()>,
 }
@@ -62,8 +63,8 @@ impl FromRequest for PublicOnboardingContext {
             let result = state
                 .db_query(move |conn| Playbook::get_latest_version_if_enabled(conn, &key))
                 .await;
-            let (ob_config, tenant) = match result.optional() {
-                Ok(Some((_, ob_config, tenant))) => (ob_config, tenant),
+            let (playbook, ob_config, tenant) = match result.optional() {
+                Ok(Some((playbook, ob_config, tenant))) => (playbook, ob_config, tenant),
                 Ok(None) => {
                     // Slightly more informative error message when we can't find an ObConfig with
                     // this key
@@ -76,13 +77,14 @@ impl FromRequest for PublicOnboardingContext {
                 Err(e) => return Err(e.into()),
             };
 
-            tracing::info!(tenant_id=%tenant.id, ob_config_id=%ob_config.id, "pk_ob_session authenticated");
+            tracing::info!(tenant_id=%tenant.id, playbook_id=%playbook.id, ob_config_id=%ob_config.id, "pk_ob_session authenticated");
             root_span.record("tenant_id", &tenant.id.to_string());
-            root_span.record("is_live", ob_config.is_live);
+            root_span.record("is_live", playbook.is_live);
             root_span.record("auth_method", "ob_pk");
 
             Ok(PublicOnboardingContext {
                 tenant,
+                playbook,
                 ob_config,
                 phantom: PhantomData,
             })

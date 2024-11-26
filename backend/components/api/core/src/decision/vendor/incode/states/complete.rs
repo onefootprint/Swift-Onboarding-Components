@@ -30,6 +30,7 @@ use db::models::document::DocumentImageArgs;
 use db::models::document::DocumentUpdate;
 use db::models::document_upload::DocumentUpload;
 use db::models::ob_configuration::ObConfiguration;
+use db::models::playbook::Playbook;
 use db::models::risk_signal::RiskSignal;
 use db::models::risk_signal_group::RiskSignalGroupScope;
 use db::models::user_timeline::UserTimeline;
@@ -74,6 +75,7 @@ pub struct Complete {}
 
 #[derive(Copy, Clone)]
 pub(super) struct PreCompleteArgs<'a> {
+    pub playbook: &'a Playbook,
     pub obc: &'a ObConfiguration,
     pub id_doc: &'a Document,
     pub sv_id: &'a ScopedVaultId,
@@ -92,6 +94,7 @@ pub(super) async fn compute_ocr_data<'a>(
     rs: &'a [NewRiskSignal],
 ) -> FpResult<FingerprintedDataRequest> {
     let PreCompleteArgs {
+        playbook,
         obc,
         vw,
         fetch_ocr_response: r,
@@ -99,7 +102,7 @@ pub(super) async fn compute_ocr_data<'a>(
         dk,
         ..
     } = args;
-    let validate_args = ValidateArgs::for_bifrost(obc.is_live);
+    let validate_args = ValidateArgs::for_bifrost(playbook.is_live);
 
     let data = ParsedIncodeFields::from_fetch_ocr_res(r)
         .ocr_data_kinds()
@@ -113,7 +116,7 @@ pub(super) async fn compute_ocr_data<'a>(
 
     // For doc-first onboardings, populate identity data
     let id_data = if obc.is_doc_first {
-        if can_fill_doc_first_id_data(dk, rs, &obc.tenant_id) {
+        if can_fill_doc_first_id_data(dk, rs, &playbook.tenant_id) {
             doc_first_id_data(r, validate_args)
                 .into_iter()
                 // Don't add OCR data to the vault that already exists

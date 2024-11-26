@@ -52,18 +52,23 @@ pub async fn post(
     let uv_id = user_auth.user.id.clone();
     let pk_obc_id = ob_pk_auth.map(|ob_pk| ob_pk.ob_config().id.clone());
     let obc_id = (user_auth.obc_id.clone().or(pk_obc_id)).ok_or(OnboardingError::NoPlaybook)?;
-    let (scoped_user, ob_config, portable_vw) = state
+    let (scoped_user, playbook, ob_config, portable_vw) = state
         .db_query(move |conn| {
             let su = ScopedVault::get(conn, (&scoped_user_id, &uv_id))?;
             // Check that the ob configuration is still active
-            let (_, ob_config) = ObConfiguration::get_enabled(conn, &obc_id)?;
+            let (playbook, ob_config) = ObConfiguration::get_enabled(conn, &obc_id)?;
             let portable_vw = VaultWrapper::<Any>::build_portable(conn, &su.vault_id)?;
-            Ok((su, ob_config, portable_vw))
+            Ok((su, playbook, ob_config, portable_vw))
         })
         .await?;
 
     let prefill_data = portable_vw
-        .get_data_to_prefill(&state, &ob_config, PrefillKind::Onboarding(&scoped_user))
+        .get_data_to_prefill(
+            &state,
+            &playbook,
+            &ob_config,
+            PrefillKind::Onboarding(&scoped_user),
+        )
         .await?;
 
     let insight_event = CreateInsightEvent::from(insights);
@@ -85,6 +90,7 @@ pub async fn post(
             // If this auth token allows reonboarding, force create a new workflow
             let force_create = user_auth.data.metadata.allow_reonboard;
             let common_args = CommonWfArgs {
+                playbook: &playbook,
                 obc: &obc,
                 insight_event: Some(insight_event),
                 source: WorkflowSource::Hosted,

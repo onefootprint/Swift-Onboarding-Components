@@ -56,19 +56,15 @@ impl TestData {
         let t1_id = fixtures::tenant::create(conn).id;
         let t2_id = fixtures::tenant::create(conn).id;
 
-        // Create ob configs
-        let ob_config_id = fixtures::ob_configuration::create(conn, &t1_id, true).1.id;
-        let ob_config2_id = fixtures::ob_configuration::create(conn, &t2_id, true).1.id;
-
         // Create user vaults (without phone number)
         let v1_id = fixtures::vault::create_person(conn, true).into_inner().id;
         let v2_id = fixtures::vault::create_person(conn, true).into_inner().id;
         let vx_id = fixtures::vault::create_person(conn, true).into_inner().id;
 
         // Create scoped users
-        let sv1 = fixtures::scoped_vault::create(conn, &v1_id, &ob_config_id);
-        let sv2 = fixtures::scoped_vault::create(conn, &v1_id, &ob_config2_id);
-        let sv3 = fixtures::scoped_vault::create(conn, &v2_id, &ob_config_id);
+        let sv1 = fixtures::scoped_vault::create(conn, &v1_id, &t1_id);
+        let sv2 = fixtures::scoped_vault::create(conn, &v1_id, &t2_id);
+        let sv3 = fixtures::scoped_vault::create(conn, &v2_id, &t1_id);
 
         // Timeline of seqnos
         let mut seqnos = vec![];

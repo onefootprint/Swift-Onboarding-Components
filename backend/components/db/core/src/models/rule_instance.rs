@@ -551,8 +551,8 @@ mod tests {
             &t.id,
             ObConfigurationOpts { ..Default::default() },
         );
-        let list1 = tests::fixtures::list::create(conn, &t.id, obc.is_live);
-        let list2 = tests::fixtures::list::create(conn, &t.id, obc.is_live);
+        let list1 = tests::fixtures::list::create(conn, &t.id, playbook.is_live);
+        let list2 = tests::fixtures::list::create(conn, &t.id, playbook.is_live);
 
         // r1 references both list1 and list2
         let r1_a = RuleAction::ManualReview;
@@ -719,7 +719,7 @@ mod tests {
         assert_eq!(5, rules.len());
         assert_eq!(
             5,
-            RuleInstance::list(conn, &t.id, obc.is_live, &obc.id, IncludeRules::All)
+            RuleInstance::list(conn, &t.id, playbook.is_live, &obc.id, IncludeRules::All)
                 .unwrap()
                 .len()
         );
@@ -809,7 +809,7 @@ mod tests {
         // list should return 5 rules. we started with 5, deleted 2, and added 2 (and edited 2)
         assert_eq!(
             5,
-            RuleInstance::list(conn, &t.id, obc.is_live, &obc.id, IncludeRules::All)
+            RuleInstance::list(conn, &t.id, playbook.is_live, &obc.id, IncludeRules::All)
                 .unwrap()
                 .len()
         );

@@ -254,7 +254,7 @@ pub async fn adhoc_create_document_and_workflow(
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let uvw = VaultWrapper::<Any>::build(conn, VwArgs::Historical(&sv.id, seqno))?;
 
-            let (_, obc, _) =
+            let (playbook, obc, _) =
                 Playbook::get_latest_version_if_enabled(conn, (&playbook_key, &tenant_id, is_live))?;
 
             if obc.kind != ObConfigurationKind::Document && !obc.is_doc_first {
@@ -262,6 +262,7 @@ pub async fn adhoc_create_document_and_workflow(
             }
 
             let common_args = CommonWfArgs {
+                playbook: &playbook,
                 obc: &obc,
                 insight_event: None,
                 source: WorkflowSource::Unknown,
@@ -403,7 +404,7 @@ pub async fn adhoc_document_process(
 ) -> ApiResponse<api_wire_types::Empty> {
     let document_id = args.into_inner();
 
-    let (wf, uvw, obc, seqno) = state
+    let (wf, uvw, playbook, obc, seqno) = state
         .db_transaction(move |conn| {
             let (_, doc_req) = Document::get(conn, &document_id)?;
             // authorize since this is a non-customer facing route
@@ -419,12 +420,12 @@ pub async fn adhoc_document_process(
             }
             .insert(conn)?;
 
-            let (_, obc) = ObConfiguration::get_enabled(conn, &wf.ob_configuration_id)?;
+            let (playbook, obc) = ObConfiguration::get_enabled(conn, &wf.ob_configuration_id)?;
 
             let seqno = DataLifetime::get_current_seqno(conn)?;
             let uvw = VaultWrapper::<Any>::build_for_tenant_version(conn, &wf.scoped_vault_id, seqno)?;
 
-            Ok((wf, uvw, obc, seqno))
+            Ok((wf, uvw, playbook, obc, seqno))
         })
         .await?;
 
@@ -449,6 +450,7 @@ pub async fn adhoc_document_process(
                 business_owners: &[],
                 auth_events: &[],
                 is_secondary_bo: false,
+                playbook: &playbook,
                 obc: &obc,
                 opts: RequirementOpts::default(),
             };

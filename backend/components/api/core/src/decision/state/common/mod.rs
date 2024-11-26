@@ -35,6 +35,7 @@ use db::models::list_entry::ListEntry;
 use db::models::list_entry::ListWithDecryptedEntries;
 use db::models::list_entry::ListWithEntries;
 use db::models::ob_configuration::ObConfiguration;
+use db::models::playbook::Playbook;
 use db::models::risk_signal::NewRiskSignalInfo;
 use db::models::risk_signal::RiskSignal;
 use db::models::rule_instance::RuleInstance;
@@ -93,12 +94,12 @@ pub fn get_vw_and_obc(
     sv_id: &ScopedVaultId,
     seqno: DataLifetimeSeqno,
     wf_id: &WorkflowId,
-) -> FpResult<(VaultWrapper, ObConfiguration)> {
-    let (_, obc) = ObConfiguration::get(conn, wf_id)?;
+) -> FpResult<(VaultWrapper, Playbook, ObConfiguration)> {
+    let (playbook, obc) = ObConfiguration::get(conn, wf_id)?;
 
     let vw = VaultWrapper::<_>::build(conn, VwArgs::Historical(sv_id, seqno))?;
 
-    Ok((vw, obc))
+    Ok((vw, playbook, obc))
 }
 
 #[tracing::instrument(skip(state))]
@@ -293,7 +294,12 @@ pub async fn run_aml_call(
 
 
 #[tracing::instrument(skip(state))]
-pub async fn run_samba_if_needed(state: &State, wf_id: &WorkflowId, obc: &ObConfiguration) -> FpResult<()> {
+pub async fn run_samba_if_needed(
+    state: &State,
+    wf_id: &WorkflowId,
+    playbook: &Playbook,
+    obc: &ObConfiguration,
+) -> FpResult<()> {
     let samba_enabled = state
         .ff_client
         .flag(BoolFlag::RunSambaActivityHistoryForPlaybook(&obc.key));
@@ -317,7 +323,7 @@ pub async fn run_samba_if_needed(state: &State, wf_id: &WorkflowId, obc: &ObConf
 
     let s2 = state.clone();
     // Flexcar only wants this in PA at the moment
-    let config = if obc.tenant_id.is_flexcar() {
+    let config = if playbook.tenant_id.is_flexcar() {
         let c = SambaOrderConfig {
             states: vec![UsStateAndTerritories::PA],
         };

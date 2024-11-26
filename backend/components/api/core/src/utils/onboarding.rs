@@ -21,6 +21,7 @@ use db::models::document_request::DocumentRequest;
 use db::models::document_request::NewDocumentRequestArgs;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
+use db::models::playbook::Playbook;
 use db::models::scoped_vault::IsNew;
 use db::models::scoped_vault::NewScopedVaultArgs;
 use db::models::scoped_vault::ScopedVault;
@@ -68,6 +69,7 @@ pub enum NewBusinessWfArgs {
 
 #[derive(Clone)]
 pub struct CommonWfArgs<'a> {
+    pub playbook: &'a Playbook,
     pub obc: &'a ObConfiguration,
     pub insight_event: Option<CreateInsightEvent>,
     pub source: WorkflowSource,
@@ -92,6 +94,7 @@ pub fn get_or_create_user_workflow(
     user_args: CreateUserWfArgs,
 ) -> FpResult<(Workflow, IsNew)> {
     let CommonWfArgs {
+        playbook: _,
         obc,
         insight_event,
         source,
@@ -210,7 +213,7 @@ pub enum ScopedVaultAction {
 fn get_or_create_business(
     conn: &mut TxnPgConn,
     user_auth: &UserSessionContext,
-    obc: &ObConfiguration,
+    playbook: &Playbook,
     sv_action: ScopedVaultAction,
     new_biz_keypair: VaultKeyPair,
 ) -> FpResult<(ScopedVaultId, IsNew)> {
@@ -232,7 +235,7 @@ fn get_or_create_business(
         let id = ScopedVaultIdentifier::OwnedBusiness {
             bo_id,
             uv_id: &user_auth.user.id,
-            t_id: &obc.tenant_id,
+            t_id: &playbook.tenant_id,
         };
         let sb = ScopedVault::get(conn, id).optional()?.ok_or(BadRequest(
             "Could not find the requested business owned by the user.",
@@ -261,7 +264,7 @@ fn get_or_create_business(
     let sv_args = NewScopedVaultArgs {
         is_active: true,
         status: OnboardingStatus::None,
-        tenant_id: &obc.tenant_id,
+        tenant_id: &playbook.tenant_id,
         external_id,
     };
     let (sb, bv, is_new) = ScopedVault::get_or_create_by_external_id(conn, vault_args, sv_args, None)?;
@@ -293,6 +296,7 @@ pub fn get_or_create_business_wf<'a>(
     args: CreateBusinessWfArgs<'a>,
 ) -> FpResult<(Workflow, IsNew, IsNew)> {
     let CommonWfArgs {
+        playbook,
         obc,
         insight_event,
         source,
@@ -324,7 +328,7 @@ pub fn get_or_create_business_wf<'a>(
     };
 
     Vault::lock(conn, &su.vault_id)?;
-    let (sb_id, is_new_sb) = get_or_create_business(conn, user_auth, obc, scoped_vault_action, kp)?;
+    let (sb_id, is_new_sb) = get_or_create_business(conn, user_auth, playbook, scoped_vault_action, kp)?;
     ScopedVault::lock(conn, &sb_id)?;
 
 

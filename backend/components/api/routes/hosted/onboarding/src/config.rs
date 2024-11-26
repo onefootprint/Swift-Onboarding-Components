@@ -37,21 +37,23 @@ pub fn get(
     user_auth: Option<UserAuthContext>,
 ) -> ApiResponse<api_wire_types::PublicOnboardingConfiguration> {
     let user_auth = user_auth.map(|ua| ua.check_guard(Any)).transpose()?;
-    let (tenant, ob_config, user_auth) = match (user_auth, ob_pk_auth) {
+    let (tenant, playbook, ob_config, user_auth) = match (user_auth, ob_pk_auth) {
         (Some(user_auth), Some(ob_pk_auth))
             if (user_auth.obc.as_ref()).is_some_and(|obc| obc.id != ob_pk_auth.ob_config().id) =>
         {
             return Err(OnboardingError::ConflictingPlaybookKey.into());
         }
         (Some(user_auth), _) => {
+            let playbook = user_auth.playbook.clone().ok_or(OnboardingError::NoPlaybook)?;
             let ob_config = user_auth.obc.clone().ok_or(OnboardingError::NoPlaybook)?;
             let tenant = user_auth.tenant.clone().ok_or(OnboardingError::NoPlaybook)?;
-            (tenant, ob_config, Some(user_auth))
+            (tenant, playbook, ob_config, Some(user_auth))
         }
         (None, Some(ob_pk_auth)) => {
             let tenant = ob_pk_auth.tenant().clone();
+            let playbook = ob_pk_auth.playbook().clone();
             let ob_config = ob_pk_auth.ob_config().clone();
-            (tenant, ob_config, None)
+            (tenant, playbook, ob_config, None)
         }
         (None, None) => {
             let missing_headers = vec![
@@ -64,7 +66,7 @@ pub fn get(
 
     let tenant_id = tenant.id.clone();
     let appearance_id = ob_config.appearance_id.clone();
-    let is_live = ob_config.is_live;
+    let is_live = playbook.is_live;
     let obc_id = ob_config.id.clone();
     let obc_kind = ob_config.kind;
 
@@ -107,6 +109,7 @@ pub fn get(
 
     // TODO: serialize some wfr context
     Ok(api_wire_types::PublicOnboardingConfiguration::from_db((
+        playbook,
         ob_config,
         tenant,
         wfr,

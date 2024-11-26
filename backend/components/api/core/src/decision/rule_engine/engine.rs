@@ -18,6 +18,7 @@ use db::models::document_request::DocumentRequest;
 use db::models::insight_event::InsightEvent;
 use db::models::list_entry::ListWithDecryptedEntries;
 use db::models::ob_configuration::ObConfiguration;
+use db::models::playbook::Playbook;
 use db::models::risk_signal::RiskSignal;
 use db::models::rule_instance::IncludeRules;
 use db::models::rule_instance::RuleInstance;
@@ -98,10 +99,11 @@ pub fn evaluate_workflow_decision<'a>(
         .into_iter()
         .collect_vec();
 
-    let (_, obc) = ObConfiguration::get(conn, obc_id)?;
+    let (playbook, obc) = ObConfiguration::get(conn, obc_id)?;
     let rules_output = evaluate_rules(
         conn,
         sv_id,
+        &playbook,
         &obc,
         Some(wf_id),
         kind,
@@ -227,6 +229,7 @@ impl VaultDataForRules {
 pub fn evaluate_rules(
     conn: &mut TxnPgConn,
     sv_id: &ScopedVaultId,
+    playbook: &Playbook,
     obc: &ObConfiguration,
     wf_id: Option<&WorkflowId>,
     kind: RuleSetResultKind,
@@ -237,7 +240,7 @@ pub fn evaluate_rules(
     rule_eval_config: &RuleEvalConfig, // could maybe query for DocReq in here and not need to pass this in
     rule_kinds: IncludeRules,
 ) -> FpResult<Option<(RuleSetResult, Vec<RuleResult>)>> {
-    let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id, rule_kinds)?;
+    let rules = RuleInstance::list(conn, &playbook.tenant_id, playbook.is_live, &obc.id, rule_kinds)?;
     if rules.is_empty() {
         let v = Vault::get(conn, sv_id)?;
         let can_have_no_rules = match obc.kind {
@@ -410,6 +413,7 @@ mod tests {
         let (rule_set_result, rule_results) = evaluate_rules(
             conn,
             &sv.id,
+            &playbook,
             &obc,
             None,
             RuleSetResultKind::Adhoc,
@@ -454,8 +458,8 @@ mod tests {
             &t.id,
             ObConfigurationOpts { ..Default::default() },
         );
-        let uv = tests::fixtures::vault::create_person(conn, obc.is_live);
-        let sv = tests::fixtures::scoped_vault::create(conn, &uv.id, &obc.id);
+        let uv = tests::fixtures::vault::create_person(conn, playbook.is_live);
+        let sv = tests::fixtures::scoped_vault::create(conn, &uv.id, &t.id);
 
         (sv, playbook, obc)
     }

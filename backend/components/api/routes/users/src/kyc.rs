@@ -151,8 +151,8 @@ pub async fn post(
     let (wf, obc) = state
         .db_transaction(move |conn| {
             let result = Playbook::get_latest_version_if_enabled(conn, (&key, &tenant_id, is_live));
-            let obc = match result.optional() {
-                Ok(Some((_, obc, _))) => obc,
+            let (playbook, obc) = match result.optional() {
+                Ok(Some((playbook, obc, _))) => (playbook, obc),
                 Ok(None) => return Err(DbError::PlaybookNotFound.into()),
                 Err(e) => return Err(e),
             };
@@ -179,6 +179,7 @@ pub async fn post(
             }
 
             let common_args = CommonWfArgs {
+                playbook: &playbook,
                 obc: &obc,
                 insight_event: None,
                 source: WorkflowSource::Tenant,
@@ -220,6 +221,7 @@ pub async fn post(
                 user_values: &decrypted_values,
                 auth_events: &[],
                 is_secondary_bo: false,
+                playbook: &playbook,
                 obc: &obc,
                 opts: RequirementOpts::default(),
             };

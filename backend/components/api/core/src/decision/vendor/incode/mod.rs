@@ -47,13 +47,15 @@ pub fn get_config_id(
 
 // TODO: better home for this?
 pub fn validate_doc_type_is_allowed(
+    tenant_id: &TenantId,
     obc: &ObConfiguration,
     document_type: IdDocKind,
     // TODO why are these two countries different?
     residential_country: Option<Iso3166TwoDigitCountryCode>,
     country_code: Iso3166TwoDigitCountryCode,
 ) -> FpResult<()> {
-    let document_to_country_mapping = obc.supported_country_mapping_for_document(residential_country);
+    let document_to_country_mapping =
+        obc.supported_country_mapping_for_document(tenant_id, residential_country);
     let Some(allowed_doc_types) = document_to_country_mapping.get(&country_code) else {
         // this country is not in our available countries
         return Err(

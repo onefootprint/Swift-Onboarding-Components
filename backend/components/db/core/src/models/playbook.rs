@@ -47,6 +47,7 @@ pub struct NewPlaybook {
 
 #[derive(Debug, derive_more::From)]
 pub enum PlaybookIdentifier<'a> {
+    Id(&'a PlaybookId),
     TenantId {
         id: &'a PlaybookId,
         tenant_id: &'a TenantId,
@@ -75,6 +76,7 @@ impl<'a> PlaybookIdentifier<'a> {
         playbook::key: SelectableExpression<QS>,
     {
         match self {
+            PlaybookIdentifier::Id(id) => Box::new(playbook::id.eq((*id).clone())),
             PlaybookIdentifier::TenantId {
                 id,
                 tenant_id,
@@ -134,6 +136,21 @@ impl Playbook {
         let obc = ObConfiguration::create(conn, &pb, obc_args)?;
 
         Ok((pb, obc))
+    }
+
+    #[tracing::instrument("Playbook::get", skip_all)]
+    pub fn get<'a, T>(conn: &mut PgConn, id: T) -> FpResult<Self>
+    where
+        T: Into<PlaybookIdentifier<'a>>,
+    {
+        let id: PlaybookIdentifier = id.into();
+
+        let result = playbook::table
+            .inner_join(ob_configuration::table)
+            .filter(id.filter())
+            .select(Playbook::as_select())
+            .get_result(conn)?;
+        Ok(result)
     }
 
     #[tracing::instrument("Playbook::lock", skip_all)]

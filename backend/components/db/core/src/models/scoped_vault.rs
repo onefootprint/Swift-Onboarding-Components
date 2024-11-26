@@ -37,7 +37,6 @@ use newtypes::FireWebhookArgs;
 use newtypes::FpId;
 use newtypes::IdempotencyId;
 use newtypes::Locked;
-use newtypes::ObConfigurationId;
 use newtypes::OnboardingStatus;
 use newtypes::ScopedVaultId;
 use newtypes::TenantId;
@@ -210,14 +209,13 @@ impl ScopedVault {
     pub fn get_or_create_for_tenant(
         conn: &mut TxnPgConn,
         vault: &Locked<Vault>,
-        ob_configuration_id: &ObConfigurationId,
+        tenant_id: &TenantId,
     ) -> FpResult<(Self, IsNew)> {
-        let (_, ob_config) = ObConfiguration::get_enabled(conn, ob_configuration_id)?;
         // Has to be inside locked txn, otherwise this could be a stale read.
         // Still protected by uniqueness constraints, but those are clunkier
         let scoped_vault = scoped_vault::table
             .filter(scoped_vault::vault_id.eq(&vault.id))
-            .filter(scoped_vault::tenant_id.eq(&ob_config.tenant_id))
+            .filter(scoped_vault::tenant_id.eq(&tenant_id))
             .first(conn.conn())
             .optional()?;
         if let Some(scoped_vault) = scoped_vault {
@@ -228,7 +226,7 @@ impl ScopedVault {
             is_active: true,
             status: OnboardingStatus::None,
             external_id: None,
-            tenant_id: &ob_config.tenant_id,
+            tenant_id,
         };
         let sv = Self::create(conn, vault, args)?;
         Ok((sv, true))

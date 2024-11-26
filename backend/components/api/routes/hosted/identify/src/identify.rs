@@ -58,7 +58,7 @@ pub async fn post(
         scope,
     } = request.into_inner();
     // TODO remove identifier
-    tracing::info!(tenant_id=?ob_context.as_ref().map(|ob| &ob.ob_config().tenant_id), has_identifier=%identifier.is_some(), "Identifier provided");
+    tracing::info!(tenant_id=?ob_context.as_ref().map(|ob| &ob.playbook().tenant_id), has_identifier=%identifier.is_some(), "Identifier provided");
 
     let user_auth = user_auth.map(|ua| ua.check_guard(Any)).transpose()?;
     let is_from_api = user_auth.as_ref().is_some_and(|ua| ua.is_from_api());
@@ -67,7 +67,7 @@ pub async fn post(
         let user_is_live = (user_auth.as_ref())
             .map(|ua| ua.user.is_live)
             .unwrap_or(sandbox_id.is_none());
-        if ob.ob_config().is_live != user_is_live {
+        if ob.playbook().is_live != user_is_live {
             return BadRequestInto("Sandbox ID must be provided if and only if using a sandbox playbook");
         }
     }

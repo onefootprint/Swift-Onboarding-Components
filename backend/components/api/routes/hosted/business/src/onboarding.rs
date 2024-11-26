@@ -51,6 +51,7 @@ pub async fn post(
 
             let force_create = user_auth.data.metadata.allow_reonboard;
             let common_args = CommonWfArgs {
+                playbook: &user_auth.playbook,
                 obc: &user_auth.ob_config,
                 insight_event: Some(insight_event),
                 source: WorkflowSource::Hosted,

@@ -12,6 +12,7 @@ use crate::FpResult;
 use api_errors::BadRequestInto;
 use db::models::auth_event::AuthEvent;
 use db::models::ob_configuration::ObConfiguration;
+use db::models::playbook::Playbook;
 use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::vault::Vault;
@@ -28,6 +29,7 @@ use std::collections::HashMap;
 #[derive(Debug, Clone, derive_more::Deref)]
 pub struct UserSessionContext {
     pub user: Vault,
+    pub playbook: Option<Playbook>,
     pub obc: Option<ObConfiguration>,
     pub tenant: Option<Tenant>,
     pub scoped_user: Option<ScopedVault>,
@@ -139,8 +141,8 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                     }
                 }
 
-                if let Some(obc) = obc.as_ref() {
-                    if obc.is_live != vault.is_live {
+                if let Some(playbook) = playbook.as_ref() {
+                    if playbook.is_live != vault.is_live {
                         return BadRequestInto(
                             "Invalid auth session: playbook live mode does not match user live mode",
                         );
@@ -149,9 +151,10 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
 
                 let data = UserSessionContext {
                     user: vault,
-                    scoped_user,
+                    playbook,
                     obc,
                     tenant,
+                    scoped_user,
                     session: data,
                 };
                 Ok(ParsedUserSessionContext(data))

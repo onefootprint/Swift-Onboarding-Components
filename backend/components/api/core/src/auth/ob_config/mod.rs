@@ -7,6 +7,7 @@ use super::Either;
 pub use bo_session::*;
 use db::models::business_owner::BusinessOwner;
 use db::models::ob_configuration::ObConfiguration;
+use db::models::playbook::Playbook;
 use db::models::tenant::Tenant;
 use newtypes::WorkflowId;
 pub use ob_public_key::*;
@@ -16,6 +17,15 @@ pub use pb_token::ObSessionAuth;
 pub type ObConfigAuth = Either<PublicOnboardingContext, Either<ObSessionAuth, BoSessionAuth>>;
 
 impl ObConfigAuth {
+    /// The playbook associated with this auth method
+    pub fn playbook(&self) -> &Playbook {
+        match self {
+            Either::Left(a) => &a.playbook,
+            Either::Right(Either::Left(a)) => &a.playbook,
+            Either::Right(Either::Right(a)) => &a.playbook,
+        }
+    }
+
     /// The ob configuration associated with this auth method
     pub fn ob_config(&self) -> &ObConfiguration {
         match self {

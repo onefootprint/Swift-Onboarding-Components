@@ -175,12 +175,12 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
     ) -> FpResult<Self::AsyncRes> {
         let wfid = self.wf_id.clone();
         let svid = self.sv_id.clone();
-        let (vw, obc, wf) = state
+        let (vw, playbook, obc, wf) = state
             .db_query(move |conn| {
-                let (vw, obc) = common::get_vw_and_obc(conn, &svid, action.seqno, &wfid)?;
+                let (vw, playbook, obc) = common::get_vw_and_obc(conn, &svid, action.seqno, &wfid)?;
                 let wf = DbWorkflow::get(conn, &wfid)?;
 
-                Ok((vw, obc, wf))
+                Ok((vw, playbook, obc, wf))
             })
             .await?;
 
@@ -277,7 +277,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         };
 
         // Run samba if needed
-        match common::run_samba_if_needed(state, &self.wf_id, &obc).await {
+        match common::run_samba_if_needed(state, &self.wf_id, &playbook, &obc).await {
             Ok(()) => (),
             Err(err) => {
                 tracing::warn!(?err, wf_id=?self.wf_id, "non-Samba related error running Samba");
@@ -325,7 +325,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             twilio_result,
             sentilink_result,
         ) = *async_res;
-        let (vw, obc) = common::get_vw_and_obc(conn, &self.sv_id, self.seqno, &self.wf_id)?;
+        let (vw, _, obc) = common::get_vw_and_obc(conn, &self.sv_id, self.seqno, &self.wf_id)?;
         let user_submitted_info = UserSubmittedInfoForFRC::new(&vw);
         // For all reason codes, we scope them to the onboarding/wf
         let risk_signal_group_scope = RiskSignalGroupScope::WorkflowId {
@@ -531,7 +531,8 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
             .db_query(move |conn| {
                 let (playbook, obc) = ObConfiguration::get(conn, &wfid)?;
                 let tenant = Tenant::get(conn, &playbook.tenant_id)?;
-                let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id, rule_kind)?;
+                let rules =
+                    RuleInstance::list(conn, &playbook.tenant_id, playbook.is_live, &obc.id, rule_kind)?;
 
                 // TODO: should technically pass this seqno to RuleSetResult to store in pg instead of pulling
                 // a new seqno inside the RSR write itself

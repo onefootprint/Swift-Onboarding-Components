@@ -22,6 +22,7 @@ use newtypes::DocumentCdoInfo;
 use newtypes::EnhancedAmlOption;
 use newtypes::IdDocKind;
 use newtypes::Iso3166TwoDigitCountryCode;
+use newtypes::Locked;
 use newtypes::ObConfigurationKind;
 use newtypes::TenantId;
 use std::collections::HashMap;
@@ -101,7 +102,7 @@ fn obc_with_doc_cdo(
     international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
     doc_cdo: &str,
     tenant_id: Option<&str>,
-) -> ObConfiguration {
+) -> (Locked<Playbook>, ObConfiguration) {
     let args = NewObConfigurationArgs {
         name: "obc".into(),
         must_collect_data: vec![CollectedDataOption::Document(
@@ -128,8 +129,7 @@ fn obc_with_doc_cdo(
     };
 
     let tenant_id = TenantId::from_str(tenant_id.unwrap_or("t_1234")).unwrap();
-    let (_, obc) = Playbook::create(conn, &tenant_id, true, args).unwrap();
-    obc
+    Playbook::create(conn, &tenant_id, true, args).unwrap()
 }
 
 #[db_test_case(None)]
@@ -142,7 +142,7 @@ fn test_supported_country_mapping_us_only(
     //
     // We expect by default to return US with the indicated doc types
     //  every other country with just passport
-    let obc = obc_with_doc_cdo(
+    let (playbook, obc) = obc_with_doc_cdo(
         conn,
         false,
         None,
@@ -150,7 +150,7 @@ fn test_supported_country_mapping_us_only(
         None,
     );
 
-    let mapping = obc.supported_country_mapping_for_document(residential_country);
+    let mapping = obc.supported_country_mapping_for_document(&playbook.tenant_id, residential_country);
 
     // US has the 3 documents indicated
     assert_eq!(
@@ -165,7 +165,7 @@ fn test_supported_country_mapping_us_only(
 
 #[db_test]
 fn test_supported_country_mapping_override_for_coba(conn: &mut TestPgConn) {
-    let obc = obc_with_doc_cdo(
+    let (playbook, obc) = obc_with_doc_cdo(
         conn,
         false,
         None,
@@ -176,11 +176,12 @@ fn test_supported_country_mapping_override_for_coba(conn: &mut TestPgConn) {
     Iso3166TwoDigitCountryCode::iter()
         .filter(|c| *c != Iso3166TwoDigitCountryCode::MX)
         .for_each(|c| {
-            let supported = obc.supported_country_mapping_for_document(Some(c));
+            let supported = obc.supported_country_mapping_for_document(&playbook.tenant_id, Some(c));
             assert_eq!(supported.get(&c).cloned().unwrap(), vec![IdDocKind::Passport])
         });
 
-    let supported = obc.supported_country_mapping_for_document(Some(Iso3166TwoDigitCountryCode::MX));
+    let supported =
+        obc.supported_country_mapping_for_document(&playbook.tenant_id, Some(Iso3166TwoDigitCountryCode::MX));
     assert_have_same_elements(
         supported.get(&Iso3166TwoDigitCountryCode::MX).cloned().unwrap(),
         vec![
@@ -190,7 +191,7 @@ fn test_supported_country_mapping_override_for_coba(conn: &mut TestPgConn) {
         ],
     );
     // Second form of ID: Mexican Resident Card
-    let obc = obc_with_doc_cdo(
+    let (playbook, obc) = obc_with_doc_cdo(
         conn,
         false,
         None,
@@ -198,7 +199,7 @@ fn test_supported_country_mapping_override_for_coba(conn: &mut TestPgConn) {
         Some("org_5lwSs95mU5v3gOU9xdSaml"),
     );
 
-    let all_supported = obc.supported_country_mapping_for_document(None);
+    let all_supported = obc.supported_country_mapping_for_document(&playbook.tenant_id, None);
     assert_eq!(all_supported.keys().len(), 1);
     assert_have_same_elements(
         all_supported
@@ -208,14 +209,15 @@ fn test_supported_country_mapping_override_for_coba(conn: &mut TestPgConn) {
         vec![IdDocKind::ResidenceDocument],
     );
 
-    let supported = obc.supported_country_mapping_for_document(Some(Iso3166TwoDigitCountryCode::MX));
+    let supported =
+        obc.supported_country_mapping_for_document(&playbook.tenant_id, Some(Iso3166TwoDigitCountryCode::MX));
     assert_have_same_elements(
         supported.get(&Iso3166TwoDigitCountryCode::MX).cloned().unwrap(),
         vec![IdDocKind::ResidenceDocument],
     );
 
     // Second form of ID: Any additional document (voters ID, drivers license, etc)
-    let obc = obc_with_doc_cdo(
+    let (_, obc) = obc_with_doc_cdo(
         conn,
         false,
         None,
@@ -223,7 +225,7 @@ fn test_supported_country_mapping_override_for_coba(conn: &mut TestPgConn) {
         Some("org_5lwSs95mU5v3gOU9xdSaml"),
     );
 
-    let all_supported = obc.supported_country_mapping_for_document(None);
+    let all_supported = obc.supported_country_mapping_for_document(&playbook.tenant_id, None);
     assert_eq!(all_supported.keys().len(), 1);
     assert_have_same_elements(
         all_supported
@@ -239,7 +241,8 @@ fn test_supported_country_mapping_override_for_coba(conn: &mut TestPgConn) {
         ],
     );
 
-    let supported = obc.supported_country_mapping_for_document(Some(Iso3166TwoDigitCountryCode::MX));
+    let supported =
+        obc.supported_country_mapping_for_document(&playbook.tenant_id, Some(Iso3166TwoDigitCountryCode::MX));
     assert_have_same_elements(
         supported.get(&Iso3166TwoDigitCountryCode::MX).cloned().unwrap(),
         vec![
@@ -252,7 +255,7 @@ fn test_supported_country_mapping_override_for_coba(conn: &mut TestPgConn) {
     );
 
     // Second form of ID: Driver's license
-    let obc = obc_with_doc_cdo(
+    let (playbook, obc) = obc_with_doc_cdo(
         conn,
         false,
         None,
@@ -260,7 +263,7 @@ fn test_supported_country_mapping_override_for_coba(conn: &mut TestPgConn) {
         Some("org_5lwSs95mU5v3gOU9xdSaml"),
     );
 
-    let all_supported = obc.supported_country_mapping_for_document(None);
+    let all_supported = obc.supported_country_mapping_for_document(&playbook.tenant_id, None);
     assert_eq!(all_supported.keys().len(), 1);
     assert_have_same_elements(
         all_supported
@@ -270,7 +273,8 @@ fn test_supported_country_mapping_override_for_coba(conn: &mut TestPgConn) {
         vec![IdDocKind::DriversLicense],
     );
 
-    let supported = obc.supported_country_mapping_for_document(Some(Iso3166TwoDigitCountryCode::MX));
+    let supported =
+        obc.supported_country_mapping_for_document(&playbook.tenant_id, Some(Iso3166TwoDigitCountryCode::MX));
     assert_have_same_elements(
         supported.get(&Iso3166TwoDigitCountryCode::MX).cloned().unwrap(),
         vec![IdDocKind::DriversLicense],
@@ -313,7 +317,7 @@ fn test_supported_country_mapping_allow_international(
     //
     // Note: international country restrictions do not affect the countries you can submit a passport
     // for, this just controls residential address - there are integration tests testing this part
-    let obc = obc_with_doc_cdo(
+    let (playbook, obc) = obc_with_doc_cdo(
         conn,
         true,
         international_country_restrictions,
@@ -321,7 +325,7 @@ fn test_supported_country_mapping_allow_international(
         None,
     );
 
-    let mapping = obc.supported_country_mapping_for_document(residential_country);
+    let mapping = obc.supported_country_mapping_for_document(&playbook.tenant_id, residential_country);
 
     match residential_country.map(|c| c.is_us_including_territories()) {
         // country provided
@@ -392,9 +396,11 @@ fn test_cip_kind_documents(
     };
 
     let tenant_id = TenantId::from_str("t_1234").unwrap();
-    let (_, obc) = Playbook::create(conn, &tenant_id, true, args).unwrap();
+    let (playbook, obc) = Playbook::create(conn, &tenant_id, true, args).unwrap();
 
-    let mapping = obc.supported_country_mapping_for_document(residential_country).0;
+    let mapping = obc
+        .supported_country_mapping_for_document(&playbook.tenant_id, residential_country)
+        .0;
     if let Some(c) = cip {
         match c {
             CipKind::Alpaca => match residential_country {
@@ -466,10 +472,12 @@ fn test_document_types_and_countries(conn: &mut TestPgConn) {
     };
 
     let tenant_id = TenantId::from_str("t_1234").unwrap();
-    let (_, obc) = Playbook::create(conn, &tenant_id, true, args).unwrap();
+    let (playbook, obc) = Playbook::create(conn, &tenant_id, true, args).unwrap();
 
 
-    let mapping = obc.supported_country_mapping_for_document(None).0;
+    let mapping = obc
+        .supported_country_mapping_for_document(&playbook.tenant_id, None)
+        .0;
     assert_eq!(mapping.keys().len(), 1);
     assert_eq!(
         mapping.get(&Iso3166TwoDigitCountryCode::CA).unwrap().clone(),
@@ -513,11 +521,11 @@ fn test_document_and_countries_field_with_cip_kind(conn: &mut TestPgConn) {
     };
 
     let tenant_id = TenantId::from_str("t_1234").unwrap();
-    let (_, obc) = Playbook::create(conn, &tenant_id, true, args).unwrap();
+    let (playbook, obc) = Playbook::create(conn, &tenant_id, true, args).unwrap();
 
     // Despite configuring document_types_and_countries on the OBC, we respect the alpaca overrides
     let mapping = obc
-        .supported_country_mapping_for_document(Some(Iso3166TwoDigitCountryCode::PR))
+        .supported_country_mapping_for_document(&playbook.tenant_id, Some(Iso3166TwoDigitCountryCode::PR))
         .0;
     assert_eq!(mapping.keys().len(), 2);
     // we respect alpaca overrides

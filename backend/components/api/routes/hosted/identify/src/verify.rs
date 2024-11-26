@@ -35,6 +35,7 @@ use db::models::contact_info::ContactInfo;
 use db::models::data_lifetime::DataLifetime;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::passkey::Passkey;
+use db::models::playbook::Playbook;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::TxnPgConn;
@@ -148,7 +149,8 @@ pub async fn post(
             } else if let Some(obc) = user_auth.obc.as_ref() {
                 // Create a ScopedVault for this tenant if we are onboarding onto a new tenant.
                 let uv = Vault::lock(conn, uv_id)?;
-                let (su, is_new_su) = ScopedVault::get_or_create_for_tenant(conn, &uv, &obc.id)?;
+                let playbook = Playbook::get(conn, &obc.playbook_id)?;
+                let (su, is_new_su) = ScopedVault::get_or_create_for_tenant(conn, &uv, &playbook.tenant_id)?;
                 root_span.record_su(&su);
                 if is_new_su {
                     // If the scoped vault is brand new, prefill its data
@@ -300,6 +302,10 @@ async fn get_prefill_data(
     state: &State,
     user_auth: &CheckedUserAuthContext,
 ) -> FpResult<Option<PrefillData>> {
+    let Some(playbook) = user_auth.playbook.as_ref() else {
+        // My1fp
+        return Ok(None);
+    };
     let Some(obc) = user_auth.obc.as_ref() else {
         // My1fp
         return Ok(None);
@@ -308,7 +314,7 @@ async fn get_prefill_data(
         // ScopedVault already exists, no need to prefill
         return Ok(None);
     }
-    let t_id = obc.tenant_id.clone();
+    let t_id = playbook.tenant_id.clone();
     let uv_id = user_auth.user_vault_id.clone();
     let portable_vw = state
         .db_query(move |conn| {
@@ -325,7 +331,7 @@ async fn get_prefill_data(
         return Ok(None);
     };
     let prefill_data = portable_vw
-        .get_data_to_prefill(state, obc, PrefillKind::LoginMethods)
+        .get_data_to_prefill(state, playbook, obc, PrefillKind::LoginMethods)
         .await?;
     Ok(Some(prefill_data))
 }
@@ -354,13 +360,13 @@ async fn on_contact_info_verify(
     lifetime_id: DataLifetimeId,
     cik: ContactInfoKind,
 ) -> FpResult<VerifiedCredential> {
-    let data = if let Some(obc) = user_auth.obc.as_ref() {
+    let data = if let Some(playbook) = user_auth.playbook.as_ref() {
         let args = ValidateArgs::for_bifrost(user_auth.user.is_live);
         let data = HashMap::from_iter([(cik.verified_di(), contact_info)]);
         // The vault should already have `id.phone_number` or `id.email`, let's not derive it here.
         let data = DataRequest::clean_and_validate_str(data, args)?
             .filter(|di| !matches!(di, DI::Id(IDK::PhoneNumber) | DI::Id(IDK::Email)));
-        let data = FingerprintedDataRequest::build_for_new_user(state, data, &obc.tenant_id).await?;
+        let data = FingerprintedDataRequest::build_for_new_user(state, data, &playbook.tenant_id).await?;
         Some(data)
     } else {
         None

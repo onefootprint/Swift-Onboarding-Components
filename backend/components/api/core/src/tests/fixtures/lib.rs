@@ -12,7 +12,6 @@ use newtypes::DataIdentifier;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::KycState;
 use newtypes::Locked;
-use newtypes::ObConfigurationId;
 use newtypes::OnboardingStatus;
 use newtypes::PiiString;
 use newtypes::TenantId;
@@ -41,14 +40,14 @@ pub fn create_user_and_populate_vault(
     conn: &mut TxnPgConn,
     is_live: bool,
     tenant_id: TenantId,
-    obc_id: Option<&ObConfigurationId>,
+    portable: bool,
     idks: Vec<IDK>,
 ) -> (Vault, Locked<ScopedVault>) {
     let sandbox_id = (!is_live).then_some("pass".to_string());
-    let (uv, su) = if let Some(obc_id) = obc_id {
+    let (uv, su) = if portable {
         let uv = fixtures::vault::create(conn, VaultKind::Person, sandbox_id, true).into_inner();
         let uvid = uv.id.clone();
-        (uv, fixtures::scoped_vault::create(conn, &uvid, obc_id))
+        (uv, fixtures::scoped_vault::create(conn, &uvid, &tenant_id))
     } else {
         let args = fixtures::vault::new_vault_args(VaultKind::Person, sandbox_id, false);
         let (su, uv) = fixtures::scoped_vault::create_non_portable(conn, args, &tenant_id);
@@ -86,7 +85,7 @@ pub fn create_user_and_onboarding(
     let (_, obc) = fixtures::ob_configuration::create_with_opts(conn, &tenant.id, obc_opts);
 
     let tenant_id = tenant.id.clone();
-    let (uv, su) = create_user_and_populate_vault(conn, is_live, tenant_id, Some(&obc.id), idks);
+    let (uv, su) = create_user_and_populate_vault(conn, is_live, tenant_id, true, idks);
 
     let wf = fixtures::workflow::create(conn, &su.id, &obc.id, None);
     let wf = Workflow::lock(conn, &wf.id).unwrap();

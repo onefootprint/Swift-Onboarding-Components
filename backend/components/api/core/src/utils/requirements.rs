@@ -16,6 +16,7 @@ use db::models::document_request::DocumentRequest;
 use db::models::liveness_event::LivenessEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::passkey::Passkey;
+use db::models::playbook::Playbook;
 use db::models::user_consent::UserConsent;
 use db::models::workflow::Workflow;
 use db::PgConn;
@@ -88,6 +89,7 @@ pub async fn get_requirements_for_person_and_maybe_business(
     user_auth: &CheckUserWfAuthContext,
 ) -> FpResult<Vec<OnboardingRequirement>> {
     // Fetch the UVW and use it to decrypt IPK::Declarations, if they exist
+    let playbook = user_auth.playbook.clone();
     let person_obc = user_auth.ob_config.clone();
     let su_id = user_auth.scoped_user.id.clone();
     let sb_id = user_auth.sb_id.clone();
@@ -132,6 +134,7 @@ pub async fn get_requirements_for_person_and_maybe_business(
                 auth_events: &auth_events,
                 is_secondary_bo,
                 opts: requirement_opts,
+                playbook: &playbook,
                 // Technically for business reqs, the business's OBC should be the same as the person's.
                 // But they should be same and this is the existing logic so may as well keep as is
                 obc: &person_obc,
@@ -176,6 +179,7 @@ pub struct RequirementContext<'a> {
     pub business_owners: &'a [BusinessOwnerInfo],
     pub auth_events: &'a [AssociatedAuthEvent],
     pub is_secondary_bo: bool,
+    pub playbook: &'a Playbook,
     pub obc: &'a ObConfiguration,
     pub opts: RequirementOpts,
 }
@@ -507,8 +511,10 @@ fn get_collect_document_requirements(
             let config = match dr.config {
                 DocumentRequestConfig::Identity { collect_selfie, .. } => {
                     let user_consent = UserConsent::get_for_workflow(conn, &wf.id)?;
-                    let supported_country_and_doc_types =
-                        ctx.obc.supported_country_mapping_for_document(country).0;
+                    let supported_country_and_doc_types = ctx
+                        .obc
+                        .supported_country_mapping_for_document(&ctx.playbook.tenant_id, country)
+                        .0;
                     CollectDocumentConfig::Identity {
                         should_collect_selfie: collect_selfie,
                         should_collect_consent: user_consent.is_none(),

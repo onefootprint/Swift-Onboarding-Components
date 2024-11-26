@@ -10,6 +10,7 @@ use crate::State;
 use db::models::contact_info::ContactInfo;
 use db::models::data_lifetime::DataLifetime;
 use db::models::ob_configuration::ObConfiguration;
+use db::models::playbook::Playbook;
 use db::models::scoped_vault::ScopedVault;
 use db::test_helpers::assert_have_same_elements;
 use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
@@ -35,9 +36,15 @@ use std::collections::HashMap;
 struct TestData {
     su1: ScopedVault,
     su2: ScopedVault,
-    pb1: ObConfiguration,
-    auth_pb2: ObConfiguration,
-    pb2: ObConfiguration,
+
+    pb1: Playbook,
+    obc1: ObConfiguration,
+
+    auth_pb2: Playbook,
+    auth_obc2: ObConfiguration,
+
+    pb2: Playbook,
+    obc2: ObConfiguration,
 }
 
 /// Follows the journey of a user who onboards onto one tenant and then one-clicks onto another
@@ -58,7 +65,7 @@ async fn test_prefill_data(state: &mut State) {
     // su1 then goes through onboarding. When su1 triggers onboarding, we'll compose prefill data,
     // but it should be empty since the only data exists at the current tenant
     let prefill_data = vw
-        .get_data_to_prefill(state, &data.pb1, PrefillKind::Onboarding(&data.su1))
+        .get_data_to_prefill(state, &data.pb1, &data.obc1, PrefillKind::Onboarding(&data.su1))
         .await
         .unwrap();
     assert!(prefill_data.data.is_empty());
@@ -69,7 +76,7 @@ async fn test_prefill_data(state: &mut State) {
     // nothing is portablized - only the phone number because the phone is portablized after it's
     // verified
     let prefill_data = vw
-        .get_data_to_prefill(state, &data.pb2, PrefillKind::LoginMethods)
+        .get_data_to_prefill(state, &data.pb2, &data.obc2, PrefillKind::LoginMethods)
         .await
         .unwrap();
     assert_have_same_elements(
@@ -97,7 +104,7 @@ async fn test_prefill_data(state: &mut State) {
     assert!(phone_ci.is_otp_verified);
 
     let prefill_data = vw
-        .get_data_to_prefill(state, &data.pb2, PrefillKind::Onboarding(&data.su2))
+        .get_data_to_prefill(state, &data.pb2, &data.obc2, PrefillKind::Onboarding(&data.su2))
         .await
         .unwrap();
     assert!(prefill_data.data.is_empty());
@@ -130,7 +137,7 @@ async fn test_prefill_data(state: &mut State) {
     //
 
     let prefill_data = vw
-        .get_data_to_prefill(state, &data.pb2, PrefillKind::LoginMethods)
+        .get_data_to_prefill(state, &data.pb2, &data.obc2, PrefillKind::LoginMethods)
         .await
         .unwrap();
 
@@ -188,7 +195,7 @@ async fn test_prefill_data(state: &mut State) {
     //
 
     let prefill_data = vw
-        .get_data_to_prefill(state, &data.pb2, PrefillKind::Onboarding(&data.su2))
+        .get_data_to_prefill(state, &data.pb2, &data.obc2, PrefillKind::Onboarding(&data.su2))
         .await
         .unwrap();
 
@@ -333,7 +340,7 @@ async fn test_prefill_data_auth_then_kyc(state: &mut State) {
 
     // We should only prefill phone and email from this auth playbook
     let prefill_data = vw
-        .get_data_to_prefill(state, &data.auth_pb2, PrefillKind::LoginMethods)
+        .get_data_to_prefill(state, &data.auth_pb2, &data.auth_obc2, PrefillKind::LoginMethods)
         .await
         .unwrap();
     assert_have_same_elements(
@@ -360,7 +367,7 @@ async fn test_prefill_data_auth_then_kyc(state: &mut State) {
 
     // Then, prefill data for KYC playbook shouldn't prefill phone and email again
     let prefill_data = vw
-        .get_data_to_prefill(state, &data.pb2, PrefillKind::Onboarding(&data.su2))
+        .get_data_to_prefill(state, &data.pb2, &data.obc2, PrefillKind::Onboarding(&data.su2))
         .await
         .unwrap();
     assert_have_same_elements(
@@ -398,25 +405,25 @@ fn create_test_data(conn: &mut TxnPgConn) -> TestData {
         is_live: true,
         ..Default::default()
     };
-    let (_, pb1) = db::tests::fixtures::ob_configuration::create_with_opts(conn, &tenant1.id, pb1_opts);
+    let (pb1, obc1) = db::tests::fixtures::ob_configuration::create_with_opts(conn, &tenant1.id, pb1_opts);
     // PB2 only collects ssn4, doesn't collect dob
     let pb2_opts = ObConfigurationOpts {
         must_collect_data: vec![CDO::Email, CDO::PhoneNumber, CDO::Name, CDO::Ssn4],
         is_live: true,
         ..Default::default()
     };
-    let (_, pb2) = db::tests::fixtures::ob_configuration::create_with_opts(conn, &tenant2.id, pb2_opts);
+    let (pb2, obc2) = db::tests::fixtures::ob_configuration::create_with_opts(conn, &tenant2.id, pb2_opts);
     let auth_pb2_opts = ObConfigurationOpts {
         must_collect_data: vec![CDO::PhoneNumber, CDO::Email],
         is_live: true,
         ..Default::default()
     };
-    let (_, auth_pb2) =
+    let (auth_pb2, auth_obc2) =
         db::tests::fixtures::ob_configuration::create_with_opts(conn, &tenant2.id, auth_pb2_opts);
 
     let uv = db::tests::fixtures::vault::create_person(conn, true);
-    let su1 = db::tests::fixtures::scoped_vault::create(conn, &uv.id, &pb1.id);
-    let su2 = db::tests::fixtures::scoped_vault::create(conn, &uv.id, &pb2.id);
+    let su1 = db::tests::fixtures::scoped_vault::create(conn, &uv.id, &tenant1.id);
+    let su2 = db::tests::fixtures::scoped_vault::create(conn, &uv.id, &tenant2.id);
 
     let vw: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &su1.id).unwrap();
     // Start w just phone and email for a user that went through identify flow
@@ -444,9 +451,15 @@ fn create_test_data(conn: &mut TxnPgConn) -> TestData {
     TestData {
         su1: su1.into_inner(),
         su2: su2.into_inner(),
-        pb1,
-        auth_pb2,
-        pb2,
+
+        pb1: pb1.into_inner(),
+        obc1,
+
+        auth_pb2: auth_pb2.into_inner(),
+        auth_obc2,
+
+        pb2: pb2.into_inner(),
+        obc2,
     }
 }
 

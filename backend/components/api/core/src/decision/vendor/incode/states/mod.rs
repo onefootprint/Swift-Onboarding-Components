@@ -5,6 +5,7 @@ use db::models::document::DocumentImageArgs;
 use db::models::document_upload::DocumentUpload;
 use db::models::incode_verification_session::IncodeVerificationSession;
 use db::models::ob_configuration::ObConfiguration;
+use db::models::playbook::Playbook;
 use db::models::verification_request::VerificationRequest;
 use std::str::FromStr;
 use std::sync::Arc;
@@ -103,6 +104,7 @@ pub async fn save_incode_fixtures(
     state: &State,
     su_id: &ScopedVaultId,
     wf_id: &WorkflowId,
+    playbook: Playbook,
     obc: ObConfiguration,
     id_doc: Document,
     should_collect_selfie: bool,
@@ -182,6 +184,7 @@ pub async fn save_incode_fixtures(
         .await?;
 
     let args = PreCompleteArgs {
+        playbook: &playbook,
         obc: &obc,
         id_doc: &id_doc,
         dk: ValidatedIdDocKind(doc_type),
@@ -270,7 +273,14 @@ fn parse_type_of_id(
         return Ok(Err(IncodeFailureReason::UnsupportedDocumentType));
     };
     if id_doc_kind != expected_doc_type
-        && validate_doc_type_is_allowed(&ctx.obc, id_doc_kind, ctx.vault_country, expected_country).is_err()
+        && validate_doc_type_is_allowed(
+            &ctx.tenant_id,
+            &ctx.obc,
+            id_doc_kind,
+            ctx.vault_country,
+            expected_country,
+        )
+        .is_err()
     {
         // only throw DocTypeMismatch if the Incode doc type and the user specified doc type do not match
         // AND the Incode doc type is not supportable according to the Tenant's OBC
@@ -288,7 +298,14 @@ fn parse_type_of_id(
     };
 
     if expected_country != provided_country
-        && validate_doc_type_is_allowed(&ctx.obc, id_doc_kind, ctx.vault_country, provided_country).is_err()
+        && validate_doc_type_is_allowed(
+            &ctx.tenant_id,
+            &ctx.obc,
+            id_doc_kind,
+            ctx.vault_country,
+            provided_country,
+        )
+        .is_err()
     {
         // only throw CountryCodeMismatch if the Incode country and the user-specified country do not match
         // AND the Incode country is not supportable according to the Tenant's OBC

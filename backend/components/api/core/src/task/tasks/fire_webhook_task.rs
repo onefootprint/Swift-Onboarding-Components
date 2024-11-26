@@ -50,7 +50,7 @@ mod tests {
                 let t = fixtures::tenant::create(conn);
                 let (_, obc) = fixtures::ob_configuration::create(conn, &t.id, true);
                 let vault = fixtures::vault::create_person(conn, true);
-                let sv = fixtures::scoped_vault::create(conn, &vault.id, &obc.id).into_inner();
+                let sv = fixtures::scoped_vault::create(conn, &vault.id, &t.id).into_inner();
                 Ok((sv, obc))
             })
             .await

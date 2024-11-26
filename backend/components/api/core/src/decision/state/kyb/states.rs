@@ -479,7 +479,8 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
                 let wf = DbWorkflow::get(conn, &wfid)?;
                 let (playbook, obc) = ObConfiguration::get(conn, &wfid)?;
                 let tenant = Tenant::get(conn, &playbook.tenant_id)?;
-                let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id, rule_kind)?;
+                let rules =
+                    RuleInstance::list(conn, &playbook.tenant_id, playbook.is_live, &obc.id, rule_kind)?;
 
                 // TODO: should technically pass this seqno to RuleSetResult to store in pg instead
                 // of pulling a new seqno inside the RSR write itself
@@ -508,7 +509,7 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
         let (ff_client, vault_data_for_rules, lists_for_rules) = async_res;
         let v = Vault::get(conn, &wf.scoped_vault_id)?;
         let fixture_result = decision::utils::get_fixture_result(ff_client, &v, &wf, &self.t_id)?;
-        let (_, obc) = ObConfiguration::get(conn, &self.wf_id)?;
+        let (playbook, obc) = ObConfiguration::get(conn, &self.wf_id)?;
         let doc_req_configs = DocumentRequest::get_all(conn, &self.wf_id)?
             .into_iter()
             .map(|dr| dr.config)
@@ -534,6 +535,7 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
         let (decision, rsr_id) = if let Some((rsr, _)) = decision::rule_engine::engine::evaluate_rules(
             conn,
             &sv.id,
+            &playbook,
             &obc,
             Some(&self.wf_id),
             RuleSetResultKind::WorkflowDecision,
@@ -680,7 +682,8 @@ impl OnAction<MakeDecision, KybState> for KybStepUpDecisioning {
                 let wf = DbWorkflow::get(conn, &wfid)?;
                 let (playbook, obc) = ObConfiguration::get(conn, &wfid)?;
                 let tenant = Tenant::get(conn, &playbook.tenant_id)?;
-                let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id, rule_kind)?;
+                let rules =
+                    RuleInstance::list(conn, &playbook.tenant_id, playbook.is_live, &obc.id, rule_kind)?;
 
                 // TODO: should technically pass this seqno to RuleSetResult to store in pg instead
                 // of pulling a new seqno inside the RSR write itself
@@ -707,7 +710,7 @@ impl OnAction<MakeDecision, KybState> for KybStepUpDecisioning {
         conn: &mut db::TxnPgConn,
     ) -> FpResult<KybState> {
         let (vault_data_for_rules, lists_for_rules) = async_res;
-        let (_, obc) = ObConfiguration::get(conn, &self.wf_id)?;
+        let (playbook, obc) = ObConfiguration::get(conn, &self.wf_id)?;
 
         let sv = ScopedVault::get(conn, &self.wf_id)?;
         let kyb_rs: Vec<RiskSignal> = RiskSignal::latest_by_risk_signal_group_kinds(
@@ -729,6 +732,7 @@ impl OnAction<MakeDecision, KybState> for KybStepUpDecisioning {
         let (decision, rsr_id) = if let Some((rsr, _)) = decision::rule_engine::engine::evaluate_rules(
             conn,
             &sv.id,
+            &playbook,
             &obc,
             Some(&self.wf_id),
             RuleSetResultKind::WorkflowDecision,

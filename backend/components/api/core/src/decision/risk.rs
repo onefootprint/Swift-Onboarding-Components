@@ -11,6 +11,7 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding_decision::FailedForDocReview;
 use db::models::onboarding_decision::NewDecisionArgs;
 use db::models::onboarding_decision::OnboardingDecision;
+use db::models::playbook::Playbook;
 use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::user_timeline::UserTimeline;
@@ -133,7 +134,7 @@ pub fn save_final_decision(
         UserTimeline::create(conn, event, bo.business_vault_id, biz_wf.scoped_vault_id)?;
     }
 
-    log_canonical_line(&obc, rules_outcome, &obd, &tenant);
+    log_canonical_line(&playbook, &obc, rules_outcome, &obd, &tenant);
 
     Ok(())
 }
@@ -162,6 +163,7 @@ fn get_final_decision_status(
 }
 
 fn log_canonical_line(
+    playbook: &Playbook,
     obc: &ObConfiguration,
     rules_outcome: RulesOutcome,
     obd: &OnboardingDecision,
@@ -179,8 +181,8 @@ fn log_canonical_line(
         action=%RuleResultRuleAction::from(action),
         decision_status=%obd.status,
         failed_for_doc_review=%obd.failed_for_doc_review,
-        is_live=%obc.is_live,
-        tenant_id=%obc.tenant_id,
+        is_live=%playbook.is_live,
+        tenant_id=%playbook.tenant_id,
         tenant_name=%tenant.name,
         kind=%obc.kind,
         name = "CANONICAL-WORKFLOW-COMPLETE"

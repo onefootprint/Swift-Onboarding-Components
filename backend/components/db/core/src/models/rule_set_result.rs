@@ -292,7 +292,6 @@ pub struct RuleSetResultSample {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::models::ob_configuration::ObConfiguration;
     use crate::models::onboarding_decision::OnboardingDecision;
     use crate::models::risk_signal::RiskSignal;
     use crate::models::risk_signal_group::RiskSignalGroupScope;
@@ -312,6 +311,7 @@ mod tests {
     use newtypes::KycState;
     use newtypes::Locked;
     use newtypes::RiskSignalGroupKind;
+    use newtypes::TenantId;
     use newtypes::VendorAPI;
     use newtypes::WorkflowState;
 
@@ -324,8 +324,8 @@ mod tests {
             ObConfigurationOpts { ..Default::default() },
         );
 
-        let uv = tests::fixtures::vault::create_person(conn, obc.is_live);
-        let sv = tests::fixtures::scoped_vault::create(conn, &uv.id, &obc.id);
+        let uv = tests::fixtures::vault::create_person(conn, playbook.is_live);
+        let sv = tests::fixtures::scoped_vault::create(conn, &uv.id, &playbook.tenant_id);
 
         let action = RuleAction::Fail;
         let rules = vec![
@@ -428,10 +428,11 @@ mod tests {
 
     fn create_vault(
         conn: &mut TxnPgConn,
-        obc: &ObConfiguration,
+        tenant_id: &TenantId,
+        is_live: bool,
     ) -> (Locked<ScopedVault>, Vault, Vec<RiskSignal>) {
-        let uv = tests::fixtures::vault::create_person(conn, obc.is_live);
-        let sv = tests::fixtures::scoped_vault::create(conn, &uv.id, &obc.id);
+        let uv = tests::fixtures::vault::create_person(conn, is_live);
+        let sv = tests::fixtures::scoped_vault::create(conn, &uv.id, &tenant_id);
 
         let di = crate::models::decision_intent::DecisionIntent::create(
             conn,
@@ -518,29 +519,30 @@ mod tests {
     #[db_test]
     fn test_sample_for_eval(conn: &mut TestPgConn) {
         let t = tests::fixtures::tenant::create(conn);
+        let is_live = true;
         let (_, obc) = tests::fixtures::ob_configuration::create_with_opts(
             conn,
             &t.id,
             ObConfigurationOpts {
-                is_live: true,
+                is_live,
                 ..Default::default()
             },
         );
 
         // Vault with 1 WF
-        let (sv1, uv1, risk_signals_1) = create_vault(conn, &obc);
+        let (sv1, uv1, risk_signals_1) = create_vault(conn, &t.id, is_live);
         let wf = create_wf(conn, &sv1, &obc.id, Some(DecisionStatus::Pass));
         let rsr1 = create_rule_set_result(conn, &obc.id, &sv1.id, &wf.id, &risk_signals_1);
 
         // Vault with multiple WF
-        let (sv2, uv2, risk_signals_2) = create_vault(conn, &obc);
+        let (sv2, uv2, risk_signals_2) = create_vault(conn, &t.id, is_live);
         let wf2a = create_wf(conn, &sv2, &obc.id, Some(DecisionStatus::Pass));
         let _rsr2a = create_rule_set_result(conn, &obc.id, &sv2.id, &wf2a.id, &risk_signals_2);
         let wf2b = create_wf(conn, &sv2, &obc.id, Some(DecisionStatus::Pass));
         let rsr2b = create_rule_set_result(conn, &obc.id, &sv2.id, &wf2b.id, &risk_signals_2);
 
         // Vault with multiple WF but some incomplete
-        let (sv3, uv3, risk_signals_3) = create_vault(conn, &obc);
+        let (sv3, uv3, risk_signals_3) = create_vault(conn, &t.id, is_live);
         let wf3a = create_wf(conn, &sv3, &obc.id, None);
         let _rsr3a = create_rule_set_result(conn, &obc.id, &sv3.id, &wf3a.id, &risk_signals_3);
         let wf3b = create_wf(conn, &sv3, &obc.id, Some(DecisionStatus::Pass));
@@ -549,13 +551,13 @@ mod tests {
         let _rsr3c = create_rule_set_result(conn, &obc.id, &sv3.id, &wf3c.id, &risk_signals_3);
 
         // Vault with 1 WF but multiple rule_set_result's
-        let (sv4, uv4, risk_signals_4) = create_vault(conn, &obc);
+        let (sv4, uv4, risk_signals_4) = create_vault(conn, &t.id, is_live);
         let wf4 = create_wf(conn, &sv4, &obc.id, Some(DecisionStatus::Pass));
         let rsr4a = create_rule_set_result(conn, &obc.id, &sv4.id, &wf4.id, &risk_signals_4);
         let _rsr4b = create_rule_set_result(conn, &obc.id, &sv4.id, &wf4.id, &risk_signals_4);
 
         // Vault with just 1 incomplete WF
-        let (sv5, _uv5, risk_signals_5) = create_vault(conn, &obc);
+        let (sv5, _uv5, risk_signals_5) = create_vault(conn, &t.id, is_live);
         let wf5 = create_wf(conn, &sv5, &obc.id, None);
         let _rsr5 = create_rule_set_result(conn, &obc.id, &sv5.id, &wf5.id, &risk_signals_5);
 

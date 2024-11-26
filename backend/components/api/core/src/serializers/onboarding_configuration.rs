@@ -4,6 +4,7 @@ use api_wire_types::HostedWorkflowRequest;
 use db::actor::SaturatedActor;
 use db::models::appearance::Appearance;
 use db::models::ob_configuration::ObConfiguration;
+use db::models::playbook::Playbook;
 use db::models::rule_set::RuleSet;
 use db::models::tenant::Tenant;
 use db::models::tenant_client_config::TenantClientConfig;
@@ -16,6 +17,7 @@ use std::sync::Arc;
 
 type StepupEnabledInSandboxOutcomes = bool;
 pub type ObConfigInfo = (
+    Playbook,
     ObConfiguration,
     Tenant,
     Option<WorkflowRequest>,
@@ -27,7 +29,7 @@ pub type ObConfigInfo = (
 
 impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
     fn from_db(
-        (ob_config, tenant, wfr, tenant_client_config, appearance, ff_client, is_stepup_enabled): ObConfigInfo,
+        (playbook, ob_config, tenant, wfr, tenant_client_config, appearance, ff_client, is_stepup_enabled): ObConfigInfo,
     ) -> Self {
         let supported_countries = ob_config.supported_countries_for_residential_address();
         let required_auth_methods = ob_config.required_auth_methods.clone();
@@ -36,6 +38,7 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
             .get(VerificationCheckKind::NeuroId)
             .map(|_| true);
 
+        #[allow(deprecated)]
         let ObConfiguration {
             name,
             key,
@@ -63,7 +66,7 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
         // we only need to tell FE about this if we're in the skip ssn step up flow
         let is_app_clip_enabled = ff_client.flag(BoolFlag::IsAppClipEnabled(&tenant_id));
         let is_instant_app_enabled = ff_client.flag(BoolFlag::IsInstantAppEnabled(&tenant_id));
-        let can_make_real_doc_scan_calls_in_sandbox = (!ob_config.is_live)
+        let can_make_real_doc_scan_calls_in_sandbox = (!playbook.is_live)
             .then(|| ff_client.flag(BoolFlag::CanMakeDemoIncodeRequestsInSandbox(&tenant_id)))
             .unwrap_or(false);
         let is_kyb = must_collect_data.iter().any(|cdo| cdo.matches(DID::Business));
@@ -133,6 +136,8 @@ impl
         let enhanced_aml = vc.enhanced_aml();
         let skip_kyb = vc.skip_kyc();
         let curp_validation_enabled = vc.is_enabled(VerificationCheckKind::CurpValidation);
+
+        #[allow(deprecated)]
         let ObConfiguration {
             id,
             key,

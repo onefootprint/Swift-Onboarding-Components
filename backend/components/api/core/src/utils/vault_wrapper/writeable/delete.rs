@@ -78,12 +78,11 @@ mod tests {
     #[db_test]
     fn test_soft_deletion(conn: &mut TestPgConn) {
         let tenant = fixtures::tenant::create(conn);
-        let (_, ob_config) = fixtures::ob_configuration::create(conn, &tenant.id, true);
 
         let scoped_vaults: Vec<_> = (0..=1)
             .map(|_| {
                 let uv = fixtures::vault::create_person(conn, true).into_inner();
-                let sv = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
+                let sv = fixtures::scoped_vault::create(conn, &uv.id, &tenant.id);
                 let sv = ScopedVault::lock(conn, &sv.id).unwrap();
 
                 let data = vec![

@@ -12,6 +12,7 @@ use crate::telemetry::RootSpan;
 use crate::FpResult;
 use api_errors::ServerErrInto;
 use db::models::ob_configuration::ObConfiguration;
+use db::models::playbook::Playbook;
 use db::models::scoped_vault::NewScopedVaultArgs;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::NewVaultArgs;
@@ -36,6 +37,7 @@ pub struct VaultContext {
     pub sources: HashMap<DI, DataLifetimeSource>,
     pub keypair: VaultKeyPair,
     pub sandbox_id: Option<SandboxId>,
+    pub playbook: Playbook,
     pub obc: ObConfiguration,
 }
 
@@ -54,10 +56,11 @@ impl VaultWrapper<Person> {
             sources,
             keypair,
             sandbox_id,
+            playbook,
             obc,
         } = ctx;
         // Verify that the ob config is_live matches the user vault
-        if obc.is_live != sandbox_id.is_none() {
+        if playbook.is_live != sandbox_id.is_none() {
             return Err(UserError::SandboxMismatch.into());
         }
         let is_fixture_data = data
@@ -73,7 +76,7 @@ impl VaultWrapper<Person> {
             .collect::<FpResult<Vec<_>>>()?
             .into_iter()
             .any(|x| x);
-        if obc.is_live && is_fixture_data {
+        if playbook.is_live && is_fixture_data {
             return Err(UserError::FixtureCIInLive.into());
         }
 
@@ -82,7 +85,7 @@ impl VaultWrapper<Person> {
         }
 
         if let Some(duplicate_of_id) = duplicate_of_id.as_ref() {
-            if !obc.tenant_id.is_integration_test_tenant() {
+            if !playbook.tenant_id.is_integration_test_tenant() {
                 tracing::error!(%duplicate_of_id, "Duplicate vault created");
             }
         }
@@ -92,7 +95,7 @@ impl VaultWrapper<Person> {
         let new_user_vault = NewVaultArgs {
             e_private_key,
             public_key,
-            is_live: obc.is_live, // Must derive is_live from the ob config used to create it
+            is_live: playbook.is_live, // Must derive is_live from the playbook used to create it
             kind: VaultKind::Person,
             is_fixture: is_fixture_data,
             sandbox_id,
@@ -112,7 +115,7 @@ impl VaultWrapper<Person> {
         let args = NewScopedVaultArgs {
             is_active: false,
             status,
-            tenant_id: &obc.tenant_id,
+            tenant_id: &playbook.tenant_id,
             external_id: None,
         };
         let su = ScopedVault::create(conn, &uv, args)?;

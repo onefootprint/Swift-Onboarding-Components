@@ -11,6 +11,7 @@ use api_errors::ServerErrInto;
 use db::models::contact_info::ContactInfo;
 use db::models::contact_info::NewContactInfoArgs;
 use db::models::ob_configuration::ObConfiguration;
+use db::models::playbook::Playbook;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault_data::NewVaultData;
 use db::TxnPgConn;
@@ -73,7 +74,8 @@ impl<Type> VaultWrapper<Type> {
         // NOTE: self here is a user-scoped VW with only portable data
         &'a self,
         state: &'a State,
-        pb: &'a ObConfiguration,
+        playbook: &'a Playbook,
+        obc: &'a ObConfiguration,
         prefill_kind: PrefillKind<'a>,
     ) -> FpResult<PrefillData> {
         let destination_vw = match prefill_kind {
@@ -115,7 +117,7 @@ impl<Type> VaultWrapper<Type> {
             .into_iter()
             .filter(|d| prefill_kind.allow_prefilling(d))
             .filter(|d| {
-                let collected_by_pb = pb
+                let collected_by_pb = obc
                     .must_collect_data
                     .iter()
                     .any(|cdo| cdo.data_identifiers().unwrap_or_default().contains(d));
@@ -179,7 +181,7 @@ impl<Type> VaultWrapper<Type> {
 
         let data_to_fp = data
             .iter()
-            .flat_map(|d| d.kind.get_fingerprint_payload(&d.e_data, Some(&pb.tenant_id)))
+            .flat_map(|d| d.kind.get_fingerprint_payload(&d.e_data, Some(&playbook.tenant_id)))
             // Attach a Key to each fingerprint payload that includes the salt
             .map(|(salt, e_data)| (salt.clone(), (salt, e_data)))
             .collect_vec();
@@ -198,7 +200,7 @@ impl<Type> VaultWrapper<Type> {
             &salt_to_fp,
             &[],
             &new_dis,
-            &pb.tenant_id,
+            &playbook.tenant_id,
         )?;
 
         if !addl_dis.is_empty() {

@@ -6,19 +6,14 @@ use crate::models::vault::Vault;
 use crate::TxnPgConn;
 use newtypes::DbActor;
 use newtypes::Locked;
-use newtypes::ObConfigurationId;
 use newtypes::OnboardingStatus;
 use newtypes::TenantId;
 use newtypes::VaultCreatedInfo;
 use newtypes::VaultId;
 
-pub fn create(
-    conn: &mut TxnPgConn,
-    uv_id: &VaultId,
-    ob_config_id: &ObConfigurationId,
-) -> Locked<ScopedVault> {
+pub fn create(conn: &mut TxnPgConn, uv_id: &VaultId, tenant_id: &TenantId) -> Locked<ScopedVault> {
     let uv = Vault::lock(conn, uv_id).unwrap();
-    let sv = ScopedVault::get_or_create_for_tenant(conn, &uv, ob_config_id)
+    let sv = ScopedVault::get_or_create_for_tenant(conn, &uv, tenant_id)
         .unwrap()
         .0;
 
