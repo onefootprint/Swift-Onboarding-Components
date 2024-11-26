@@ -17,6 +17,9 @@ import type {
   GetHostedCheckSessionData,
   GetHostedCheckSessionError,
   GetHostedCheckSessionResponse,
+  GetHostedIdentifyVerifyContactInfoData,
+  GetHostedIdentifyVerifyContactInfoError,
+  GetHostedIdentifyVerifyContactInfoResponse,
   GetHostedOnboardingConfigData,
   GetHostedOnboardingConfigError,
   GetHostedOnboardingConfigResponse,
@@ -103,6 +106,9 @@ import type {
   PostHostedIdentifyValidationTokenData,
   PostHostedIdentifyValidationTokenError,
   PostHostedIdentifyValidationTokenResponse,
+  PostHostedIdentifyVerifyContactInfoData,
+  PostHostedIdentifyVerifyContactInfoError,
+  PostHostedIdentifyVerifyContactInfoResponse,
   PostHostedIdentifyVerifyData,
   PostHostedIdentifyVerifyError,
   PostHostedIdentifyVerifyResponse,
@@ -456,6 +462,38 @@ export const postHostedIdentifyVerify = <ThrowOnError extends boolean = false>(
   >({
     ...options,
     url: '/hosted/identify/verify',
+  });
+};
+
+/**
+ * Get context on a verify contact info session.
+ */
+export const getHostedIdentifyVerifyContactInfo = <ThrowOnError extends boolean = false>(
+  options?: Options<GetHostedIdentifyVerifyContactInfoData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetHostedIdentifyVerifyContactInfoResponse,
+    GetHostedIdentifyVerifyContactInfoError,
+    ThrowOnError
+  >({
+    ...options,
+    url: '/hosted/identify/verify_contact_info',
+  });
+};
+
+/**
+ * Creates an auth event to mark the provided contact info as verified.
+ */
+export const postHostedIdentifyVerifyContactInfo = <ThrowOnError extends boolean = false>(
+  options?: Options<PostHostedIdentifyVerifyContactInfoData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    PostHostedIdentifyVerifyContactInfoResponse,
+    PostHostedIdentifyVerifyContactInfoError,
+    ThrowOnError
+  >({
+    ...options,
+    url: '/hosted/identify/verify_contact_info',
   });
 };
 

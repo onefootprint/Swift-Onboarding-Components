@@ -51,7 +51,7 @@ export type BusinessOnboardingResponse = {
   authToken: string;
   isNewBusiness: boolean;
 };
-export type ChallengeKind = 'sms' | 'biometric' | 'email';
+export type ChallengeKind = 'sms' | 'sms_link' | 'biometric' | 'email';
 export type CheckSessionResponse = 'active' | 'expired' | 'unknown';
 export type CollectDocumentConfig =
   | ({
@@ -657,6 +657,14 @@ export type GetUserTokenResponse = {
   expiresAt: string;
   scopes: Array<UserAuthScope>;
 };
+export type GetVerifyContactInfoResponse = {
+  isVerified: boolean;
+  /**
+   * The insight event from the machine that initiated the contact info verify session
+   */
+  originInsightEvent: InsightEvent;
+  tenantName: string;
+};
 /**
  * Embeds extra information in the d2p token to pass from the desktop to handoff session.
  * NOTE: changes to this struct should be backwards-compatible since we may use this struct
@@ -795,7 +803,7 @@ export type IdentifyResponse = {
 };
 export type IdentifyScope = 'my1fp' | 'onboarding' | 'auth';
 export type IdentifyVerifyRequest = {
-  challengeResponse: string;
+  challengeResponse?: string;
   /**
    * Opaque challenge state token
    */
@@ -808,6 +816,21 @@ export type IdentifyVerifyRequest = {
 };
 export type IdentifyVerifyResponse = {
   authToken: string;
+};
+export type InsightEvent = {
+  city?: string;
+  country?: string;
+  ipAddress?: string;
+  latitude?: number;
+  longitude?: number;
+  metroCode?: string;
+  postalCode?: string;
+  region?: string;
+  regionName?: string;
+  sessionId?: string;
+  timestamp: string;
+  timeZone?: string;
+  userAgent?: string;
 };
 export type InvestorProfileDeclaration =
   | 'affiliated_with_us_broker'
@@ -2672,6 +2695,26 @@ export type PostHostedIdentifyVerifyData = {
 };
 export type PostHostedIdentifyVerifyResponse = IdentifyVerifyResponse;
 export type PostHostedIdentifyVerifyError = unknown;
+export type GetHostedIdentifyVerifyContactInfoData = {
+  headers?: {
+    /**
+     * Short-lived auth token for async verification of contact info.
+     */
+    'X-Fp-Authorization'?: string;
+  };
+};
+export type GetHostedIdentifyVerifyContactInfoResponse = GetVerifyContactInfoResponse;
+export type GetHostedIdentifyVerifyContactInfoError = unknown;
+export type PostHostedIdentifyVerifyContactInfoData = {
+  headers?: {
+    /**
+     * Short-lived auth token for async verification of contact info.
+     */
+    'X-Fp-Authorization'?: string;
+  };
+};
+export type PostHostedIdentifyVerifyContactInfoResponse = Empty;
+export type PostHostedIdentifyVerifyContactInfoError = unknown;
 export type PostHostedOnboardingData = {
   body?: PostOnboardingRequest;
   headers?: {
@@ -3618,6 +3661,26 @@ export type $OpenApiTs = {
          * OK
          */
         '200': IdentifyVerifyResponse;
+      };
+    };
+  };
+  '/hosted/identify/verify_contact_info': {
+    get: {
+      req: GetHostedIdentifyVerifyContactInfoData;
+      res: {
+        /**
+         * OK
+         */
+        '200': GetVerifyContactInfoResponse;
+      };
+    };
+    post: {
+      req: PostHostedIdentifyVerifyContactInfoData;
+      res: {
+        /**
+         * OK
+         */
+        '200': Empty;
       };
     };
   };

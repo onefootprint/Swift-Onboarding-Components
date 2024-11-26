@@ -54,6 +54,7 @@ import type {
   GetDeviceAttestationChallengeRequest,
   GetSdkArgsTokenResponse,
   GetUserTokenResponse,
+  GetVerifyContactInfoResponse,
   HandoffMetadata,
   HostedBusiness,
   HostedBusinessDetail,
@@ -71,6 +72,7 @@ import type {
   IdentifyScope,
   IdentifyVerifyRequest,
   IdentifyVerifyResponse,
+  InsightEvent,
   InvestorProfileDeclaration,
   InvestorProfileFundingSource,
   InvestorProfileInvestmentGoal,
@@ -1013,6 +1015,34 @@ export const getGetUserTokenResponse = (
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 
+export const getGetVerifyContactInfoResponse = (
+  props: Partial<GetVerifyContactInfoResponse>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): GetVerifyContactInfoResponse =>
+  deepmerge<GetVerifyContactInfoResponse>(
+    {
+      isVerified: false,
+      originInsightEvent: {
+        city: 'South Delphine',
+        country: 'Bouvet Island',
+        ipAddress: '73738 Beier Meadows Apt. 412',
+        latitude: 56219789.96812764,
+        longitude: -62598655.46846557,
+        metroCode: 'cillum Ut eu officia',
+        postalCode: 'cupidatat',
+        region: 'cupidatat',
+        regionName: 'Amy Labadie',
+        sessionId: 'ad686df3-f502-473b-97da-dc6f70636f2d',
+        timeZone: 'laboris Excepteur cupidatat',
+        timestamp: '1911-02-04T22:25:26.0Z',
+        userAgent: 'nulla Excepteur pariatur cupidatat',
+      },
+      tenantName: 'Sherri Labadie',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
 export const getHandoffMetadata = (
   props: Partial<HandoffMetadata>,
   options: { overwriteArray: boolean } = { overwriteArray: true },
@@ -1862,6 +1892,30 @@ export const getIdentifyVerifyResponse = (
   deepmerge<IdentifyVerifyResponse>(
     {
       authToken: 'b84bc949-4e0e-4b97-b44d-4159c6b8b20f',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getInsightEvent = (
+  props: Partial<InsightEvent>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): InsightEvent =>
+  deepmerge<InsightEvent>(
+    {
+      city: 'Kellicester',
+      country: 'Lithuania',
+      ipAddress: '4231 Hickory Street Suite 856',
+      latitude: 54923173.08038744,
+      longitude: 64705952.02044535,
+      metroCode: 'ut deserunt qui',
+      postalCode: 'ex eu cupidatat',
+      region: 'exercitation eu non aliqua',
+      regionName: 'Alma Franey',
+      sessionId: '7a73e357-a11b-46c4-9dd8-ecbc36ed31f5',
+      timeZone: 'amet ipsum mollit ea laborum',
+      timestamp: '1933-04-01T08:30:46.0Z',
+      userAgent: 'id reprehenderit fugiat consequat officia',
     },
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },

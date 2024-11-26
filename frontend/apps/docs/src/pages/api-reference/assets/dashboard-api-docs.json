@@ -9998,6 +9998,21 @@
                     {
                         "type": "object",
                         "properties": {
+                            "data": {
+                                "type": "object",
+                                "properties": {
+                                    "decision_status": {
+                                        "$ref": "#/components/schemas/DecisionStatus"
+                                    },
+                                    "fp_id": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "decision_status",
+                                    "fp_id"
+                                ]
+                            },
                             "kind": {
                                 "type": "string",
                                 "enum": [
@@ -10006,6 +10021,7 @@
                             }
                         },
                         "required": [
+                            "data",
                             "kind"
                         ]
                     },

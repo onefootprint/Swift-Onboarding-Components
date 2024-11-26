@@ -268,6 +268,10 @@ export type AuditEventDetail =
       kind: 'disable_playbook';
     }
   | {
+      data: {
+        decisionStatus: DecisionStatus;
+        fpId: string;
+      };
       kind: 'manually_review_entity';
     }
   | {
@@ -349,7 +353,7 @@ export type AuthEvent = {
   linkedAttestations: Array<AttestedDeviceData>;
   scope: IdentifyScope;
 };
-export type AuthEventKind = 'sms' | 'email' | 'passkey' | 'third_party';
+export type AuthEventKind = 'sms' | 'sms_link' | 'email' | 'passkey' | 'third_party';
 export type AuthMethodKind = 'phone' | 'passkey' | 'email';
 export type AuthMethodUpdated = {
   action: ActionKind;
@@ -4142,6 +4146,7 @@ export type PreviewApi =
   | 'vault_integrity'
   | 'soft_delete_users'
   | 'post_kyc_stepup_links'
+  | 'sms_link_authentication'
   | 'client_vaulting_docs'
   | 'list_duplicate_users';
 export type PrivateBusinessOwner = {

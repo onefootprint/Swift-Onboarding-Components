@@ -6,6 +6,7 @@ import type {
   GetHostedBusinessOwnersData,
   GetHostedBusinessesData,
   GetHostedCheckSessionData,
+  GetHostedIdentifyVerifyContactInfoData,
   GetHostedOnboardingConfigData,
   GetHostedOnboardingNidData,
   GetHostedOnboardingPrivacyPassData,
@@ -72,6 +73,9 @@ import type {
   PostHostedIdentifyValidationTokenData,
   PostHostedIdentifyValidationTokenError,
   PostHostedIdentifyValidationTokenResponse,
+  PostHostedIdentifyVerifyContactInfoData,
+  PostHostedIdentifyVerifyContactInfoError,
+  PostHostedIdentifyVerifyContactInfoResponse,
   PostHostedIdentifyVerifyData,
   PostHostedIdentifyVerifyError,
   PostHostedIdentifyVerifyResponse,
@@ -156,6 +160,7 @@ import {
   getHostedBusinessOwners,
   getHostedBusinesses,
   getHostedCheckSession,
+  getHostedIdentifyVerifyContactInfo,
   getHostedOnboardingConfig,
   getHostedOnboardingNid,
   getHostedOnboardingPrivacyPass,
@@ -187,6 +192,7 @@ import {
   postHostedIdentifySignupChallenge,
   postHostedIdentifyValidationToken,
   postHostedIdentifyVerify,
+  postHostedIdentifyVerifyContactInfo,
   postHostedOnboarding,
   postHostedOnboardingAuthorize,
   postHostedOnboardingFp,
@@ -846,6 +852,68 @@ export const postHostedIdentifyVerifyMutation = (options?: Partial<Options<PostH
   > = {
     mutationFn: async localOptions => {
       const { data } = await postHostedIdentifyVerify({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const getHostedIdentifyVerifyContactInfoQueryKey = (
+  options?: Options<GetHostedIdentifyVerifyContactInfoData>,
+) => [createQueryKey('getHostedIdentifyVerifyContactInfo', options)];
+
+export const getHostedIdentifyVerifyContactInfoOptions = (
+  options?: Options<GetHostedIdentifyVerifyContactInfoData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getHostedIdentifyVerifyContactInfo({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getHostedIdentifyVerifyContactInfoQueryKey(options),
+  });
+};
+
+export const postHostedIdentifyVerifyContactInfoQueryKey = (
+  options?: Options<PostHostedIdentifyVerifyContactInfoData>,
+) => [createQueryKey('postHostedIdentifyVerifyContactInfo', options)];
+
+export const postHostedIdentifyVerifyContactInfoOptions = (
+  options?: Options<PostHostedIdentifyVerifyContactInfoData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await postHostedIdentifyVerifyContactInfo({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: postHostedIdentifyVerifyContactInfoQueryKey(options),
+  });
+};
+
+export const postHostedIdentifyVerifyContactInfoMutation = (
+  options?: Partial<Options<PostHostedIdentifyVerifyContactInfoData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    PostHostedIdentifyVerifyContactInfoResponse,
+    AxiosError<PostHostedIdentifyVerifyContactInfoError>,
+    Options<PostHostedIdentifyVerifyContactInfoData>
+  > = {
+    mutationFn: async localOptions => {
+      const { data } = await postHostedIdentifyVerifyContactInfo({
         ...options,
         ...localOptions,
         throwOnError: true,

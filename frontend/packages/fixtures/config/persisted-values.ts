@@ -38,6 +38,7 @@ import type {
   GetDeviceAttestationChallengeRequest,
   GetSdkArgsTokenResponse,
   GetUserTokenResponse,
+  GetVerifyContactInfoResponse,
   HandoffMetadata,
   HostedBusiness,
   HostedBusinessDetail,
@@ -948,6 +949,25 @@ export const hosted_GetUserTokenResponse: GetUserTokenResponse = {
   expiresAt: '1938-03-18T10:30:50.0Z',
   scopes: ['handoff', 'explicit_auth', 'explicit_auth'],
 };
+export const hosted_GetVerifyContactInfoResponse: GetVerifyContactInfoResponse = {
+  isVerified: false,
+  originInsightEvent: {
+    city: 'South Delphine',
+    country: 'Bouvet Island',
+    ipAddress: '73738 Beier Meadows Apt. 412',
+    latitude: 56219789.96812764,
+    longitude: -62598655.46846557,
+    metroCode: 'cillum Ut eu officia',
+    postalCode: 'cupidatat',
+    region: 'cupidatat',
+    regionName: 'Amy Labadie',
+    sessionId: 'ad686df3-f502-473b-97da-dc6f70636f2d',
+    timeZone: 'laboris Excepteur cupidatat',
+    timestamp: '1911-02-04T22:25:26.0Z',
+    userAgent: 'nulla Excepteur pariatur cupidatat',
+  },
+  tenantName: 'Sherri Labadie',
+};
 export const hosted_HandoffMetadata: HandoffMetadata = {
   l10N: {
     language: 'en',
@@ -1662,6 +1682,21 @@ export const hosted_IdentifyVerifyRequest: IdentifyVerifyRequest = {
 };
 export const hosted_IdentifyVerifyResponse: IdentifyVerifyResponse = {
   authToken: 'b84bc949-4e0e-4b97-b44d-4159c6b8b20f',
+};
+export const hosted_InsightEvent: InsightEvent = {
+  city: 'Kellicester',
+  country: 'Lithuania',
+  ipAddress: '4231 Hickory Street Suite 856',
+  latitude: 54923173.08038744,
+  longitude: 64705952.02044535,
+  metroCode: 'ut deserunt qui',
+  postalCode: 'ex eu cupidatat',
+  region: 'exercitation eu non aliqua',
+  regionName: 'Alma Franey',
+  sessionId: '7a73e357-a11b-46c4-9dd8-ecbc36ed31f5',
+  timeZone: 'amet ipsum mollit ea laborum',
+  timestamp: '1933-04-01T08:30:46.0Z',
+  userAgent: 'id reprehenderit fugiat consequat officia',
 };
 export const hosted_InvestorProfileDeclaration: InvestorProfileDeclaration = 'senior_executive';
 export const hosted_InvestorProfileFundingSource: InvestorProfileFundingSource = 'business_income';
