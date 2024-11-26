@@ -65,7 +65,18 @@ const InsightEventDisplay = ({ insightEvent }: InsightEventDisplayProps) => {
             <Text variant="body-3" color="tertiary">
               {t('labels.user-agent')}
             </Text>
-            <Text variant="body-3">{insightEvent?.userAgent || '-'}</Text>
+            <Text
+              variant="body-3"
+              maxHeight="6em"
+              overflow="hidden"
+              textOverflow="ellipsis"
+              // note - easiest way to get multi-line truncation with an ellipsis at the end
+              // otherwise, we truncate with ellipsis after one line (or don't show an ellipsis at all)
+              display="-webkit-box"
+              style={{ WebkitLineClamp: 4, WebkitBoxOrient: 'vertical' }}
+            >
+              {insightEvent?.userAgent || '-'}
+            </Text>
           </Stack>
         </Stack>
       </Stack>

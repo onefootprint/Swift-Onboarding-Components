@@ -34,7 +34,7 @@ const Loading = () => {
             display="flex"
             alignItems="center"
           >
-            <IcoDotSmall16 color="primary" />
+            <StyledDot />
           </Grid.Item>
           <Grid.Container
             style={{ gridArea: 'content' }}
@@ -59,6 +59,16 @@ const Loading = () => {
     </Stack>
   );
 };
+
+// we need to override the fill color because IcoDotSmall16 uses text colors
+// rather than our DS background colors for the dot
+const StyledDot = styled(IcoDotSmall16)`
+  ${({ theme }) => css`
+    path {
+      fill: ${theme.backgroundColor.senary};
+    }
+  `}
+`;
 
 const Line = styled(Grid.Item)`
   ${({ theme }) => css`
