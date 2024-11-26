@@ -44,8 +44,6 @@ pub struct DeleteHostedBusinessOwnerRequest {
 #[openapi(
     example = r#"{"op": "create", "uuid": "73b7e274-8080-44d6-b160-86cbc9877a00", "data": {"id.first_name": "John", "id.last_name": "Doe"}, "ownership_stake": 30}"#
 )]
-// TODO: now that each variant has its own type, can we start to implicitly inline nested types
-// here? That would get rid of some allOfs
 pub enum BatchHostedBusinessOwnerRequest {
     Update(UpdateOrCreateHostedBusinessOwnerRequest),
     Create(UpdateOrCreateHostedBusinessOwnerRequest),

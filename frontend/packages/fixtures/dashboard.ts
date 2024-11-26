@@ -116,7 +116,6 @@ import type {
   CreateTenantIosAppMetaRequest,
   CreateTenantRoleRequest,
   CreateTenantUserRequest,
-  CreateTokenResponse,
   CursorPaginatedAuditEvent,
   CursorPaginatedEntity,
   CursorPaginatedListEvent,
@@ -234,7 +233,6 @@ import type {
   LivenessEvent,
   LivenessIssuer,
   LivenessSource,
-  ManualDecisionRequest,
   ManualReview,
   ManualReviewKind,
   MatchLevel,
@@ -352,7 +350,6 @@ import type {
   TimelineOnboardingDecision,
   TimelinePlaybook,
   TokenOperationKind,
-  TriggerRequest,
   UnvalidatedRuleExpression,
   UpdateAnnotationRequest,
   UpdateApiKeyRequest,
@@ -3330,20 +3327,6 @@ export const getCreateTenantUserRequest = (
       omitEmailInvite: true,
       redirectUrl: 'https://gullible-soup.net',
       roleId: '1947aac2-7c90-4c10-8cc0-ae78cfb206ad',
-    },
-    props,
-    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
-  );
-
-export const getCreateTokenResponse = (
-  props: Partial<CreateTokenResponse>,
-  options: { overwriteArray: boolean } = { overwriteArray: true },
-): CreateTokenResponse =>
-  deepmerge<CreateTokenResponse>(
-    {
-      expiresAt: '1916-08-06T07:48:41.0Z',
-      link: 'minim id',
-      token: '0e29d8e2-2ac6-496d-bab1-c8b6373287a3',
     },
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
@@ -6924,22 +6907,6 @@ export const getLivenessEvent = (
 export const getLivenessIssuer = (props: LivenessIssuer): LivenessIssuer => props ?? 'google';
 export const getLivenessSource = (props: LivenessSource): LivenessSource => props ?? 'google_device_attestation';
 
-export const getManualDecisionRequest = (
-  props: Partial<ManualDecisionRequest>,
-  options: { overwriteArray: boolean } = { overwriteArray: true },
-): ManualDecisionRequest =>
-  deepmerge<ManualDecisionRequest>(
-    {
-      annotation: {
-        isPinned: false,
-        note: 'occaecat ut laboris qui sit',
-      },
-      status: 'pass',
-    },
-    props,
-    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
-  );
-
 export const getManualReview = (
   props: Partial<ManualReview>,
   options: { overwriteArray: boolean } = { overwriteArray: true },
@@ -10156,27 +10123,6 @@ export const getTimelinePlaybook = (
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getTokenOperationKind = (props: TokenOperationKind): TokenOperationKind => props ?? 'update_auth_methods';
-
-export const getTriggerRequest = (
-  props: Partial<TriggerRequest>,
-  options: { overwriteArray: boolean } = { overwriteArray: true },
-): TriggerRequest =>
-  deepmerge<TriggerRequest>(
-    {
-      fpBid: '54bda7fa-e958-4aaa-b672-6dbbca8b515a',
-      note: 'minim dolore consequat commodo',
-      trigger: {
-        data: {
-          playbookId: 'ef1a3dd4-7bc3-4a73-8ba2-f6606c165557',
-          recollectAttributes: ['nationality', 'business_kyced_beneficial_owners', 'bank'],
-          reuseExistingBoKyc: true,
-        },
-        kind: 'onboard',
-      },
-    },
-    props,
-    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
-  );
 
 export const getUnvalidatedRuleExpression = (
   props: Partial<UnvalidatedRuleExpression>,

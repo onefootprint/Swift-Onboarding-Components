@@ -41,16 +41,23 @@ export type BatchHostedBusinessOwnerRequest =
   | BatchHostedBusinessOwnerRequestUpdate
   | BatchHostedBusinessOwnerRequestCreate
   | BatchHostedBusinessOwnerRequestDelete;
-export type BatchHostedBusinessOwnerRequestCreate = UpdateOrCreateHostedBusinessOwnerRequest & {
+export type BatchHostedBusinessOwnerRequestCreate = {
+  data: ModernRawUserDataRequest;
   op: 'create';
+  ownershipStake?: number;
+  uuid: string;
 };
 export type op = 'create';
-export type BatchHostedBusinessOwnerRequestDelete = DeleteHostedBusinessOwnerRequest & {
+export type BatchHostedBusinessOwnerRequestDelete = {
   op: 'delete';
+  uuid: string;
 };
 export type op2 = 'delete';
-export type BatchHostedBusinessOwnerRequestUpdate = UpdateOrCreateHostedBusinessOwnerRequest & {
+export type BatchHostedBusinessOwnerRequestUpdate = {
+  data: ModernRawUserDataRequest;
   op: 'update';
+  ownershipStake?: number;
+  uuid: string;
 };
 export type op3 = 'update';
 export type BusinessOnboardingResponse = {
@@ -64,29 +71,38 @@ export type CollectDocumentConfig =
   | CollectDocumentConfigProofOfSsn
   | CollectDocumentConfigProofOfAddress
   | CollectDocumentConfigCustom;
-export type CollectDocumentConfigCustom = CustomDocumentConfig & {
+export type CollectDocumentConfigCustom = {
+  /**
+   * Optional human-readable description of the document that will be displayed to the user
+   */
+  description?: string;
+  /**
+   * Custom document identifier under which the document will be vaulted
+   */
+  identifier: DataIdentifier;
   kind: 'custom';
+  /**
+   * The human-readable name of the document to display to the user
+   */
+  name: string;
+  requiresHumanReview: boolean;
+  uploadSettings: DocumentUploadSettings;
 };
 export type kind = 'custom';
 export type CollectDocumentConfigIdentity = {
+  kind: 'identity';
   shouldCollectConsent: boolean;
   shouldCollectSelfie: boolean;
   supportedCountryAndDocTypes: {
     [key: string]: unknown;
   };
-} & {
-  kind: 'identity';
 };
 export type kind2 = 'identity';
 export type CollectDocumentConfigProofOfAddress = {
-  [key: string]: unknown;
-} & {
   kind: 'proof_of_address';
 };
 export type kind3 = 'proof_of_address';
 export type CollectDocumentConfigProofOfSsn = {
-  [key: string]: unknown;
-} & {
   kind: 'proof_of_ssn';
 };
 export type kind4 = 'proof_of_ssn';
@@ -507,9 +523,6 @@ export type DataIdentifier =
   | 'bank.*.ach_account_id'
   | 'bank.*.account_type'
   | 'bank.*.fingerprint';
-export type DeleteHostedBusinessOwnerRequest = {
-  uuid: string;
-};
 export type DeviceAttestationChallengeResponse = {
   /**
    * attestation challenge to use
@@ -1804,47 +1817,62 @@ export type OnboardingRequirement =
   | OnboardingRequirementCollectDocument
   | OnboardingRequirementAuthorize
   | OnboardingRequirementProcess;
+/**
+ * The client needs to display the authorization consent page and confirm the user authorizes
+ * access
+ */
 export type OnboardingRequirementAuthorize = {
   authorizedAt?: string;
   fieldsToAuthorize: AuthorizeFields;
-} & {
   kind: 'authorize';
 };
 export type kind5 = 'authorize';
+/**
+ * There is missing business data that must be collected
+ */
 export type OnboardingRequirementCollectBusinessData = {
+  kind: 'collect_business_data';
   missingAttributes: Array<CollectedDataOption>;
   populatedAttributes: Array<CollectedDataOption>;
   recollectAttributes: Array<CollectedDataOption>;
-} & {
-  kind: 'collect_business_data';
 };
 export type kind6 = 'collect_business_data';
+/**
+ * There is missing identity data that must be collected
+ */
 export type OnboardingRequirementCollectData = {
+  kind: 'collect_data';
   missingAttributes: Array<CollectedDataOption>;
   optionalAttributes: Array<CollectedDataOption>;
   populatedAttributes: Array<CollectedDataOption>;
   recollectAttributes: Array<CollectedDataOption>;
-} & {
-  kind: 'collect_data';
 };
 export type kind7 = 'collect_data';
+/**
+ * A document needs to be collected
+ */
 export type OnboardingRequirementCollectDocument = {
   config: CollectDocumentConfig;
   documentRequestId: string;
-  uploadSettings: DocumentUploadSettings;
-} & {
   kind: 'collect_document';
+  uploadSettings: DocumentUploadSettings;
 };
 export type kind8 = 'collect_document';
+/**
+ * There is missing investor profile data that must be collected
+ */
 export type OnboardingRequirementCollectInvestorProfile = {
+  kind: 'collect_investor_profile';
   missingAttributes: Array<CollectedDataOption>;
   missingDocument: boolean;
   populatedAttributes: Array<CollectedDataOption>;
-} & {
-  kind: 'collect_investor_profile';
 };
 export type kind9 = 'collect_investor_profile';
+/**
+ * The flow requires a business, and one hasn't yet been created / selected
+ */
 export type OnboardingRequirementCreateBusinessOnboarding = {
+  kind: 'create_business_onboarding';
   /**
    * When true, requires either selecting an existing business, or will create a new one upon
    * `POST /hosted/business/onboarding`.
@@ -1852,8 +1880,6 @@ export type OnboardingRequirementCreateBusinessOnboarding = {
    * immediately call `POST /hosted/business/onboarding`.
    */
   requiresBusinessSelection: boolean;
-} & {
-  kind: 'create_business_onboarding';
 };
 export type kind10 = 'create_business_onboarding';
 /**
@@ -1865,7 +1891,6 @@ export type OnboardingRequirementProcess = {
 export type kind11 = 'process';
 export type OnboardingRequirementRegisterAuthMethod = {
   authMethodKind: AuthMethodKind;
-} & {
   kind: 'register_auth_method';
 };
 export type kind12 = 'register_auth_method';
@@ -2038,11 +2063,6 @@ export type UpdateAuthMethodsV1SdkArgs = {
   authToken: string;
   l10N?: L10nV1;
   options?: AuthV1Options;
-};
-export type UpdateOrCreateHostedBusinessOwnerRequest = {
-  data: ModernRawUserDataRequest;
-  ownershipStake?: number;
-  uuid: string;
 };
 export type UserAuthScope =
   | 'sign_up'

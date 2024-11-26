@@ -8897,37 +8897,26 @@
                 ]
             },
             "ActorApiKey": {
-                "allOf": [
-                    {
-                        "description": "A tenant API key",
-                        "type": "object",
-                        "properties": {
-                            "id": {
-                                "type": "string"
-                            },
-                            "name": {
-                                "type": "string"
-                            }
-                        },
-                        "required": [
-                            "id",
-                            "name"
+                "description": "A tenant API key",
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "api_key"
                         ]
                     },
-                    {
-                        "type": "object",
-                        "properties": {
-                            "kind": {
-                                "type": "string",
-                                "enum": [
-                                    "api_key"
-                                ]
-                            }
-                        },
-                        "required": [
-                            "kind"
-                        ]
+                    "name": {
+                        "type": "string"
                     }
+                },
+                "required": [
+                    "id",
+                    "kind",
+                    "name"
                 ]
             },
             "ActorFirmEmployee": {
@@ -8961,73 +8950,51 @@
                 ]
             },
             "ActorOrganization": {
-                "allOf": [
-                    {
-                        "description": "A dashboard user for a tenant",
-                        "type": "object",
-                        "properties": {
-                            "email": {
-                                "type": "string"
-                            },
-                            "first_name": {
-                                "type": "string"
-                            },
-                            "last_name": {
-                                "type": "string"
-                            },
-                            "member": {
-                                "type": "string"
-                            }
-                        },
-                        "required": [
-                            "email",
-                            "member"
+                "description": "A dashboard user for a tenant",
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string"
+                    },
+                    "first_name": {
+                        "type": "string"
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "organization"
                         ]
                     },
-                    {
-                        "type": "object",
-                        "properties": {
-                            "kind": {
-                                "type": "string",
-                                "enum": [
-                                    "organization"
-                                ]
-                            }
-                        },
-                        "required": [
-                            "kind"
-                        ]
+                    "last_name": {
+                        "type": "string"
+                    },
+                    "member": {
+                        "type": "string"
                     }
+                },
+                "required": [
+                    "email",
+                    "kind",
+                    "member"
                 ]
             },
             "ActorUser": {
-                "allOf": [
-                    {
-                        "description": "A user onboarding with Footprint.",
-                        "type": "object",
-                        "properties": {
-                            "id": {
-                                "type": "string"
-                            }
-                        },
-                        "required": [
-                            "id"
-                        ]
+                "description": "A user onboarding with Footprint.",
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
                     },
-                    {
-                        "type": "object",
-                        "properties": {
-                            "kind": {
-                                "type": "string",
-                                "enum": [
-                                    "user"
-                                ]
-                            }
-                        },
-                        "required": [
-                            "kind"
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "user"
                         ]
                     }
+                },
+                "required": [
+                    "id",
+                    "kind"
                 ]
             },
             "AdverseMediaListKind": {
@@ -11640,31 +11607,6 @@
                     "role_id"
                 ]
             },
-            "CreateTokenResponse": {
-                "type": "object",
-                "properties": {
-                    "expires_at": {
-                        "description": "The time at which the token (and link) expire",
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "link": {
-                        "example": "https://verify.onefootprint.com/?type=user#utok_ssPvNRjNGdk8Iq9qgf6lsO2iTVhALuR4Nt",
-                        "description": "A Footprint link embedding the `token` that can be sent to this user to allow them to\n complete the flow. This is useful to send in an automated message to the end user.",
-                        "type": "string"
-                    },
-                    "token": {
-                        "example": "utok_ssPvNRjNGdk8Iq9qgf6lsO2iTVhALuR4Nt",
-                        "description": "A short-lived token that can be passed into the Verify SDK to allow the user to complete the\n flow. This is useful when you'd like to open a native interface inside your app for the user\n to complete the flow.",
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "expires_at",
-                    "link",
-                    "token"
-                ]
-            },
             "CursorPaginatedAuditEvent": {
                 "description": "Describes an event relevant to security as seen by tenants.",
                 "type": "object",
@@ -13056,24 +12998,25 @@
                 ]
             },
             "EntityActionManualDecision": {
-                "allOf": [
-                    {
-                        "$ref": "#/components/schemas/ManualDecisionRequest"
+                "type": "object",
+                "properties": {
+                    "annotation": {
+                        "$ref": "#/components/schemas/CreateAnnotationRequest"
                     },
-                    {
-                        "type": "object",
-                        "properties": {
-                            "kind": {
-                                "type": "string",
-                                "enum": [
-                                    "manual_decision"
-                                ]
-                            }
-                        },
-                        "required": [
-                            "kind"
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "manual_decision"
                         ]
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/TerminalDecisionStatus"
                     }
+                },
+                "required": [
+                    "annotation",
+                    "kind",
+                    "status"
                 ]
             },
             "EntityActionResponse": {
@@ -13084,45 +13027,60 @@
                 ]
             },
             "EntityActionResponseTrigger": {
-                "allOf": [
-                    {
-                        "$ref": "#/components/schemas/CreateTokenResponse"
+                "type": "object",
+                "properties": {
+                    "expires_at": {
+                        "description": "The time at which the token (and link) expire",
+                        "type": "string",
+                        "format": "date-time"
                     },
-                    {
-                        "type": "object",
-                        "properties": {
-                            "kind": {
-                                "type": "string",
-                                "enum": [
-                                    "trigger"
-                                ]
-                            }
-                        },
-                        "required": [
-                            "kind"
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "trigger"
                         ]
+                    },
+                    "link": {
+                        "example": "https://verify.onefootprint.com/?type=user#utok_ssPvNRjNGdk8Iq9qgf6lsO2iTVhALuR4Nt",
+                        "description": "A Footprint link embedding the `token` that can be sent to this user to allow them to\n complete the flow. This is useful to send in an automated message to the end user.",
+                        "type": "string"
+                    },
+                    "token": {
+                        "example": "utok_ssPvNRjNGdk8Iq9qgf6lsO2iTVhALuR4Nt",
+                        "description": "A short-lived token that can be passed into the Verify SDK to allow the user to complete the\n flow. This is useful when you'd like to open a native interface inside your app for the user\n to complete the flow.",
+                        "type": "string"
                     }
+                },
+                "required": [
+                    "expires_at",
+                    "kind",
+                    "link",
+                    "token"
                 ]
             },
             "EntityActionTrigger": {
-                "allOf": [
-                    {
-                        "$ref": "#/components/schemas/TriggerRequest"
+                "type": "object",
+                "properties": {
+                    "fp_bid": {
+                        "type": "string"
                     },
-                    {
-                        "type": "object",
-                        "properties": {
-                            "kind": {
-                                "type": "string",
-                                "enum": [
-                                    "trigger"
-                                ]
-                            }
-                        },
-                        "required": [
-                            "kind"
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "trigger"
                         ]
+                    },
+                    "note": {
+                        "description": "Optional note with more context on what we're asking the user to do",
+                        "type": "string"
+                    },
+                    "trigger": {
+                        "$ref": "#/components/schemas/WorkflowRequestConfig"
                     }
+                },
+                "required": [
+                    "kind",
+                    "trigger"
                 ]
             },
             "EntityActionsRequest": {
@@ -14921,32 +14879,21 @@
                 ]
             },
             "InvokeVaultProxyPermissionId": {
-                "allOf": [
-                    {
-                        "type": "object",
-                        "properties": {
-                            "id": {
-                                "type": "string"
-                            }
-                        },
-                        "required": [
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
                             "id"
                         ]
-                    },
-                    {
-                        "type": "object",
-                        "properties": {
-                            "kind": {
-                                "type": "string",
-                                "enum": [
-                                    "id"
-                                ]
-                            }
-                        },
-                        "required": [
-                            "kind"
-                        ]
                     }
+                },
+                "required": [
+                    "id",
+                    "kind"
                 ]
             },
             "InvokeVaultProxyPermissionJustInTime": {
@@ -15659,21 +15606,6 @@
                     "privacy_pass",
                     "apple_device_attestation",
                     "google_device_attestation"
-                ]
-            },
-            "ManualDecisionRequest": {
-                "type": "object",
-                "properties": {
-                    "annotation": {
-                        "$ref": "#/components/schemas/CreateAnnotationRequest"
-                    },
-                    "status": {
-                        "$ref": "#/components/schemas/TerminalDecisionStatus"
-                    }
-                },
-                "required": [
-                    "annotation",
-                    "status"
                 ]
             },
             "ManualReview": {
@@ -19258,33 +19190,22 @@
                 ]
             },
             "TenantScopeDecrypt": {
-                "allOf": [
-                    {
-                        "description": "Allows decrypting data attributes belonging to the listed CollectedDataOption",
-                        "type": "object",
-                        "properties": {
-                            "data": {
-                                "$ref": "#/components/schemas/CollectedDataOption"
-                            }
-                        },
-                        "required": [
-                            "data"
-                        ]
+                "description": "Allows decrypting data attributes belonging to the listed CollectedDataOption",
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/CollectedDataOption"
                     },
-                    {
-                        "type": "object",
-                        "properties": {
-                            "kind": {
-                                "type": "string",
-                                "enum": [
-                                    "decrypt"
-                                ]
-                            }
-                        },
-                        "required": [
-                            "kind"
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "decrypt"
                         ]
                     }
+                },
+                "required": [
+                    "data",
+                    "kind"
                 ]
             },
             "TenantScopeDecryptAll": {
@@ -19363,33 +19284,22 @@
                 ]
             },
             "TenantScopeInvokeVaultProxy": {
-                "allOf": [
-                    {
-                        "description": "Invoke the specified vault proxies",
-                        "type": "object",
-                        "properties": {
-                            "data": {
-                                "$ref": "#/components/schemas/InvokeVaultProxyPermission"
-                            }
-                        },
-                        "required": [
-                            "data"
-                        ]
+                "description": "Invoke the specified vault proxies",
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/InvokeVaultProxyPermission"
                     },
-                    {
-                        "type": "object",
-                        "properties": {
-                            "kind": {
-                                "type": "string",
-                                "enum": [
-                                    "invoke_vault_proxy"
-                                ]
-                            }
-                        },
-                        "required": [
-                            "kind"
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "invoke_vault_proxy"
                         ]
                     }
+                },
+                "required": [
+                    "data",
+                    "kind"
                 ]
             },
             "TenantScopeLabelAndTag": {
@@ -19671,24 +19581,6 @@
                     "onboard",
                     "inherit",
                     "update_auth_methods"
-                ]
-            },
-            "TriggerRequest": {
-                "type": "object",
-                "properties": {
-                    "fp_bid": {
-                        "type": "string"
-                    },
-                    "note": {
-                        "description": "Optional note with more context on what we're asking the user to do",
-                        "type": "string"
-                    },
-                    "trigger": {
-                        "$ref": "#/components/schemas/WorkflowRequestConfig"
-                    }
-                },
-                "required": [
-                    "trigger"
                 ]
             },
             "UnvalidatedRuleExpression": {
