@@ -176,7 +176,7 @@ async fn invalid_action(state: &mut State) {
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: DocumentCollectionKind) {
     // DATA SETUP
-    let (wf, tenant, obc, _tu) = setup_data(
+    let (wf, tenant, playbook, _obc, _tu) = setup_data(
         state,
         ObConfigurationOpts {
             is_live: user_kind.is_live(),
@@ -219,11 +219,11 @@ async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: Docum
         }
         // Mock vendor calls for Live users
         UserKind::Live => {
-            let ob_config_key = obc.key.clone();
+            let playbook_key = playbook.key.clone();
             // TODO: later we should just mock is_production=true for these tests and not need this FF mock.
             mock_ff_client.mock(|c| {
                 c.expect_flag()
-                    .withf(move |f| *f == BoolFlag::EnableIdologyInNonProd(&ob_config_key))
+                    .withf(move |f| *f == BoolFlag::EnableIdologyInNonProd(&playbook_key))
                     .return_once(move |_| true);
             });
 
@@ -385,7 +385,7 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
         DocumentCollectionKind::DocumentNotRequested => {}
     }
 
-    let (wf, tenant, obc, _tu) = setup_data(
+    let (wf, tenant, playbook, _obc, _tu) = setup_data(
         state,
         ObConfigurationOpts {
             is_live: user_kind.is_live(),
@@ -430,7 +430,7 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
         }
         // Mock vendor calls for Live users
         UserKind::Live => {
-            let ob_config_key = obc.key.clone();
+            let ob_config_key = playbook.key.clone();
             // TODO: later we should just mock is_production=true for these tests and not need this FF mock.
             mock_ff_client.mock(|c| {
                 c.expect_flag()
@@ -579,7 +579,7 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
                     &wf,
                     &obd,
                     &tenant.id,
-                    &obc.key,
+                    &playbook.key,
                     rs_failing,
                     document_requested.is_some(),
                 )

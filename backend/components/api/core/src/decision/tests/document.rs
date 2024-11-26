@@ -692,6 +692,7 @@ async fn setup_document_test(
         sv,
         dr,
         v,
+        playbook: _,
         obc: _,
     } = super::test_helpers::create_kyc_user_and_wf(state, obc_opts, user_fixture_result, None).await;
     let dr = dr.unwrap();

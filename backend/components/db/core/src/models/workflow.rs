@@ -4,6 +4,7 @@ use super::fingerprint::Fingerprint;
 use super::insight_event::CreateInsightEvent;
 use super::manual_review::ManualReviewDelta;
 use super::ob_configuration::ObConfiguration;
+use super::playbook::Playbook;
 use super::scoped_vault::ScopedVault;
 use super::scoped_vault::ScopedVaultUpdate;
 use super::scoped_vault::SvStatusDelta;
@@ -23,6 +24,7 @@ use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::identity_document;
 use db_schema::schema::ob_configuration;
+use db_schema::schema::playbook;
 use db_schema::schema::workflow;
 use diesel::dsl::not;
 use diesel::prelude::*;
@@ -401,11 +403,16 @@ impl Workflow {
         conn: &mut PgConn,
         sv_id: &ScopedVaultId,
         pagination: OffsetPagination,
-    ) -> FpResult<OffsetPaginatedResult<(Self, ObConfiguration)>> {
+    ) -> FpResult<OffsetPaginatedResult<(Self, Playbook, ObConfiguration)>> {
         let mut query = workflow::table
             .filter(workflow::scoped_vault_id.eq(sv_id))
+            .inner_join(ob_configuration::table.inner_join(playbook::table))
+            .select((
+                workflow::all_columns,
+                playbook::all_columns,
+                ob_configuration::all_columns,
+            ))
             .order_by(workflow::created_at.desc())
-            .inner_join(ob_configuration::table)
             .limit(pagination.limit())
             .into_boxed();
         if let Some(offset) = pagination.offset() {
@@ -591,7 +598,7 @@ impl Workflow {
             return Ok(());
         }
 
-        let (_, obc) = ObConfiguration::get(conn, &self.ob_configuration_id)?;
+        let (playbook, _) = ObConfiguration::get(conn, &self.ob_configuration_id)?;
         let sv = ScopedVault::get(conn, &self.scoped_vault_id)?;
         let webhook_event = WebhookEvent::OnboardingCompleted(OnboardingCompletedPayload {
             fp_id: sv.fp_id.clone(),
@@ -599,7 +606,7 @@ impl Workflow {
             // TODO this doesn't really make sense in the context of ad-hoc document workflows
             status: wf_delta.new_status,
             requires_manual_review: mr_deltas.new_has_mrs,
-            playbook_key: obc.key,
+            playbook_key: playbook.key,
             is_live: sv.is_live,
         });
         let task_data = sv.webhook_event(webhook_event);

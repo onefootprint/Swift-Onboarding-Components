@@ -2,9 +2,9 @@ use crate::utils::db2api::DbToApi;
 use api_wire_types::Actor;
 use api_wire_types::OnboardingDecisionKind;
 use db::models::manual_review::ManualReview;
-use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::onboarding_decision::SaturatedOnboardingDecisionInfo;
+use db::models::playbook::Playbook;
 use db::models::workflow::Workflow;
 use newtypes::DbActor;
 use newtypes::WorkflowFixtureResult;
@@ -48,8 +48,8 @@ impl DbToApi<ManualReview> for api_wire_types::ManualReview {
     }
 }
 
-impl DbToApi<(OnboardingDecision, Workflow, ObConfiguration)> for api_wire_types::PublicOnboardingDecision {
-    fn from_db((decision, _, obc): (OnboardingDecision, Workflow, ObConfiguration)) -> Self {
+impl DbToApi<(OnboardingDecision, Playbook)> for api_wire_types::PublicOnboardingDecision {
+    fn from_db((decision, playbook): (OnboardingDecision, Playbook)) -> Self {
         let OnboardingDecision {
             status,
             created_at,
@@ -59,7 +59,7 @@ impl DbToApi<(OnboardingDecision, Workflow, ObConfiguration)> for api_wire_types
         // The actor who made the decision determines whether this is an automated decision or manual
         // decision
         let (kind, playbook_key) = match actor {
-            DbActor::Footprint => (OnboardingDecisionKind::PlaybookRun, Some(obc.key)),
+            DbActor::Footprint => (OnboardingDecisionKind::PlaybookRun, Some(playbook.key)),
             DbActor::TenantApiKey { .. } | DbActor::TenantUser { .. } | DbActor::FirmEmployee { .. } => {
                 (OnboardingDecisionKind::Manual, None)
             }

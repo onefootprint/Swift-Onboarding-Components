@@ -49,7 +49,7 @@ pub async fn run_kyc_waterfall(state: &State, di: &DecisionIntent, wf: &Workflow
             Ok((sv.tenant_id, vw, playbook, obc))
         })
         .await?;
-    let ob_configuration_key = obc.key.clone();
+    let playbook_key = playbook.key.clone();
     let tvc = TenantVendorControl::new(
         tenant_id.clone(),
         &state.db_pool,
@@ -117,7 +117,7 @@ pub async fn run_kyc_waterfall(state: &State, di: &DecisionIntent, wf: &Workflow
             &tvc,
             &di.scoped_vault_id,
             &di.id,
-            ob_configuration_key.clone(),
+            playbook_key.clone(),
             waterfall_vendor_api,
         )
         .await?;
@@ -352,7 +352,9 @@ pub(super) fn eval_waterfall_rules(
         %vault_id,
         tenant_id=%playbook.tenant_id,
         obc_id=%obc.id,
-        obc_key=%obc.key,
+        playbook_key=%playbook.key,
+        // TODO(ethan): remove after ~December 15, 2024.
+        obc_key=%playbook.key,
         ?reason_codes,
         version=2,
         "kyc_waterfall rule evaluation"

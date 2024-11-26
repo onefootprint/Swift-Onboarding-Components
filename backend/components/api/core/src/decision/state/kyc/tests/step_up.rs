@@ -96,7 +96,7 @@ async fn test_stepup_with_multiple_docs(state: &State, action: RuleActionMigrati
     let must_collect_data = vec![CDO::PhoneNumber, CDO::Ssn9];
 
     let is_live = true;
-    let (wf, t, obc, _tu) = setup_data(
+    let (wf, t, playbook, obc, _tu) = setup_data(
         state,
         ObConfigurationOpts {
             is_live,
@@ -157,7 +157,7 @@ async fn test_stepup_with_multiple_docs(state: &State, action: RuleActionMigrati
     let ww = WorkflowWrapper::init(state, wf, seqno).await.unwrap();
 
     // Mock vendor calls
-    let ob_config_key = obc.key.clone();
+    let ob_config_key = playbook.key.clone();
     let mut mock_ff_client = MockFFClient::new();
     mock_ff_client.mock(|c| {
         c.expect_flag()
@@ -314,7 +314,7 @@ async fn test_multi_stage_step_up(state: &mut State) {
     let must_collect_data = vec![CDO::PhoneNumber, CDO::Ssn9];
 
     let is_live = true;
-    let (wf, tenant, obc, _tu) = setup_data(
+    let (wf, tenant, playbook, obc, _tu) = setup_data(
         state,
         ObConfigurationOpts {
             is_live: true,
@@ -394,7 +394,7 @@ async fn test_multi_stage_step_up(state: &mut State) {
     let ww = WorkflowWrapper::init(state, wf, seqno).await.unwrap();
 
     // Mock vendor calls
-    let ob_config_key = obc.key.clone();
+    let ob_config_key = playbook.key.clone();
     let mut mock_ff_client = MockFFClient::new();
     mock_ff_client.mock(|c| {
         c.expect_flag()

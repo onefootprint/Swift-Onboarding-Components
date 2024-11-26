@@ -432,7 +432,7 @@ mod tests {
         is_live: bool,
     ) -> (Locked<ScopedVault>, Vault, Vec<RiskSignal>) {
         let uv = tests::fixtures::vault::create_person(conn, is_live);
-        let sv = tests::fixtures::scoped_vault::create(conn, &uv.id, &tenant_id);
+        let sv = tests::fixtures::scoped_vault::create(conn, &uv.id, tenant_id);
 
         let di = crate::models::decision_intent::DecisionIntent::create(
             conn,

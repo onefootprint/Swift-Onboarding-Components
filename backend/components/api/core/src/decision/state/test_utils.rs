@@ -24,6 +24,7 @@ use db::models::manual_review::ManualReview;
 use db::models::manual_review::ManualReviewFilters;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding_decision::OnboardingDecision;
+use db::models::playbook::Playbook;
 use db::models::risk_signal::RiskSignal;
 use db::models::risk_signal::RiskSignalFilter;
 use db::models::risk_signal_group::RiskSignalGroupScope;
@@ -178,9 +179,13 @@ pub async fn setup_data(
     state: &State,
     obc_opts: ObConfigurationOpts,
     fixture_result: Option<WorkflowFixtureResult>,
-) -> (Workflow, Tenant, ObConfiguration, TenantUser) {
+) -> (Workflow, Tenant, Playbook, ObConfiguration, TenantUser) {
     let FixtureData {
-        t: tenant, wf, obc, ..
+        t: tenant,
+        wf,
+        playbook,
+        obc,
+        ..
     } = test_helpers::create_kyc_user_and_wf(state, obc_opts, fixture_result, None).await;
 
     let tid = tenant.id.clone();
@@ -198,7 +203,7 @@ pub async fn setup_data(
         .await
         .unwrap();
 
-    (wf, tenant, obc, tu)
+    (wf, tenant, playbook, obc, tu)
 }
 
 pub async fn query_data(

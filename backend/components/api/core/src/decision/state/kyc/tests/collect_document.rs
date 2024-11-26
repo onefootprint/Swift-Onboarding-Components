@@ -70,7 +70,7 @@ async fn test_document_fails(state: &mut State, user_kind: UserKind, doc_outcome
 
     // DATA SETUP
     let is_live = user_kind.is_live();
-    let (wf, tenant, obc, _tu) = setup_data(
+    let (wf, tenant, playbook, obc, _tu) = setup_data(
         state,
         ObConfigurationOpts {
             is_live,
@@ -157,7 +157,7 @@ async fn test_document_fails(state: &mut State, user_kind: UserKind, doc_outcome
         }
         // Mock vendor calls for Live users
         UserKind::Live => {
-            let ob_config_key = obc.key.clone();
+            let ob_config_key = playbook.key.clone();
             // TODO: later we should just mock is_production=true for these tests and not need this FF mock.
             mock_ff_client.mock(|c| {
                 c.expect_flag()

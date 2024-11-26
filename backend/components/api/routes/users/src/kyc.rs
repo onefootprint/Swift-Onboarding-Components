@@ -148,7 +148,7 @@ pub async fn post(
         .flag(BoolFlag::ApiKycSkipEmailAndPhoneRequirements(&tenant_id))
         && uvw.vault.is_created_via_api;
 
-    let (wf, obc) = state
+    let (wf, playbook) = state
         .db_transaction(move |conn| {
             let result = Playbook::get_latest_version_if_enabled(conn, (&key, &tenant_id, is_live));
             let (playbook, obc) = match result.optional() {
@@ -156,7 +156,7 @@ pub async fn post(
                 Ok(None) => return Err(DbError::PlaybookNotFound.into()),
                 Err(e) => return Err(e),
             };
-            tracing::info!(playbook_key=%obc.key, "Post /kyc with playbook");
+            tracing::info!(playbook_key=%playbook.key, "Post /kyc with playbook");
             // We support using a KYB playbook since this will just run the KYC checks from the playbook
             if !matches!(obc.kind, ObConfigurationKind::Kyc | ObConfigurationKind::Kyb) {
                 return BadRequestInto("Invalid playbook kind");
@@ -248,7 +248,7 @@ pub async fn post(
                 return Err(err.into());
             }
 
-            Ok((wf, obc))
+            Ok((wf, playbook))
         })
         .await?;
 
@@ -299,7 +299,7 @@ pub async fn post(
         None
     };
 
-    let validate = api_wire_types::EntityValidateResponse::from_db((wf.status, sv, mrs, obc));
+    let validate = api_wire_types::EntityValidateResponse::from_db((wf.status, sv, mrs, playbook));
     let in_progress_link = in_progress_session.map(|(token, session)| CreateTokenResponse {
         link: (state.config.service_config).generate_link(LinkKind::VerifyUser, &token),
         token,

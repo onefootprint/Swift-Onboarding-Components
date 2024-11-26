@@ -56,7 +56,7 @@ async fn collect_doc_skip_kyc(
 ) {
     let (expected_status, expected_review) = expected;
     // DATA SETUP
-    let (wf, _t, _obc, _tu) = setup_data(
+    let (wf, _t, _playbook, _obc, _tu) = setup_data(
         state,
         ObConfigurationOpts {
             is_live: user_kind.is_live(),

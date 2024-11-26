@@ -54,6 +54,7 @@ pub async fn get(
         .filter(|(_, wf, _)| wf.kind.has_tenant_facing_decision())
         // Filter out step up decisions
         .filter(|(d, _, _)| OnboardingStatus::from(d.status).is_terminal())
+        .map(|(d, _, obc)| (d, obc))
         .map(api_wire_types::PublicOnboardingDecision::from_db)
         .collect::<Vec<_>>();
     Ok(Json(OffsetPaginatedResponse::ok_no_count(results, next_page)))

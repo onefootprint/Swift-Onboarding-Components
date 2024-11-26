@@ -59,7 +59,7 @@ async fn test(
     let (expected_status, expected_rs) = expected;
     let user_kind = UserKind::Live;
     // DATA SETUP
-    let (wf, _t, obc, _tu) = setup_data(
+    let (wf, _t, _, obc, _tu) = setup_data(
         state,
         ObConfigurationOpts {
             is_live: user_kind.is_live(),

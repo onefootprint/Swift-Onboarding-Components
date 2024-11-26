@@ -84,14 +84,14 @@ fn create_webhook_event(
         .filter(|(wf, _)| wf.completed_at.is_some())
         .max_by_key(|(wf, _)| wf.completed_at)
         .ok_or(ServerErr!("No completed workflow for {}", sv.fp_id))?;
-    let (_, obc) = ObConfiguration::get(conn, &latest_wf.ob_configuration_id)?;
+    let (playbook, _) = ObConfiguration::get(conn, &latest_wf.ob_configuration_id)?;
     let event = match kind {
         WebhookEventKind::OnboardingCompleted => {
             WebhookEvent::OnboardingCompleted(OnboardingCompletedPayload {
                 fp_id: sv.fp_id.clone(),
                 timestamp: Utc::now(),
                 status: sv.status,
-                playbook_key: obc.key,
+                playbook_key: playbook.key,
                 requires_manual_review: !mrs.is_empty(),
                 is_live: sv.is_live,
             })

@@ -92,7 +92,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
         //  - Create it with state Pending and a decision_intent is created at the same time
         //  - Create it with state NotNeeded and no decision_intent is written, meaning no vendor call is to
         //    be made
-        let (tenant, sv, obc, uvw, wc) = state
+        let (tenant, sv, playbook_obc, uvw, wc) = state
             .db_transaction(move |conn| {
                 // not strictly needed since we ever only execute a single task 1 at a time, but nice to be
                 // extra safe
@@ -108,9 +108,9 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
 
                 let tenant = Tenant::get(conn, &sv.tenant_id)?;
                 let sv = ScopedVault::get(conn, &sv_id)?;
-                let obc = ObConfiguration::get_enhanced_aml_obc_for_sv(conn, &sv.id)?;
+                let playbook_obc = ObConfiguration::get_enhanced_aml_obc_for_sv(conn, &sv.id)?;
 
-                Ok((tenant, sv, obc, uvw, wc))
+                Ok((tenant, sv, playbook_obc, uvw, wc))
             })
             .await?;
 
@@ -126,12 +126,17 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
             "Expected watchlist_check.decision_intent_id to be non-null",
         ))?;
 
-        let watchlist_result = match (&obc, obc.as_ref().map(|o| o.verification_checks().enhanced_aml())) {
+        let watchlist_result = match (
+            &playbook_obc,
+            playbook_obc
+                .as_ref()
+                .map(|(_, obc)| obc.verification_checks().enhanced_aml()),
+        ) {
             // Idology
             (None, _) | (Some(_), None) | (_, Some(EnhancedAmlOption::No)) => {
                 // logic that enqeues this Task should prevent this, but extra precaution
                 if !tenant.id.is_fractional() {
-                    tracing::error!(%tenant.id, obc_id=obc.map(|o| o.id.to_string()).unwrap_or_default(),"WatchlistCheckTask run with an obc with enhanced_aml=No on a non-Fractional tenant");
+                    tracing::error!(%tenant.id, obc_id=playbook_obc.map(|(_, obc)| obc.id.to_string()).unwrap_or_default(),"WatchlistCheckTask run with an obc with enhanced_aml=No on a non-Fractional tenant");
                 }
 
                 let existing_response = load_response_for_vendor_api(
@@ -154,7 +159,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
             }
             // Incode
             (
-                Some(obc),
+                Some((playbook, obc)),
                 Some(EnhancedAmlOption::Yes {
                     ofac: _,
                     pep: _,
@@ -170,7 +175,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
                 }
                 if IncodeWatchlistCheck.requirements_are_satisfied(uvw.populated().as_slice()) {
                     let reason_codes =
-                        incode::complete_vendor_call(&state, &sv.id, &di_id, obc, &uvw).await?;
+                        incode::complete_vendor_call(&state, &sv.id, &di_id, playbook, obc, &uvw).await?;
                     WatchlistVendorResult::Completed(reason_codes)
                 } else {
                     WatchlistVendorResult::InsufficientData

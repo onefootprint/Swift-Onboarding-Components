@@ -26,6 +26,7 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
 use crate::State;
 use db::models::ob_configuration::ObConfiguration;
+use db::models::playbook::Playbook;
 use db::models::rule_instance::IncludeRules;
 use db::models::rule_instance::RuleInstance;
 use db::models::rule_set_result::RuleSetResult;
@@ -60,7 +61,7 @@ async fn setup(
     state: &State,
     fixture_result: Option<WorkflowFixtureResult>,
     ein_only: bool,
-) -> (DbWorkflow, Tenant, ObConfiguration, DbWorkflow) {
+) -> (DbWorkflow, Tenant, Playbook, ObConfiguration, DbWorkflow) {
     let is_live = fixture_result.is_none();
     let cdos: Vec<CDO> = vec![
         Some(CDO::PhoneNumber),
@@ -73,7 +74,7 @@ async fn setup(
     .into_iter()
     .flatten()
     .collect();
-    let (t, wf, _v, _sv, obc, biz_wf) = test_helpers::create_kyb_user_and_onboarding(
+    let (t, wf, _v, _sv, playbook, obc, biz_wf) = test_helpers::create_kyb_user_and_onboarding(
         state,
         ObConfigurationOpts {
             is_live,
@@ -90,14 +91,14 @@ async fn setup(
     )
     .await;
 
-    (biz_wf, t, obc, wf)
+    (biz_wf, t, playbook, obc, wf)
 }
 
 async fn run_kyc_for_bo(
     state: &mut State,
     wf: &DbWorkflow,
     tenant: Tenant,
-    obc: ObConfiguration,
+    playbook: Playbook,
     user_kind: UserKind,
 ) {
     let wfid = wf.id.clone();
@@ -155,10 +156,10 @@ async fn run_kyc_for_bo(
     match user_kind {
         UserKind::Demo | UserKind::Sandbox(_) => {}
         UserKind::Live => {
-            let ob_config_key = obc.key.clone();
+            let playbook_key = playbook.key.clone();
             mock_ff_client.mock(|c| {
                 c.expect_flag()
-                    .withf(move |f| *f == BoolFlag::EnableIdologyInNonProd(&ob_config_key))
+                    .withf(move |f| *f == BoolFlag::EnableIdologyInNonProd(&playbook_key))
                     .return_once(move |_| true);
             });
 
@@ -230,7 +231,7 @@ async fn run_kyc_for_bo(
 
 #[test_state]
 async fn authorize(state: &mut State) {
-    let (wf, _, _, _) = setup(state, None, false).await;
+    let (wf, _, _, _, _) = setup(state, None, false).await;
 
     let seqno = get_current_seqno(state).await;
     let ww = WorkflowWrapper::init(state, wf, seqno).await.unwrap();
@@ -256,7 +257,7 @@ async fn authorize(state: &mut State) {
 #[tokio::test(flavor = "multi_thread")]
 async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult, ein_only: bool) {
     // SETUP
-    let (wf, tenant, obc, person_wf) = setup(state, Some(fixture_result), ein_only).await;
+    let (wf, tenant, playbook, _obc, person_wf) = setup(state, Some(fixture_result), ein_only).await;
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
     let seqno = get_current_seqno(state).await;
@@ -275,7 +276,14 @@ async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult, ein_o
         .unwrap();
 
     // BoKycCompleted
-    run_kyc_for_bo(state, &person_wf, tenant, obc, UserKind::Sandbox(fixture_result)).await;
+    run_kyc_for_bo(
+        state,
+        &person_wf,
+        tenant,
+        playbook,
+        UserKind::Sandbox(fixture_result),
+    )
+    .await;
     let (ww, _) = ww
         .action(state, WorkflowActions::BoKycCompleted(BoKycCompleted {}))
         .await
@@ -380,9 +388,7 @@ async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult, ein_o
 #[tokio::test(flavor = "multi_thread")]
 async fn live(state: &mut State, terminal_status: TerminalDecisionStatus, ein_only: bool) {
     // SETUP
-    let (wf, tenant, obc, person_wf) = setup(state, None, ein_only).await;
-    let t1 = tenant.clone();
-    let obc1 = obc.clone();
+    let (wf, tenant, playbook, _obc, person_wf) = setup(state, None, ein_only).await;
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
     let seqno = get_current_seqno(state).await;
@@ -400,7 +406,14 @@ async fn live(state: &mut State, terminal_status: TerminalDecisionStatus, ein_on
         .action(state, WorkflowActions::MakeDecision(MakeDecision { seqno }))
         .await
         .unwrap();
-    run_kyc_for_bo(state, &person_wf, t1, obc1, UserKind::Live).await;
+    run_kyc_for_bo(
+        state,
+        &person_wf,
+        tenant.clone(),
+        playbook.clone(),
+        UserKind::Live,
+    )
+    .await;
 
     let mut mock_ff_client = MockFFClient::new();
     mock_ff_client.mock(|c| {
@@ -411,7 +424,7 @@ async fn live(state: &mut State, terminal_status: TerminalDecisionStatus, ein_on
     });
     mock_ff_client.mock(|c| {
         c.expect_flag()
-            .withf(move |f| *f == BoolFlag::EnableMiddeskInNonProd(&obc.key))
+            .withf(move |f| *f == BoolFlag::EnableMiddeskInNonProd(&playbook.key))
             .return_once(move |_| true);
     });
 

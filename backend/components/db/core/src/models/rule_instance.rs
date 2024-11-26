@@ -397,6 +397,7 @@ impl RuleInstance {
                 rule_instance::created_at.desc(),
                 rule_instance::id,
             ))
+            // Why is this artificially limited?
             .limit(300)
             .get_results(conn)?;
 

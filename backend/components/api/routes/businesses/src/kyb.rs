@@ -109,7 +109,7 @@ pub async fn post(
 
     let dbos = bvw.decrypt_business_owners(&state).await?;
     let tenant_id = auth.tenant().id.clone();
-    let (biz_wf, obc) = state
+    let (biz_wf, playbook) = state
         .db_transaction(move |conn| {
             let result = Playbook::get_latest_version_if_enabled(conn, (&key, &tenant_id, is_live));
             let (playbook, obc) = match result.optional() {
@@ -117,7 +117,7 @@ pub async fn post(
                 Ok(None) => return Err(DbError::PlaybookNotFound.into()),
                 Err(e) => return Err(e),
             };
-            tracing::info!(playbook_key=%obc.key, "Post /kyb with playbook");
+            tracing::info!(playbook_key=%playbook.key, "Post /kyb with playbook");
             if obc.kind != ObConfigurationKind::Kyb {
                 return BadRequestInto("Must use playbook of kind KYB");
             }
@@ -185,7 +185,7 @@ pub async fn post(
                 .into());
             }
 
-            Ok((biz_wf, obc))
+            Ok((biz_wf, playbook))
         })
         .await?;
 
@@ -205,6 +205,6 @@ pub async fn post(
         .await?;
 
     Ok(web::Json(api_wire_types::EntityValidateResponse::from_db((
-        wf.status, sv, mrs, obc,
+        wf.status, sv, mrs, playbook,
     ))))
 }

@@ -435,8 +435,8 @@ async fn get_risk_signal_and_maybe_detail(
                         .clone()
                         .ok_or(ServerErr("missing vres_id"))?,
                 )?;
-                let obc = ObConfiguration::get_enhanced_aml_obc_for_sv(conn, &vreq.scoped_vault_id)?;
-                if let Some(obc) = obc {
+                let playbook_obc = ObConfiguration::get_enhanced_aml_obc_for_sv(conn, &vreq.scoped_vault_id)?;
+                if let Some((_, obc)) = playbook_obc {
                     let v = Vault::get(conn, (&fp_id, &tenant_id, is_live))?;
                     Some(((vreq, vres), v.e_private_key, obc))
                 } else {

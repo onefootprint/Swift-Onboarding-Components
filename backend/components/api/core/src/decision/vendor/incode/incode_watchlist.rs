@@ -16,6 +16,7 @@ use crate::State;
 use db::models::billing_event::BillingEvent;
 use db::models::decision_intent::DecisionIntent;
 use db::models::ob_configuration::ObConfiguration;
+use db::models::playbook::Playbook;
 use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::VReqIdentifier;
 use db::models::verification_request::VerificationRequest;
@@ -226,6 +227,7 @@ impl From<WatchlistCheckKind> for VendorAPI {
 pub async fn run_watchlist_check(
     state: &State,
     di: &DecisionIntent,
+    playbook: &Playbook,
     obc: &ObConfiguration,
     kind: WatchlistCheckKind,
 ) -> FpResult<(VerificationResultId, WatchlistResultResponse)> {
@@ -267,7 +269,7 @@ pub async fn run_watchlist_check(
     if state.config.service_config.is_production()
         || state
             .ff_client
-            .flag(BoolFlag::EnableIncodeWatchlistCheckInNonProd(&obc.key))
+            .flag(BoolFlag::EnableIncodeWatchlistCheckInNonProd(&playbook.key))
     {
         // Get the first configured match kind for an aml check.
         let match_kind = if let Some(VerificationCheck::Aml { match_kind, .. }) =

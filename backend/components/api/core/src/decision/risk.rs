@@ -175,7 +175,9 @@ fn log_canonical_line(
     };
 
     tracing::info!(
-        obc_key=%obc.key,
+        playbook_key=%playbook.key,
+        // TODO(ethan): remove after ~December 15, 2024.
+        obc_key=%playbook.key,
         should_commit=%rules_outcome.should_commit(),
         create_manual_review=rules_outcome.create_manual_review(),
         action=%RuleResultRuleAction::from(action),

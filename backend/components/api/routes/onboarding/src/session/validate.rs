@@ -21,6 +21,7 @@ use db::models::auth_event::AuthEvent;
 use db::models::manual_review::ManualReview;
 use db::models::manual_review::ManualReviewFilters;
 use db::models::ob_configuration::ObConfiguration;
+use db::models::playbook::Playbook;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow::Workflow;
 use newtypes::AuthEventKind;
@@ -64,16 +65,16 @@ pub async fn post(
                 let (wf, sv) = Workflow::get_all(conn, &wf_id)?;
                 let mr_filters = ManualReviewFilters::get_active();
                 let user_mrs = ManualReview::get(conn, &sv.id, mr_filters.clone())?;
-                let (_, obc) = ObConfiguration::get(conn, &wf.ob_configuration_id)?;
+                let (playbook, obc) = ObConfiguration::get(conn, &wf.ob_configuration_id)?;
                 let biz_wf = if requires_biz_workflow(&wf, &obc)? {
                     let biz_wf_id = biz_wf_id.ok_or(BadRequest("Missing business workflow"))?;
                     let (biz_wf, biz_sv) = Workflow::get_all(conn, &biz_wf_id)?;
                     let biz_mrs = ManualReview::get(conn, &biz_sv.id, mr_filters)?;
-                    Some((biz_sv, biz_wf, biz_mrs, obc.clone()))
+                    Some((biz_sv, biz_wf, biz_mrs, playbook.clone(), obc.clone()))
                 } else {
                     None
                 };
-                (Some((wf, user_mrs, obc)), biz_wf)
+                (Some((wf, user_mrs, playbook, obc)), biz_wf)
             } else {
                 (None, None)
             };
@@ -88,7 +89,7 @@ pub async fn post(
     // For now, we'll keep serializing this, but we should migrate them away as soon as we start
     // serializing the playbook key here.
     let onboarding_configuration_id = if auth.tenant().pinned_api_version.is_some_and(|v| v <= 2) {
-        wf.as_ref().map(|(_, _, obc)| obc.id.clone())
+        wf.as_ref().map(|(_, _, _, obc)| obc.id.clone())
     } else {
         None
     };
@@ -97,7 +98,7 @@ pub async fn post(
     let validate_and_serialize = |sv: ScopedVault,
                                   mrs: Vec<ManualReview>,
                                   wf: Workflow,
-                                  obc: ObConfiguration|
+                                  playbook: Playbook|
      -> FpResult<EntityValidateResponse> {
         if sv.tenant_id != auth.tenant().id {
             return Err(OnboardingError::TenantMismatch.into());
@@ -110,7 +111,7 @@ pub async fn post(
             return Err(OnboardingError::NonTerminalState.into());
         }
 
-        let response = api_wire_types::EntityValidateResponse::from_db((wf.status, sv, mrs, obc));
+        let response = api_wire_types::EntityValidateResponse::from_db((wf.status, sv, mrs, playbook));
         Ok(response)
     };
     let user_auth = UserAuthResponse {
@@ -125,12 +126,12 @@ pub async fn post(
             })
             .collect(),
     };
-    let wf_id = wf.as_ref().map(|(wf, _, _)| wf.id.clone());
+    let wf_id = wf.as_ref().map(|(wf, _, _, _)| wf.id.clone());
     let user = wf
-        .map(|(wf, mrs, obc)| validate_and_serialize(sv, mrs, wf, obc))
+        .map(|(wf, mrs, playbook, _obc)| validate_and_serialize(sv, mrs, wf, playbook))
         .transpose()?;
     let business = biz_wf
-        .map(|(sv, wf, mrs, obc)| validate_and_serialize(sv, mrs, wf, obc))
+        .map(|(sv, wf, mrs, playbook, _obc)| validate_and_serialize(sv, mrs, wf, playbook))
         .transpose()?;
 
     if let Some(wf_id) = wf_id {

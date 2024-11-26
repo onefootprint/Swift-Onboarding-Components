@@ -45,13 +45,13 @@ mod tests {
     #[test_db_pool]
     async fn test(db_pool: TestDbPool) {
         // Setup
-        let (sv, obc) = db_pool
+        let (sv, playbook) = db_pool
             .db_transaction(|conn| -> FpResult<_> {
                 let t = fixtures::tenant::create(conn);
-                let (_, obc) = fixtures::ob_configuration::create(conn, &t.id, true);
+                let (playbook, _) = fixtures::ob_configuration::create(conn, &t.id, true);
                 let vault = fixtures::vault::create_person(conn, true);
                 let sv = fixtures::scoped_vault::create(conn, &vault.id, &t.id).into_inner();
-                Ok((sv, obc))
+                Ok((sv, playbook.into_inner()))
             })
             .await
             .unwrap();
@@ -64,7 +64,7 @@ mod tests {
                 fp_id: sv.fp_id.clone(),
                 timestamp: chrono::Utc::now(),
                 status: OnboardingStatus::Fail,
-                playbook_key: obc.key.clone(),
+                playbook_key: playbook.key.clone(),
                 requires_manual_review: true,
                 is_live: sv.is_live,
             }),
@@ -80,7 +80,7 @@ mod tests {
                     payload.fp_id == fp_id
                         && payload.status == OnboardingStatus::Fail
                         && payload.requires_manual_review
-                        && payload.playbook_key == obc.key
+                        && payload.playbook_key == playbook.key
                 }
                 _ => false,
             })

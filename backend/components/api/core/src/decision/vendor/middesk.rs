@@ -264,7 +264,7 @@ impl MiddeskState<PendingCreateBusinessCall> {
         let vreq_id = self.state.create_business_vreq.id.clone();
         let wf_id = self.middesk_request.workflow_id;
 
-        let (_, obc) = state
+        let (playbook, obc) = state
             .db_query(move |conn| ObConfiguration::get(conn, &wf_id))
             .await?;
 
@@ -284,7 +284,7 @@ impl MiddeskState<PendingCreateBusinessCall> {
         // Validate we have the appropriate data for the call we're making
         let business_data_for_request = BusinessDataForRequest::try_from((business_data, EinOnly(ein_only)))?;
 
-        let obc_key = obc.key.clone();
+        let playbook_key = playbook.key.clone();
 
         // based on the check we're performing... validate the data
 
@@ -295,7 +295,7 @@ impl MiddeskState<PendingCreateBusinessCall> {
             &state.config,
             &state.enclave_client,
             business_data_for_request,
-            obc_key,
+            playbook_key,
             tenant_id,
         )
         .await?;

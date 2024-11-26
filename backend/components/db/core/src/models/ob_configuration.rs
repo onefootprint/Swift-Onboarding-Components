@@ -56,7 +56,7 @@ pub type IsLive = bool;
 #[diesel(table_name = ob_configuration)]
 pub struct ObConfiguration {
     pub id: ObConfigurationId,
-    // #[deprecated(note = "Use playbook(key) instead")]
+    #[deprecated(note = "Use playbook(key) instead")]
     pub key: PublishablePlaybookKey,
     pub name: String,
     #[deprecated(note = "Use playbook(tenant_id) instead")]
@@ -773,27 +773,31 @@ impl ObConfiguration {
     }
 
     #[tracing::instrument("ObConfiguration::get_enhanced_aml_obc_for_sv", skip_all)]
-    pub fn get_enhanced_aml_obc_for_sv(conn: &mut PgConn, sv_id: &ScopedVaultId) -> FpResult<Option<Self>> {
+    pub fn get_enhanced_aml_obc_for_sv(
+        conn: &mut PgConn,
+        sv_id: &ScopedVaultId,
+    ) -> FpResult<Option<(Playbook, Self)>> {
         // Get OBC for this scoped vault. This is a little funky now because you can theoretically onboard
         // only multiple Workflow's and each could have a different OBC For now, we take the first
         // completed WF by completed_at where enhanced_aml = Yes. If none of the WF's have enhanced AML,
         // then we just take the first OBC.
         let (wfs, _) = Workflow::list(conn, sv_id, OffsetPagination::page(20))?;
-        let obc = if let Some((_, obc)) = wfs
+        let playbook_obc = if let Some((_, playbook, obc)) = wfs
             .iter()
-            .filter(|(wf, _)| wf.completed_at.is_some())
-            .sorted_by_key(|(wf, _)| wf.completed_at)
-            .find(|(_, obc)| {
+            .filter(|(wf, _, _)| wf.completed_at.is_some())
+            .sorted_by_key(|(wf, _, _)| wf.completed_at)
+            .find(|(_, _, obc)| {
                 matches!(
                     &obc.verification_checks().enhanced_aml(),
                     EnhancedAmlOption::Yes { .. }
                 )
             }) {
-            Some(obc.clone())
+            Some((playbook.clone(), obc.clone()))
         } else {
-            wfs.first().map(|(_, obc)| obc.clone())
+            wfs.first()
+                .map(|(_, playbook, obc)| (playbook.clone(), obc.clone()))
         };
-        Ok(obc)
+        Ok(playbook_obc)
     }
 
     pub fn document_cdo(&self) -> Option<&DocumentCdoInfo> {

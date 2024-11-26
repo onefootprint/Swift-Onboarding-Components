@@ -198,7 +198,7 @@ async fn test_run_kyc_waterfall(
     run2: Run,
 ) {
     // Setup
-    let (wf, t, _obc, _tu) = test_utils::setup_data(
+    let (wf, t, _playbook, _obc, _tu) = test_utils::setup_data(
         state,
         ObConfigurationOpts {
             is_live: true,

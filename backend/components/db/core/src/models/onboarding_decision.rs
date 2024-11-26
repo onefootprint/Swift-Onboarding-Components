@@ -2,6 +2,7 @@ use super::manual_review::ManualReview;
 use super::manual_review::ManualReviewArgs;
 use super::manual_review::ManualReviewDelta;
 use super::ob_configuration::ObConfiguration;
+use super::playbook::Playbook;
 use super::user_timeline::UserTimeline;
 use crate::actor;
 use crate::actor::SaturatedActor;
@@ -16,6 +17,7 @@ use chrono::Utc;
 use db_schema::schema::manual_review;
 use db_schema::schema::ob_configuration;
 use db_schema::schema::onboarding_decision;
+use db_schema::schema::playbook;
 use db_schema::schema::workflow;
 use diesel::dsl::not;
 use diesel::prelude::*;
@@ -199,11 +201,16 @@ impl OnboardingDecision {
         sv_id: &ScopedVaultId,
         filters: OnboardingDecisionFilters,
         pagination: OffsetPagination,
-    ) -> FpResult<OffsetPaginatedResult<(Self, Workflow, ObConfiguration)>> {
+    ) -> FpResult<OffsetPaginatedResult<(Self, Workflow, Playbook)>> {
         let OnboardingDecisionFilters { made_by_footprint } = filters;
         let mut query = onboarding_decision::table
-            .inner_join(workflow::table.inner_join(ob_configuration::table))
+            .inner_join(workflow::table.inner_join(ob_configuration::table.inner_join(playbook::table)))
             .filter(workflow::scoped_vault_id.eq(sv_id))
+            .select((
+                onboarding_decision::all_columns,
+                workflow::all_columns,
+                playbook::all_columns,
+            ))
             .order_by(onboarding_decision::created_at.desc())
             .limit(pagination.limit())
             .into_boxed();
@@ -218,7 +225,6 @@ impl OnboardingDecision {
             }
         }
         let results = query.get_results(conn)?;
-        let results = results.into_iter().map(|(d, (wf, obc))| (d, wf, obc)).collect();
         Ok(pagination.results(results))
     }
 }

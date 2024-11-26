@@ -116,7 +116,7 @@ pub async fn get_requirements_for_person_and_maybe_business(
 
     let require_capture_on_stepup = state
         .ff_client
-        .flag(BoolFlag::RequireCaptureOnStepUp(&person_obc.key));
+        .flag(BoolFlag::RequireCaptureOnStepUp(&playbook.key));
     let requirement_opts = RequirementOpts {
         require_capture_on_stepup: Some(require_capture_on_stepup),
     };

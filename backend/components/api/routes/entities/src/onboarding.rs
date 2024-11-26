@@ -44,7 +44,7 @@ pub async fn get(
         .db_query(move |conn| {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let (wfs, next_page) = Workflow::list(conn, &sv.id, pagination)?;
-            let wf_ids = wfs.iter().map(|(wf, _)| wf.id.clone()).collect_vec();
+            let wf_ids = wfs.iter().map(|(wf, _, _)| wf.id.clone()).collect_vec();
 
             // Hide rule set results in sandbox because outcome will be confusing.
             let wf_id_to_rsrs = if is_live {
@@ -54,7 +54,7 @@ pub async fn get(
             };
 
             let mut wf_id_to_seqno = HashMap::new();
-            for (wf, _) in &wfs {
+            for (wf, _, _) in &wfs {
                 let ts = wf.completed_at.or(wf.deactivated_at);
                 if let Some(ts) = ts {
                     let seqno = DataLifetime::get_seqno_at(conn, ts)?;
@@ -64,10 +64,10 @@ pub async fn get(
 
             let results = wfs
                 .into_iter()
-                .map(|(wf, obc)| {
+                .map(|(wf, playbook, obc)| {
                     let rsrs = wf_id_to_rsrs.get(&wf.id).cloned().unwrap_or_default();
                     let seqno = wf_id_to_seqno.get(&wf.id).cloned();
-                    (wf, obc, rsrs, seqno)
+                    (wf, playbook, obc, rsrs, seqno)
                 })
                 .collect_vec();
 

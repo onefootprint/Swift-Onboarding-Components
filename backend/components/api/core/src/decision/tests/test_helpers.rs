@@ -11,6 +11,7 @@ use db::models::data_lifetime::DataLifetime;
 use db::models::document_request::DocumentRequest;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
+use db::models::playbook::Playbook;
 use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::PrivateUpdateTenant;
 use db::models::tenant::Tenant;
@@ -49,6 +50,7 @@ pub async fn create_user_and_onboarding(
     Workflow,
     Vault,
     ScopedVault,
+    Playbook,
     ObConfiguration,
     Option<Workflow>, // Business workflow
 ) {
@@ -119,7 +121,7 @@ pub async fn create_user_and_onboarding(
                 None
             };
 
-            Ok((tenant, wf, uv, su, obc, biz_wf))
+            Ok((tenant, wf, uv, su, playbook.into_inner(), obc, biz_wf))
         })
         .await
         .unwrap()
@@ -130,6 +132,7 @@ pub struct FixtureData {
     pub wf: Workflow,
     pub v: Vault,
     pub sv: ScopedVault,
+    pub playbook: Playbook,
     pub obc: ObConfiguration,
     pub dr: Option<DocumentRequest>,
 }
@@ -140,7 +143,7 @@ pub async fn create_kyc_user_and_wf(
     fixture_result: Option<WorkflowFixtureResult>,
     reuse_tenant: Option<Tenant>,
 ) -> FixtureData {
-    let (t, wf, v, sv, obc, _) =
+    let (t, wf, v, sv, playbook, obc, _) =
         create_user_and_onboarding(state, obc_opts, fixture_result, false, reuse_tenant).await;
     let wf_id = wf.id.clone();
     let dr = state
@@ -152,6 +155,7 @@ pub async fn create_kyc_user_and_wf(
         wf,
         v,
         sv,
+        playbook,
         obc,
         dr,
     }
@@ -166,13 +170,14 @@ pub async fn create_kyb_user_and_onboarding(
     Workflow,
     Vault,
     ScopedVault,
+    Playbook,
     ObConfiguration,
     Workflow, // Business workflow
 ) {
-    let (t, wf, v, sv, obc, biz_wf) =
+    let (t, wf, v, sv, playbook, obc, biz_wf) =
         create_user_and_onboarding(state, obc_opts, fixture_result, true, None).await;
 
-    (t, wf, v, sv, obc, biz_wf.unwrap())
+    (t, wf, v, sv, playbook, obc, biz_wf.unwrap())
 }
 
 pub fn create_user_and_populate_vault(

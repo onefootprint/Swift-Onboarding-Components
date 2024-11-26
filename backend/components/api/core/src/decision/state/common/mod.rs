@@ -253,7 +253,7 @@ pub async fn run_aml_call(
     t_id: &TenantId,
 ) -> FpResult<(VerificationResultId, WatchlistResultResponse)> {
     let wfid = wf_id.clone();
-    let (wf, obc, v, di) = state
+    let (wf, playbook, obc, v, di) = state
         .db_transaction(move |conn| {
             let (wf, v) = Workflow::get_with_vault(conn, &wfid)?;
             let di = DecisionIntent::get_or_create_for_workflow(
@@ -262,8 +262,8 @@ pub async fn run_aml_call(
                 &wfid,
                 DecisionIntentKind::WatchlistCheck,
             )?;
-            let (_, obc) = ObConfiguration::get(conn, &wfid)?;
-            Ok((wf, obc, v, di))
+            let (playbook, obc) = ObConfiguration::get(conn, &wfid)?;
+            Ok((wf, playbook, obc, v, di))
         })
         .await?;
     let ff_client = state.ff_client.clone();
@@ -285,6 +285,7 @@ pub async fn run_aml_call(
         vendor::incode::incode_watchlist::run_watchlist_check(
             state,
             &di,
+            &playbook,
             &obc,
             WatchlistCheckKind::MakeNewSearch,
         )
@@ -302,7 +303,7 @@ pub async fn run_samba_if_needed(
 ) -> FpResult<()> {
     let samba_enabled = state
         .ff_client
-        .flag(BoolFlag::RunSambaActivityHistoryForPlaybook(&obc.key));
+        .flag(BoolFlag::RunSambaActivityHistoryForPlaybook(&playbook.key));
     if !samba_enabled {
         return Ok(());
     }

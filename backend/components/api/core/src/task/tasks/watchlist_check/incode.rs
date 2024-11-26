@@ -12,6 +12,7 @@ use chrono::Duration;
 use chrono::Utc;
 use db::models::decision_intent::DecisionIntent;
 use db::models::ob_configuration::ObConfiguration;
+use db::models::playbook::Playbook;
 use db::models::risk_signal::NewRiskSignalInfo;
 use db::models::verification_request::RequestAndResult;
 use db::models::verification_request::VReqIdentifier;
@@ -31,6 +32,7 @@ pub async fn complete_vendor_call(
     state: &State,
     sv_id: &ScopedVaultId,
     di_id: &DecisionIntentId,
+    playbook: &Playbook,
     obc: &ObConfiguration,
     current_uvw: &VaultWrapper<Person>,
 ) -> FpResult<Vec<NewRiskSignalInfo>> {
@@ -71,9 +73,14 @@ pub async fn complete_vendor_call(
         None => WatchlistCheckKind::MakeNewSearch,
     };
 
-    let (vres_id, res) =
-        decision::vendor::incode::incode_watchlist::run_watchlist_check(state, &di, obc, kind.clone())
-            .await?;
+    let (vres_id, res) = decision::vendor::incode::incode_watchlist::run_watchlist_check(
+        state,
+        &di,
+        playbook,
+        obc,
+        kind.clone(),
+    )
+    .await?;
 
     let reason_codes = decision::features::incode_watchlist::reason_codes_from_watchlist_result(
         &res,
