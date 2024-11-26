@@ -9,6 +9,7 @@ impl DbToApi<OrderedOnboardingRequirements> for OnboardingStatusResponse {
             .into_iter()
             .map(|r| ApiOnboardingRequirement {
                 is_met: r.is_met(),
+                old_requirement: r.clone(),
                 requirement: r,
             })
             .collect();

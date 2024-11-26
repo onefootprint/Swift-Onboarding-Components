@@ -2532,21 +2532,18 @@
                 ]
             },
             "ApiOnboardingRequirement": {
-                "allOf": [
-                    {
-                        "type": "object",
-                        "properties": {
-                            "is_met": {
-                                "type": "boolean"
-                            }
-                        },
-                        "required": [
-                            "is_met"
-                        ]
+                "type": "object",
+                "properties": {
+                    "is_met": {
+                        "type": "boolean"
                     },
-                    {
+                    "requirement": {
                         "$ref": "#/components/schemas/OnboardingRequirement"
                     }
+                },
+                "required": [
+                    "is_met",
+                    "requirement"
                 ]
             },
             "AuthMethod": {

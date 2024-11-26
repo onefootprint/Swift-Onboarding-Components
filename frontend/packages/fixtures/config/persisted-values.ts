@@ -558,9 +558,11 @@ import type {
 export const hosted_ActionKind: ActionKind = 'replace';
 export const hosted_ApiKeyStatus: ApiKeyStatus = 'disabled';
 export const hosted_ApiOnboardingRequirement: ApiOnboardingRequirement = {
-  authMethodKind: 'phone',
   isMet: false,
-  kind: 'register_auth_method',
+  requirement: {
+    authMethodKind: 'passkey',
+    kind: 'register_auth_method',
+  },
 };
 export const hosted_AuthMethod: AuthMethod = {
   canUpdate: true,
@@ -572,15 +574,21 @@ export const hosted_AuthRequirementsResponse: AuthRequirementsResponse = {
   allRequirements: [
     {
       isMet: true,
-      kind: 'process',
+      requirement: {
+        kind: 'process',
+      },
     },
     {
       isMet: true,
-      kind: 'process',
+      requirement: {
+        kind: 'process',
+      },
     },
     {
       isMet: true,
-      kind: 'process',
+      requirement: {
+        kind: 'process',
+      },
     },
   ],
 };
@@ -3221,15 +3229,21 @@ export const hosted_OnboardingStatusResponse: OnboardingStatusResponse = {
   allRequirements: [
     {
       isMet: false,
-      kind: 'process',
+      requirement: {
+        kind: 'process',
+      },
     },
     {
       isMet: true,
-      kind: 'process',
+      requirement: {
+        kind: 'process',
+      },
     },
     {
       isMet: false,
-      kind: 'process',
+      requirement: {
+        kind: 'process',
+      },
     },
   ],
 };

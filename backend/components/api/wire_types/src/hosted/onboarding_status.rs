@@ -16,5 +16,9 @@ pub struct AuthRequirementsResponse {
 pub struct ApiOnboardingRequirement {
     pub is_met: bool,
     #[serde(flatten)]
+    #[openapi(skip)]
+    /// DEPRECATED: remove this once the client stops reading the inlined, flattened requirement
+    /// fields
+    pub old_requirement: OnboardingRequirement,
     pub requirement: OnboardingRequirement,
 }

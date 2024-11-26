@@ -7,6 +7,7 @@ import type {
 } from '../data/collected-data-option';
 import type { SupportedIdDocTypes } from '../data/id-doc-type';
 
+/** Note: these will be a little trickier to migrate to the open API type. The open API type has a new, more modern serialization */
 export enum OnboardingRequirementKind {
   registerAuthMethod = 'register_auth_method',
   registerPasskey = 'liveness', // TODO: eventually we need to synchronously rename `liveness` or create a duplicate
@@ -19,17 +20,20 @@ export enum OnboardingRequirementKind {
   process = 'process',
 }
 
+/** Note: these will be a little trickier to migrate to the open API type. The open API type has a new, more modern serialization */
 export type RegisterAuthMethodRequirement = {
   kind: OnboardingRequirementKind.registerAuthMethod;
   isMet: boolean;
   authMethodKind: AuthMethodKind;
 };
 
+/** Note: these will be a little trickier to migrate to the open API type. The open API type has a new, more modern serialization */
 export type CreateBusinessOnboardingRequirement = {
   kind: OnboardingRequirementKind.createBusinessOnboarding;
   requiresBusinessSelection: boolean;
 };
 
+/** Note: these will be a little trickier to migrate to the open API type. The open API type has a new, more modern serialization */
 export type CollectKybDataRequirement = {
   kind: OnboardingRequirementKind.collectKybData;
   isMet: boolean;
@@ -38,6 +42,7 @@ export type CollectKybDataRequirement = {
   recollectAttributes: CollectedKybDataOption[];
 };
 
+/** Note: these will be a little trickier to migrate to the open API type. The open API type has a new, more modern serialization */
 export type CollectKycDataRequirement = {
   kind: OnboardingRequirementKind.collectKycData;
   isMet: boolean;
@@ -47,6 +52,7 @@ export type CollectKycDataRequirement = {
   optionalAttributes: CollectedKycDataOption[];
 };
 
+/** Note: these will be a little trickier to migrate to the open API type. The open API type has a new, more modern serialization */
 export type CollectInvestorProfileRequirement = {
   kind: OnboardingRequirementKind.investorProfile;
   isMet: boolean;
@@ -55,6 +61,7 @@ export type CollectInvestorProfileRequirement = {
   populatedAttributes: CollectedInvestorProfileDataOption[];
 };
 
+/** Note: these will be a little trickier to migrate to the open API type. The open API type has a new, more modern serialization */
 export type DocumentRequirement<TConfig = DocumentRequirementConfig> = {
   kind: OnboardingRequirementKind.document;
   isMet: boolean;
@@ -113,22 +120,26 @@ export type DocumentRequirementConfig =
   | ProofOfSsnRequirementConfig
   | CustomDocumentRequirementConfig;
 
+/** Note: these will be a little trickier to migrate to the open API type. The open API type has a new, more modern serialization */
 export type RegisterPasskeyRequirement = {
   kind: OnboardingRequirementKind.registerPasskey;
   isMet: boolean;
 };
 
+/** Note: these will be a little trickier to migrate to the open API type. The open API type has a new, more modern serialization */
 export type AuthorizeRequirement = {
   kind: OnboardingRequirementKind.authorize;
   isMet: boolean;
   fieldsToAuthorize: AuthorizeFields;
 };
 
+/** Note: these will be a little trickier to migrate to the open API type. The open API type has a new, more modern serialization */
 export type ProcessRequirement = {
   kind: OnboardingRequirementKind.process;
   isMet: boolean;
 };
 
+/** Note: these will be a little trickier to migrate to the open API type. The open API type has a new, more modern serialization */
 export type OnboardingRequirement =
   | RegisterAuthMethodRequirement
   | CollectKybDataRequirement

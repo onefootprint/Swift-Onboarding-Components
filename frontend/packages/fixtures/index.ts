@@ -164,9 +164,11 @@ export const getApiOnboardingRequirement = (
 ): ApiOnboardingRequirement =>
   deepmerge<ApiOnboardingRequirement>(
     {
-      authMethodKind: 'phone',
       isMet: false,
-      kind: 'register_auth_method',
+      requirement: {
+        authMethodKind: 'passkey',
+        kind: 'register_auth_method',
+      },
     },
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
@@ -196,15 +198,21 @@ export const getAuthRequirementsResponse = (
       allRequirements: [
         {
           isMet: true,
-          kind: 'process',
+          requirement: {
+            kind: 'process',
+          },
         },
         {
           isMet: true,
-          kind: 'process',
+          requirement: {
+            kind: 'process',
+          },
         },
         {
           isMet: true,
-          kind: 'process',
+          requirement: {
+            kind: 'process',
+          },
         },
       ],
     },
@@ -3659,15 +3667,21 @@ export const getOnboardingStatusResponse = (
       allRequirements: [
         {
           isMet: false,
-          kind: 'process',
+          requirement: {
+            kind: 'process',
+          },
         },
         {
           isMet: true,
-          kind: 'process',
+          requirement: {
+            kind: 'process',
+          },
         },
         {
           isMet: false,
-          kind: 'process',
+          requirement: {
+            kind: 'process',
+          },
         },
       ],
     },
