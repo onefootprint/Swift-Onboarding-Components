@@ -73,12 +73,6 @@ const Company = () => {
       linkedin: 'https://www.linkedin.com/in/a7e/',
     },
     {
-      name: 'Bruno Batista',
-      avatarSrc: '/team/member-bruno.png',
-      role: 'Engineering',
-      linkedin: 'https://www.linkedin.com/in/bruno-batista-b25ab76b/',
-    },
-    {
       name: 'Claudio Angrigiani',
       avatarSrc: '/team/member-claudio.png',
       role: 'Design Engineering',
