@@ -133,6 +133,9 @@ import type {
   PostHostedUserEmailVerifyData,
   PostHostedUserEmailVerifyError,
   PostHostedUserEmailVerifyResponse,
+  PostHostedUserExpireSessionData,
+  PostHostedUserExpireSessionError,
+  PostHostedUserExpireSessionResponse,
   PostHostedUserTokensData,
   PostHostedUserTokensError,
   PostHostedUserTokensResponse,
@@ -211,6 +214,7 @@ import {
   postHostedUserDocumentsByIdProcess,
   postHostedUserDocumentsByIdUploadBySide,
   postHostedUserEmailVerify,
+  postHostedUserExpireSession,
   postHostedUserTokens,
   postHostedUserUploadByDocumentIdentifier,
   postHostedUserVaultDecrypt,
@@ -1882,6 +1886,43 @@ export const postHostedUserEmailVerifyMutation = (options?: Partial<Options<Post
   > = {
     mutationFn: async localOptions => {
       const { data } = await postHostedUserEmailVerify({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const postHostedUserExpireSessionQueryKey = (options?: Options<PostHostedUserExpireSessionData>) => [
+  createQueryKey('postHostedUserExpireSession', options),
+];
+
+export const postHostedUserExpireSessionOptions = (options?: Options<PostHostedUserExpireSessionData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await postHostedUserExpireSession({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: postHostedUserExpireSessionQueryKey(options),
+  });
+};
+
+export const postHostedUserExpireSessionMutation = (options?: Partial<Options<PostHostedUserExpireSessionData>>) => {
+  const mutationOptions: UseMutationOptions<
+    PostHostedUserExpireSessionResponse,
+    AxiosError<PostHostedUserExpireSessionError>,
+    Options<PostHostedUserExpireSessionData>
+  > = {
+    mutationFn: async localOptions => {
+      const { data } = await postHostedUserExpireSession({
         ...options,
         ...localOptions,
         throwOnError: true,

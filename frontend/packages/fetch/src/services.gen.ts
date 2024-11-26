@@ -166,6 +166,9 @@ import type {
   PostHostedUserEmailVerifyData,
   PostHostedUserEmailVerifyError,
   PostHostedUserEmailVerifyResponse,
+  PostHostedUserExpireSessionData,
+  PostHostedUserExpireSessionError,
+  PostHostedUserExpireSessionResponse,
   PostHostedUserTokensData,
   PostHostedUserTokensError,
   PostHostedUserTokensResponse,
@@ -934,6 +937,22 @@ export const postHostedUserEmailVerify = <ThrowOnError extends boolean = false>(
   >({
     ...options,
     url: '/hosted/user/email/verify',
+  });
+};
+
+/**
+ * Expires the session defined by `x-fp-authorization`
+ */
+export const postHostedUserExpireSession = <ThrowOnError extends boolean = false>(
+  options?: Options<PostHostedUserExpireSessionData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    PostHostedUserExpireSessionResponse,
+    PostHostedUserExpireSessionError,
+    ThrowOnError
+  >({
+    ...options,
+    url: '/hosted/user/expire_session',
   });
 };
 

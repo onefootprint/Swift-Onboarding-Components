@@ -37,16 +37,21 @@ export type AuthorizedOrg = {
   orgName: string;
 };
 export type BatchHostedBusinessOwnerRequest =
-  | (UpdateOrCreateHostedBusinessOwnerRequest & {
-      op: 'update';
-    })
-  | (UpdateOrCreateHostedBusinessOwnerRequest & {
-      op: 'create';
-    })
-  | (DeleteHostedBusinessOwnerRequest & {
-      op: 'delete';
-    });
-export type op = 'update';
+  | BatchHostedBusinessOwnerRequestUpdate
+  | BatchHostedBusinessOwnerRequestCreate
+  | BatchHostedBusinessOwnerRequestDelete;
+export type BatchHostedBusinessOwnerRequestCreate = UpdateOrCreateHostedBusinessOwnerRequest & {
+  op: 'create';
+};
+export type op = 'create';
+export type BatchHostedBusinessOwnerRequestDelete = DeleteHostedBusinessOwnerRequest & {
+  op: 'delete';
+};
+export type op2 = 'delete';
+export type BatchHostedBusinessOwnerRequestUpdate = UpdateOrCreateHostedBusinessOwnerRequest & {
+  op: 'update';
+};
+export type op3 = 'update';
 export type BusinessOnboardingResponse = {
   authToken: string;
   isNewBusiness: boolean;
@@ -54,29 +59,36 @@ export type BusinessOnboardingResponse = {
 export type ChallengeKind = 'sms' | 'sms_link' | 'biometric' | 'email';
 export type CheckSessionResponse = 'active' | 'expired' | 'unknown';
 export type CollectDocumentConfig =
-  | ({
-      shouldCollectConsent: boolean;
-      shouldCollectSelfie: boolean;
-      supportedCountryAndDocTypes: {
-        [key: string]: unknown;
-      };
-    } & {
-      kind: 'identity';
-    })
-  | ({
-      [key: string]: unknown;
-    } & {
-      kind: 'proof_of_ssn';
-    })
-  | ({
-      [key: string]: unknown;
-    } & {
-      kind: 'proof_of_address';
-    })
-  | (CustomDocumentConfig & {
-      kind: 'custom';
-    });
-export type kind = 'identity';
+  | CollectDocumentConfigIdentity
+  | CollectDocumentConfigProofOfSsn
+  | CollectDocumentConfigProofOfAddress
+  | CollectDocumentConfigCustom;
+export type CollectDocumentConfigCustom = CustomDocumentConfig & {
+  kind: 'custom';
+};
+export type kind = 'custom';
+export type CollectDocumentConfigIdentity = {
+  shouldCollectConsent: boolean;
+  shouldCollectSelfie: boolean;
+  supportedCountryAndDocTypes: {
+    [key: string]: unknown;
+  };
+} & {
+  kind: 'identity';
+};
+export type kind2 = 'identity';
+export type CollectDocumentConfigProofOfAddress = {
+  [key: string]: unknown;
+} & {
+  kind: 'proof_of_address';
+};
+export type kind3 = 'proof_of_address';
+export type CollectDocumentConfigProofOfSsn = {
+  [key: string]: unknown;
+} & {
+  kind: 'proof_of_ssn';
+};
+export type kind4 = 'proof_of_ssn';
 /**
  * Represent the options of allowed CollectedData.
  * Some CollectedData variants only have a single allowable CollectedDataOption.
@@ -564,29 +576,33 @@ export type DocumentKind =
   | 'proof_of_address'
   | 'custom';
 export type DocumentRequestConfig =
-  | {
-      data: {
-        collectSelfie: boolean;
-        documentTypesAndCountries?: DocumentAndCountryConfiguration;
-      };
-      kind: 'identity';
-    }
-  | {
-      data: {
-        requiresHumanReview: boolean;
-      };
-      kind: 'proof_of_ssn';
-    }
-  | {
-      data: {
-        requiresHumanReview: boolean;
-      };
-      kind: 'proof_of_address';
-    }
-  | {
-      data: CustomDocumentConfig;
-      kind: 'custom';
-    };
+  | DocumentRequestConfigIdentity
+  | DocumentRequestConfigProofOfSsn
+  | DocumentRequestConfigProofOfAddress
+  | DocumentRequestConfigCustom;
+export type DocumentRequestConfigCustom = {
+  data: CustomDocumentConfig;
+  kind: 'custom';
+};
+export type DocumentRequestConfigIdentity = {
+  data: {
+    collectSelfie: boolean;
+    documentTypesAndCountries?: DocumentAndCountryConfiguration;
+  };
+  kind: 'identity';
+};
+export type DocumentRequestConfigProofOfAddress = {
+  data: {
+    requiresHumanReview: boolean;
+  };
+  kind: 'proof_of_address';
+};
+export type DocumentRequestConfigProofOfSsn = {
+  data: {
+    requiresHumanReview: boolean;
+  };
+  kind: 'proof_of_ssn';
+};
 /**
  * Response for a identity document request. Errors are non-optional if the identity vendor.
  * Requires additional images be collected.
@@ -1778,64 +1794,87 @@ export type NeuroIdentityIdResponse = {
 };
 export type ObConfigurationKind = 'kyc' | 'kyb' | 'auth' | 'document';
 export type OnboardingRequirement =
-  | ({
-      authMethodKind: AuthMethodKind;
-    } & {
-      kind: 'register_auth_method';
-    })
-  | ({
-      missingAttributes: Array<CollectedDataOption>;
-      optionalAttributes: Array<CollectedDataOption>;
-      populatedAttributes: Array<CollectedDataOption>;
-      recollectAttributes: Array<CollectedDataOption>;
-    } & {
-      kind: 'collect_data';
-    })
-  | ({
-      missingAttributes: Array<CollectedDataOption>;
-      missingDocument: boolean;
-      populatedAttributes: Array<CollectedDataOption>;
-    } & {
-      kind: 'collect_investor_profile';
-    })
-  | ({
-      /**
-       * When true, requires either selecting an existing business, or will create a new one upon
-       * `POST /hosted/business/onboarding`.
-       * When false, there's already a business associated with this session, so we can
-       * immediately call `POST /hosted/business/onboarding`.
-       */
-      requiresBusinessSelection: boolean;
-    } & {
-      kind: 'create_business_onboarding';
-    })
-  | ({
-      missingAttributes: Array<CollectedDataOption>;
-      populatedAttributes: Array<CollectedDataOption>;
-      recollectAttributes: Array<CollectedDataOption>;
-    } & {
-      kind: 'collect_business_data';
-    })
-  | {
-      kind: 'liveness';
-    }
-  | ({
-      config: CollectDocumentConfig;
-      documentRequestId: string;
-      uploadSettings: DocumentUploadSettings;
-    } & {
-      kind: 'collect_document';
-    })
-  | ({
-      authorizedAt?: string;
-      fieldsToAuthorize: AuthorizeFields;
-    } & {
-      kind: 'authorize';
-    })
-  | {
-      kind: 'process';
-    };
-export type kind2 = 'register_auth_method';
+  | OnboardingRequirementRegisterAuthMethod
+  | OnboardingRequirementCollectData
+  | OnboardingRequirementCollectInvestorProfile
+  | OnboardingRequirementCreateBusinessOnboarding
+  | OnboardingRequirementCollectBusinessData
+  | OnboardingRequirementRegisterPasskey
+  | OnboardingRequirementCollectDocument
+  | OnboardingRequirementAuthorize
+  | OnboardingRequirementProcess;
+export type OnboardingRequirementAuthorize = {
+  authorizedAt?: string;
+  fieldsToAuthorize: AuthorizeFields;
+} & {
+  kind: 'authorize';
+};
+export type kind5 = 'authorize';
+export type OnboardingRequirementCollectBusinessData = {
+  missingAttributes: Array<CollectedDataOption>;
+  populatedAttributes: Array<CollectedDataOption>;
+  recollectAttributes: Array<CollectedDataOption>;
+} & {
+  kind: 'collect_business_data';
+};
+export type kind6 = 'collect_business_data';
+export type OnboardingRequirementCollectData = {
+  missingAttributes: Array<CollectedDataOption>;
+  optionalAttributes: Array<CollectedDataOption>;
+  populatedAttributes: Array<CollectedDataOption>;
+  recollectAttributes: Array<CollectedDataOption>;
+} & {
+  kind: 'collect_data';
+};
+export type kind7 = 'collect_data';
+export type OnboardingRequirementCollectDocument = {
+  config: CollectDocumentConfig;
+  documentRequestId: string;
+  uploadSettings: DocumentUploadSettings;
+} & {
+  kind: 'collect_document';
+};
+export type kind8 = 'collect_document';
+export type OnboardingRequirementCollectInvestorProfile = {
+  missingAttributes: Array<CollectedDataOption>;
+  missingDocument: boolean;
+  populatedAttributes: Array<CollectedDataOption>;
+} & {
+  kind: 'collect_investor_profile';
+};
+export type kind9 = 'collect_investor_profile';
+export type OnboardingRequirementCreateBusinessOnboarding = {
+  /**
+   * When true, requires either selecting an existing business, or will create a new one upon
+   * `POST /hosted/business/onboarding`.
+   * When false, there's already a business associated with this session, so we can
+   * immediately call `POST /hosted/business/onboarding`.
+   */
+  requiresBusinessSelection: boolean;
+} & {
+  kind: 'create_business_onboarding';
+};
+export type kind10 = 'create_business_onboarding';
+/**
+ * The client needs to tell us when user input is done in order for us to continue processing
+ */
+export type OnboardingRequirementProcess = {
+  kind: 'process';
+};
+export type kind11 = 'process';
+export type OnboardingRequirementRegisterAuthMethod = {
+  authMethodKind: AuthMethodKind;
+} & {
+  kind: 'register_auth_method';
+};
+export type kind12 = 'register_auth_method';
+/**
+ * Register a passkey
+ */
+export type OnboardingRequirementRegisterPasskey = {
+  kind: 'liveness';
+};
+export type kind13 = 'liveness';
 export type OnboardingResponse = {
   authToken: string;
 };
@@ -1930,31 +1969,42 @@ export type RequestedTokenScope = 'auth' | 'onboarding' | 'my1fp' | 'onboarding_
  * enum variant.
  */
 export type SdkArgs =
-  | {
-      data: VerifyV1SdkArgs;
-      kind: 'verify_v1';
-    }
-  | {
-      data: VerifyResultV1SdkArgs;
-      kind: 'verify_result_v1';
-    }
-  | {
-      data: FormV1SdkArgs;
-      kind: 'form_v1';
-    }
-  | {
-      data: AuthV1SdkArgs;
-      kind: 'auth_v1';
-    }
-  | {
-      data: UpdateAuthMethodsV1SdkArgs;
-      kind: 'update_auth_methods_v1';
-    }
-  | {
-      data: RenderV1SdkArgs;
-      kind: 'render_v1';
-    };
-export type kind3 = 'verify_v1';
+  | SdkArgsVerifyV1
+  | SdkArgsVerifyResultV1
+  | SdkArgsFormV1
+  | SdkArgsAuthV1
+  | SdkArgsUpdateAuthMethodsV1
+  | SdkArgsRenderV1;
+export type SdkArgsAuthV1 = {
+  data: AuthV1SdkArgs;
+  kind: 'auth_v1';
+};
+export type kind14 = 'auth_v1';
+export type SdkArgsFormV1 = {
+  data: FormV1SdkArgs;
+  kind: 'form_v1';
+};
+export type kind15 = 'form_v1';
+export type SdkArgsRenderV1 = {
+  data: RenderV1SdkArgs;
+  kind: 'render_v1';
+};
+export type kind16 = 'render_v1';
+export type SdkArgsUpdateAuthMethodsV1 = {
+  data: UpdateAuthMethodsV1SdkArgs;
+  kind: 'update_auth_methods_v1';
+};
+export type kind17 = 'update_auth_methods_v1';
+export type SdkArgsVerifyResultV1 = {
+  data: VerifyResultV1SdkArgs;
+  kind: 'verify_result_v1';
+};
+export type kind18 = 'verify_result_v1';
+export type SdkArgsVerifyV1 = {
+  data: VerifyV1SdkArgs;
+  kind: 'verify_v1';
+};
+export type kind19 = 'verify_v1';
 export type SignupChallengeRequest = {
   challengeKind: ChallengeKind;
   email?: {
@@ -2399,46 +2449,50 @@ export type VerifyV1SdkArgs = {
   };
 };
 export type WorkflowFixtureResult = 'fail' | 'pass' | 'manual_review' | 'step_up' | 'use_rules_outcome';
-export type WorkflowRequestConfig =
-  | {
-      /**
-       * Allow onboarding onto the specific playbook.
-       * This allows editing data, re-verifies data, and then re-triggers decision engine
-       */
-      data: {
-        playbookId: string;
-        recollectAttributes: Array<CollectedDataOption>;
-        /**
-         * When true, reuses existing BOs' KYC results on the same playbook.
-         * When false, requires the existing BOs to re-complete KYC.
-         * Can only be true for KYB playbooks
-         */
-        reuseExistingBoKyc: boolean;
-      };
-      /**
-       * Allow onboarding onto the specific playbook.
-       * This allows editing data, re-verifies data, and then re-triggers decision engine
-       */
-      kind: 'onboard';
-    }
-  | {
-      /**
-       * Upload a new document and re-run the decision engine
-       */
-      data: {
-        businessConfigs: Array<DocumentRequestConfig>;
-        configs: Array<DocumentRequestConfig>;
-      };
-      /**
-       * Upload a new document and re-run the decision engine
-       */
-      kind: 'document';
-    };
+export type WorkflowRequestConfig = WorkflowRequestConfigOnboard | WorkflowRequestConfigDocument;
+export type WorkflowRequestConfigDocument = {
+  /**
+   * Upload a new document and re-run the decision engine
+   */
+  data: {
+    businessConfigs: Array<DocumentRequestConfig>;
+    configs: Array<DocumentRequestConfig>;
+  };
+  /**
+   * Upload a new document and re-run the decision engine
+   */
+  kind: 'document';
+};
+/**
+ * Upload a new document and re-run the decision engine
+ */
+export type kind20 = 'document';
+export type WorkflowRequestConfigOnboard = {
+  /**
+   * Allow onboarding onto the specific playbook.
+   * This allows editing data, re-verifies data, and then re-triggers decision engine
+   */
+  data: {
+    playbookId: string;
+    recollectAttributes: Array<CollectedDataOption>;
+    /**
+     * When true, reuses existing BOs' KYC results on the same playbook.
+     * When false, requires the existing BOs to re-complete KYC.
+     * Can only be true for KYB playbooks
+     */
+    reuseExistingBoKyc: boolean;
+  };
+  /**
+   * Allow onboarding onto the specific playbook.
+   * This allows editing data, re-verifies data, and then re-triggers decision engine
+   */
+  kind: 'onboard';
+};
 /**
  * Allow onboarding onto the specific playbook.
  * This allows editing data, re-verifies data, and then re-triggers decision engine
  */
-export type kind4 = 'onboard';
+export type kind21 = 'onboard';
 export type GetHostedBusinessData = {
   headers?: {
     /**
@@ -3047,6 +3101,16 @@ export type PostHostedUserEmailVerifyData = {
 };
 export type PostHostedUserEmailVerifyResponse = Empty;
 export type PostHostedUserEmailVerifyError = unknown;
+export type PostHostedUserExpireSessionData = {
+  headers?: {
+    /**
+     * Short-lived auth token for a user. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
+};
+export type PostHostedUserExpireSessionResponse = Empty;
+export type PostHostedUserExpireSessionError = unknown;
 export type GetHostedUserPrivateTokenData = {
   headers?: {
     /**
@@ -3998,6 +4062,17 @@ export type $OpenApiTs = {
   '/hosted/user/email/verify': {
     post: {
       req: PostHostedUserEmailVerifyData;
+      res: {
+        /**
+         * OK
+         */
+        '200': Empty;
+      };
+    };
+  };
+  '/hosted/user/expire_session': {
+    post: {
+      req: PostHostedUserExpireSessionData;
       res: {
         /**
          * OK

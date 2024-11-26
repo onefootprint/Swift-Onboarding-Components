@@ -1,6 +1,11 @@
 import type {
   ActionKind,
   Actor,
+  ActorApiKey,
+  ActorFirmEmployee,
+  ActorFootprint,
+  ActorOrganization,
+  ActorUser,
   AdverseMediaListKind,
   AmlDetail,
   AmlHit,
@@ -16,6 +21,38 @@ import type {
   AuditEvent,
   AuditEventApiKey,
   AuditEventDetail,
+  AuditEventDetailCollectUserDocument,
+  AuditEventDetailCompleteUserCheckLiveness,
+  AuditEventDetailCompleteUserCheckWatchlist,
+  AuditEventDetailCompleteUserVerification,
+  AuditEventDetailCreateListEntry,
+  AuditEventDetailCreateOrg,
+  AuditEventDetailCreateOrgApiKey,
+  AuditEventDetailCreateOrgRole,
+  AuditEventDetailCreatePlaybook,
+  AuditEventDetailCreateUser,
+  AuditEventDetailCreateUserAnnotation,
+  AuditEventDetailDeactivateOrgRole,
+  AuditEventDetailDecryptOrgApiKey,
+  AuditEventDetailDecryptUserData,
+  AuditEventDetailDeleteListEntry,
+  AuditEventDetailDeleteUser,
+  AuditEventDetailDeleteUserData,
+  AuditEventDetailDisablePlaybook,
+  AuditEventDetailEditPlaybook,
+  AuditEventDetailInviteOrgMember,
+  AuditEventDetailLoginOrgMember,
+  AuditEventDetailManuallyReviewEntity,
+  AuditEventDetailOrgMemberJoined,
+  AuditEventDetailRemoveOrgMember,
+  AuditEventDetailRequestUserData,
+  AuditEventDetailStartUserVerification,
+  AuditEventDetailUpdateOrgApiKeyRole,
+  AuditEventDetailUpdateOrgApiKeyStatus,
+  AuditEventDetailUpdateOrgMember,
+  AuditEventDetailUpdateOrgRole,
+  AuditEventDetailUpdateOrgSettings,
+  AuditEventDetailUpdateUserData,
   AuditEventName,
   AuditEventOrgMember,
   AuthEvent,
@@ -35,6 +72,8 @@ import type {
   CompanySize,
   ComplianceCompanySummary,
   ComplianceDocData,
+  ComplianceDocDataExternalUrl,
+  ComplianceDocDataFileUpload,
   ComplianceDocDataKind,
   ComplianceDocEvent,
   ComplianceDocEventAssigned,
@@ -42,6 +81,11 @@ import type {
   ComplianceDocEventReviewed,
   ComplianceDocEventSubmitted,
   ComplianceDocEventType,
+  ComplianceDocEventTypeAssigned,
+  ComplianceDocEventTypeRequestRetracted,
+  ComplianceDocEventTypeRequested,
+  ComplianceDocEventTypeReviewed,
+  ComplianceDocEventTypeSubmitted,
   ComplianceDocReviewDecision,
   ComplianceDocStatus,
   ComplianceDocSubmission,
@@ -83,6 +127,11 @@ import type {
   DataIdentifier,
   DataLifetimeSource,
   DbActor,
+  DbActorFirmEmployee,
+  DbActorFootprint,
+  DbActorTenantApiKey,
+  DbActorTenantUser,
+  DbActorUser,
   DecisionStatus,
   DecryptionContext,
   DeleteRequest,
@@ -97,6 +146,10 @@ import type {
   DocumentKind,
   DocumentRequest,
   DocumentRequestConfig,
+  DocumentRequestConfigCustom,
+  DocumentRequestConfigIdentity,
+  DocumentRequestConfigProofOfAddress,
+  DocumentRequestConfigProofOfSsn,
   DocumentRequestKind,
   DocumentReviewStatus,
   DocumentSide,
@@ -112,7 +165,11 @@ import type {
   EnhancedAml,
   Entity,
   EntityAction,
+  EntityActionClearReview,
+  EntityActionManualDecision,
   EntityActionResponse,
+  EntityActionResponseTrigger,
+  EntityActionTrigger,
   EntityActionsRequest,
   EntityAttribute,
   EntityOnboarding,
@@ -152,6 +209,9 @@ import type {
   InvestorProfileInvestmentGoal,
   InvoicePreview,
   InvokeVaultProxyPermission,
+  InvokeVaultProxyPermissionAny,
+  InvokeVaultProxyPermissionId,
+  InvokeVaultProxyPermissionJustInTime,
   IsIn,
   Iso3166TwoDigitCountryCode,
   LabelAdded,
@@ -164,6 +224,8 @@ import type {
   ListEntry,
   ListEvent,
   ListEventDetail,
+  ListEventDetailCreateListEntry,
+  ListEventDetailDeleteListEntry,
   ListKind,
   ListPlaybookUsage,
   LiteOrgMember,
@@ -226,6 +288,10 @@ import type {
   Rule,
   RuleAction,
   RuleActionConfig,
+  RuleActionConfigFail,
+  RuleActionConfigManualReview,
+  RuleActionConfigPassWithManualReview,
+  RuleActionConfigStepUp,
   RuleActionMigration,
   RuleEvalResult,
   RuleEvalResults,
@@ -254,6 +320,34 @@ import type {
   TenantLoginRequest,
   TenantRoleKindDiscriminant,
   TenantScope,
+  TenantScopeAdmin,
+  TenantScopeApiKeys,
+  TenantScopeAuthToken,
+  TenantScopeCipIntegration,
+  TenantScopeCompliancePartnerAdmin,
+  TenantScopeCompliancePartnerManageReviews,
+  TenantScopeCompliancePartnerManageTemplates,
+  TenantScopeCompliancePartnerRead,
+  TenantScopeDecrypt,
+  TenantScopeDecryptAll,
+  TenantScopeDecryptAllExceptPciData,
+  TenantScopeDecryptCustom,
+  TenantScopeDecryptDocument,
+  TenantScopeDecryptDocumentAndSelfie,
+  TenantScopeInvokeVaultProxy,
+  TenantScopeLabelAndTag,
+  TenantScopeManageComplianceDocSubmission,
+  TenantScopeManageVaultProxy,
+  TenantScopeManageWebhooks,
+  TenantScopeManualReview,
+  TenantScopeOnboarding,
+  TenantScopeOnboardingConfiguration,
+  TenantScopeOrgSettings,
+  TenantScopeRead,
+  TenantScopeTriggerKyb,
+  TenantScopeTriggerKyc,
+  TenantScopeWriteEntities,
+  TenantScopeWriteLists,
   TerminalDecisionStatus,
   TimelineOnboardingDecision,
   TimelinePlaybook,
@@ -288,6 +382,21 @@ import type {
   UserTag,
   UserTimeline,
   UserTimelineEvent,
+  UserTimelineEventAnnotation,
+  UserTimelineEventAuthMethodUpdated,
+  UserTimelineEventBusinessOwnerCompletedKyc,
+  UserTimelineEventDataCollected,
+  UserTimelineEventDocumentUploaded,
+  UserTimelineEventExternalIntegrationCalled,
+  UserTimelineEventLabelAdded,
+  UserTimelineEventLiveness,
+  UserTimelineEventOnboardingDecision,
+  UserTimelineEventOnboardingTimeline,
+  UserTimelineEventStepUp,
+  UserTimelineEventVaultCreated,
+  UserTimelineEventWatchlistCheck,
+  UserTimelineEventWorkflowStarted,
+  UserTimelineEventWorkflowTriggered,
   VaultCreated,
   VaultDrAwsPreEnrollResponse,
   VaultDrEnrollRequest,
@@ -299,6 +408,16 @@ import type {
   VaultKind,
   VaultOperation,
   VerificationCheck,
+  VerificationCheckAml,
+  VerificationCheckBusinessAml,
+  VerificationCheckCurpValidation,
+  VerificationCheckIdentityDocument,
+  VerificationCheckKyb,
+  VerificationCheckKyc,
+  VerificationCheckNeuroId,
+  VerificationCheckPhone,
+  VerificationCheckSentilink,
+  VerificationCheckStytchDevice,
   WatchlistCheck,
   WatchlistCheckStatusKind,
   WatchlistEntry,
@@ -306,6 +425,8 @@ import type {
   WebhookPortalResponse,
   WorkflowKind,
   WorkflowRequestConfig,
+  WorkflowRequestConfigDocument,
+  WorkflowRequestConfigOnboard,
   WorkflowSource,
   WorkflowStarted,
   WorkflowStartedEventKind,
@@ -322,6 +443,73 @@ export const getActor = (
   deepmerge<Actor>(
     {
       id: '790e0e91-7999-45b8-92d6-2c9b6115af8e',
+      kind: 'user',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getActorApiKey = (
+  props: Partial<ActorApiKey>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ActorApiKey =>
+  deepmerge<ActorApiKey>(
+    {
+      id: 'f6d41b04-20ac-4b18-9a06-b8abe1c8fb9a',
+      kind: 'api_key',
+      name: 'Angelina Murray',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getActorFirmEmployee = (
+  props: Partial<ActorFirmEmployee>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ActorFirmEmployee =>
+  deepmerge<ActorFirmEmployee>(
+    {
+      kind: 'firm_employee',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getActorFootprint = (
+  props: Partial<ActorFootprint>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ActorFootprint =>
+  deepmerge<ActorFootprint>(
+    {
+      kind: 'footprint',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getActorOrganization = (
+  props: Partial<ActorOrganization>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ActorOrganization =>
+  deepmerge<ActorOrganization>(
+    {
+      email: 'jon79@gmail.com',
+      firstName: 'Raquel',
+      kind: 'organization',
+      lastName: 'Spinka',
+      member: 'exercitation tempor',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getActorUser = (
+  props: Partial<ActorUser>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ActorUser =>
+  deepmerge<ActorUser>(
+    {
+      id: '50c4e2c1-87c1-4ed0-bc9b-bba4aa982c59',
       kind: 'user',
     },
     props,
@@ -755,6 +943,739 @@ export const getAuditEventDetail = (
         fpId: '1595ebc7-1aa3-492e-a40c-8042c7745d87',
       },
       kind: 'create_user',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getAuditEventDetailCollectUserDocument = (
+  props: Partial<AuditEventDetailCollectUserDocument>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEventDetailCollectUserDocument =>
+  deepmerge<AuditEventDetailCollectUserDocument>(
+    {
+      kind: 'collect_user_document',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getAuditEventDetailCompleteUserCheckLiveness = (
+  props: Partial<AuditEventDetailCompleteUserCheckLiveness>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEventDetailCompleteUserCheckLiveness =>
+  deepmerge<AuditEventDetailCompleteUserCheckLiveness>(
+    {
+      kind: 'complete_user_check_liveness',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getAuditEventDetailCompleteUserCheckWatchlist = (
+  props: Partial<AuditEventDetailCompleteUserCheckWatchlist>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEventDetailCompleteUserCheckWatchlist =>
+  deepmerge<AuditEventDetailCompleteUserCheckWatchlist>(
+    {
+      kind: 'complete_user_check_watchlist',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getAuditEventDetailCompleteUserVerification = (
+  props: Partial<AuditEventDetailCompleteUserVerification>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEventDetailCompleteUserVerification =>
+  deepmerge<AuditEventDetailCompleteUserVerification>(
+    {
+      kind: 'complete_user_verification',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getAuditEventDetailCreateListEntry = (
+  props: Partial<AuditEventDetailCreateListEntry>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEventDetailCreateListEntry =>
+  deepmerge<AuditEventDetailCreateListEntry>(
+    {
+      data: {
+        listEntryCreationId: '9f3fbdc0-a348-428e-ad43-9622a052d59c',
+        listId: '753b0f6f-bfa8-426e-b8dc-5d55274a9562',
+      },
+      kind: 'create_list_entry',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getAuditEventDetailCreateOrg = (
+  props: Partial<AuditEventDetailCreateOrg>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEventDetailCreateOrg =>
+  deepmerge<AuditEventDetailCreateOrg>(
+    {
+      kind: 'create_org',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getAuditEventDetailCreateOrgApiKey = (
+  props: Partial<AuditEventDetailCreateOrgApiKey>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEventDetailCreateOrgApiKey =>
+  deepmerge<AuditEventDetailCreateOrgApiKey>(
+    {
+      data: {
+        apiKey: {
+          id: 'c9cac702-95d4-4714-bb4b-e05d50dcf1fe',
+          name: 'Rebecca Gleichner DDS',
+          role: {
+            createdAt: '1915-03-17T20:20:42.0Z',
+            id: 'f3d6922a-325c-421d-aa41-9416c200f746',
+            isImmutable: false,
+            kind: 'dashboard_user',
+            name: 'Jane Harvey',
+            numActiveApiKeys: -5928957,
+            numActiveUsers: -45832167,
+            scopes: [
+              {
+                kind: 'read',
+              },
+              {
+                kind: 'read',
+              },
+              {
+                kind: 'read',
+              },
+            ],
+          },
+        },
+      },
+      kind: 'create_org_api_key',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getAuditEventDetailCreateOrgRole = (
+  props: Partial<AuditEventDetailCreateOrgRole>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEventDetailCreateOrgRole =>
+  deepmerge<AuditEventDetailCreateOrgRole>(
+    {
+      data: {
+        roleName: 'Jeannie Hirthe',
+        scopes: [
+          {
+            kind: 'read',
+          },
+          {
+            kind: 'read',
+          },
+          {
+            kind: 'read',
+          },
+        ],
+        tenantRoleId: 'a4899385-655b-4591-a313-abe887ec50ba',
+      },
+      kind: 'create_org_role',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getAuditEventDetailCreatePlaybook = (
+  props: Partial<AuditEventDetailCreatePlaybook>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEventDetailCreatePlaybook =>
+  deepmerge<AuditEventDetailCreatePlaybook>(
+    {
+      data: {
+        obConfigurationId: '3ecfc294-f88c-4cc1-ad64-9d06724f607f',
+      },
+      kind: 'create_playbook',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getAuditEventDetailCreateUser = (
+  props: Partial<AuditEventDetailCreateUser>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEventDetailCreateUser =>
+  deepmerge<AuditEventDetailCreateUser>(
+    {
+      data: {
+        createdFields: [
+          'document.residence_document.issuing_state',
+          'card.*.cvc',
+          'document.id_card.classified_document_type',
+        ],
+        fpId: '57bcdd09-2734-43d1-8db7-19eca47c09ee',
+      },
+      kind: 'create_user',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getAuditEventDetailCreateUserAnnotation = (
+  props: Partial<AuditEventDetailCreateUserAnnotation>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEventDetailCreateUserAnnotation =>
+  deepmerge<AuditEventDetailCreateUserAnnotation>(
+    {
+      kind: 'create_user_annotation',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getAuditEventDetailDeactivateOrgRole = (
+  props: Partial<AuditEventDetailDeactivateOrgRole>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEventDetailDeactivateOrgRole =>
+  deepmerge<AuditEventDetailDeactivateOrgRole>(
+    {
+      data: {
+        roleName: 'Dwayne Doyle',
+        scopes: [
+          {
+            kind: 'read',
+          },
+          {
+            kind: 'read',
+          },
+          {
+            kind: 'read',
+          },
+        ],
+        tenantRoleId: '6700c385-a574-461a-983e-4a3cff57e2e8',
+      },
+      kind: 'deactivate_org_role',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getAuditEventDetailDecryptOrgApiKey = (
+  props: Partial<AuditEventDetailDecryptOrgApiKey>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEventDetailDecryptOrgApiKey =>
+  deepmerge<AuditEventDetailDecryptOrgApiKey>(
+    {
+      data: {
+        apiKey: {
+          id: '3cf9538f-bf0e-4b92-b016-32b6c289dbb2',
+          name: 'Michael Von III',
+          role: {
+            createdAt: '1931-11-20T07:28:04.0Z',
+            id: '6da6a499-5bdc-4b45-acc2-82c6d1701af8',
+            isImmutable: false,
+            kind: 'api_key',
+            name: 'Caleb McCullough',
+            numActiveApiKeys: -86612338,
+            numActiveUsers: -19936768,
+            scopes: [
+              {
+                kind: 'read',
+              },
+              {
+                kind: 'read',
+              },
+              {
+                kind: 'read',
+              },
+            ],
+          },
+        },
+      },
+      kind: 'decrypt_org_api_key',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getAuditEventDetailDecryptUserData = (
+  props: Partial<AuditEventDetailDecryptUserData>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEventDetailDecryptUserData =>
+  deepmerge<AuditEventDetailDecryptUserData>(
+    {
+      data: {
+        context: 'reflect',
+        decryptedFields: ['document.permit.document_number', 'document.passport.issued_at', 'document.visa.gender'],
+        fpId: '0b7d884e-b645-4486-a40a-05f4319818bb',
+        reason: 'ea ut',
+      },
+      kind: 'decrypt_user_data',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getAuditEventDetailDeleteListEntry = (
+  props: Partial<AuditEventDetailDeleteListEntry>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEventDetailDeleteListEntry =>
+  deepmerge<AuditEventDetailDeleteListEntry>(
+    {
+      data: {
+        listEntryId: '1ccaf27a-61e0-4411-8243-52bd298c98ca',
+        listId: 'fc1a62b8-e93e-4fdd-aff9-c01ae91b21c4',
+      },
+      kind: 'delete_list_entry',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getAuditEventDetailDeleteUser = (
+  props: Partial<AuditEventDetailDeleteUser>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEventDetailDeleteUser =>
+  deepmerge<AuditEventDetailDeleteUser>(
+    {
+      data: {
+        fpId: '4727d27a-8250-4052-869e-ea2be5d3017b',
+      },
+      kind: 'delete_user',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getAuditEventDetailDeleteUserData = (
+  props: Partial<AuditEventDetailDeleteUserData>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEventDetailDeleteUserData =>
+  deepmerge<AuditEventDetailDeleteUserData>(
+    {
+      data: {
+        deletedFields: [
+          'document.passport.issuing_state',
+          'document.passport_card.dob',
+          'investor_profile.annual_income',
+        ],
+        fpId: '051ca946-3d35-4606-899e-76be99c68791',
+      },
+      kind: 'delete_user_data',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getAuditEventDetailDisablePlaybook = (
+  props: Partial<AuditEventDetailDisablePlaybook>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEventDetailDisablePlaybook =>
+  deepmerge<AuditEventDetailDisablePlaybook>(
+    {
+      kind: 'disable_playbook',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getAuditEventDetailEditPlaybook = (
+  props: Partial<AuditEventDetailEditPlaybook>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEventDetailEditPlaybook =>
+  deepmerge<AuditEventDetailEditPlaybook>(
+    {
+      data: {
+        obConfigurationId: 'fa7d1a85-7b91-4add-8562-0595aab3d270',
+      },
+      kind: 'edit_playbook',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getAuditEventDetailInviteOrgMember = (
+  props: Partial<AuditEventDetailInviteOrgMember>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEventDetailInviteOrgMember =>
+  deepmerge<AuditEventDetailInviteOrgMember>(
+    {
+      data: {
+        email: 'kaylah78@gmail.com',
+        firstName: 'Janiya',
+        lastName: 'White',
+        scopes: [
+          {
+            kind: 'read',
+          },
+          {
+            kind: 'read',
+          },
+          {
+            kind: 'read',
+          },
+        ],
+        tenantName: 'Patty Kulas',
+        tenantRoleId: 'a26a8071-c49d-437e-81d0-d1d4b0f8a22e',
+        tenantRoleName: 'Joey Mayer',
+      },
+      kind: 'invite_org_member',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getAuditEventDetailLoginOrgMember = (
+  props: Partial<AuditEventDetailLoginOrgMember>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEventDetailLoginOrgMember =>
+  deepmerge<AuditEventDetailLoginOrgMember>(
+    {
+      kind: 'login_org_member',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getAuditEventDetailManuallyReviewEntity = (
+  props: Partial<AuditEventDetailManuallyReviewEntity>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEventDetailManuallyReviewEntity =>
+  deepmerge<AuditEventDetailManuallyReviewEntity>(
+    {
+      data: {
+        decisionStatus: 'step_up',
+        fpId: '4a037525-46d5-4bd0-b110-10a334dcd750',
+      },
+      kind: 'manually_review_entity',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getAuditEventDetailOrgMemberJoined = (
+  props: Partial<AuditEventDetailOrgMemberJoined>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEventDetailOrgMemberJoined =>
+  deepmerge<AuditEventDetailOrgMemberJoined>(
+    {
+      data: {
+        email: 'arlie.hoeger@gmail.com',
+        firstName: 'Eric',
+        lastName: 'Green',
+        tenantRole: {
+          createdAt: '1915-10-08T18:01:26.0Z',
+          id: '1cd14203-4478-4021-a94a-b85bea115d38',
+          isImmutable: true,
+          kind: 'dashboard_user',
+          name: 'Willie Kohler MD',
+          numActiveApiKeys: -68553613,
+          numActiveUsers: -33581186,
+          scopes: [
+            {
+              kind: 'read',
+            },
+            {
+              kind: 'read',
+            },
+            {
+              kind: 'read',
+            },
+          ],
+        },
+      },
+      kind: 'org_member_joined',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getAuditEventDetailRemoveOrgMember = (
+  props: Partial<AuditEventDetailRemoveOrgMember>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEventDetailRemoveOrgMember =>
+  deepmerge<AuditEventDetailRemoveOrgMember>(
+    {
+      data: {
+        member: {
+          email: 'hilbert41@gmail.com',
+          firstName: 'Ocie',
+          id: '9b3ee70b-bbc9-4c42-89e6-325f7efca8a7',
+          lastName: 'Smith',
+        },
+      },
+      kind: 'remove_org_member',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getAuditEventDetailRequestUserData = (
+  props: Partial<AuditEventDetailRequestUserData>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEventDetailRequestUserData =>
+  deepmerge<AuditEventDetailRequestUserData>(
+    {
+      kind: 'request_user_data',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getAuditEventDetailStartUserVerification = (
+  props: Partial<AuditEventDetailStartUserVerification>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEventDetailStartUserVerification =>
+  deepmerge<AuditEventDetailStartUserVerification>(
+    {
+      kind: 'start_user_verification',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getAuditEventDetailUpdateOrgApiKeyRole = (
+  props: Partial<AuditEventDetailUpdateOrgApiKeyRole>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEventDetailUpdateOrgApiKeyRole =>
+  deepmerge<AuditEventDetailUpdateOrgApiKeyRole>(
+    {
+      data: {
+        apiKey: {
+          id: 'cc82ce07-fe4f-45df-9ecc-1bedf13d8b19',
+          name: 'Pam Schowalter',
+          role: {
+            createdAt: '1896-10-24T19:12:58.0Z',
+            id: '4e14ea08-57e6-4f9c-927a-2b408e1d22e8',
+            isImmutable: false,
+            kind: 'compliance_partner_dashboard_user',
+            name: 'Joshua Renner PhD',
+            numActiveApiKeys: -30233385,
+            numActiveUsers: 19395810,
+            scopes: [
+              {
+                kind: 'read',
+              },
+              {
+                kind: 'read',
+              },
+              {
+                kind: 'read',
+              },
+            ],
+          },
+        },
+        newRole: {
+          createdAt: '1890-12-23T12:46:33.0Z',
+          id: 'd3b85a37-b219-4801-893b-5ab0a76cf43b',
+          isImmutable: true,
+          kind: 'dashboard_user',
+          name: 'Woodrow Kozey',
+          numActiveApiKeys: -39875879,
+          numActiveUsers: -54610634,
+          scopes: [
+            {
+              kind: 'read',
+            },
+            {
+              kind: 'read',
+            },
+            {
+              kind: 'read',
+            },
+          ],
+        },
+        oldRole: {
+          createdAt: '1962-12-06T03:17:41.0Z',
+          id: 'f38774df-b84d-45ce-bc0c-1c6891dded37',
+          isImmutable: true,
+          kind: 'compliance_partner_dashboard_user',
+          name: 'Lois Roob',
+          numActiveApiKeys: 30030082,
+          numActiveUsers: -30106657,
+          scopes: [
+            {
+              kind: 'read',
+            },
+            {
+              kind: 'read',
+            },
+            {
+              kind: 'read',
+            },
+          ],
+        },
+      },
+      kind: 'update_org_api_key_role',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getAuditEventDetailUpdateOrgApiKeyStatus = (
+  props: Partial<AuditEventDetailUpdateOrgApiKeyStatus>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEventDetailUpdateOrgApiKeyStatus =>
+  deepmerge<AuditEventDetailUpdateOrgApiKeyStatus>(
+    {
+      data: {
+        apiKey: {
+          id: 'e88d3e7b-38e7-43a8-be04-4fca52e4ab89',
+          name: 'Rosemary Grimes',
+          role: {
+            createdAt: '1905-12-23T01:06:28.0Z',
+            id: '4517451a-16e2-4525-a14e-8a8df55b2780',
+            isImmutable: false,
+            kind: 'api_key',
+            name: 'Pete Kuhic',
+            numActiveApiKeys: -42633076,
+            numActiveUsers: 15308920,
+            scopes: [
+              {
+                kind: 'read',
+              },
+              {
+                kind: 'read',
+              },
+              {
+                kind: 'read',
+              },
+            ],
+          },
+        },
+        status: 'disabled',
+      },
+      kind: 'update_org_api_key_status',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getAuditEventDetailUpdateOrgMember = (
+  props: Partial<AuditEventDetailUpdateOrgMember>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEventDetailUpdateOrgMember =>
+  deepmerge<AuditEventDetailUpdateOrgMember>(
+    {
+      data: {
+        firstName: 'Michael',
+        lastName: 'Reinger',
+        newRole: {
+          createdAt: '1944-08-22T14:54:17.0Z',
+          id: '78d78637-3c90-463e-a5e6-af4e37cb91c4',
+          isImmutable: false,
+          kind: 'api_key',
+          name: 'Sheryl Kilback',
+          numActiveApiKeys: 19760290,
+          numActiveUsers: -53321230,
+          scopes: [
+            {
+              kind: 'read',
+            },
+            {
+              kind: 'read',
+            },
+            {
+              kind: 'read',
+            },
+          ],
+        },
+        oldRole: {
+          createdAt: '1951-03-23T01:25:58.0Z',
+          id: '08ff255a-35b6-4382-b072-4d55bbf2a82a',
+          isImmutable: false,
+          kind: 'compliance_partner_dashboard_user',
+          name: 'Lois Wyman Sr.',
+          numActiveApiKeys: 32285650,
+          numActiveUsers: 46117115,
+          scopes: [
+            {
+              kind: 'read',
+            },
+            {
+              kind: 'read',
+            },
+            {
+              kind: 'read',
+            },
+          ],
+        },
+        tenantUserId: 'e466b76b-a791-451d-9c0d-01bd6aaffe56',
+      },
+      kind: 'update_org_member',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getAuditEventDetailUpdateOrgRole = (
+  props: Partial<AuditEventDetailUpdateOrgRole>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEventDetailUpdateOrgRole =>
+  deepmerge<AuditEventDetailUpdateOrgRole>(
+    {
+      data: {
+        newScopes: [
+          {
+            kind: 'read',
+          },
+          {
+            kind: 'read',
+          },
+          {
+            kind: 'read',
+          },
+        ],
+        prevScopes: [
+          {
+            kind: 'read',
+          },
+          {
+            kind: 'read',
+          },
+          {
+            kind: 'read',
+          },
+        ],
+        roleName: 'Mae Erdman Sr.',
+        tenantRoleId: '28392d08-4426-4fcf-b0d1-91aa366ce409',
+      },
+      kind: 'update_org_role',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getAuditEventDetailUpdateOrgSettings = (
+  props: Partial<AuditEventDetailUpdateOrgSettings>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEventDetailUpdateOrgSettings =>
+  deepmerge<AuditEventDetailUpdateOrgSettings>(
+    {
+      kind: 'update_org_settings',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getAuditEventDetailUpdateUserData = (
+  props: Partial<AuditEventDetailUpdateUserData>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEventDetailUpdateUserData =>
+  deepmerge<AuditEventDetailUpdateUserData>(
+    {
+      data: {
+        fpId: '4b632385-7ea4-40b2-bcaa-06e0c24a8022',
+        updatedFields: [
+          'document.passport_card.full_name',
+          'document.passport.classified_document_type',
+          'document.voter_identification.issued_at',
+        ],
+      },
+      kind: 'update_user_data',
     },
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
@@ -1480,6 +2401,37 @@ export const getComplianceDocData = (
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+
+export const getComplianceDocDataExternalUrl = (
+  props: Partial<ComplianceDocDataExternalUrl>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ComplianceDocDataExternalUrl =>
+  deepmerge<ComplianceDocDataExternalUrl>(
+    {
+      data: {
+        url: 'https://alienated-ownership.org/',
+      },
+      kind: 'external_url',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getComplianceDocDataFileUpload = (
+  props: Partial<ComplianceDocDataFileUpload>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ComplianceDocDataFileUpload =>
+  deepmerge<ComplianceDocDataFileUpload>(
+    {
+      data: {
+        data: 'reprehenderit cupidatat',
+        filename: 'Mrs. Joanne Bernhard',
+      },
+      kind: 'file_upload',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
 export const getComplianceDocDataKind = (props: ComplianceDocDataKind): ComplianceDocDataKind => props ?? 'file_upload';
 
 export const getComplianceDocEvent = (
@@ -1582,6 +2534,91 @@ export const getComplianceDocEventType = (
         templateId: 'f824ba64-b197-4620-b9cc-5403e7a66bdd',
       },
       kind: 'requested',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getComplianceDocEventTypeAssigned = (
+  props: Partial<ComplianceDocEventTypeAssigned>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ComplianceDocEventTypeAssigned =>
+  deepmerge<ComplianceDocEventTypeAssigned>(
+    {
+      data: {
+        assignedTo: {
+          org: 'officia',
+          user: {
+            firstName: 'Jaren',
+            id: '208fd3fb-ad62-41ed-b8aa-5b04d6ce8d85',
+            lastName: 'Moen',
+          },
+        },
+        kind: 'partner_tenant',
+      },
+      kind: 'assigned',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getComplianceDocEventTypeRequestRetracted = (
+  props: Partial<ComplianceDocEventTypeRequestRetracted>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ComplianceDocEventTypeRequestRetracted =>
+  deepmerge<ComplianceDocEventTypeRequestRetracted>(
+    {
+      data: {},
+      kind: 'request_retracted',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getComplianceDocEventTypeRequested = (
+  props: Partial<ComplianceDocEventTypeRequested>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ComplianceDocEventTypeRequested =>
+  deepmerge<ComplianceDocEventTypeRequested>(
+    {
+      data: {
+        description: 'irure reprehenderit minim consectetur labore',
+        name: 'Jake Barrows',
+        templateId: '66e8a3d4-4539-47ca-a9d6-ea837f8f6a66',
+      },
+      kind: 'requested',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getComplianceDocEventTypeReviewed = (
+  props: Partial<ComplianceDocEventTypeReviewed>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ComplianceDocEventTypeReviewed =>
+  deepmerge<ComplianceDocEventTypeReviewed>(
+    {
+      data: {
+        decision: 'rejected',
+        note: 'est nostrud Lorem',
+      },
+      kind: 'reviewed',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getComplianceDocEventTypeSubmitted = (
+  props: Partial<ComplianceDocEventTypeSubmitted>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ComplianceDocEventTypeSubmitted =>
+  deepmerge<ComplianceDocEventTypeSubmitted>(
+    {
+      data: {
+        kind: 'file_upload',
+        submissionId: 'b93b6955-f4b0-4cbb-802b-e76297110145',
+      },
+      kind: 'submitted',
     },
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
@@ -3063,6 +4100,78 @@ export const getDbActor = (
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+
+export const getDbActorFirmEmployee = (
+  props: Partial<DbActorFirmEmployee>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): DbActorFirmEmployee =>
+  deepmerge<DbActorFirmEmployee>(
+    {
+      data: {
+        id: 'ed3ae1e2-6b10-4f82-a632-42caf2fd31d5',
+      },
+      kind: 'firm_employee',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getDbActorFootprint = (
+  props: Partial<DbActorFootprint>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): DbActorFootprint =>
+  deepmerge<DbActorFootprint>(
+    {
+      kind: 'footprint',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getDbActorTenantApiKey = (
+  props: Partial<DbActorTenantApiKey>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): DbActorTenantApiKey =>
+  deepmerge<DbActorTenantApiKey>(
+    {
+      data: {
+        id: '39e3b751-3ba1-4f24-acc3-6d82efbe1a4f',
+      },
+      kind: 'tenant_api_key',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getDbActorTenantUser = (
+  props: Partial<DbActorTenantUser>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): DbActorTenantUser =>
+  deepmerge<DbActorTenantUser>(
+    {
+      data: {
+        id: 'd0203384-f90c-4e21-9df8-f7a94bd24e6c',
+      },
+      kind: 'tenant_user',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getDbActorUser = (
+  props: Partial<DbActorUser>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): DbActorUser =>
+  deepmerge<DbActorUser>(
+    {
+      data: {
+        id: 'a3acb3a5-d85b-4453-a22c-972fc4b8f18a',
+      },
+      kind: 'user',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
 export const getDecisionStatus = (props: DecisionStatus): DecisionStatus => props ?? 'fail';
 export const getDecryptionContext = (props: DecryptionContext): DecryptionContext => props ?? 'vault_proxy';
 
@@ -3203,6 +4312,74 @@ export const getDocumentRequestConfig = (
         },
       },
       kind: 'identity',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getDocumentRequestConfigCustom = (
+  props: Partial<DocumentRequestConfigCustom>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): DocumentRequestConfigCustom =>
+  deepmerge<DocumentRequestConfigCustom>(
+    {
+      data: {
+        description: 'dolor laborum labore',
+        identifier: 'custom.*',
+        name: 'Jodi McDermott',
+        requiresHumanReview: true,
+        uploadSettings: 'capture_only_on_mobile',
+      },
+      kind: 'custom',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getDocumentRequestConfigIdentity = (
+  props: Partial<DocumentRequestConfigIdentity>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): DocumentRequestConfigIdentity =>
+  deepmerge<DocumentRequestConfigIdentity>(
+    {
+      data: {
+        collectSelfie: false,
+        documentTypesAndCountries: {
+          countrySpecific: {},
+          global: ['permit', 'permit', 'id_card'],
+        },
+      },
+      kind: 'identity',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getDocumentRequestConfigProofOfAddress = (
+  props: Partial<DocumentRequestConfigProofOfAddress>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): DocumentRequestConfigProofOfAddress =>
+  deepmerge<DocumentRequestConfigProofOfAddress>(
+    {
+      data: {
+        requiresHumanReview: true,
+      },
+      kind: 'proof_of_address',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getDocumentRequestConfigProofOfSsn = (
+  props: Partial<DocumentRequestConfigProofOfSsn>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): DocumentRequestConfigProofOfSsn =>
+  deepmerge<DocumentRequestConfigProofOfSsn>(
+    {
+      data: {
+        requiresHumanReview: true,
+      },
+      kind: 'proof_of_ssn',
     },
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
@@ -3638,6 +4815,35 @@ export const getEntityAction = (
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 
+export const getEntityActionClearReview = (
+  props: Partial<EntityActionClearReview>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): EntityActionClearReview =>
+  deepmerge<EntityActionClearReview>(
+    {
+      kind: 'clear_review',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getEntityActionManualDecision = (
+  props: Partial<EntityActionManualDecision>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): EntityActionManualDecision =>
+  deepmerge<EntityActionManualDecision>(
+    {
+      annotation: {
+        isPinned: false,
+        note: 'proident aute voluptate est',
+      },
+      kind: 'manual_decision',
+      status: 'pass',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
 export const getEntityActionResponse = (
   props: Partial<EntityActionResponse>,
   options: { overwriteArray: boolean } = { overwriteArray: true },
@@ -3648,6 +4854,43 @@ export const getEntityActionResponse = (
       kind: 'trigger',
       link: 'fugiat adipisicing anim et enim',
       token: 'de8a5133-091c-4879-b82e-d3e27a7def31',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getEntityActionResponseTrigger = (
+  props: Partial<EntityActionResponseTrigger>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): EntityActionResponseTrigger =>
+  deepmerge<EntityActionResponseTrigger>(
+    {
+      expiresAt: '1936-03-22T16:13:45.0Z',
+      kind: 'trigger',
+      link: 'dolore culpa',
+      token: '44cb927d-71e5-4e9c-a2a4-73824bc3f3ce',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getEntityActionTrigger = (
+  props: Partial<EntityActionTrigger>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): EntityActionTrigger =>
+  deepmerge<EntityActionTrigger>(
+    {
+      fpBid: '53553c19-481c-472f-b5c6-981395de46c8',
+      kind: 'trigger',
+      note: 'cillum',
+      trigger: {
+        data: {
+          playbookId: '6e542123-e213-47be-870d-59dae64d51dc',
+          recollectAttributes: ['business_website', 'us_tax_id', 'investor_profile'],
+          reuseExistingBoKyc: false,
+        },
+        kind: 'onboard',
+      },
     },
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
@@ -4945,6 +6188,43 @@ export const getInvokeVaultProxyPermission = (
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+
+export const getInvokeVaultProxyPermissionAny = (
+  props: Partial<InvokeVaultProxyPermissionAny>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): InvokeVaultProxyPermissionAny =>
+  deepmerge<InvokeVaultProxyPermissionAny>(
+    {
+      kind: 'any',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getInvokeVaultProxyPermissionId = (
+  props: Partial<InvokeVaultProxyPermissionId>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): InvokeVaultProxyPermissionId =>
+  deepmerge<InvokeVaultProxyPermissionId>(
+    {
+      id: 'bf06dada-b237-4929-98b9-e260456e1da7',
+      kind: 'id',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getInvokeVaultProxyPermissionJustInTime = (
+  props: Partial<InvokeVaultProxyPermissionJustInTime>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): InvokeVaultProxyPermissionJustInTime =>
+  deepmerge<InvokeVaultProxyPermissionJustInTime>(
+    {
+      kind: 'just_in_time',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
 export const getIsIn = (props: IsIn): IsIn => props ?? 'is_not_in';
 export const getIso3166TwoDigitCountryCode = (props: Iso3166TwoDigitCountryCode): Iso3166TwoDigitCountryCode =>
   props ?? 'GN';
@@ -5420,6 +6700,40 @@ export const getListEventDetail = (
         listId: '2a21540f-209c-4391-8845-a8b9dba4fabc',
       },
       kind: 'create_list_entry',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getListEventDetailCreateListEntry = (
+  props: Partial<ListEventDetailCreateListEntry>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ListEventDetailCreateListEntry =>
+  deepmerge<ListEventDetailCreateListEntry>(
+    {
+      data: {
+        entries: ['mollit velit', 'dolore incididunt Duis', 'commodo anim'],
+        listEntryCreationId: '04f8e8a2-5849-48df-97a9-f60ccb022d91',
+        listId: 'ed083548-3c08-4094-926f-3130b275133e',
+      },
+      kind: 'create_list_entry',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getListEventDetailDeleteListEntry = (
+  props: Partial<ListEventDetailDeleteListEntry>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): ListEventDetailDeleteListEntry =>
+  deepmerge<ListEventDetailDeleteListEntry>(
+    {
+      data: {
+        entry: 'veniam ad eu',
+        listEntryId: 'bf17b809-d859-4bf2-b90b-d6ac27516940',
+        listId: '4e3766fb-db0f-45c5-b1b3-7bc2945ef556',
+      },
+      kind: 'delete_list_entry',
     },
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
@@ -7823,6 +9137,89 @@ export const getRuleActionConfig = (
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+
+export const getRuleActionConfigFail = (
+  props: Partial<RuleActionConfigFail>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): RuleActionConfigFail =>
+  deepmerge<RuleActionConfigFail>(
+    {
+      config: {},
+      kind: 'fail',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getRuleActionConfigManualReview = (
+  props: Partial<RuleActionConfigManualReview>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): RuleActionConfigManualReview =>
+  deepmerge<RuleActionConfigManualReview>(
+    {
+      config: {},
+      kind: 'manual_review',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getRuleActionConfigPassWithManualReview = (
+  props: Partial<RuleActionConfigPassWithManualReview>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): RuleActionConfigPassWithManualReview =>
+  deepmerge<RuleActionConfigPassWithManualReview>(
+    {
+      config: {},
+      kind: 'pass_with_manual_review',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getRuleActionConfigStepUp = (
+  props: Partial<RuleActionConfigStepUp>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): RuleActionConfigStepUp =>
+  deepmerge<RuleActionConfigStepUp>(
+    {
+      config: [
+        {
+          data: {
+            collectSelfie: true,
+            documentTypesAndCountries: {
+              countrySpecific: {},
+              global: ['id_card', 'visa', 'residence_document'],
+            },
+          },
+          kind: 'identity',
+        },
+        {
+          data: {
+            collectSelfie: false,
+            documentTypesAndCountries: {
+              countrySpecific: {},
+              global: ['residence_document', 'passport', 'passport'],
+            },
+          },
+          kind: 'identity',
+        },
+        {
+          data: {
+            collectSelfie: true,
+            documentTypesAndCountries: {
+              countrySpecific: {},
+              global: ['id_card', 'id_card', 'drivers_license'],
+            },
+          },
+          kind: 'identity',
+        },
+      ],
+      kind: 'step_up',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
 export const getRuleActionMigration = (props: RuleActionMigration): RuleActionMigration => props ?? 'manual_review';
 
 export const getRuleEvalResult = (
@@ -8366,6 +9763,346 @@ export const getTenantScope = (
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+
+export const getTenantScopeAdmin = (
+  props: Partial<TenantScopeAdmin>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): TenantScopeAdmin =>
+  deepmerge<TenantScopeAdmin>(
+    {
+      kind: 'admin',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getTenantScopeApiKeys = (
+  props: Partial<TenantScopeApiKeys>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): TenantScopeApiKeys =>
+  deepmerge<TenantScopeApiKeys>(
+    {
+      kind: 'api_keys',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getTenantScopeAuthToken = (
+  props: Partial<TenantScopeAuthToken>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): TenantScopeAuthToken =>
+  deepmerge<TenantScopeAuthToken>(
+    {
+      kind: 'auth_token',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getTenantScopeCipIntegration = (
+  props: Partial<TenantScopeCipIntegration>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): TenantScopeCipIntegration =>
+  deepmerge<TenantScopeCipIntegration>(
+    {
+      kind: 'cip_integration',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getTenantScopeCompliancePartnerAdmin = (
+  props: Partial<TenantScopeCompliancePartnerAdmin>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): TenantScopeCompliancePartnerAdmin =>
+  deepmerge<TenantScopeCompliancePartnerAdmin>(
+    {
+      kind: 'compliance_partner_admin',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getTenantScopeCompliancePartnerManageReviews = (
+  props: Partial<TenantScopeCompliancePartnerManageReviews>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): TenantScopeCompliancePartnerManageReviews =>
+  deepmerge<TenantScopeCompliancePartnerManageReviews>(
+    {
+      kind: 'compliance_partner_manage_reviews',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getTenantScopeCompliancePartnerManageTemplates = (
+  props: Partial<TenantScopeCompliancePartnerManageTemplates>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): TenantScopeCompliancePartnerManageTemplates =>
+  deepmerge<TenantScopeCompliancePartnerManageTemplates>(
+    {
+      kind: 'compliance_partner_manage_templates',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getTenantScopeCompliancePartnerRead = (
+  props: Partial<TenantScopeCompliancePartnerRead>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): TenantScopeCompliancePartnerRead =>
+  deepmerge<TenantScopeCompliancePartnerRead>(
+    {
+      kind: 'compliance_partner_read',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getTenantScopeDecrypt = (
+  props: Partial<TenantScopeDecrypt>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): TenantScopeDecrypt =>
+  deepmerge<TenantScopeDecrypt>(
+    {
+      data: 'card',
+      kind: 'decrypt',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getTenantScopeDecryptAll = (
+  props: Partial<TenantScopeDecryptAll>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): TenantScopeDecryptAll =>
+  deepmerge<TenantScopeDecryptAll>(
+    {
+      kind: 'decrypt_all',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getTenantScopeDecryptAllExceptPciData = (
+  props: Partial<TenantScopeDecryptAllExceptPciData>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): TenantScopeDecryptAllExceptPciData =>
+  deepmerge<TenantScopeDecryptAllExceptPciData>(
+    {
+      kind: 'decrypt_all_except_pci_data',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getTenantScopeDecryptCustom = (
+  props: Partial<TenantScopeDecryptCustom>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): TenantScopeDecryptCustom =>
+  deepmerge<TenantScopeDecryptCustom>(
+    {
+      kind: 'decrypt_custom',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getTenantScopeDecryptDocument = (
+  props: Partial<TenantScopeDecryptDocument>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): TenantScopeDecryptDocument =>
+  deepmerge<TenantScopeDecryptDocument>(
+    {
+      kind: 'decrypt_document',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getTenantScopeDecryptDocumentAndSelfie = (
+  props: Partial<TenantScopeDecryptDocumentAndSelfie>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): TenantScopeDecryptDocumentAndSelfie =>
+  deepmerge<TenantScopeDecryptDocumentAndSelfie>(
+    {
+      kind: 'decrypt_document_and_selfie',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getTenantScopeInvokeVaultProxy = (
+  props: Partial<TenantScopeInvokeVaultProxy>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): TenantScopeInvokeVaultProxy =>
+  deepmerge<TenantScopeInvokeVaultProxy>(
+    {
+      data: {
+        kind: 'any',
+      },
+      kind: 'invoke_vault_proxy',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getTenantScopeLabelAndTag = (
+  props: Partial<TenantScopeLabelAndTag>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): TenantScopeLabelAndTag =>
+  deepmerge<TenantScopeLabelAndTag>(
+    {
+      kind: 'label_and_tag',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getTenantScopeManageComplianceDocSubmission = (
+  props: Partial<TenantScopeManageComplianceDocSubmission>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): TenantScopeManageComplianceDocSubmission =>
+  deepmerge<TenantScopeManageComplianceDocSubmission>(
+    {
+      kind: 'manage_compliance_doc_submission',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getTenantScopeManageVaultProxy = (
+  props: Partial<TenantScopeManageVaultProxy>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): TenantScopeManageVaultProxy =>
+  deepmerge<TenantScopeManageVaultProxy>(
+    {
+      kind: 'manage_vault_proxy',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getTenantScopeManageWebhooks = (
+  props: Partial<TenantScopeManageWebhooks>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): TenantScopeManageWebhooks =>
+  deepmerge<TenantScopeManageWebhooks>(
+    {
+      kind: 'manage_webhooks',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getTenantScopeManualReview = (
+  props: Partial<TenantScopeManualReview>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): TenantScopeManualReview =>
+  deepmerge<TenantScopeManualReview>(
+    {
+      kind: 'manual_review',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getTenantScopeOnboarding = (
+  props: Partial<TenantScopeOnboarding>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): TenantScopeOnboarding =>
+  deepmerge<TenantScopeOnboarding>(
+    {
+      kind: 'onboarding',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getTenantScopeOnboardingConfiguration = (
+  props: Partial<TenantScopeOnboardingConfiguration>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): TenantScopeOnboardingConfiguration =>
+  deepmerge<TenantScopeOnboardingConfiguration>(
+    {
+      kind: 'onboarding_configuration',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getTenantScopeOrgSettings = (
+  props: Partial<TenantScopeOrgSettings>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): TenantScopeOrgSettings =>
+  deepmerge<TenantScopeOrgSettings>(
+    {
+      kind: 'org_settings',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getTenantScopeRead = (
+  props: Partial<TenantScopeRead>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): TenantScopeRead =>
+  deepmerge<TenantScopeRead>(
+    {
+      kind: 'read',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getTenantScopeTriggerKyb = (
+  props: Partial<TenantScopeTriggerKyb>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): TenantScopeTriggerKyb =>
+  deepmerge<TenantScopeTriggerKyb>(
+    {
+      kind: 'trigger_kyb',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getTenantScopeTriggerKyc = (
+  props: Partial<TenantScopeTriggerKyc>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): TenantScopeTriggerKyc =>
+  deepmerge<TenantScopeTriggerKyc>(
+    {
+      kind: 'trigger_kyc',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getTenantScopeWriteEntities = (
+  props: Partial<TenantScopeWriteEntities>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): TenantScopeWriteEntities =>
+  deepmerge<TenantScopeWriteEntities>(
+    {
+      kind: 'write_entities',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getTenantScopeWriteLists = (
+  props: Partial<TenantScopeWriteLists>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): TenantScopeWriteLists =>
+  deepmerge<TenantScopeWriteLists>(
+    {
+      kind: 'write_lists',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
 export const getTerminalDecisionStatus = (props: TerminalDecisionStatus): TerminalDecisionStatus => props ?? 'pass';
 
 export const getTimelineOnboardingDecision = (
@@ -8841,6 +10578,398 @@ export const getUserTimelineEvent = (
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 
+export const getUserTimelineEventAnnotation = (
+  props: Partial<UserTimelineEventAnnotation>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): UserTimelineEventAnnotation =>
+  deepmerge<UserTimelineEventAnnotation>(
+    {
+      data: {
+        id: '2163d2f3-0bfc-4bb0-b757-83ed1ff7b856',
+        isPinned: false,
+        note: 'enim',
+        source: {
+          id: '3f0a3e6f-6f2e-4eac-97c7-6ec7ae7f0893',
+          kind: 'user',
+        },
+        timestamp: '1941-11-01T01:39:16.0Z',
+      },
+      kind: 'annotation',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getUserTimelineEventAuthMethodUpdated = (
+  props: Partial<UserTimelineEventAuthMethodUpdated>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): UserTimelineEventAuthMethodUpdated =>
+  deepmerge<UserTimelineEventAuthMethodUpdated>(
+    {
+      data: {
+        action: 'add_primary',
+        insightEvent: {
+          city: 'West Nellie',
+          country: 'El Salvador',
+          ipAddress: '49747 Center Street Apt. 222',
+          latitude: 57937526.54385415,
+          longitude: 15402501.555539057,
+          metroCode: 'Excepteur',
+          postalCode: 'velit aliquip magna consequat',
+          region: 'aliqua sit aute',
+          regionName: 'Crystal Doyle',
+          sessionId: '47b7a9d6-b345-4eff-bcf6-0c96c94cee1f',
+          timeZone: 'Ut deserunt',
+          timestamp: '1936-06-04T01:58:31.0Z',
+          userAgent: 'Lorem',
+        },
+        kind: 'email',
+      },
+      kind: 'auth_method_updated',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getUserTimelineEventBusinessOwnerCompletedKyc = (
+  props: Partial<UserTimelineEventBusinessOwnerCompletedKyc>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): UserTimelineEventBusinessOwnerCompletedKyc =>
+  deepmerge<UserTimelineEventBusinessOwnerCompletedKyc>(
+    {
+      data: {
+        decision: {
+          clearedManualReviews: [
+            {
+              kind: 'rule_triggered',
+            },
+            {
+              kind: 'document_needs_review',
+            },
+            {
+              kind: 'document_needs_review',
+            },
+          ],
+          id: '5f2f3ae5-8758-462a-854a-0c4195cb469e',
+          obConfiguration: {
+            id: '03eae7be-3038-487c-8a46-b071fff01b4d',
+            mustCollectData: ['card', 'us_legal_status', 'us_legal_status'],
+            name: 'Guadalupe Nitzsche',
+          },
+          ranRulesInSandbox: false,
+          ruleSetResultId: '76777816-5588-44d3-9ce8-5dd62d2bd4da',
+          source: {
+            id: '51aecba3-5218-435d-a40d-4a084db19256',
+            kind: 'user',
+          },
+          status: 'pass',
+          timestamp: '1914-12-10T01:11:44.0Z',
+          workflowKind: 'kyc',
+        },
+        fpId: '3882e700-3bd9-4606-b19f-e05f9923c118',
+      },
+      kind: 'business_owner_completed_kyc',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getUserTimelineEventDataCollected = (
+  props: Partial<UserTimelineEventDataCollected>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): UserTimelineEventDataCollected =>
+  deepmerge<UserTimelineEventDataCollected>(
+    {
+      data: {
+        actor: {
+          id: 'b308fb06-c9be-473f-9ad9-78986d85eea5',
+          kind: 'user',
+        },
+        attributes: ['ssn4', 'business_kyced_beneficial_owners', 'business_kyced_beneficial_owners'],
+        isPrefill: false,
+        targets: ['card.*.expiration_year', 'document.passport.issuing_state', 'id.middle_name'],
+      },
+      kind: 'data_collected',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getUserTimelineEventDocumentUploaded = (
+  props: Partial<UserTimelineEventDocumentUploaded>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): UserTimelineEventDocumentUploaded =>
+  deepmerge<UserTimelineEventDocumentUploaded>(
+    {
+      data: {
+        config: {
+          data: {
+            collectSelfie: true,
+            documentTypesAndCountries: {
+              countrySpecific: {},
+              global: ['voter_identification', 'passport_card', 'id_card'],
+            },
+          },
+          kind: 'identity',
+        },
+        deviceType: 'ios',
+        documentType: 'passport',
+        status: 'failed',
+      },
+      kind: 'document_uploaded',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getUserTimelineEventExternalIntegrationCalled = (
+  props: Partial<UserTimelineEventExternalIntegrationCalled>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): UserTimelineEventExternalIntegrationCalled =>
+  deepmerge<UserTimelineEventExternalIntegrationCalled>(
+    {
+      data: {
+        externalId: '031d33fc-7e95-4646-bce5-838be493687c',
+        integration: 'alpaca_cip',
+        successful: true,
+      },
+      kind: 'external_integration_called',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getUserTimelineEventLabelAdded = (
+  props: Partial<UserTimelineEventLabelAdded>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): UserTimelineEventLabelAdded =>
+  deepmerge<UserTimelineEventLabelAdded>(
+    {
+      data: {
+        kind: 'active',
+      },
+      kind: 'label_added',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getUserTimelineEventLiveness = (
+  props: Partial<UserTimelineEventLiveness>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): UserTimelineEventLiveness =>
+  deepmerge<UserTimelineEventLiveness>(
+    {
+      data: {
+        attributes: {
+          device: 'tempor eiusmod occaecat quis',
+          issuers: ['footprint', 'footprint', 'cloudflare'],
+          metadata: {},
+          os: 'reprehenderit eu id',
+        },
+        insightEvent: {
+          city: 'Vonshire',
+          country: 'Latvia',
+          ipAddress: '833 Graham Overpass Suite 590',
+          latitude: -8028729.352235422,
+          longitude: -80407628.13278826,
+          metroCode: 'elit ut cillum',
+          postalCode: 'Duis sed nulla proident ullamco',
+          region: 'tempor velit',
+          regionName: 'Marilyn Johnston',
+          sessionId: 'f8c6b184-b94f-4756-be57-2e470f27169b',
+          timeZone: 'in tempor proident anim in',
+          timestamp: '1894-04-14T13:16:01.0Z',
+          userAgent: 'ullamco tempor enim dolor occaecat',
+        },
+        source: 'apple_device_attestation',
+      },
+      kind: 'liveness',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getUserTimelineEventOnboardingDecision = (
+  props: Partial<UserTimelineEventOnboardingDecision>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): UserTimelineEventOnboardingDecision =>
+  deepmerge<UserTimelineEventOnboardingDecision>(
+    {
+      data: {
+        annotation: {
+          id: '4e83cfc5-8d29-49cf-85f0-0012b770a678',
+          isPinned: false,
+          note: 'sed incididunt',
+          source: {
+            id: 'fa9ac550-c231-4fa1-a1f9-940d4ba7dd58',
+            kind: 'user',
+          },
+          timestamp: '1925-02-05T06:25:07.0Z',
+        },
+        decision: {
+          clearedManualReviews: [
+            {
+              kind: 'document_needs_review',
+            },
+            {
+              kind: 'rule_triggered',
+            },
+            {
+              kind: 'rule_triggered',
+            },
+          ],
+          id: '2b64a4e6-4941-438c-88f8-d7dfaaa72dc8',
+          obConfiguration: {
+            id: '4422c4b8-d424-49f8-89be-6d02a7ba71c5',
+            mustCollectData: ['business_name', 'phone_number', 'business_tin'],
+            name: 'Alfredo King',
+          },
+          ranRulesInSandbox: false,
+          ruleSetResultId: 'faa372d0-3e7d-4faa-b967-32f9ef639a71',
+          source: {
+            id: 'fbe1698e-f62f-4c02-9af6-cca075cfb2fe',
+            kind: 'user',
+          },
+          status: 'pass',
+          timestamp: '1928-05-15T02:12:20.0Z',
+          workflowKind: 'kyc',
+        },
+        workflowSource: 'tenant',
+      },
+      kind: 'onboarding_decision',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getUserTimelineEventOnboardingTimeline = (
+  props: Partial<UserTimelineEventOnboardingTimeline>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): UserTimelineEventOnboardingTimeline =>
+  deepmerge<UserTimelineEventOnboardingTimeline>(
+    {
+      data: {
+        event: 'dolore ullamco culpa in esse',
+        sessionId: '7da98b9c-501b-4807-9fcc-c6630015fd3c',
+      },
+      kind: 'onboarding_timeline',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getUserTimelineEventStepUp = (
+  props: Partial<UserTimelineEventStepUp>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): UserTimelineEventStepUp =>
+  deepmerge<UserTimelineEventStepUp>(
+    {
+      data: [
+        {
+          kind: 'proof_of_ssn',
+          ruleSetResultId: 'c954cbca-386e-4cd9-8ff7-8ee75ba24e7c',
+        },
+        {
+          kind: 'identity',
+          ruleSetResultId: 'c954cbca-386e-4cd9-8ff7-8ee75ba24e7c',
+        },
+        {
+          kind: 'proof_of_ssn',
+          ruleSetResultId: 'c954cbca-386e-4cd9-8ff7-8ee75ba24e7c',
+        },
+      ],
+      kind: 'step_up',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getUserTimelineEventVaultCreated = (
+  props: Partial<UserTimelineEventVaultCreated>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): UserTimelineEventVaultCreated =>
+  deepmerge<UserTimelineEventVaultCreated>(
+    {
+      data: {
+        actor: {
+          id: 'f9907fd5-8657-4adc-b8d0-79e64d916e5e',
+          kind: 'user',
+        },
+      },
+      kind: 'vault_created',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getUserTimelineEventWatchlistCheck = (
+  props: Partial<UserTimelineEventWatchlistCheck>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): UserTimelineEventWatchlistCheck =>
+  deepmerge<UserTimelineEventWatchlistCheck>(
+    {
+      data: {
+        id: '972ceb12-49f6-4959-bf10-bd212c5b4290',
+        reasonCodes: ['device_reputation', 'document_ocr_first_name_matches', 'document_photo_is_paper_capture'],
+        status: 'not_needed',
+      },
+      kind: 'watchlist_check',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getUserTimelineEventWorkflowStarted = (
+  props: Partial<UserTimelineEventWorkflowStarted>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): UserTimelineEventWorkflowStarted =>
+  deepmerge<UserTimelineEventWorkflowStarted>(
+    {
+      data: {
+        kind: 'document',
+        playbook: {
+          id: 'eb6f55e8-7b9e-4302-8b07-9dafb30bed16',
+          mustCollectData: ['business_kyced_beneficial_owners', 'ssn4', 'business_website'],
+          name: 'Ed Koelpin',
+        },
+        workflowSource: 'tenant',
+      },
+      kind: 'workflow_started',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getUserTimelineEventWorkflowTriggered = (
+  props: Partial<UserTimelineEventWorkflowTriggered>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): UserTimelineEventWorkflowTriggered =>
+  deepmerge<UserTimelineEventWorkflowTriggered>(
+    {
+      data: {
+        actor: {
+          id: 'd52773cc-a1f5-4133-93ed-260322708c07',
+          kind: 'user',
+        },
+        config: {
+          data: {
+            playbookId: '25e3a989-3259-4ab2-b264-f21e00fcd015',
+            recollectAttributes: ['business_address', 'business_tin', 'dob'],
+            reuseExistingBoKyc: true,
+          },
+          kind: 'onboard',
+        },
+        fpId: 'da664919-9631-4b66-9154-ce8c43555f67',
+        note: 'cupidatat',
+        requestIsActive: false,
+      },
+      kind: 'workflow_triggered',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
 export const getVaultCreated = (
   props: Partial<VaultCreated>,
   options: { overwriteArray: boolean } = { overwriteArray: true },
@@ -8993,6 +11122,147 @@ export const getVerificationCheck = (
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 
+export const getVerificationCheckAml = (
+  props: Partial<VerificationCheckAml>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): VerificationCheckAml =>
+  deepmerge<VerificationCheckAml>(
+    {
+      data: {
+        adverseMedia: true,
+        adverseMediaLists: ['financial_crime', 'violent_crime', 'general_minor'],
+        continuousMonitoring: true,
+        matchKind: 'exact_name_and_dob_year',
+        ofac: false,
+        pep: true,
+      },
+      kind: 'aml',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getVerificationCheckBusinessAml = (
+  props: Partial<VerificationCheckBusinessAml>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): VerificationCheckBusinessAml =>
+  deepmerge<VerificationCheckBusinessAml>(
+    {
+      data: {},
+      kind: 'business_aml',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getVerificationCheckCurpValidation = (
+  props: Partial<VerificationCheckCurpValidation>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): VerificationCheckCurpValidation =>
+  deepmerge<VerificationCheckCurpValidation>(
+    {
+      data: {},
+      kind: 'curp_validation',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getVerificationCheckIdentityDocument = (
+  props: Partial<VerificationCheckIdentityDocument>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): VerificationCheckIdentityDocument =>
+  deepmerge<VerificationCheckIdentityDocument>(
+    {
+      data: {},
+      kind: 'identity_document',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getVerificationCheckKyb = (
+  props: Partial<VerificationCheckKyb>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): VerificationCheckKyb =>
+  deepmerge<VerificationCheckKyb>(
+    {
+      data: {
+        einOnly: false,
+      },
+      kind: 'kyb',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getVerificationCheckKyc = (
+  props: Partial<VerificationCheckKyc>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): VerificationCheckKyc =>
+  deepmerge<VerificationCheckKyc>(
+    {
+      data: {},
+      kind: 'kyc',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getVerificationCheckNeuroId = (
+  props: Partial<VerificationCheckNeuroId>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): VerificationCheckNeuroId =>
+  deepmerge<VerificationCheckNeuroId>(
+    {
+      data: {},
+      kind: 'neuro_id',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getVerificationCheckPhone = (
+  props: Partial<VerificationCheckPhone>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): VerificationCheckPhone =>
+  deepmerge<VerificationCheckPhone>(
+    {
+      data: {
+        attributes: ['line_type_intelligence', 'line_type_intelligence', 'line_type_intelligence'],
+      },
+      kind: 'phone',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getVerificationCheckSentilink = (
+  props: Partial<VerificationCheckSentilink>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): VerificationCheckSentilink =>
+  deepmerge<VerificationCheckSentilink>(
+    {
+      data: {},
+      kind: 'sentilink',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getVerificationCheckStytchDevice = (
+  props: Partial<VerificationCheckStytchDevice>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): VerificationCheckStytchDevice =>
+  deepmerge<VerificationCheckStytchDevice>(
+    {
+      data: {},
+      kind: 'stytch_device',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
 export const getWatchlistCheck = (
   props: Partial<WatchlistCheck>,
   options: { overwriteArray: boolean } = { overwriteArray: true },
@@ -9105,6 +11375,101 @@ export const getWorkflowRequestConfig = (
         playbookId: 'd8e6617d-30c7-4c60-877f-e9917c128abc',
         recollectAttributes: ['dob', 'business_kyced_beneficial_owners', 'us_tax_id'],
         reuseExistingBoKyc: true,
+      },
+      kind: 'onboard',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getWorkflowRequestConfigDocument = (
+  props: Partial<WorkflowRequestConfigDocument>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): WorkflowRequestConfigDocument =>
+  deepmerge<WorkflowRequestConfigDocument>(
+    {
+      data: {
+        businessConfigs: [
+          {
+            data: {
+              collectSelfie: false,
+              documentTypesAndCountries: {
+                countrySpecific: {},
+                global: ['permit', 'id_card', 'id_card'],
+              },
+            },
+            kind: 'identity',
+          },
+          {
+            data: {
+              collectSelfie: true,
+              documentTypesAndCountries: {
+                countrySpecific: {},
+                global: ['id_card', 'id_card', 'drivers_license'],
+              },
+            },
+            kind: 'identity',
+          },
+          {
+            data: {
+              collectSelfie: true,
+              documentTypesAndCountries: {
+                countrySpecific: {},
+                global: ['id_card', 'voter_identification', 'drivers_license'],
+              },
+            },
+            kind: 'identity',
+          },
+        ],
+        configs: [
+          {
+            data: {
+              collectSelfie: true,
+              documentTypesAndCountries: {
+                countrySpecific: {},
+                global: ['passport_card', 'passport_card', 'voter_identification'],
+              },
+            },
+            kind: 'identity',
+          },
+          {
+            data: {
+              collectSelfie: true,
+              documentTypesAndCountries: {
+                countrySpecific: {},
+                global: ['passport_card', 'passport_card', 'id_card'],
+              },
+            },
+            kind: 'identity',
+          },
+          {
+            data: {
+              collectSelfie: false,
+              documentTypesAndCountries: {
+                countrySpecific: {},
+                global: ['passport', 'drivers_license', 'residence_document'],
+              },
+            },
+            kind: 'identity',
+          },
+        ],
+      },
+      kind: 'document',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getWorkflowRequestConfigOnboard = (
+  props: Partial<WorkflowRequestConfigOnboard>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): WorkflowRequestConfigOnboard =>
+  deepmerge<WorkflowRequestConfigOnboard>(
+    {
+      data: {
+        playbookId: '46361b19-f134-49f5-a5af-7dc9de850981',
+        recollectAttributes: ['email', 'business_name', 'phone_number'],
+        reuseExistingBoKyc: false,
       },
       kind: 'onboard',
     },

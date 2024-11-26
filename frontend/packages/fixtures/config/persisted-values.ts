@@ -7,10 +7,17 @@ import type {
   AuthorizeFields,
   AuthorizedOrg,
   BatchHostedBusinessOwnerRequest,
+  BatchHostedBusinessOwnerRequestCreate,
+  BatchHostedBusinessOwnerRequestDelete,
+  BatchHostedBusinessOwnerRequestUpdate,
   BusinessOnboardingResponse,
   ChallengeKind,
   CheckSessionResponse,
   CollectDocumentConfig,
+  CollectDocumentConfigCustom,
+  CollectDocumentConfigIdentity,
+  CollectDocumentConfigProofOfAddress,
+  CollectDocumentConfigProofOfSsn,
   ConsentRequest,
   CreateDeviceAttestationRequest,
   CreateDocumentRequest,
@@ -68,6 +75,15 @@ import type {
   ModernUserDecryptResponse,
   NeuroIdentityIdResponse,
   OnboardingRequirement,
+  OnboardingRequirementAuthorize,
+  OnboardingRequirementCollectBusinessData,
+  OnboardingRequirementCollectData,
+  OnboardingRequirementCollectDocument,
+  OnboardingRequirementCollectInvestorProfile,
+  OnboardingRequirementCreateBusinessOnboarding,
+  OnboardingRequirementProcess,
+  OnboardingRequirementRegisterAuthMethod,
+  OnboardingRequirementRegisterPasskey,
   OnboardingResponse,
   OnboardingSessionResponse,
   OnboardingStatusResponse,
@@ -79,6 +95,12 @@ import type {
   RenderV1SdkArgs,
   RequestedTokenScope,
   SdkArgs,
+  SdkArgsAuthV1,
+  SdkArgsFormV1,
+  SdkArgsRenderV1,
+  SdkArgsUpdateAuthMethodsV1,
+  SdkArgsVerifyResultV1,
+  SdkArgsVerifyV1,
   SignupChallengeRequest,
   SkipLivenessClientType,
   SkipLivenessContext,
@@ -101,6 +123,11 @@ import type {
 import type {
   ActionKind,
   Actor,
+  ActorApiKey,
+  ActorFirmEmployee,
+  ActorFootprint,
+  ActorOrganization,
+  ActorUser,
   AdverseMediaListKind,
   AmlDetail,
   AmlHit,
@@ -116,6 +143,38 @@ import type {
   AuditEvent,
   AuditEventApiKey,
   AuditEventDetail,
+  AuditEventDetailCollectUserDocument,
+  AuditEventDetailCompleteUserCheckLiveness,
+  AuditEventDetailCompleteUserCheckWatchlist,
+  AuditEventDetailCompleteUserVerification,
+  AuditEventDetailCreateListEntry,
+  AuditEventDetailCreateOrg,
+  AuditEventDetailCreateOrgApiKey,
+  AuditEventDetailCreateOrgRole,
+  AuditEventDetailCreatePlaybook,
+  AuditEventDetailCreateUser,
+  AuditEventDetailCreateUserAnnotation,
+  AuditEventDetailDeactivateOrgRole,
+  AuditEventDetailDecryptOrgApiKey,
+  AuditEventDetailDecryptUserData,
+  AuditEventDetailDeleteListEntry,
+  AuditEventDetailDeleteUser,
+  AuditEventDetailDeleteUserData,
+  AuditEventDetailDisablePlaybook,
+  AuditEventDetailEditPlaybook,
+  AuditEventDetailInviteOrgMember,
+  AuditEventDetailLoginOrgMember,
+  AuditEventDetailManuallyReviewEntity,
+  AuditEventDetailOrgMemberJoined,
+  AuditEventDetailRemoveOrgMember,
+  AuditEventDetailRequestUserData,
+  AuditEventDetailStartUserVerification,
+  AuditEventDetailUpdateOrgApiKeyRole,
+  AuditEventDetailUpdateOrgApiKeyStatus,
+  AuditEventDetailUpdateOrgMember,
+  AuditEventDetailUpdateOrgRole,
+  AuditEventDetailUpdateOrgSettings,
+  AuditEventDetailUpdateUserData,
   AuditEventName,
   AuditEventOrgMember,
   AuthEvent,
@@ -135,6 +194,8 @@ import type {
   CompanySize,
   ComplianceCompanySummary,
   ComplianceDocData,
+  ComplianceDocDataExternalUrl,
+  ComplianceDocDataFileUpload,
   ComplianceDocDataKind,
   ComplianceDocEvent,
   ComplianceDocEventAssigned,
@@ -142,6 +203,11 @@ import type {
   ComplianceDocEventReviewed,
   ComplianceDocEventSubmitted,
   ComplianceDocEventType,
+  ComplianceDocEventTypeAssigned,
+  ComplianceDocEventTypeRequestRetracted,
+  ComplianceDocEventTypeRequested,
+  ComplianceDocEventTypeReviewed,
+  ComplianceDocEventTypeSubmitted,
   ComplianceDocReviewDecision,
   ComplianceDocStatus,
   ComplianceDocSubmission,
@@ -183,6 +249,11 @@ import type {
   DataIdentifier,
   DataLifetimeSource,
   DbActor,
+  DbActorFirmEmployee,
+  DbActorFootprint,
+  DbActorTenantApiKey,
+  DbActorTenantUser,
+  DbActorUser,
   DecisionStatus,
   DecryptionContext,
   DeleteRequest,
@@ -197,6 +268,10 @@ import type {
   DocumentKind,
   DocumentRequest,
   DocumentRequestConfig,
+  DocumentRequestConfigCustom,
+  DocumentRequestConfigIdentity,
+  DocumentRequestConfigProofOfAddress,
+  DocumentRequestConfigProofOfSsn,
   DocumentRequestKind,
   DocumentReviewStatus,
   DocumentSide,
@@ -212,7 +287,11 @@ import type {
   EnhancedAml,
   Entity,
   EntityAction,
+  EntityActionClearReview,
+  EntityActionManualDecision,
   EntityActionResponse,
+  EntityActionResponseTrigger,
+  EntityActionTrigger,
   EntityActionsRequest,
   EntityAttribute,
   EntityOnboarding,
@@ -252,6 +331,9 @@ import type {
   InvestorProfileInvestmentGoal,
   InvoicePreview,
   InvokeVaultProxyPermission,
+  InvokeVaultProxyPermissionAny,
+  InvokeVaultProxyPermissionId,
+  InvokeVaultProxyPermissionJustInTime,
   IsIn,
   Iso3166TwoDigitCountryCode,
   LabelAdded,
@@ -264,6 +346,8 @@ import type {
   ListEntry,
   ListEvent,
   ListEventDetail,
+  ListEventDetailCreateListEntry,
+  ListEventDetailDeleteListEntry,
   ListKind,
   ListPlaybookUsage,
   LiteOrgMember,
@@ -326,6 +410,10 @@ import type {
   Rule,
   RuleAction,
   RuleActionConfig,
+  RuleActionConfigFail,
+  RuleActionConfigManualReview,
+  RuleActionConfigPassWithManualReview,
+  RuleActionConfigStepUp,
   RuleActionMigration,
   RuleEvalResult,
   RuleEvalResults,
@@ -354,6 +442,34 @@ import type {
   TenantLoginRequest,
   TenantRoleKindDiscriminant,
   TenantScope,
+  TenantScopeAdmin,
+  TenantScopeApiKeys,
+  TenantScopeAuthToken,
+  TenantScopeCipIntegration,
+  TenantScopeCompliancePartnerAdmin,
+  TenantScopeCompliancePartnerManageReviews,
+  TenantScopeCompliancePartnerManageTemplates,
+  TenantScopeCompliancePartnerRead,
+  TenantScopeDecrypt,
+  TenantScopeDecryptAll,
+  TenantScopeDecryptAllExceptPciData,
+  TenantScopeDecryptCustom,
+  TenantScopeDecryptDocument,
+  TenantScopeDecryptDocumentAndSelfie,
+  TenantScopeInvokeVaultProxy,
+  TenantScopeLabelAndTag,
+  TenantScopeManageComplianceDocSubmission,
+  TenantScopeManageVaultProxy,
+  TenantScopeManageWebhooks,
+  TenantScopeManualReview,
+  TenantScopeOnboarding,
+  TenantScopeOnboardingConfiguration,
+  TenantScopeOrgSettings,
+  TenantScopeRead,
+  TenantScopeTriggerKyb,
+  TenantScopeTriggerKyc,
+  TenantScopeWriteEntities,
+  TenantScopeWriteLists,
   TerminalDecisionStatus,
   TimelineOnboardingDecision,
   TimelinePlaybook,
@@ -388,6 +504,21 @@ import type {
   UserTag,
   UserTimeline,
   UserTimelineEvent,
+  UserTimelineEventAnnotation,
+  UserTimelineEventAuthMethodUpdated,
+  UserTimelineEventBusinessOwnerCompletedKyc,
+  UserTimelineEventDataCollected,
+  UserTimelineEventDocumentUploaded,
+  UserTimelineEventExternalIntegrationCalled,
+  UserTimelineEventLabelAdded,
+  UserTimelineEventLiveness,
+  UserTimelineEventOnboardingDecision,
+  UserTimelineEventOnboardingTimeline,
+  UserTimelineEventStepUp,
+  UserTimelineEventVaultCreated,
+  UserTimelineEventWatchlistCheck,
+  UserTimelineEventWorkflowStarted,
+  UserTimelineEventWorkflowTriggered,
   VaultCreated,
   VaultDrAwsPreEnrollResponse,
   VaultDrEnrollRequest,
@@ -399,6 +530,16 @@ import type {
   VaultKind,
   VaultOperation,
   VerificationCheck,
+  VerificationCheckAml,
+  VerificationCheckBusinessAml,
+  VerificationCheckCurpValidation,
+  VerificationCheckIdentityDocument,
+  VerificationCheckKyb,
+  VerificationCheckKyc,
+  VerificationCheckNeuroId,
+  VerificationCheckPhone,
+  VerificationCheckSentilink,
+  VerificationCheckStytchDevice,
   WatchlistCheck,
   WatchlistCheckStatusKind,
   WatchlistEntry,
@@ -406,6 +547,8 @@ import type {
   WebhookPortalResponse,
   WorkflowKind,
   WorkflowRequestConfig,
+  WorkflowRequestConfigDocument,
+  WorkflowRequestConfigOnboard,
   WorkflowSource,
   WorkflowStarted,
   WorkflowStartedEventKind,
@@ -761,6 +904,608 @@ export const hosted_BatchHostedBusinessOwnerRequest: BatchHostedBusinessOwnerReq
   ownershipStake: -98833602,
   uuid: 'd393392a-1bb1-4389-a70e-1b4a749e0a30',
 };
+export const hosted_BatchHostedBusinessOwnerRequestCreate: BatchHostedBusinessOwnerRequestCreate = {
+  data: {
+    'bank.*.account_type': 'non sed',
+    'bank.*.ach_account_id': '5896c6e5-0c53-4977-a674-00c26e81b84a',
+    'bank.*.ach_account_number': 'aliquip sint ullamco ea Lorem',
+    'bank.*.ach_routing_number': 'sit sunt ad aliqua',
+    'bank.*.fingerprint': 'irure Ut anim esse',
+    'bank.*.name': 'Miss Marcia Hagenes',
+    'card.*.billing_address.country': '18845 Main Street N Suite 809',
+    'card.*.billing_address.zip': '578 Ash Street Suite 730',
+    'card.*.cvc': 'cupidatat Duis id anim',
+    'card.*.expiration': 'voluptate',
+    'card.*.expiration_month': 'in dolore id',
+    'card.*.expiration_year': 'commodo aliquip ea dolore Duis',
+    'card.*.fingerprint': 'dolore sunt elit aliqua',
+    'card.*.issuer': 'anim enim incididunt Lorem',
+    'card.*.name': 'Dr. Lucas Towne',
+    'card.*.number': 'mollit sint sunt aute nulla',
+    'card.*.number_last4': 'sit voluptate in proident commodo',
+    'custom.*': 'ea enim laborum ex dolore',
+    'document.custom.*': 'eu Duis sed',
+    'document.drivers_license.address_line1': '55114 Doyle Roads Suite 719',
+    'document.drivers_license.back.image': 'cupidatat adipisicing in ipsum do',
+    'document.drivers_license.back.mime_type': 'quis',
+    'document.drivers_license.city': 'Zulauffurt',
+    'document.drivers_license.classified_document_type': 'fugiat eiusmod',
+    'document.drivers_license.clave_de_elector': 'ullamco quis fugiat nulla',
+    'document.drivers_license.curp': 'fugiat non nulla',
+    'document.drivers_license.curp_validation_response': 'fc3e4509-e374-4073-b5ad-b4cb54000590',
+    'document.drivers_license.dob': 'quis et',
+    'document.drivers_license.document_number': 'irure sunt',
+    'document.drivers_license.expires_at': 'magna',
+    'document.drivers_license.first_name': 'Isidro',
+    'document.drivers_license.front.image': 'cupidatat nulla',
+    'document.drivers_license.front.mime_type': 'aliqua commodo mollit sed sunt',
+    'document.drivers_license.full_address': '118 Lake Street Suite 231',
+    'document.drivers_license.full_name': "Amber O'Conner Sr.",
+    'document.drivers_license.gender': 'id',
+    'document.drivers_license.issued_at': 'dolore occaecat ad in in',
+    'document.drivers_license.issuing_country': 'Puerto Rico',
+    'document.drivers_license.issuing_state': 'Wisconsin',
+    'document.drivers_license.last_name': 'Reilly',
+    'document.drivers_license.nationality': 'dolore',
+    'document.drivers_license.postal_code': 'sit sed Duis',
+    'document.drivers_license.ref_number': 'culpa commodo eiusmod consectetur non',
+    'document.drivers_license.samba_activity_history_response': 'eiusmod cillum et dolore adipisicing',
+    'document.drivers_license.selfie.image': 'sint fugiat irure dolor',
+    'document.drivers_license.selfie.mime_type': 'pariatur voluptate fugiat',
+    'document.drivers_license.state': 'Rhode Island',
+    'document.drivers_license.us_issuing_state': 'Vermont',
+    'document.finra_compliance_letter': 'ut dolor amet enim',
+    'document.id_card.address_line1': '37960 Helene Valleys Suite 103',
+    'document.id_card.back.image': '36df30e9-6d97-402c-b07e-716f45cd4360',
+    'document.id_card.back.mime_type': '42fb32f0-4688-4112-a4f3-ca8a986828e2',
+    'document.id_card.city': 'Bayerview',
+    'document.id_card.classified_document_type': '4a7f1854-0f57-4db0-b1be-09231c1cd907',
+    'document.id_card.clave_de_elector': '6e444baf-43e5-49b0-9b17-c4a12246748f',
+    'document.id_card.curp': 'e457a80e-76af-4f2f-9c4d-d9c712989194',
+    'document.id_card.curp_validation_response': '69f1a80e-555b-4a38-83dc-b31a2fd4d6c9',
+    'document.id_card.dob': '8ff036fc-1dc3-41e6-9a45-19f6eff61d54',
+    'document.id_card.document_number': 'ec22cd28-c63e-4e70-95f0-5c1291334941',
+    'document.id_card.expires_at': '4529a8ca-8115-4e85-a9bd-02cdc51c2abf',
+    'document.id_card.first_name': 'Stephen',
+    'document.id_card.front.image': 'fa15506f-4111-4e22-8592-49d9301bc564',
+    'document.id_card.front.mime_type': '3cbced56-d105-42dc-a622-07749960b4e4',
+    'document.id_card.full_address': '437 W Central Avenue Apt. 757',
+    'document.id_card.full_name': 'Jeffery Jenkins',
+    'document.id_card.gender': 'fa134078-f4f4-46dd-8440-f6e6219f9c37',
+    'document.id_card.issued_at': '3a3fab50-8028-44b2-bc92-de10f91094ae',
+    'document.id_card.issuing_country': 'Northern Mariana Islands',
+    'document.id_card.issuing_state': 'Pennsylvania',
+    'document.id_card.last_name': 'Mertz',
+    'document.id_card.nationality': '89703ff5-ebd0-4b1c-a744-d803b51aba5e',
+    'document.id_card.postal_code': 'd8fca35d-e1c1-442a-b8b0-bac7451cdd92',
+    'document.id_card.ref_number': 'dabf0490-3b7e-4f9d-a06c-6de074ae39eb',
+    'document.id_card.samba_activity_history_response': '2b2db70b-efb3-4b90-8b24-4d47a2057516',
+    'document.id_card.selfie.image': '8bda2fcf-61a2-4096-99be-d426050a80e4',
+    'document.id_card.selfie.mime_type': '9bfb4738-45fe-4f7e-a552-50738b4f43d3',
+    'document.id_card.state': 'Massachusetts',
+    'document.id_card.us_issuing_state': 'Ohio',
+    'document.passport.address_line1': '68596 S College Street Apt. 314',
+    'document.passport.back.image': 'dolore et non',
+    'document.passport.back.mime_type': 'dolor',
+    'document.passport.city': 'Fort Shanelburgh',
+    'document.passport.classified_document_type': 'consectetur officia aliquip mollit consequat',
+    'document.passport.clave_de_elector': 'aute adipisicing laboris',
+    'document.passport.curp': 'sunt in cillum sint culpa',
+    'document.passport.curp_validation_response': '3636c89b-cc4d-40a8-bd7e-a4cdaa6a4582',
+    'document.passport.dob': 'qui',
+    'document.passport.document_number': 'Lorem aliquip',
+    'document.passport.expires_at': 'deserunt non ad',
+    'document.passport.first_name': 'Savion',
+    'document.passport.front.image': 'id',
+    'document.passport.front.mime_type': 'culpa',
+    'document.passport.full_address': '824 Harber Burg Apt. 139',
+    'document.passport.full_name': 'Sandy Becker DVM',
+    'document.passport.gender': 'voluptate',
+    'document.passport.issued_at': 'nisi est adipisicing do',
+    'document.passport.issuing_country': 'Cyprus',
+    'document.passport.issuing_state': 'Delaware',
+    'document.passport.last_name': 'Stoltenberg',
+    'document.passport.nationality': 'consequat dolore',
+    'document.passport.postal_code': 'aliqua sunt Ut in',
+    'document.passport.ref_number': 'ut aliquip irure pariatur enim',
+    'document.passport.samba_activity_history_response': 'nisi Ut',
+    'document.passport.selfie.image': 'aliqua ea ullamco sint id',
+    'document.passport.selfie.mime_type': 'laboris consequat Duis',
+    'document.passport.state': 'North Dakota',
+    'document.passport.us_issuing_state': 'West Virginia',
+    'document.passport_card.address_line1': '1255 Kertzmann Station Apt. 958',
+    'document.passport_card.back.image': 'fugiat adipisicing irure in sint',
+    'document.passport_card.back.mime_type': 'occaecat irure mollit anim do',
+    'document.passport_card.city': 'Terencefield',
+    'document.passport_card.classified_document_type': 'sunt',
+    'document.passport_card.clave_de_elector': 'aute anim culpa consequat id',
+    'document.passport_card.curp': 'Ut cillum laborum',
+    'document.passport_card.curp_validation_response': 'af89519b-63d4-4547-b38c-b46e9c4ad532',
+    'document.passport_card.dob': 'ut sit',
+    'document.passport_card.document_number': 'amet ipsum deserunt Lorem',
+    'document.passport_card.expires_at': 'id pariatur qui cupidatat',
+    'document.passport_card.first_name': 'Chase',
+    'document.passport_card.front.image': 'eiusmod',
+    'document.passport_card.front.mime_type': 'ut eu ipsum eiusmod aute',
+    'document.passport_card.full_address': '592 Williamson Ridge Suite 446',
+    'document.passport_card.full_name': 'Yvonne Abshire',
+    'document.passport_card.gender': 'id consectetur tempor',
+    'document.passport_card.issued_at': 'laborum voluptate',
+    'document.passport_card.issuing_country': 'Benin',
+    'document.passport_card.issuing_state': 'Utah',
+    'document.passport_card.last_name': 'Cummings',
+    'document.passport_card.nationality': 'Ut',
+    'document.passport_card.postal_code': 'veniam aute qui eiusmod',
+    'document.passport_card.ref_number': 'ut dolore id',
+    'document.passport_card.samba_activity_history_response': 'nisi nulla Excepteur cupidatat',
+    'document.passport_card.selfie.image': 'exercitation ut',
+    'document.passport_card.selfie.mime_type': 'consequat fugiat laboris aliqua',
+    'document.passport_card.state': 'Hawaii',
+    'document.passport_card.us_issuing_state': 'South Dakota',
+    'document.permit.address_line1': '9888 Jeremy Groves Suite 210',
+    'document.permit.back.image': 'Duis elit Ut cupidatat voluptate',
+    'document.permit.back.mime_type': 'cillum velit',
+    'document.permit.city': 'Deloresshire',
+    'document.permit.classified_document_type': 'dolore elit',
+    'document.permit.clave_de_elector': 'laboris',
+    'document.permit.curp': 'consequat',
+    'document.permit.curp_validation_response': '5b348279-65b8-49f1-8d56-4f92a76b637c',
+    'document.permit.dob': 'eiusmod Excepteur',
+    'document.permit.document_number': 'exercitation',
+    'document.permit.expires_at': 'sit qui id sint adipisicing',
+    'document.permit.first_name': 'Pascale',
+    'document.permit.front.image': 'consectetur',
+    'document.permit.front.mime_type': 'velit officia qui',
+    'document.permit.full_address': '355 W Church Street Suite 420',
+    'document.permit.full_name': 'Amos Collins',
+    'document.permit.gender': 'id aliquip ex eu',
+    'document.permit.issued_at': 'consequat in magna occaecat',
+    'document.permit.issuing_country': 'Seychelles',
+    'document.permit.issuing_state': 'Montana',
+    'document.permit.last_name': 'Weimann',
+    'document.permit.nationality': 'sunt enim in',
+    'document.permit.postal_code': 'dolor in aliqua laborum',
+    'document.permit.ref_number': 'qui',
+    'document.permit.samba_activity_history_response': 'ad incididunt',
+    'document.permit.selfie.image': 'reprehenderit',
+    'document.permit.selfie.mime_type': 'id tempor est quis',
+    'document.permit.state': 'New York',
+    'document.permit.us_issuing_state': 'South Dakota',
+    'document.proof_of_address.image': '537 Lincoln Avenue Apt. 421',
+    'document.residence_document.address_line1': '61014 Connelly Way Suite 944',
+    'document.residence_document.back.image': 'cff72b71-9016-4913-b8fb-e9a58be1dfef',
+    'document.residence_document.back.mime_type': '761fd059-98b9-493b-9921-23393c4de15b',
+    'document.residence_document.city': 'East Mayboro',
+    'document.residence_document.classified_document_type': 'c6dcb3f8-e019-4b06-aa8f-47a90dc50ec0',
+    'document.residence_document.clave_de_elector': '19a075fe-ce0c-49db-8946-cb4c273a92e8',
+    'document.residence_document.curp': '5dbe06ce-3d26-46e7-9b14-97e399cbd54b',
+    'document.residence_document.curp_validation_response': '16142b7e-0964-4517-8823-c06a6fd6a61e',
+    'document.residence_document.dob': '145d50c4-d773-478c-ac7f-195d670e4fc0',
+    'document.residence_document.document_number': '9f267963-2c90-405f-a3dd-88b404821bb6',
+    'document.residence_document.expires_at': '27ba3f5a-e4a6-4567-aa1e-49d5fa6c0ad5',
+    'document.residence_document.first_name': 'Lawson',
+    'document.residence_document.front.image': '23c1501d-9aa4-492e-9a3d-82af61caf444',
+    'document.residence_document.front.mime_type': '82d0676e-d5c6-4290-85c4-4b8dc5e8a939',
+    'document.residence_document.full_address': '25300 S Lincoln Street Apt. 847',
+    'document.residence_document.full_name': 'Alan Kutch',
+    'document.residence_document.gender': 'e508d03a-1fd7-48f4-8a39-7b3ae23efe1a',
+    'document.residence_document.issued_at': '89963f60-9e6e-45db-9e6b-e3fc0b461cbe',
+    'document.residence_document.issuing_country': 'Bouvet Island',
+    'document.residence_document.issuing_state': 'Maine',
+    'document.residence_document.last_name': 'Turcotte',
+    'document.residence_document.nationality': 'b8a3a40a-2444-49e6-ac22-ea96fe5a53ef',
+    'document.residence_document.postal_code': 'f115955f-f6a9-4da8-ae9e-652d8737ab70',
+    'document.residence_document.ref_number': '60bb1012-5149-4508-9307-61b430efd607',
+    'document.residence_document.samba_activity_history_response': 'a522f733-2e1c-4b2a-b62e-dc3c8e773a57',
+    'document.residence_document.selfie.image': '459878b8-0fb6-4f92-9662-db42723842fa',
+    'document.residence_document.selfie.mime_type': 'b5c37cd9-23f6-4ced-8a51-9e0f284c57ea',
+    'document.residence_document.state': 'California',
+    'document.residence_document.us_issuing_state': 'Wisconsin',
+    'document.ssn_card.image': 'cupidatat dolore',
+    'document.visa.address_line1': '755 N Lincoln Street Apt. 283',
+    'document.visa.back.image': 'magna consectetur est',
+    'document.visa.back.mime_type': 'irure in qui commodo',
+    'document.visa.city': 'Mitchellview',
+    'document.visa.classified_document_type': 'non',
+    'document.visa.clave_de_elector': 'pariatur aute cupidatat',
+    'document.visa.curp': 'Duis',
+    'document.visa.curp_validation_response': 'bb0d6563-ebab-4783-9b76-15fb5b8830e8',
+    'document.visa.dob': 'exercitation',
+    'document.visa.document_number': 'labore amet qui',
+    'document.visa.expires_at': 'proident velit ut laborum',
+    'document.visa.first_name': 'Liam',
+    'document.visa.front.image': 'laboris',
+    'document.visa.front.mime_type': 'exercitation non nulla laborum pariatur',
+    'document.visa.full_address': '6418 Delores Rest Apt. 608',
+    'document.visa.full_name': 'Sean Cormier',
+    'document.visa.gender': 'laborum veniam eu qui',
+    'document.visa.issued_at': 'proident consectetur commodo',
+    'document.visa.issuing_country': 'Guam',
+    'document.visa.issuing_state': 'Vermont',
+    'document.visa.last_name': 'Hyatt',
+    'document.visa.nationality': 'tempor incididunt adipisicing in',
+    'document.visa.postal_code': 'laborum aute mollit',
+    'document.visa.ref_number': 'sint id consequat',
+    'document.visa.samba_activity_history_response': 'magna ut Excepteur ipsum',
+    'document.visa.selfie.image': 'dolor minim qui',
+    'document.visa.selfie.mime_type': 'in labore velit dolor',
+    'document.visa.state': 'Idaho',
+    'document.visa.us_issuing_state': 'California',
+    'document.voter_identification.address_line1': '5946 Rollin Park Suite 800',
+    'document.voter_identification.back.image': 'b39b9d47-6bf3-4a46-a642-dce652db58c0',
+    'document.voter_identification.back.mime_type': '5f4f446c-c0c1-436d-8abb-71aaf25eceb1',
+    'document.voter_identification.city': 'Fort Lynn',
+    'document.voter_identification.classified_document_type': 'aa13be99-9c61-4977-b5f6-836c209d0f7a',
+    'document.voter_identification.clave_de_elector': '42df7d57-c5a3-4218-a86d-67b9bfe81133',
+    'document.voter_identification.curp': '80372f37-fb2d-4194-9048-cebbda5be8cc',
+    'document.voter_identification.curp_validation_response': '1e8313e9-8f40-49c1-afa6-28354045d6cc',
+    'document.voter_identification.dob': 'bda60548-b33d-420e-bd96-5bfca10ffd1f',
+    'document.voter_identification.document_number': 'bc68f9a1-2997-4587-9653-c92660e80666',
+    'document.voter_identification.expires_at': '2d8e3758-52b4-472c-a609-65b6a98cb945',
+    'document.voter_identification.first_name': 'Gerda',
+    'document.voter_identification.front.image': '13946eeb-93ca-4e07-a60c-876a358d5154',
+    'document.voter_identification.front.mime_type': '51b4114f-d368-45cc-9b02-29ca3f642d18',
+    'document.voter_identification.full_address': '78896 Bednar Ridges Suite 228',
+    'document.voter_identification.full_name': 'Earl McKenzie',
+    'document.voter_identification.gender': '6739c6a5-91fe-496b-93eb-eb6d15afb280',
+    'document.voter_identification.issued_at': 'c4d03615-bf54-4cb8-9440-7fb601dc29c5',
+    'document.voter_identification.issuing_country': 'Marshall Islands',
+    'document.voter_identification.issuing_state': 'Nebraska',
+    'document.voter_identification.last_name': 'Smith',
+    'document.voter_identification.nationality': '6101eafc-ee8c-4b70-b4df-9585615f75ef',
+    'document.voter_identification.postal_code': '75e317a0-002a-4aea-97d4-3d4f10ee220c',
+    'document.voter_identification.ref_number': '354f110d-9fc1-4e41-908a-30c43b594d8f',
+    'document.voter_identification.samba_activity_history_response': '36d656c9-9e32-4ea5-b27c-693909d886bc',
+    'document.voter_identification.selfie.image': '1642a526-d879-4b70-ac0d-6f83e172d29b',
+    'document.voter_identification.selfie.mime_type': '19039036-6dc4-4b34-8b95-c9bd65b9f205',
+    'document.voter_identification.state': 'Alaska',
+    'document.voter_identification.us_issuing_state': 'Nebraska',
+    'id.address_line1': '806 E Oak Street Apt. 247',
+    'id.address_line2': '41965 Third Street Apt. 999',
+    'id.citizenships': ['GG', 'IL', 'WS'],
+    'id.city': 'Manteborough',
+    'id.country': 'Nicaragua',
+    'id.dob': 'c9237c82-c15d-46ce-a786-241b1e08a6ba',
+    'id.drivers_license_number': '7d8f0c57-26be-440b-9a49-790d68b5d083',
+    'id.drivers_license_state': 'Indiana',
+    'id.email': 'christian_feil72@gmail.com',
+    'id.first_name': 'Shyann',
+    'id.itin': 'a2a2fea5-69d2-4b8d-8fba-faf4120f797d',
+    'id.last_name': 'Kreiger',
+    'id.middle_name': 'Dr. Blake Farrell',
+    'id.nationality': '548cdeff-5245-45df-afb0-40f6ec0532e4',
+    'id.phone_number': '+17438597548',
+    'id.ssn4': 'bbd643b7-8439-40a1-8d22-d87cfbd010f4',
+    'id.ssn9': '6bbb3f9f-7657-46c7-a19a-8748713a7786',
+    'id.state': 'Georgia',
+    'id.us_legal_status': 'a58d9006-8623-449f-ae40-dc8cc0a6c7d7',
+    'id.us_tax_id': '92d268d7-4ac4-43a9-98a0-a24e2da9da06',
+    'id.visa_expiration_date': '88511507-ce2d-4e49-9b3d-8d7be0376e6a',
+    'id.visa_kind': 'db109c79-cc0b-415b-ad7b-0b074c4c6fe4',
+    'id.zip': '54583',
+    'investor_profile.annual_income': 'in incididunt',
+    'investor_profile.brokerage_firm_employer': 'id',
+    'investor_profile.declarations': ['senior_political_figure', 'senior_executive', 'senior_executive'],
+    'investor_profile.employer': 'cupidatat',
+    'investor_profile.employment_status': 'ea officia',
+    'investor_profile.family_member_names': ['sunt cupidatat dolor', 'in dolore culpa', 'magna do'],
+    'investor_profile.funding_sources': ['investments', 'investments', 'employment_income'],
+    'investor_profile.investment_goals': ['preserve_capital', 'speculation', 'other'],
+    'investor_profile.net_worth': 'pariatur consectetur in',
+    'investor_profile.occupation': 'ea anim ad irure pariatur',
+    'investor_profile.political_organization': 'proident consectetur deserunt',
+    'investor_profile.risk_tolerance': 'dolor commodo consequat in',
+    'investor_profile.senior_executive_symbols': ['cillum', 'sit eu nulla Duis', 'tempor pariatur ut'],
+  },
+  op: 'create',
+  ownershipStake: -39183789,
+  uuid: '41c9d9a2-56a6-4c54-a411-d7c9869d9e2b',
+};
+export const hosted_BatchHostedBusinessOwnerRequestDelete: BatchHostedBusinessOwnerRequestDelete = {
+  op: 'delete',
+  uuid: '239d47ea-9137-4702-9c4b-e0c0c8883741',
+};
+export const hosted_BatchHostedBusinessOwnerRequestUpdate: BatchHostedBusinessOwnerRequestUpdate = {
+  data: {
+    'bank.*.account_type': 'dolore occaecat',
+    'bank.*.ach_account_id': '3cf7b5b2-eb06-47ef-9dba-406e4722b823',
+    'bank.*.ach_account_number': 'sit esse culpa deserunt',
+    'bank.*.ach_routing_number': 'eiusmod',
+    'bank.*.fingerprint': 'occaecat dolore',
+    'bank.*.name': 'Isaac Rohan-Yost',
+    'card.*.billing_address.country': '476 10th Street Suite 279',
+    'card.*.billing_address.zip': '6191 Koepp Forks Suite 308',
+    'card.*.cvc': 'minim id',
+    'card.*.expiration': 'ut',
+    'card.*.expiration_month': 'sunt id aliqua',
+    'card.*.expiration_year': 'dolor in exercitation culpa',
+    'card.*.fingerprint': 'et proident',
+    'card.*.issuer': 'laboris dolor sed eiusmod irure',
+    'card.*.name': 'Lula Mayer V',
+    'card.*.number': 'quis sint',
+    'card.*.number_last4': 'ut',
+    'custom.*': 'exercitation',
+    'document.custom.*': 'commodo',
+    'document.drivers_license.address_line1': '8688 Block Parks Apt. 213',
+    'document.drivers_license.back.image': 'in occaecat sunt elit irure',
+    'document.drivers_license.back.mime_type': 'commodo do dolore enim',
+    'document.drivers_license.city': 'South Dion',
+    'document.drivers_license.classified_document_type': 'aute in dolore',
+    'document.drivers_license.clave_de_elector': 'in',
+    'document.drivers_license.curp': 'cupidatat',
+    'document.drivers_license.curp_validation_response': 'a5e770d2-ab0c-48ac-8ea6-d0bf8f643372',
+    'document.drivers_license.dob': 'Excepteur nulla est amet magna',
+    'document.drivers_license.document_number': 'in',
+    'document.drivers_license.expires_at': 'aliquip elit proident',
+    'document.drivers_license.first_name': 'Savanna',
+    'document.drivers_license.front.image': 'consectetur veniam minim Lorem dolor',
+    'document.drivers_license.front.mime_type': 'do culpa ipsum',
+    'document.drivers_license.full_address': '319 Hirthe Ford Suite 532',
+    'document.drivers_license.full_name': 'Iris Shanahan',
+    'document.drivers_license.gender': 'non ea irure',
+    'document.drivers_license.issued_at': 'nostrud',
+    'document.drivers_license.issuing_country': 'Angola',
+    'document.drivers_license.issuing_state': 'Minnesota',
+    'document.drivers_license.last_name': 'Borer',
+    'document.drivers_license.nationality': 'ex veniam dolore',
+    'document.drivers_license.postal_code': 'labore dolor nulla ut eiusmod',
+    'document.drivers_license.ref_number': 'aliqua',
+    'document.drivers_license.samba_activity_history_response': 'enim qui voluptate occaecat',
+    'document.drivers_license.selfie.image': 'velit enim Excepteur',
+    'document.drivers_license.selfie.mime_type': 'laborum est',
+    'document.drivers_license.state': 'Massachusetts',
+    'document.drivers_license.us_issuing_state': 'New York',
+    'document.finra_compliance_letter': 'cupidatat nulla magna',
+    'document.id_card.address_line1': '444 Durgan Springs Apt. 428',
+    'document.id_card.back.image': '1fad2696-9d51-425a-826b-423e225509c6',
+    'document.id_card.back.mime_type': '47de0690-ee60-468c-95cf-9b8ec48a1ff6',
+    'document.id_card.city': 'North Fridatown',
+    'document.id_card.classified_document_type': 'b290d87a-486e-457c-907c-580a9246c5cc',
+    'document.id_card.clave_de_elector': '05e1e4dd-9b04-48ea-b559-185f521a6ef2',
+    'document.id_card.curp': 'b6907af3-231a-4f72-86d7-ebb9cafcab44',
+    'document.id_card.curp_validation_response': '25444256-00d6-4c9c-85fd-8934e5ea8b65',
+    'document.id_card.dob': '86285868-e068-4cb7-b1d5-6dde2a59f323',
+    'document.id_card.document_number': '269dcdd7-315a-4ec5-acd4-f0fb8d23252c',
+    'document.id_card.expires_at': '2374d4d0-01d2-469b-a48a-083a35d87116',
+    'document.id_card.first_name': 'Gordon',
+    'document.id_card.front.image': '033c1156-6eda-4232-a3e3-ec722dfa1d1d',
+    'document.id_card.front.mime_type': '58b29fde-1bcf-4ed1-9040-4c4d6ec61ff0',
+    'document.id_card.full_address': '49425 State Road Apt. 123',
+    'document.id_card.full_name': 'Jill Nicolas',
+    'document.id_card.gender': 'dd95d81c-8e0f-419f-9955-5c979d515926',
+    'document.id_card.issued_at': '10e3a707-4f21-4c04-b248-47356d027ae7',
+    'document.id_card.issuing_country': 'Guinea-Bissau',
+    'document.id_card.issuing_state': 'Washington',
+    'document.id_card.last_name': 'Barrows-Tremblay',
+    'document.id_card.nationality': '09b8300e-3e34-4b15-9b4f-d01bff72cbdb',
+    'document.id_card.postal_code': '7d81dd7f-7c53-46af-9849-b75d8fffcf20',
+    'document.id_card.ref_number': '003777c0-118f-447f-99b9-0c39f977c7a9',
+    'document.id_card.samba_activity_history_response': 'a3651a88-b822-4e97-a395-def98ed9f6c4',
+    'document.id_card.selfie.image': '2d2f46f2-e06d-43ba-8b18-eb7cbe92f4b3',
+    'document.id_card.selfie.mime_type': 'bad9efc4-334b-4088-b7c4-0fc00dbffbce',
+    'document.id_card.state': 'Iowa',
+    'document.id_card.us_issuing_state': 'Maryland',
+    'document.passport.address_line1': '618 Thalia Creek Apt. 330',
+    'document.passport.back.image': 'cillum esse',
+    'document.passport.back.mime_type': 'occaecat aliquip in Excepteur velit',
+    'document.passport.city': 'Hyattstead',
+    'document.passport.classified_document_type': 'consequat ipsum qui',
+    'document.passport.clave_de_elector': 'in adipisicing dolor nulla',
+    'document.passport.curp': 'Duis consequat dolore id',
+    'document.passport.curp_validation_response': 'a34a4ebb-247b-42db-b8be-8795efcec544',
+    'document.passport.dob': 'ut ea tempor non',
+    'document.passport.document_number': 'ullamco',
+    'document.passport.expires_at': 'laborum pariatur labore adipisicing',
+    'document.passport.first_name': 'Briana',
+    'document.passport.front.image': 'mollit',
+    'document.passport.front.mime_type': 'aliqua aute magna',
+    'document.passport.full_address': '4034 Cathrine Greens Apt. 328',
+    'document.passport.full_name': 'Yolanda Gleason',
+    'document.passport.gender': 'consequat',
+    'document.passport.issued_at': 'nisi do commodo non ipsum',
+    'document.passport.issuing_country': 'Philippines',
+    'document.passport.issuing_state': 'California',
+    'document.passport.last_name': 'Waters',
+    'document.passport.nationality': 'dolore cillum ad',
+    'document.passport.postal_code': 'officia elit dolore',
+    'document.passport.ref_number': 'ullamco sed laboris nisi',
+    'document.passport.samba_activity_history_response': 'eu',
+    'document.passport.selfie.image': 'veniam',
+    'document.passport.selfie.mime_type': 'reprehenderit occaecat in',
+    'document.passport.state': 'Oregon',
+    'document.passport.us_issuing_state': 'Colorado',
+    'document.passport_card.address_line1': '25555 Franey Lake Suite 882',
+    'document.passport_card.back.image': 'ex eu in in id',
+    'document.passport_card.back.mime_type': 'in',
+    'document.passport_card.city': 'Port Karson',
+    'document.passport_card.classified_document_type': 'eu velit reprehenderit',
+    'document.passport_card.clave_de_elector': 'in',
+    'document.passport_card.curp': 'dolore laboris',
+    'document.passport_card.curp_validation_response': '7f3b2387-4931-4402-b09d-4da3295ebdf6',
+    'document.passport_card.dob': 'irure dolor et qui dolore',
+    'document.passport_card.document_number': 'incididunt amet eu',
+    'document.passport_card.expires_at': 'irure anim veniam',
+    'document.passport_card.first_name': 'Colby',
+    'document.passport_card.front.image': 'ipsum exercitation proident ex quis',
+    'document.passport_card.front.mime_type': 'enim elit pariatur adipisicing',
+    'document.passport_card.full_address': '121 Kemmer Greens Suite 353',
+    'document.passport_card.full_name': 'Julia Nader MD',
+    'document.passport_card.gender': 'et occaecat tempor',
+    'document.passport_card.issued_at': 'commodo dolore Ut veniam nisi',
+    'document.passport_card.issuing_country': 'Montenegro',
+    'document.passport_card.issuing_state': 'Minnesota',
+    'document.passport_card.last_name': 'Skiles',
+    'document.passport_card.nationality': 'ullamco sit sed ea',
+    'document.passport_card.postal_code': 'tempor',
+    'document.passport_card.ref_number': 'nulla deserunt pariatur velit sunt',
+    'document.passport_card.samba_activity_history_response': 'nulla dolor Lorem fugiat ad',
+    'document.passport_card.selfie.image': 'labore nulla Excepteur deserunt adipisicing',
+    'document.passport_card.selfie.mime_type': 'ex dolore consequat',
+    'document.passport_card.state': 'Alaska',
+    'document.passport_card.us_issuing_state': 'Ohio',
+    'document.permit.address_line1': '379 Tamara Orchard Suite 216',
+    'document.permit.back.image': 'aute eu veniam sed',
+    'document.permit.back.mime_type': 'magna',
+    'document.permit.city': 'New Jake',
+    'document.permit.classified_document_type': 'in voluptate deserunt occaecat veniam',
+    'document.permit.clave_de_elector': 'exercitation magna Lorem',
+    'document.permit.curp': 'eu elit in',
+    'document.permit.curp_validation_response': '6d97b5a5-044f-4a55-96ba-b5ff7bd14af7',
+    'document.permit.dob': 'in ut',
+    'document.permit.document_number': 'et Duis',
+    'document.permit.expires_at': 'fugiat occaecat ipsum',
+    'document.permit.first_name': 'Cortez',
+    'document.permit.front.image': 'sint',
+    'document.permit.front.mime_type': 'in dolor',
+    'document.permit.full_address': '46973 Altenwerth Springs Apt. 782',
+    'document.permit.full_name': 'Ms. Louise Rath',
+    'document.permit.gender': 'deserunt ad sit',
+    'document.permit.issued_at': 'qui',
+    'document.permit.issuing_country': 'Brazil',
+    'document.permit.issuing_state': 'Kansas',
+    'document.permit.last_name': 'Waters',
+    'document.permit.nationality': 'laboris',
+    'document.permit.postal_code': 'Lorem in proident enim',
+    'document.permit.ref_number': 'culpa velit',
+    'document.permit.samba_activity_history_response': 'Duis',
+    'document.permit.selfie.image': 'sint in',
+    'document.permit.selfie.mime_type': 'in sit mollit Ut labore',
+    'document.permit.state': 'Delaware',
+    'document.permit.us_issuing_state': 'New Mexico',
+    'document.proof_of_address.image': '4792 Collins Motorway Suite 609',
+    'document.residence_document.address_line1': '89078 Alberta Ferry Suite 904',
+    'document.residence_document.back.image': '33d30126-2725-40b3-80f0-c044f223794b',
+    'document.residence_document.back.mime_type': 'cdad3399-ca81-4672-b42b-9cbd9b095efb',
+    'document.residence_document.city': 'West Chadrick',
+    'document.residence_document.classified_document_type': 'ed5d98ae-c3ac-48f8-992d-2a65c0c906e8',
+    'document.residence_document.clave_de_elector': 'beea07c1-bf04-4e25-b85c-53f7fb7fdf3a',
+    'document.residence_document.curp': '756cf9c1-6b62-4788-b7a0-2e0b340b6a6b',
+    'document.residence_document.curp_validation_response': '9756065d-4eb3-4bc7-aae8-7a18926aa0ab',
+    'document.residence_document.dob': '8e880eb6-1047-4096-95b1-773793a1b084',
+    'document.residence_document.document_number': 'e699e0aa-5026-4953-8a50-6d881765679e',
+    'document.residence_document.expires_at': '013bd1d0-ac49-418c-9352-c7174244c23e',
+    'document.residence_document.first_name': 'Edgar',
+    'document.residence_document.front.image': '65fe458d-bf26-4bd6-af89-b95b6c2c9319',
+    'document.residence_document.front.mime_type': 'b3d12b38-abb6-4b1a-ad96-98cf7b5c6c3e',
+    'document.residence_document.full_address': '336 S Grand Avenue Suite 929',
+    'document.residence_document.full_name': 'Terri Borer DDS',
+    'document.residence_document.gender': 'e327ef40-d274-4fca-8e42-3cdb6987a647',
+    'document.residence_document.issued_at': '76117e50-e5c7-4cc5-8863-bc084bc777cd',
+    'document.residence_document.issuing_country': 'French Southern Territories',
+    'document.residence_document.issuing_state': 'New Jersey',
+    'document.residence_document.last_name': 'Ledner',
+    'document.residence_document.nationality': 'dbbb4771-2075-4919-9d91-0d20b1c1d03d',
+    'document.residence_document.postal_code': 'a5e6c15e-893b-45a5-9b72-7693d947d034',
+    'document.residence_document.ref_number': '207a8849-e8db-49be-83a7-45193fbdbf0f',
+    'document.residence_document.samba_activity_history_response': 'd96c36ed-b7ef-4064-b44f-16496543c0a4',
+    'document.residence_document.selfie.image': 'bfba6248-2b24-4ef1-9d3a-cf8736e6cc1e',
+    'document.residence_document.selfie.mime_type': 'ae97e4aa-4e0f-4b7a-8055-7053b0cd1d05',
+    'document.residence_document.state': 'New Jersey',
+    'document.residence_document.us_issuing_state': 'Ohio',
+    'document.ssn_card.image': 'amet fugiat enim laborum in',
+    'document.visa.address_line1': '269 Rogahn Via Suite 895',
+    'document.visa.back.image': 'dolore adipisicing occaecat et incididunt',
+    'document.visa.back.mime_type': 'eu ullamco proident',
+    'document.visa.city': 'Dibbertbury',
+    'document.visa.classified_document_type': 'enim',
+    'document.visa.clave_de_elector': 'ipsum in ex elit',
+    'document.visa.curp': 'nostrud sed Lorem',
+    'document.visa.curp_validation_response': 'da17c198-11a2-49a3-bd7e-709d85746dad',
+    'document.visa.dob': 'non in incididunt',
+    'document.visa.document_number': 'laborum quis',
+    'document.visa.expires_at': 'magna est dolore nulla',
+    'document.visa.first_name': 'Arlene',
+    'document.visa.front.image': 'non qui occaecat aliqua Lorem',
+    'document.visa.front.mime_type': 'laborum id elit',
+    'document.visa.full_address': '2162 Jameson Drives Suite 941',
+    'document.visa.full_name': 'Kerry Bahringer',
+    'document.visa.gender': 'Ut officia in minim sint',
+    'document.visa.issued_at': 'proident Excepteur amet incididunt fugiat',
+    'document.visa.issuing_country': 'Tonga',
+    'document.visa.issuing_state': 'Nevada',
+    'document.visa.last_name': 'Toy',
+    'document.visa.nationality': 'cupidatat anim',
+    'document.visa.postal_code': 'ex aute labore anim',
+    'document.visa.ref_number': 'quis commodo et ex dolor',
+    'document.visa.samba_activity_history_response': 'et Ut esse tempor eu',
+    'document.visa.selfie.image': 'in reprehenderit dolore ex eiusmod',
+    'document.visa.selfie.mime_type': 'incididunt ullamco',
+    'document.visa.state': 'West Virginia',
+    'document.visa.us_issuing_state': 'Nebraska',
+    'document.voter_identification.address_line1': '79856 Metz Valley Suite 675',
+    'document.voter_identification.back.image': 'e9986255-5499-4879-b73e-92365169457c',
+    'document.voter_identification.back.mime_type': '293af38e-d700-4787-ad99-a9a534cc6e86',
+    'document.voter_identification.city': 'Fort Alexandria',
+    'document.voter_identification.classified_document_type': '8160fd68-1a0e-43a2-82d2-1c5721394b95',
+    'document.voter_identification.clave_de_elector': 'ba97c78e-9b1d-47b2-8128-deed56732dcd',
+    'document.voter_identification.curp': '68f004f9-5aa4-4286-8610-f13ce3d73a4f',
+    'document.voter_identification.curp_validation_response': 'd08c7934-afe2-4933-8aac-8b1d7a8dde52',
+    'document.voter_identification.dob': '7582419b-6c6f-4e7b-b2c3-ad2007005c51',
+    'document.voter_identification.document_number': '7b850c6d-a730-4d41-8e4b-87558cee57cf',
+    'document.voter_identification.expires_at': 'f4fc8bd3-b4e4-49e4-97b5-872a456e20b5',
+    'document.voter_identification.first_name': 'Krista',
+    'document.voter_identification.front.image': '5d2c8245-053f-46eb-ad54-c9ec1c7f4c05',
+    'document.voter_identification.front.mime_type': '35f2d419-e2d9-4ad7-bf5f-8b47bac3b774',
+    'document.voter_identification.full_address': '18302 Harris Rest Suite 207',
+    'document.voter_identification.full_name': 'Nicholas Witting',
+    'document.voter_identification.gender': 'e0dc678a-d335-422d-a31e-96a9906dd4d7',
+    'document.voter_identification.issued_at': '673ac2b8-78f3-48b1-ab19-33483a549caf',
+    'document.voter_identification.issuing_country': 'Timor-Leste',
+    'document.voter_identification.issuing_state': 'Florida',
+    'document.voter_identification.last_name': 'Jakubowski',
+    'document.voter_identification.nationality': 'c15af8b7-14ca-43de-9805-f379beb39f3b',
+    'document.voter_identification.postal_code': '77df0457-d4d1-4c0e-99b6-708700aa774f',
+    'document.voter_identification.ref_number': 'cab961fa-4642-4fcd-a947-de5b135b2d8c',
+    'document.voter_identification.samba_activity_history_response': '9bd793ba-8c32-4d6a-805f-e7bf8790bf82',
+    'document.voter_identification.selfie.image': '6d286af4-9673-40f6-b0ad-464ac26ce390',
+    'document.voter_identification.selfie.mime_type': '6ae1b18a-c585-4635-88ad-f540759fecb8',
+    'document.voter_identification.state': 'Utah',
+    'document.voter_identification.us_issuing_state': 'Colorado',
+    'id.address_line1': '35956 E Broadway Street Apt. 778',
+    'id.address_line2': '559 Schmeler-Herman Extensions Suite 798',
+    'id.citizenships': ['BR', 'VI', 'MM'],
+    'id.city': 'West Chris',
+    'id.country': 'Kiribati',
+    'id.dob': 'c23f9314-925d-43e0-baf6-3c7b6bb07d47',
+    'id.drivers_license_number': 'd1cd87c5-e37c-44e0-ad99-43d3de1b157a',
+    'id.drivers_license_state': 'North Carolina',
+    'id.email': 'kristian24@gmail.com',
+    'id.first_name': 'Destini',
+    'id.itin': 'fc125f4b-ae35-4a5d-814e-1ef994bb85f2',
+    'id.last_name': 'Cole',
+    'id.middle_name': 'Kelley Osinski',
+    'id.nationality': 'b5d92e3b-0908-4dce-9544-65206b5fe0bd',
+    'id.phone_number': '+19418993192',
+    'id.ssn4': '0cf1b199-71e8-4104-8f78-a8e0b723d003',
+    'id.ssn9': '9431d849-1586-48c8-8a59-6f719159ab3f',
+    'id.state': 'Idaho',
+    'id.us_legal_status': '5104a0f0-0742-48c1-a1ea-fb205ab62f67',
+    'id.us_tax_id': 'b66e9ca3-c64f-4153-90de-e0c1067d653f',
+    'id.visa_expiration_date': '6c97cdd6-8516-4f43-a538-fba2d72129f3',
+    'id.visa_kind': '5c316674-1b64-4066-b372-621c01b4ecb4',
+    'id.zip': '99012',
+    'investor_profile.annual_income': 'irure tempor Ut',
+    'investor_profile.brokerage_firm_employer': 'nulla ex in',
+    'investor_profile.declarations': [
+      'affiliated_with_us_broker',
+      'senior_political_figure',
+      'senior_political_figure',
+    ],
+    'investor_profile.employer': 'Lorem',
+    'investor_profile.employment_status': 'dolore',
+    'investor_profile.family_member_names': ['irure Ut id sit', 'dolor', 'ea'],
+    'investor_profile.funding_sources': ['business_income', 'investments', 'investments'],
+    'investor_profile.investment_goals': ['diversification', 'other', 'growth'],
+    'investor_profile.net_worth': 'cupidatat proident et',
+    'investor_profile.occupation': 'id ad cupidatat',
+    'investor_profile.political_organization': 'tempor dolore proident irure laborum',
+    'investor_profile.risk_tolerance': 'enim ut Ut adipisicing consectetur',
+    'investor_profile.senior_executive_symbols': ['irure ut esse', 'tempor', 'eu'],
+  },
+  op: 'update',
+  ownershipStake: 93636283,
+  uuid: 'cd880eee-5d6f-4f43-bfeb-1ab0e5c4e456',
+};
 export const hosted_BusinessOnboardingResponse: BusinessOnboardingResponse = {
   authToken: '41785484-4c34-4619-ab8c-7f7e496b5779',
   isNewBusiness: false,
@@ -772,6 +1517,26 @@ export const hosted_CollectDocumentConfig: CollectDocumentConfig = {
   shouldCollectConsent: false,
   shouldCollectSelfie: false,
   supportedCountryAndDocTypes: {},
+};
+export const hosted_CollectDocumentConfigCustom: CollectDocumentConfigCustom = {
+  description: 'velit sint adipisicing tempor',
+  identifier: 'document.permit.front.mime_type',
+  kind: 'custom',
+  name: 'Reginald Gleichner',
+  requiresHumanReview: true,
+  uploadSettings: 'prefer_capture',
+};
+export const hosted_CollectDocumentConfigIdentity: CollectDocumentConfigIdentity = {
+  kind: 'identity',
+  shouldCollectConsent: false,
+  shouldCollectSelfie: false,
+  supportedCountryAndDocTypes: {},
+};
+export const hosted_CollectDocumentConfigProofOfAddress: CollectDocumentConfigProofOfAddress = {
+  kind: 'proof_of_address',
+};
+export const hosted_CollectDocumentConfigProofOfSsn: CollectDocumentConfigProofOfSsn = {
+  kind: 'proof_of_ssn',
 };
 export const hosted_CollectedDataOption: CollectedDataOption = 'business_kyced_beneficial_owners';
 export const hosted_ConsentRequest: ConsentRequest = {
@@ -881,6 +1646,38 @@ export const hosted_DocumentRequestConfig: DocumentRequestConfig = {
     },
   },
   kind: 'identity',
+};
+export const hosted_DocumentRequestConfigCustom: DocumentRequestConfigCustom = {
+  data: {
+    description: 'qui commodo Duis ut',
+    identifier: 'investor_profile.employer',
+    name: 'Juanita Krajcik',
+    requiresHumanReview: false,
+    uploadSettings: 'prefer_capture',
+  },
+  kind: 'custom',
+};
+export const hosted_DocumentRequestConfigIdentity: DocumentRequestConfigIdentity = {
+  data: {
+    collectSelfie: false,
+    documentTypesAndCountries: {
+      countrySpecific: {},
+      global: ['passport', 'residence_document', 'passport_card'],
+    },
+  },
+  kind: 'identity',
+};
+export const hosted_DocumentRequestConfigProofOfAddress: DocumentRequestConfigProofOfAddress = {
+  data: {
+    requiresHumanReview: false,
+  },
+  kind: 'proof_of_address',
+};
+export const hosted_DocumentRequestConfigProofOfSsn: DocumentRequestConfigProofOfSsn = {
+  data: {
+    requiresHumanReview: true,
+  },
+  kind: 'proof_of_ssn',
 };
 export const hosted_DocumentResponse: DocumentResponse = {
   errors: ['selfie_face_not_found', 'face_not_found', 'selfie_image_orientation_incorrect'],
@@ -2362,6 +3159,58 @@ export const hosted_OnboardingRequirement: OnboardingRequirement = {
   authMethodKind: 'email',
   kind: 'register_auth_method',
 };
+export const hosted_OnboardingRequirementAuthorize: OnboardingRequirementAuthorize = {
+  authorizedAt: '1942-02-21T01:33:48.0Z',
+  fieldsToAuthorize: {
+    collectedData: ['dob', 'nationality', 'business_phone_number'],
+    documentTypes: ['proof_of_address', 'visa', 'residence_document'],
+  },
+  kind: 'authorize',
+};
+export const hosted_OnboardingRequirementCollectBusinessData: OnboardingRequirementCollectBusinessData = {
+  kind: 'collect_business_data',
+  missingAttributes: ['nationality', 'business_phone_number', 'nationality'],
+  populatedAttributes: ['ssn4', 'business_website', 'email'],
+  recollectAttributes: ['business_name', 'us_legal_status', 'ssn4'],
+};
+export const hosted_OnboardingRequirementCollectData: OnboardingRequirementCollectData = {
+  kind: 'collect_data',
+  missingAttributes: ['phone_number', 'business_name', 'email'],
+  optionalAttributes: ['dob', 'us_legal_status', 'business_website'],
+  populatedAttributes: ['business_name', 'phone_number', 'us_legal_status'],
+  recollectAttributes: ['business_address', 'phone_number', 'us_legal_status'],
+};
+export const hosted_OnboardingRequirementCollectDocument: OnboardingRequirementCollectDocument = {
+  config: {
+    kind: 'identity',
+    shouldCollectConsent: false,
+    shouldCollectSelfie: false,
+    supportedCountryAndDocTypes: {},
+  },
+  documentRequestId: '25527580-8e93-4f41-be3b-0d840cf2060a',
+  kind: 'collect_document',
+  uploadSettings: 'prefer_capture',
+};
+export const hosted_OnboardingRequirementCollectInvestorProfile: OnboardingRequirementCollectInvestorProfile = {
+  kind: 'collect_investor_profile',
+  missingAttributes: ['business_kyced_beneficial_owners', 'business_phone_number', 'dob'],
+  missingDocument: false,
+  populatedAttributes: ['name', 'us_tax_id', 'investor_profile'],
+};
+export const hosted_OnboardingRequirementCreateBusinessOnboarding: OnboardingRequirementCreateBusinessOnboarding = {
+  kind: 'create_business_onboarding',
+  requiresBusinessSelection: true,
+};
+export const hosted_OnboardingRequirementProcess: OnboardingRequirementProcess = {
+  kind: 'process',
+};
+export const hosted_OnboardingRequirementRegisterAuthMethod: OnboardingRequirementRegisterAuthMethod = {
+  authMethodKind: 'email',
+  kind: 'register_auth_method',
+};
+export const hosted_OnboardingRequirementRegisterPasskey: OnboardingRequirementRegisterPasskey = {
+  kind: 'liveness',
+};
 export const hosted_OnboardingResponse: OnboardingResponse = {
   authToken: '47a04282-eeab-4b1b-8620-2201f48afa8f',
 };
@@ -2463,6 +3312,88 @@ export const hosted_SdkArgs: SdkArgs = {
     },
     publicKey: '5aa8dcbf-1691-4fbb-90af-614e08428f1a',
     sandboxId: '65880c05-2939-4082-967a-f003e1be2d79',
+    shouldRelayToComponents: false,
+    userData: {},
+  },
+  kind: 'verify_v1',
+};
+export const hosted_SdkArgsAuthV1: SdkArgsAuthV1 = {
+  data: {
+    l10N: {
+      language: 'en',
+      locale: 'en-US',
+    },
+    options: {
+      showLogo: true,
+    },
+    publicKey: '360d5efa-5c95-498e-b52f-a0c4e3a1d48c',
+    userData: {},
+  },
+  kind: 'auth_v1',
+};
+export const hosted_SdkArgsFormV1: SdkArgsFormV1 = {
+  data: {
+    authToken: '4aac6470-26c7-418d-a164-6c343eb1e60a',
+    l10N: {
+      language: 'en',
+      locale: 'en-US',
+    },
+    options: {
+      hideButtons: true,
+      hideCancelButton: true,
+      hideFootprintLogo: true,
+    },
+    title: 'amet',
+  },
+  kind: 'form_v1',
+};
+export const hosted_SdkArgsRenderV1: SdkArgsRenderV1 = {
+  data: {
+    authToken: '6bc8ffde-ab80-4517-ac75-32967bde8b97',
+    canCopy: true,
+    defaultHidden: true,
+    id: 'document.visa.curp_validation_response',
+    label: 'in enim sunt Duis culpa',
+    showHiddenToggle: true,
+  },
+  kind: 'render_v1',
+};
+export const hosted_SdkArgsUpdateAuthMethodsV1: SdkArgsUpdateAuthMethodsV1 = {
+  data: {
+    authToken: '638fdcb3-4bea-4cf5-beab-bd444da8d884',
+    l10N: {
+      language: 'en',
+      locale: 'en-US',
+    },
+    options: {
+      showLogo: false,
+    },
+  },
+  kind: 'update_auth_methods_v1',
+};
+export const hosted_SdkArgsVerifyResultV1: SdkArgsVerifyResultV1 = {
+  data: {
+    authToken: 'df86c475-af04-48eb-ae48-61c34b74850b',
+    deviceResponse: 'Duis sint et mollit cupidatat',
+  },
+  kind: 'verify_result_v1',
+};
+export const hosted_SdkArgsVerifyV1: SdkArgsVerifyV1 = {
+  data: {
+    authToken: 'f1b649c1-f826-411f-beb7-279d6ab6c382',
+    documentFixtureResult: 'pass',
+    fixtureResult: 'pass',
+    isComponentsSdk: true,
+    l10N: {
+      language: 'en',
+      locale: 'en-US',
+    },
+    options: {
+      showCompletionPage: true,
+      showLogo: true,
+    },
+    publicKey: 'b9e37d22-f3a8-4e52-a42d-3f9df43bd573',
+    sandboxId: 'b04edc68-9f52-4483-90cb-34ad1eac70c3',
     shouldRelayToComponents: false,
     userData: {},
   },
@@ -2901,9 +3832,108 @@ export const hosted_WorkflowRequestConfig: WorkflowRequestConfig = {
   },
   kind: 'onboard',
 };
+export const hosted_WorkflowRequestConfigDocument: WorkflowRequestConfigDocument = {
+  data: {
+    businessConfigs: [
+      {
+        data: {
+          collectSelfie: false,
+          documentTypesAndCountries: {
+            countrySpecific: {},
+            global: ['drivers_license', 'residence_document', 'drivers_license'],
+          },
+        },
+        kind: 'identity',
+      },
+      {
+        data: {
+          collectSelfie: true,
+          documentTypesAndCountries: {
+            countrySpecific: {},
+            global: ['id_card', 'residence_document', 'drivers_license'],
+          },
+        },
+        kind: 'identity',
+      },
+      {
+        data: {
+          collectSelfie: false,
+          documentTypesAndCountries: {
+            countrySpecific: {},
+            global: ['id_card', 'id_card', 'permit'],
+          },
+        },
+        kind: 'identity',
+      },
+    ],
+    configs: [
+      {
+        data: {
+          collectSelfie: false,
+          documentTypesAndCountries: {
+            countrySpecific: {},
+            global: ['permit', 'residence_document', 'drivers_license'],
+          },
+        },
+        kind: 'identity',
+      },
+      {
+        data: {
+          collectSelfie: false,
+          documentTypesAndCountries: {
+            countrySpecific: {},
+            global: ['id_card', 'residence_document', 'permit'],
+          },
+        },
+        kind: 'identity',
+      },
+      {
+        data: {
+          collectSelfie: false,
+          documentTypesAndCountries: {
+            countrySpecific: {},
+            global: ['permit', 'visa', 'voter_identification'],
+          },
+        },
+        kind: 'identity',
+      },
+    ],
+  },
+  kind: 'document',
+};
+export const hosted_WorkflowRequestConfigOnboard: WorkflowRequestConfigOnboard = {
+  data: {
+    playbookId: '5b5573bd-f9e8-4997-91f6-8d73aa6418a8',
+    recollectAttributes: ['full_address', 'card', 'card'],
+    reuseExistingBoKyc: false,
+  },
+  kind: 'onboard',
+};
 export const dashboard_ActionKind: ActionKind = 'add_primary';
 export const dashboard_Actor: Actor = {
   id: '790e0e91-7999-45b8-92d6-2c9b6115af8e',
+  kind: 'user',
+};
+export const dashboard_ActorApiKey: ActorApiKey = {
+  id: 'f6d41b04-20ac-4b18-9a06-b8abe1c8fb9a',
+  kind: 'api_key',
+  name: 'Angelina Murray',
+};
+export const dashboard_ActorFirmEmployee: ActorFirmEmployee = {
+  kind: 'firm_employee',
+};
+export const dashboard_ActorFootprint: ActorFootprint = {
+  kind: 'footprint',
+};
+export const dashboard_ActorOrganization: ActorOrganization = {
+  email: 'jon79@gmail.com',
+  firstName: 'Raquel',
+  kind: 'organization',
+  lastName: 'Spinka',
+  member: 'exercitation tempor',
+};
+export const dashboard_ActorUser: ActorUser = {
+  id: '50c4e2c1-87c1-4ed0-bc9b-bba4aa982c59',
   kind: 'user',
 };
 export const dashboard_AdverseMediaListKind: AdverseMediaListKind = 'cyber_crime';
@@ -3229,6 +4259,447 @@ export const dashboard_AuditEventDetail: AuditEventDetail = {
     fpId: '1595ebc7-1aa3-492e-a40c-8042c7745d87',
   },
   kind: 'create_user',
+};
+export const dashboard_AuditEventDetailCollectUserDocument: AuditEventDetailCollectUserDocument = {
+  kind: 'collect_user_document',
+};
+export const dashboard_AuditEventDetailCompleteUserCheckLiveness: AuditEventDetailCompleteUserCheckLiveness = {
+  kind: 'complete_user_check_liveness',
+};
+export const dashboard_AuditEventDetailCompleteUserCheckWatchlist: AuditEventDetailCompleteUserCheckWatchlist = {
+  kind: 'complete_user_check_watchlist',
+};
+export const dashboard_AuditEventDetailCompleteUserVerification: AuditEventDetailCompleteUserVerification = {
+  kind: 'complete_user_verification',
+};
+export const dashboard_AuditEventDetailCreateListEntry: AuditEventDetailCreateListEntry = {
+  data: {
+    listEntryCreationId: '9f3fbdc0-a348-428e-ad43-9622a052d59c',
+    listId: '753b0f6f-bfa8-426e-b8dc-5d55274a9562',
+  },
+  kind: 'create_list_entry',
+};
+export const dashboard_AuditEventDetailCreateOrg: AuditEventDetailCreateOrg = {
+  kind: 'create_org',
+};
+export const dashboard_AuditEventDetailCreateOrgApiKey: AuditEventDetailCreateOrgApiKey = {
+  data: {
+    apiKey: {
+      id: 'c9cac702-95d4-4714-bb4b-e05d50dcf1fe',
+      name: 'Rebecca Gleichner DDS',
+      role: {
+        createdAt: '1915-03-17T20:20:42.0Z',
+        id: 'f3d6922a-325c-421d-aa41-9416c200f746',
+        isImmutable: false,
+        kind: 'dashboard_user',
+        name: 'Jane Harvey',
+        numActiveApiKeys: -5928957,
+        numActiveUsers: -45832167,
+        scopes: [
+          {
+            kind: 'read',
+          },
+          {
+            kind: 'read',
+          },
+          {
+            kind: 'read',
+          },
+        ],
+      },
+    },
+  },
+  kind: 'create_org_api_key',
+};
+export const dashboard_AuditEventDetailCreateOrgRole: AuditEventDetailCreateOrgRole = {
+  data: {
+    roleName: 'Jeannie Hirthe',
+    scopes: [
+      {
+        kind: 'read',
+      },
+      {
+        kind: 'read',
+      },
+      {
+        kind: 'read',
+      },
+    ],
+    tenantRoleId: 'a4899385-655b-4591-a313-abe887ec50ba',
+  },
+  kind: 'create_org_role',
+};
+export const dashboard_AuditEventDetailCreatePlaybook: AuditEventDetailCreatePlaybook = {
+  data: {
+    obConfigurationId: '3ecfc294-f88c-4cc1-ad64-9d06724f607f',
+  },
+  kind: 'create_playbook',
+};
+export const dashboard_AuditEventDetailCreateUser: AuditEventDetailCreateUser = {
+  data: {
+    createdFields: [
+      'document.residence_document.issuing_state',
+      'card.*.cvc',
+      'document.id_card.classified_document_type',
+    ],
+    fpId: '57bcdd09-2734-43d1-8db7-19eca47c09ee',
+  },
+  kind: 'create_user',
+};
+export const dashboard_AuditEventDetailCreateUserAnnotation: AuditEventDetailCreateUserAnnotation = {
+  kind: 'create_user_annotation',
+};
+export const dashboard_AuditEventDetailDeactivateOrgRole: AuditEventDetailDeactivateOrgRole = {
+  data: {
+    roleName: 'Dwayne Doyle',
+    scopes: [
+      {
+        kind: 'read',
+      },
+      {
+        kind: 'read',
+      },
+      {
+        kind: 'read',
+      },
+    ],
+    tenantRoleId: '6700c385-a574-461a-983e-4a3cff57e2e8',
+  },
+  kind: 'deactivate_org_role',
+};
+export const dashboard_AuditEventDetailDecryptOrgApiKey: AuditEventDetailDecryptOrgApiKey = {
+  data: {
+    apiKey: {
+      id: '3cf9538f-bf0e-4b92-b016-32b6c289dbb2',
+      name: 'Michael Von III',
+      role: {
+        createdAt: '1931-11-20T07:28:04.0Z',
+        id: '6da6a499-5bdc-4b45-acc2-82c6d1701af8',
+        isImmutable: false,
+        kind: 'api_key',
+        name: 'Caleb McCullough',
+        numActiveApiKeys: -86612338,
+        numActiveUsers: -19936768,
+        scopes: [
+          {
+            kind: 'read',
+          },
+          {
+            kind: 'read',
+          },
+          {
+            kind: 'read',
+          },
+        ],
+      },
+    },
+  },
+  kind: 'decrypt_org_api_key',
+};
+export const dashboard_AuditEventDetailDecryptUserData: AuditEventDetailDecryptUserData = {
+  data: {
+    context: 'reflect',
+    decryptedFields: ['document.permit.document_number', 'document.passport.issued_at', 'document.visa.gender'],
+    fpId: '0b7d884e-b645-4486-a40a-05f4319818bb',
+    reason: 'ea ut',
+  },
+  kind: 'decrypt_user_data',
+};
+export const dashboard_AuditEventDetailDeleteListEntry: AuditEventDetailDeleteListEntry = {
+  data: {
+    listEntryId: '1ccaf27a-61e0-4411-8243-52bd298c98ca',
+    listId: 'fc1a62b8-e93e-4fdd-aff9-c01ae91b21c4',
+  },
+  kind: 'delete_list_entry',
+};
+export const dashboard_AuditEventDetailDeleteUser: AuditEventDetailDeleteUser = {
+  data: {
+    fpId: '4727d27a-8250-4052-869e-ea2be5d3017b',
+  },
+  kind: 'delete_user',
+};
+export const dashboard_AuditEventDetailDeleteUserData: AuditEventDetailDeleteUserData = {
+  data: {
+    deletedFields: ['document.passport.issuing_state', 'document.passport_card.dob', 'investor_profile.annual_income'],
+    fpId: '051ca946-3d35-4606-899e-76be99c68791',
+  },
+  kind: 'delete_user_data',
+};
+export const dashboard_AuditEventDetailDisablePlaybook: AuditEventDetailDisablePlaybook = {
+  kind: 'disable_playbook',
+};
+export const dashboard_AuditEventDetailEditPlaybook: AuditEventDetailEditPlaybook = {
+  data: {
+    obConfigurationId: 'fa7d1a85-7b91-4add-8562-0595aab3d270',
+  },
+  kind: 'edit_playbook',
+};
+export const dashboard_AuditEventDetailInviteOrgMember: AuditEventDetailInviteOrgMember = {
+  data: {
+    email: 'kaylah78@gmail.com',
+    firstName: 'Janiya',
+    lastName: 'White',
+    scopes: [
+      {
+        kind: 'read',
+      },
+      {
+        kind: 'read',
+      },
+      {
+        kind: 'read',
+      },
+    ],
+    tenantName: 'Patty Kulas',
+    tenantRoleId: 'a26a8071-c49d-437e-81d0-d1d4b0f8a22e',
+    tenantRoleName: 'Joey Mayer',
+  },
+  kind: 'invite_org_member',
+};
+export const dashboard_AuditEventDetailLoginOrgMember: AuditEventDetailLoginOrgMember = {
+  kind: 'login_org_member',
+};
+export const dashboard_AuditEventDetailManuallyReviewEntity: AuditEventDetailManuallyReviewEntity = {
+  data: {
+    decisionStatus: 'step_up',
+    fpId: '4a037525-46d5-4bd0-b110-10a334dcd750',
+  },
+  kind: 'manually_review_entity',
+};
+export const dashboard_AuditEventDetailOrgMemberJoined: AuditEventDetailOrgMemberJoined = {
+  data: {
+    email: 'arlie.hoeger@gmail.com',
+    firstName: 'Eric',
+    lastName: 'Green',
+    tenantRole: {
+      createdAt: '1915-10-08T18:01:26.0Z',
+      id: '1cd14203-4478-4021-a94a-b85bea115d38',
+      isImmutable: true,
+      kind: 'dashboard_user',
+      name: 'Willie Kohler MD',
+      numActiveApiKeys: -68553613,
+      numActiveUsers: -33581186,
+      scopes: [
+        {
+          kind: 'read',
+        },
+        {
+          kind: 'read',
+        },
+        {
+          kind: 'read',
+        },
+      ],
+    },
+  },
+  kind: 'org_member_joined',
+};
+export const dashboard_AuditEventDetailRemoveOrgMember: AuditEventDetailRemoveOrgMember = {
+  data: {
+    member: {
+      email: 'hilbert41@gmail.com',
+      firstName: 'Ocie',
+      id: '9b3ee70b-bbc9-4c42-89e6-325f7efca8a7',
+      lastName: 'Smith',
+    },
+  },
+  kind: 'remove_org_member',
+};
+export const dashboard_AuditEventDetailRequestUserData: AuditEventDetailRequestUserData = {
+  kind: 'request_user_data',
+};
+export const dashboard_AuditEventDetailStartUserVerification: AuditEventDetailStartUserVerification = {
+  kind: 'start_user_verification',
+};
+export const dashboard_AuditEventDetailUpdateOrgApiKeyRole: AuditEventDetailUpdateOrgApiKeyRole = {
+  data: {
+    apiKey: {
+      id: 'cc82ce07-fe4f-45df-9ecc-1bedf13d8b19',
+      name: 'Pam Schowalter',
+      role: {
+        createdAt: '1896-10-24T19:12:58.0Z',
+        id: '4e14ea08-57e6-4f9c-927a-2b408e1d22e8',
+        isImmutable: false,
+        kind: 'compliance_partner_dashboard_user',
+        name: 'Joshua Renner PhD',
+        numActiveApiKeys: -30233385,
+        numActiveUsers: 19395810,
+        scopes: [
+          {
+            kind: 'read',
+          },
+          {
+            kind: 'read',
+          },
+          {
+            kind: 'read',
+          },
+        ],
+      },
+    },
+    newRole: {
+      createdAt: '1890-12-23T12:46:33.0Z',
+      id: 'd3b85a37-b219-4801-893b-5ab0a76cf43b',
+      isImmutable: true,
+      kind: 'dashboard_user',
+      name: 'Woodrow Kozey',
+      numActiveApiKeys: -39875879,
+      numActiveUsers: -54610634,
+      scopes: [
+        {
+          kind: 'read',
+        },
+        {
+          kind: 'read',
+        },
+        {
+          kind: 'read',
+        },
+      ],
+    },
+    oldRole: {
+      createdAt: '1962-12-06T03:17:41.0Z',
+      id: 'f38774df-b84d-45ce-bc0c-1c6891dded37',
+      isImmutable: true,
+      kind: 'compliance_partner_dashboard_user',
+      name: 'Lois Roob',
+      numActiveApiKeys: 30030082,
+      numActiveUsers: -30106657,
+      scopes: [
+        {
+          kind: 'read',
+        },
+        {
+          kind: 'read',
+        },
+        {
+          kind: 'read',
+        },
+      ],
+    },
+  },
+  kind: 'update_org_api_key_role',
+};
+export const dashboard_AuditEventDetailUpdateOrgApiKeyStatus: AuditEventDetailUpdateOrgApiKeyStatus = {
+  data: {
+    apiKey: {
+      id: 'e88d3e7b-38e7-43a8-be04-4fca52e4ab89',
+      name: 'Rosemary Grimes',
+      role: {
+        createdAt: '1905-12-23T01:06:28.0Z',
+        id: '4517451a-16e2-4525-a14e-8a8df55b2780',
+        isImmutable: false,
+        kind: 'api_key',
+        name: 'Pete Kuhic',
+        numActiveApiKeys: -42633076,
+        numActiveUsers: 15308920,
+        scopes: [
+          {
+            kind: 'read',
+          },
+          {
+            kind: 'read',
+          },
+          {
+            kind: 'read',
+          },
+        ],
+      },
+    },
+    status: 'disabled',
+  },
+  kind: 'update_org_api_key_status',
+};
+export const dashboard_AuditEventDetailUpdateOrgMember: AuditEventDetailUpdateOrgMember = {
+  data: {
+    firstName: 'Michael',
+    lastName: 'Reinger',
+    newRole: {
+      createdAt: '1944-08-22T14:54:17.0Z',
+      id: '78d78637-3c90-463e-a5e6-af4e37cb91c4',
+      isImmutable: false,
+      kind: 'api_key',
+      name: 'Sheryl Kilback',
+      numActiveApiKeys: 19760290,
+      numActiveUsers: -53321230,
+      scopes: [
+        {
+          kind: 'read',
+        },
+        {
+          kind: 'read',
+        },
+        {
+          kind: 'read',
+        },
+      ],
+    },
+    oldRole: {
+      createdAt: '1951-03-23T01:25:58.0Z',
+      id: '08ff255a-35b6-4382-b072-4d55bbf2a82a',
+      isImmutable: false,
+      kind: 'compliance_partner_dashboard_user',
+      name: 'Lois Wyman Sr.',
+      numActiveApiKeys: 32285650,
+      numActiveUsers: 46117115,
+      scopes: [
+        {
+          kind: 'read',
+        },
+        {
+          kind: 'read',
+        },
+        {
+          kind: 'read',
+        },
+      ],
+    },
+    tenantUserId: 'e466b76b-a791-451d-9c0d-01bd6aaffe56',
+  },
+  kind: 'update_org_member',
+};
+export const dashboard_AuditEventDetailUpdateOrgRole: AuditEventDetailUpdateOrgRole = {
+  data: {
+    newScopes: [
+      {
+        kind: 'read',
+      },
+      {
+        kind: 'read',
+      },
+      {
+        kind: 'read',
+      },
+    ],
+    prevScopes: [
+      {
+        kind: 'read',
+      },
+      {
+        kind: 'read',
+      },
+      {
+        kind: 'read',
+      },
+    ],
+    roleName: 'Mae Erdman Sr.',
+    tenantRoleId: '28392d08-4426-4fcf-b0d1-91aa366ce409',
+  },
+  kind: 'update_org_role',
+};
+export const dashboard_AuditEventDetailUpdateOrgSettings: AuditEventDetailUpdateOrgSettings = {
+  kind: 'update_org_settings',
+};
+export const dashboard_AuditEventDetailUpdateUserData: AuditEventDetailUpdateUserData = {
+  data: {
+    fpId: '4b632385-7ea4-40b2-bcaa-06e0c24a8022',
+    updatedFields: [
+      'document.passport_card.full_name',
+      'document.passport.classified_document_type',
+      'document.voter_identification.issued_at',
+    ],
+  },
+  kind: 'update_user_data',
 };
 export const dashboard_AuditEventName: AuditEventName = 'decrypt_user_data';
 export const dashboard_AuditEventOrgMember: AuditEventOrgMember = {
@@ -3857,6 +5328,19 @@ export const dashboard_ComplianceDocData: ComplianceDocData = {
   },
   kind: 'external_url',
 };
+export const dashboard_ComplianceDocDataExternalUrl: ComplianceDocDataExternalUrl = {
+  data: {
+    url: 'https://alienated-ownership.org/',
+  },
+  kind: 'external_url',
+};
+export const dashboard_ComplianceDocDataFileUpload: ComplianceDocDataFileUpload = {
+  data: {
+    data: 'reprehenderit cupidatat',
+    filename: 'Mrs. Joanne Bernhard',
+  },
+  kind: 'file_upload',
+};
 export const dashboard_ComplianceDocDataKind: ComplianceDocDataKind = 'file_upload';
 export const dashboard_ComplianceDocEvent: ComplianceDocEvent = {
   actor: {
@@ -3908,6 +5392,46 @@ export const dashboard_ComplianceDocEventType: ComplianceDocEventType = {
     templateId: 'f824ba64-b197-4620-b9cc-5403e7a66bdd',
   },
   kind: 'requested',
+};
+export const dashboard_ComplianceDocEventTypeAssigned: ComplianceDocEventTypeAssigned = {
+  data: {
+    assignedTo: {
+      org: 'officia',
+      user: {
+        firstName: 'Jaren',
+        id: '208fd3fb-ad62-41ed-b8aa-5b04d6ce8d85',
+        lastName: 'Moen',
+      },
+    },
+    kind: 'partner_tenant',
+  },
+  kind: 'assigned',
+};
+export const dashboard_ComplianceDocEventTypeRequestRetracted: ComplianceDocEventTypeRequestRetracted = {
+  data: {},
+  kind: 'request_retracted',
+};
+export const dashboard_ComplianceDocEventTypeRequested: ComplianceDocEventTypeRequested = {
+  data: {
+    description: 'irure reprehenderit minim consectetur labore',
+    name: 'Jake Barrows',
+    templateId: '66e8a3d4-4539-47ca-a9d6-ea837f8f6a66',
+  },
+  kind: 'requested',
+};
+export const dashboard_ComplianceDocEventTypeReviewed: ComplianceDocEventTypeReviewed = {
+  data: {
+    decision: 'rejected',
+    note: 'est nostrud Lorem',
+  },
+  kind: 'reviewed',
+};
+export const dashboard_ComplianceDocEventTypeSubmitted: ComplianceDocEventTypeSubmitted = {
+  data: {
+    kind: 'file_upload',
+    submissionId: 'b93b6955-f4b0-4cbb-802b-e76297110145',
+  },
+  kind: 'submitted',
 };
 export const dashboard_ComplianceDocReviewDecision: ComplianceDocReviewDecision = 'rejected';
 export const dashboard_ComplianceDocStatus: ComplianceDocStatus = 'waiting_for_upload';
@@ -5071,6 +6595,33 @@ export const dashboard_DbActor: DbActor = {
   },
   kind: 'user',
 };
+export const dashboard_DbActorFirmEmployee: DbActorFirmEmployee = {
+  data: {
+    id: 'ed3ae1e2-6b10-4f82-a632-42caf2fd31d5',
+  },
+  kind: 'firm_employee',
+};
+export const dashboard_DbActorFootprint: DbActorFootprint = {
+  kind: 'footprint',
+};
+export const dashboard_DbActorTenantApiKey: DbActorTenantApiKey = {
+  data: {
+    id: '39e3b751-3ba1-4f24-acc3-6d82efbe1a4f',
+  },
+  kind: 'tenant_api_key',
+};
+export const dashboard_DbActorTenantUser: DbActorTenantUser = {
+  data: {
+    id: 'd0203384-f90c-4e21-9df8-f7a94bd24e6c',
+  },
+  kind: 'tenant_user',
+};
+export const dashboard_DbActorUser: DbActorUser = {
+  data: {
+    id: 'a3acb3a5-d85b-4453-a22c-972fc4b8f18a',
+  },
+  kind: 'user',
+};
 export const dashboard_DecisionStatus: DecisionStatus = 'fail';
 export const dashboard_DecryptionContext: DecryptionContext = 'vault_proxy';
 export const dashboard_DeleteRequest: DeleteRequest = {
@@ -5151,6 +6702,38 @@ export const dashboard_DocumentRequestConfig: DocumentRequestConfig = {
     },
   },
   kind: 'identity',
+};
+export const dashboard_DocumentRequestConfigCustom: DocumentRequestConfigCustom = {
+  data: {
+    description: 'dolor laborum labore',
+    identifier: 'custom.*',
+    name: 'Jodi McDermott',
+    requiresHumanReview: true,
+    uploadSettings: 'capture_only_on_mobile',
+  },
+  kind: 'custom',
+};
+export const dashboard_DocumentRequestConfigIdentity: DocumentRequestConfigIdentity = {
+  data: {
+    collectSelfie: false,
+    documentTypesAndCountries: {
+      countrySpecific: {},
+      global: ['permit', 'permit', 'id_card'],
+    },
+  },
+  kind: 'identity',
+};
+export const dashboard_DocumentRequestConfigProofOfAddress: DocumentRequestConfigProofOfAddress = {
+  data: {
+    requiresHumanReview: true,
+  },
+  kind: 'proof_of_address',
+};
+export const dashboard_DocumentRequestConfigProofOfSsn: DocumentRequestConfigProofOfSsn = {
+  data: {
+    requiresHumanReview: true,
+  },
+  kind: 'proof_of_ssn',
 };
 export const dashboard_DocumentRequestKind: DocumentRequestKind = 'identity';
 export const dashboard_DocumentReviewStatus: DocumentReviewStatus = 'pending_human_review';
@@ -5501,11 +7084,41 @@ export const dashboard_EntityAction: EntityAction = {
     kind: 'document',
   },
 };
+export const dashboard_EntityActionClearReview: EntityActionClearReview = {
+  kind: 'clear_review',
+};
+export const dashboard_EntityActionManualDecision: EntityActionManualDecision = {
+  annotation: {
+    isPinned: false,
+    note: 'proident aute voluptate est',
+  },
+  kind: 'manual_decision',
+  status: 'pass',
+};
 export const dashboard_EntityActionResponse: EntityActionResponse = {
   expiresAt: '1917-10-30T15:03:11.0Z',
   kind: 'trigger',
   link: 'fugiat adipisicing anim et enim',
   token: 'de8a5133-091c-4879-b82e-d3e27a7def31',
+};
+export const dashboard_EntityActionResponseTrigger: EntityActionResponseTrigger = {
+  expiresAt: '1936-03-22T16:13:45.0Z',
+  kind: 'trigger',
+  link: 'dolore culpa',
+  token: '44cb927d-71e5-4e9c-a2a4-73824bc3f3ce',
+};
+export const dashboard_EntityActionTrigger: EntityActionTrigger = {
+  fpBid: '53553c19-481c-472f-b5c6-981395de46c8',
+  kind: 'trigger',
+  note: 'cillum',
+  trigger: {
+    data: {
+      playbookId: '6e542123-e213-47be-870d-59dae64d51dc',
+      recollectAttributes: ['business_website', 'us_tax_id', 'investor_profile'],
+      reuseExistingBoKyc: false,
+    },
+    kind: 'onboard',
+  },
 };
 export const dashboard_EntityActionsRequest: EntityActionsRequest = {
   actions: [
@@ -6533,6 +8146,16 @@ export const dashboard_InvoicePreview: InvoicePreview = {
 export const dashboard_InvokeVaultProxyPermission: InvokeVaultProxyPermission = {
   kind: 'any',
 };
+export const dashboard_InvokeVaultProxyPermissionAny: InvokeVaultProxyPermissionAny = {
+  kind: 'any',
+};
+export const dashboard_InvokeVaultProxyPermissionId: InvokeVaultProxyPermissionId = {
+  id: 'bf06dada-b237-4929-98b9-e260456e1da7',
+  kind: 'id',
+};
+export const dashboard_InvokeVaultProxyPermissionJustInTime: InvokeVaultProxyPermissionJustInTime = {
+  kind: 'just_in_time',
+};
 export const dashboard_IsIn: IsIn = 'is_not_in';
 export const dashboard_Iso3166TwoDigitCountryCode: Iso3166TwoDigitCountryCode = 'GN';
 export const dashboard_LabelAdded: LabelAdded = {
@@ -6932,6 +8555,22 @@ export const dashboard_ListEventDetail: ListEventDetail = {
     listId: '2a21540f-209c-4391-8845-a8b9dba4fabc',
   },
   kind: 'create_list_entry',
+};
+export const dashboard_ListEventDetailCreateListEntry: ListEventDetailCreateListEntry = {
+  data: {
+    entries: ['mollit velit', 'dolore incididunt Duis', 'commodo anim'],
+    listEntryCreationId: '04f8e8a2-5849-48df-97a9-f60ccb022d91',
+    listId: 'ed083548-3c08-4094-926f-3130b275133e',
+  },
+  kind: 'create_list_entry',
+};
+export const dashboard_ListEventDetailDeleteListEntry: ListEventDetailDeleteListEntry = {
+  data: {
+    entry: 'veniam ad eu',
+    listEntryId: 'bf17b809-d859-4bf2-b90b-d6ac27516940',
+    listId: '4e3766fb-db0f-45c5-b1b3-7bc2945ef556',
+  },
+  kind: 'delete_list_entry',
 };
 export const dashboard_ListKind: ListKind = 'ip_address';
 export const dashboard_ListPlaybookUsage: ListPlaybookUsage = {
@@ -8902,6 +10541,53 @@ export const dashboard_RuleActionConfig: RuleActionConfig = {
   config: {},
   kind: 'pass_with_manual_review',
 };
+export const dashboard_RuleActionConfigFail: RuleActionConfigFail = {
+  config: {},
+  kind: 'fail',
+};
+export const dashboard_RuleActionConfigManualReview: RuleActionConfigManualReview = {
+  config: {},
+  kind: 'manual_review',
+};
+export const dashboard_RuleActionConfigPassWithManualReview: RuleActionConfigPassWithManualReview = {
+  config: {},
+  kind: 'pass_with_manual_review',
+};
+export const dashboard_RuleActionConfigStepUp: RuleActionConfigStepUp = {
+  config: [
+    {
+      data: {
+        collectSelfie: true,
+        documentTypesAndCountries: {
+          countrySpecific: {},
+          global: ['id_card', 'visa', 'residence_document'],
+        },
+      },
+      kind: 'identity',
+    },
+    {
+      data: {
+        collectSelfie: false,
+        documentTypesAndCountries: {
+          countrySpecific: {},
+          global: ['residence_document', 'passport', 'passport'],
+        },
+      },
+      kind: 'identity',
+    },
+    {
+      data: {
+        collectSelfie: true,
+        documentTypesAndCountries: {
+          countrySpecific: {},
+          global: ['id_card', 'id_card', 'drivers_license'],
+        },
+      },
+      kind: 'identity',
+    },
+  ],
+  kind: 'step_up',
+};
 export const dashboard_RuleActionMigration: RuleActionMigration = 'manual_review';
 export const dashboard_RuleEvalResult: RuleEvalResult = {
   backtestActionTriggered: 'step_up.identity_proof_of_ssn',
@@ -9272,6 +10958,94 @@ export const dashboard_TenantRoleKindDiscriminant: TenantRoleKindDiscriminant = 
 export const dashboard_TenantScope: TenantScope = {
   kind: 'read',
 };
+export const dashboard_TenantScopeAdmin: TenantScopeAdmin = {
+  kind: 'admin',
+};
+export const dashboard_TenantScopeApiKeys: TenantScopeApiKeys = {
+  kind: 'api_keys',
+};
+export const dashboard_TenantScopeAuthToken: TenantScopeAuthToken = {
+  kind: 'auth_token',
+};
+export const dashboard_TenantScopeCipIntegration: TenantScopeCipIntegration = {
+  kind: 'cip_integration',
+};
+export const dashboard_TenantScopeCompliancePartnerAdmin: TenantScopeCompliancePartnerAdmin = {
+  kind: 'compliance_partner_admin',
+};
+export const dashboard_TenantScopeCompliancePartnerManageReviews: TenantScopeCompliancePartnerManageReviews = {
+  kind: 'compliance_partner_manage_reviews',
+};
+export const dashboard_TenantScopeCompliancePartnerManageTemplates: TenantScopeCompliancePartnerManageTemplates = {
+  kind: 'compliance_partner_manage_templates',
+};
+export const dashboard_TenantScopeCompliancePartnerRead: TenantScopeCompliancePartnerRead = {
+  kind: 'compliance_partner_read',
+};
+export const dashboard_TenantScopeDecrypt: TenantScopeDecrypt = {
+  data: 'card',
+  kind: 'decrypt',
+};
+export const dashboard_TenantScopeDecryptAll: TenantScopeDecryptAll = {
+  kind: 'decrypt_all',
+};
+export const dashboard_TenantScopeDecryptAllExceptPciData: TenantScopeDecryptAllExceptPciData = {
+  kind: 'decrypt_all_except_pci_data',
+};
+export const dashboard_TenantScopeDecryptCustom: TenantScopeDecryptCustom = {
+  kind: 'decrypt_custom',
+};
+export const dashboard_TenantScopeDecryptDocument: TenantScopeDecryptDocument = {
+  kind: 'decrypt_document',
+};
+export const dashboard_TenantScopeDecryptDocumentAndSelfie: TenantScopeDecryptDocumentAndSelfie = {
+  kind: 'decrypt_document_and_selfie',
+};
+export const dashboard_TenantScopeInvokeVaultProxy: TenantScopeInvokeVaultProxy = {
+  data: {
+    kind: 'any',
+  },
+  kind: 'invoke_vault_proxy',
+};
+export const dashboard_TenantScopeLabelAndTag: TenantScopeLabelAndTag = {
+  kind: 'label_and_tag',
+};
+export const dashboard_TenantScopeManageComplianceDocSubmission: TenantScopeManageComplianceDocSubmission = {
+  kind: 'manage_compliance_doc_submission',
+};
+export const dashboard_TenantScopeManageVaultProxy: TenantScopeManageVaultProxy = {
+  kind: 'manage_vault_proxy',
+};
+export const dashboard_TenantScopeManageWebhooks: TenantScopeManageWebhooks = {
+  kind: 'manage_webhooks',
+};
+export const dashboard_TenantScopeManualReview: TenantScopeManualReview = {
+  kind: 'manual_review',
+};
+export const dashboard_TenantScopeOnboarding: TenantScopeOnboarding = {
+  kind: 'onboarding',
+};
+export const dashboard_TenantScopeOnboardingConfiguration: TenantScopeOnboardingConfiguration = {
+  kind: 'onboarding_configuration',
+};
+export const dashboard_TenantScopeOrgSettings: TenantScopeOrgSettings = {
+  kind: 'org_settings',
+};
+export const dashboard_TenantScopeRead: TenantScopeRead = {
+  kind: 'read',
+};
+export const dashboard_TenantScopeTriggerKyb: TenantScopeTriggerKyb = {
+  kind: 'trigger_kyb',
+};
+export const dashboard_TenantScopeTriggerKyc: TenantScopeTriggerKyc = {
+  kind: 'trigger_kyc',
+};
+export const dashboard_TenantScopeWriteEntities: TenantScopeWriteEntities = {
+  kind: 'write_entities',
+};
+export const dashboard_TenantScopeWriteLists: TenantScopeWriteLists = {
+  kind: 'write_lists',
+};
 export const dashboard_TerminalDecisionStatus: TerminalDecisionStatus = 'pass';
 export const dashboard_TimelineOnboardingDecision: TimelineOnboardingDecision = {
   clearedManualReviews: [
@@ -9494,6 +11268,263 @@ export const dashboard_UserTimelineEvent: UserTimelineEvent = {
   },
   kind: 'data_collected',
 };
+export const dashboard_UserTimelineEventAnnotation: UserTimelineEventAnnotation = {
+  data: {
+    id: '2163d2f3-0bfc-4bb0-b757-83ed1ff7b856',
+    isPinned: false,
+    note: 'enim',
+    source: {
+      id: '3f0a3e6f-6f2e-4eac-97c7-6ec7ae7f0893',
+      kind: 'user',
+    },
+    timestamp: '1941-11-01T01:39:16.0Z',
+  },
+  kind: 'annotation',
+};
+export const dashboard_UserTimelineEventAuthMethodUpdated: UserTimelineEventAuthMethodUpdated = {
+  data: {
+    action: 'add_primary',
+    insightEvent: {
+      city: 'West Nellie',
+      country: 'El Salvador',
+      ipAddress: '49747 Center Street Apt. 222',
+      latitude: 57937526.54385415,
+      longitude: 15402501.555539057,
+      metroCode: 'Excepteur',
+      postalCode: 'velit aliquip magna consequat',
+      region: 'aliqua sit aute',
+      regionName: 'Crystal Doyle',
+      sessionId: '47b7a9d6-b345-4eff-bcf6-0c96c94cee1f',
+      timeZone: 'Ut deserunt',
+      timestamp: '1936-06-04T01:58:31.0Z',
+      userAgent: 'Lorem',
+    },
+    kind: 'email',
+  },
+  kind: 'auth_method_updated',
+};
+export const dashboard_UserTimelineEventBusinessOwnerCompletedKyc: UserTimelineEventBusinessOwnerCompletedKyc = {
+  data: {
+    decision: {
+      clearedManualReviews: [
+        {
+          kind: 'rule_triggered',
+        },
+        {
+          kind: 'document_needs_review',
+        },
+        {
+          kind: 'document_needs_review',
+        },
+      ],
+      id: '5f2f3ae5-8758-462a-854a-0c4195cb469e',
+      obConfiguration: {
+        id: '03eae7be-3038-487c-8a46-b071fff01b4d',
+        mustCollectData: ['card', 'us_legal_status', 'us_legal_status'],
+        name: 'Guadalupe Nitzsche',
+      },
+      ranRulesInSandbox: false,
+      ruleSetResultId: '76777816-5588-44d3-9ce8-5dd62d2bd4da',
+      source: {
+        id: '51aecba3-5218-435d-a40d-4a084db19256',
+        kind: 'user',
+      },
+      status: 'pass',
+      timestamp: '1914-12-10T01:11:44.0Z',
+      workflowKind: 'kyc',
+    },
+    fpId: '3882e700-3bd9-4606-b19f-e05f9923c118',
+  },
+  kind: 'business_owner_completed_kyc',
+};
+export const dashboard_UserTimelineEventDataCollected: UserTimelineEventDataCollected = {
+  data: {
+    actor: {
+      id: 'b308fb06-c9be-473f-9ad9-78986d85eea5',
+      kind: 'user',
+    },
+    attributes: ['ssn4', 'business_kyced_beneficial_owners', 'business_kyced_beneficial_owners'],
+    isPrefill: false,
+    targets: ['card.*.expiration_year', 'document.passport.issuing_state', 'id.middle_name'],
+  },
+  kind: 'data_collected',
+};
+export const dashboard_UserTimelineEventDocumentUploaded: UserTimelineEventDocumentUploaded = {
+  data: {
+    config: {
+      data: {
+        collectSelfie: true,
+        documentTypesAndCountries: {
+          countrySpecific: {},
+          global: ['voter_identification', 'passport_card', 'id_card'],
+        },
+      },
+      kind: 'identity',
+    },
+    deviceType: 'ios',
+    documentType: 'passport',
+    status: 'failed',
+  },
+  kind: 'document_uploaded',
+};
+export const dashboard_UserTimelineEventExternalIntegrationCalled: UserTimelineEventExternalIntegrationCalled = {
+  data: {
+    externalId: '031d33fc-7e95-4646-bce5-838be493687c',
+    integration: 'alpaca_cip',
+    successful: true,
+  },
+  kind: 'external_integration_called',
+};
+export const dashboard_UserTimelineEventLabelAdded: UserTimelineEventLabelAdded = {
+  data: {
+    kind: 'active',
+  },
+  kind: 'label_added',
+};
+export const dashboard_UserTimelineEventLiveness: UserTimelineEventLiveness = {
+  data: {
+    attributes: {
+      device: 'tempor eiusmod occaecat quis',
+      issuers: ['footprint', 'footprint', 'cloudflare'],
+      metadata: {},
+      os: 'reprehenderit eu id',
+    },
+    insightEvent: {
+      city: 'Vonshire',
+      country: 'Latvia',
+      ipAddress: '833 Graham Overpass Suite 590',
+      latitude: -8028729.352235422,
+      longitude: -80407628.13278826,
+      metroCode: 'elit ut cillum',
+      postalCode: 'Duis sed nulla proident ullamco',
+      region: 'tempor velit',
+      regionName: 'Marilyn Johnston',
+      sessionId: 'f8c6b184-b94f-4756-be57-2e470f27169b',
+      timeZone: 'in tempor proident anim in',
+      timestamp: '1894-04-14T13:16:01.0Z',
+      userAgent: 'ullamco tempor enim dolor occaecat',
+    },
+    source: 'apple_device_attestation',
+  },
+  kind: 'liveness',
+};
+export const dashboard_UserTimelineEventOnboardingDecision: UserTimelineEventOnboardingDecision = {
+  data: {
+    annotation: {
+      id: '4e83cfc5-8d29-49cf-85f0-0012b770a678',
+      isPinned: false,
+      note: 'sed incididunt',
+      source: {
+        id: 'fa9ac550-c231-4fa1-a1f9-940d4ba7dd58',
+        kind: 'user',
+      },
+      timestamp: '1925-02-05T06:25:07.0Z',
+    },
+    decision: {
+      clearedManualReviews: [
+        {
+          kind: 'document_needs_review',
+        },
+        {
+          kind: 'rule_triggered',
+        },
+        {
+          kind: 'rule_triggered',
+        },
+      ],
+      id: '2b64a4e6-4941-438c-88f8-d7dfaaa72dc8',
+      obConfiguration: {
+        id: '4422c4b8-d424-49f8-89be-6d02a7ba71c5',
+        mustCollectData: ['business_name', 'phone_number', 'business_tin'],
+        name: 'Alfredo King',
+      },
+      ranRulesInSandbox: false,
+      ruleSetResultId: 'faa372d0-3e7d-4faa-b967-32f9ef639a71',
+      source: {
+        id: 'fbe1698e-f62f-4c02-9af6-cca075cfb2fe',
+        kind: 'user',
+      },
+      status: 'pass',
+      timestamp: '1928-05-15T02:12:20.0Z',
+      workflowKind: 'kyc',
+    },
+    workflowSource: 'tenant',
+  },
+  kind: 'onboarding_decision',
+};
+export const dashboard_UserTimelineEventOnboardingTimeline: UserTimelineEventOnboardingTimeline = {
+  data: {
+    event: 'dolore ullamco culpa in esse',
+    sessionId: '7da98b9c-501b-4807-9fcc-c6630015fd3c',
+  },
+  kind: 'onboarding_timeline',
+};
+export const dashboard_UserTimelineEventStepUp: UserTimelineEventStepUp = {
+  data: [
+    {
+      kind: 'proof_of_ssn',
+      ruleSetResultId: 'c954cbca-386e-4cd9-8ff7-8ee75ba24e7c',
+    },
+    {
+      kind: 'identity',
+      ruleSetResultId: 'c954cbca-386e-4cd9-8ff7-8ee75ba24e7c',
+    },
+    {
+      kind: 'proof_of_ssn',
+      ruleSetResultId: 'c954cbca-386e-4cd9-8ff7-8ee75ba24e7c',
+    },
+  ],
+  kind: 'step_up',
+};
+export const dashboard_UserTimelineEventVaultCreated: UserTimelineEventVaultCreated = {
+  data: {
+    actor: {
+      id: 'f9907fd5-8657-4adc-b8d0-79e64d916e5e',
+      kind: 'user',
+    },
+  },
+  kind: 'vault_created',
+};
+export const dashboard_UserTimelineEventWatchlistCheck: UserTimelineEventWatchlistCheck = {
+  data: {
+    id: '972ceb12-49f6-4959-bf10-bd212c5b4290',
+    reasonCodes: ['device_reputation', 'document_ocr_first_name_matches', 'document_photo_is_paper_capture'],
+    status: 'not_needed',
+  },
+  kind: 'watchlist_check',
+};
+export const dashboard_UserTimelineEventWorkflowStarted: UserTimelineEventWorkflowStarted = {
+  data: {
+    kind: 'document',
+    playbook: {
+      id: 'eb6f55e8-7b9e-4302-8b07-9dafb30bed16',
+      mustCollectData: ['business_kyced_beneficial_owners', 'ssn4', 'business_website'],
+      name: 'Ed Koelpin',
+    },
+    workflowSource: 'tenant',
+  },
+  kind: 'workflow_started',
+};
+export const dashboard_UserTimelineEventWorkflowTriggered: UserTimelineEventWorkflowTriggered = {
+  data: {
+    actor: {
+      id: 'd52773cc-a1f5-4133-93ed-260322708c07',
+      kind: 'user',
+    },
+    config: {
+      data: {
+        playbookId: '25e3a989-3259-4ab2-b264-f21e00fcd015',
+        recollectAttributes: ['business_address', 'business_tin', 'dob'],
+        reuseExistingBoKyc: true,
+      },
+      kind: 'onboard',
+    },
+    fpId: 'da664919-9631-4b66-9154-ce8c43555f67',
+    note: 'cupidatat',
+    requestIsActive: false,
+  },
+  kind: 'workflow_triggered',
+};
 export const dashboard_VaultCreated: VaultCreated = {
   actor: {
     id: '305157cd-57d4-45f1-ac4c-a1fb5890f411',
@@ -9557,6 +11588,57 @@ export const dashboard_VerificationCheck: VerificationCheck = {
     einOnly: true,
   },
   kind: 'kyb',
+};
+export const dashboard_VerificationCheckAml: VerificationCheckAml = {
+  data: {
+    adverseMedia: true,
+    adverseMediaLists: ['financial_crime', 'violent_crime', 'general_minor'],
+    continuousMonitoring: true,
+    matchKind: 'exact_name_and_dob_year',
+    ofac: false,
+    pep: true,
+  },
+  kind: 'aml',
+};
+export const dashboard_VerificationCheckBusinessAml: VerificationCheckBusinessAml = {
+  data: {},
+  kind: 'business_aml',
+};
+export const dashboard_VerificationCheckCurpValidation: VerificationCheckCurpValidation = {
+  data: {},
+  kind: 'curp_validation',
+};
+export const dashboard_VerificationCheckIdentityDocument: VerificationCheckIdentityDocument = {
+  data: {},
+  kind: 'identity_document',
+};
+export const dashboard_VerificationCheckKyb: VerificationCheckKyb = {
+  data: {
+    einOnly: false,
+  },
+  kind: 'kyb',
+};
+export const dashboard_VerificationCheckKyc: VerificationCheckKyc = {
+  data: {},
+  kind: 'kyc',
+};
+export const dashboard_VerificationCheckNeuroId: VerificationCheckNeuroId = {
+  data: {},
+  kind: 'neuro_id',
+};
+export const dashboard_VerificationCheckPhone: VerificationCheckPhone = {
+  data: {
+    attributes: ['line_type_intelligence', 'line_type_intelligence', 'line_type_intelligence'],
+  },
+  kind: 'phone',
+};
+export const dashboard_VerificationCheckSentilink: VerificationCheckSentilink = {
+  data: {},
+  kind: 'sentilink',
+};
+export const dashboard_VerificationCheckStytchDevice: VerificationCheckStytchDevice = {
+  data: {},
+  kind: 'stytch_device',
 };
 export const dashboard_WatchlistCheck: WatchlistCheck = {
   id: '5d06a348-6b39-4dbe-bce3-0aeda9dcecc5',
@@ -9624,6 +11706,83 @@ export const dashboard_WorkflowRequestConfig: WorkflowRequestConfig = {
     playbookId: 'd8e6617d-30c7-4c60-877f-e9917c128abc',
     recollectAttributes: ['dob', 'business_kyced_beneficial_owners', 'us_tax_id'],
     reuseExistingBoKyc: true,
+  },
+  kind: 'onboard',
+};
+export const dashboard_WorkflowRequestConfigDocument: WorkflowRequestConfigDocument = {
+  data: {
+    businessConfigs: [
+      {
+        data: {
+          collectSelfie: false,
+          documentTypesAndCountries: {
+            countrySpecific: {},
+            global: ['permit', 'id_card', 'id_card'],
+          },
+        },
+        kind: 'identity',
+      },
+      {
+        data: {
+          collectSelfie: true,
+          documentTypesAndCountries: {
+            countrySpecific: {},
+            global: ['id_card', 'id_card', 'drivers_license'],
+          },
+        },
+        kind: 'identity',
+      },
+      {
+        data: {
+          collectSelfie: true,
+          documentTypesAndCountries: {
+            countrySpecific: {},
+            global: ['id_card', 'voter_identification', 'drivers_license'],
+          },
+        },
+        kind: 'identity',
+      },
+    ],
+    configs: [
+      {
+        data: {
+          collectSelfie: true,
+          documentTypesAndCountries: {
+            countrySpecific: {},
+            global: ['passport_card', 'passport_card', 'voter_identification'],
+          },
+        },
+        kind: 'identity',
+      },
+      {
+        data: {
+          collectSelfie: true,
+          documentTypesAndCountries: {
+            countrySpecific: {},
+            global: ['passport_card', 'passport_card', 'id_card'],
+          },
+        },
+        kind: 'identity',
+      },
+      {
+        data: {
+          collectSelfie: false,
+          documentTypesAndCountries: {
+            countrySpecific: {},
+            global: ['passport', 'drivers_license', 'residence_document'],
+          },
+        },
+        kind: 'identity',
+      },
+    ],
+  },
+  kind: 'document',
+};
+export const dashboard_WorkflowRequestConfigOnboard: WorkflowRequestConfigOnboard = {
+  data: {
+    playbookId: '46361b19-f134-49f5-a5af-7dc9de850981',
+    recollectAttributes: ['email', 'business_name', 'phone_number'],
+    reuseExistingBoKyc: false,
   },
   kind: 'onboard',
 };
