@@ -22,7 +22,6 @@ use db::models::rule_instance::IncludeRules;
 use db::models::rule_instance::RuleInstance;
 use db::models::rule_set::RuleSet;
 use itertools::Itertools;
-use macros::route_alias;
 use newtypes::AuditEventDetail;
 use newtypes::PlaybookId;
 use paperclip::actix::api_v2_operation;
@@ -31,12 +30,6 @@ use paperclip::actix::web;
 use paperclip::actix::web::Json;
 
 
-// TODO: migrate clients to /org/playbooks
-#[route_alias(post(
-    "/org/onboarding_configs",
-    tags(Playbooks, Organization, Private),
-    description = "Creates a new playbook."
-))]
 #[api_v2_operation(
     description = "Creates a new playbook.",
     tags(Playbooks, Organization, Private)

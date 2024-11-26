@@ -40,7 +40,7 @@ def inactive_ob_configuration(sandbox_tenant, must_collect_data):
 
 
 def test_config_list(sandbox_tenant, ob_configuration, inactive_ob_configuration):
-    body = get("org/onboarding_configs", dict(page_size=100), *sandbox_tenant.db_auths)
+    body = get("org/playbooks", dict(page_size=100), *sandbox_tenant.db_auths)
 
     config = next(
         config for config in body["data"] if config["id"] == ob_configuration.id
@@ -94,7 +94,7 @@ def test_config_list_filters(
     expect_ob_config1,
     expect_ob_config2,
 ):
-    body = get("org/onboarding_configs", params, *sandbox_tenant.db_auths)
+    body = get("org/playbooks", params, *sandbox_tenant.db_auths)
     assert (
         any(u["id"] == ob_configuration.id for u in body["data"]) == expect_ob_config1
     )
@@ -122,18 +122,18 @@ def test_config_create(sandbox_tenant):
         kind="kyc",
         verification_checks=[{"data": {}, "kind": "kyc"}],
     )
-    body = post("org/onboarding_configs", data, *sandbox_tenant.db_auths)
+    body = post("org/playbooks", data, *sandbox_tenant.db_auths)
     obc = ObConfiguration.from_response(body, sandbox_tenant)
-
-    sandbox_id = _gen_random_sandbox_id()
-    auth_token = IdentifyClient(obc, sandbox_id).create_user()
-    post("hosted/onboarding", None, obc.key, auth_token)
 
     assert_has_audit_event_with_details(
         sandbox_tenant,
         "create_playbook",
         ob_configuration_id=obc.id,
     )
+
+    sandbox_id = _gen_random_sandbox_id()
+    auth_token = IdentifyClient(obc, sandbox_id).create_user()
+    post("hosted/onboarding", None, obc.key, auth_token)
 
 
 @pytest.mark.parametrize(
@@ -759,7 +759,7 @@ def test_config_create_validation(sandbox_tenant, config_data, expected_error):
 
     # Test validation errors
     res = post(
-        "org/onboarding_configs",
+        "org/playbooks",
         data,
         *sandbox_tenant.db_auths,
         status_code=200 if expected_error is None else 400,
@@ -779,7 +779,7 @@ def test_no_phone_obc(sandbox_tenant):
         kind="kyc",
         verification_checks=[{"kind": "kyc", "data": {}}],
     )
-    res = post("org/onboarding_configs", data, *sandbox_tenant.db_auths)
+    res = post("org/playbooks", data, *sandbox_tenant.db_auths)
 
     assert res["is_no_phone_flow"] == True
     assert res["must_collect_data"] == collect_data
@@ -800,7 +800,7 @@ def test_doc_only(sandbox_tenant):
             "country_specific": {"US": ["drivers_license"]},
         },
     )
-    res = post("org/onboarding_configs", data, *sandbox_tenant.db_auths)
+    res = post("org/playbooks", data, *sandbox_tenant.db_auths)
 
     assert res["kind"] == "document"
     assert res["must_collect_data"] == collect_data
@@ -843,7 +843,7 @@ def test_skip_kyc(
         kind="kyc",
     )
     res = post(
-        "org/onboarding_configs",
+        "org/playbooks",
         data,
         *sandbox_tenant.db_auths,
         status_code=200 if expected_error is None else 400,
@@ -981,7 +981,7 @@ def test_verification_checks(
         verification_checks=checks,
     )
     res = post(
-        "org/onboarding_configs",
+        "org/playbooks",
         data,
         *sandbox_tenant.db_auths,
         status_code=200 if expected_error is None else 400,
@@ -1058,7 +1058,7 @@ def test_enhanced_aml(sandbox_tenant, must_collect_data, enhanced_aml, expected_
         verification_checks=[{"kind": "kyc", "data": {}}],
     )
     res = post(
-        "org/onboarding_configs",
+        "org/playbooks",
         data,
         *sandbox_tenant.db_auths,
         status_code=200 if expected_error is None else 400,
@@ -1123,7 +1123,7 @@ def test_enhanced_aml_with_verification_checks(
         verification_checks=verification_checks,
     )
     res = post(
-        "org/onboarding_configs",
+        "org/playbooks",
         data,
         *sandbox_tenant.db_auths,
         status_code=200 if expected_error is None else 400,
@@ -1193,7 +1193,7 @@ def test_business_aml_with_verification_checks(
     )
 
     res = post(
-        "org/onboarding_configs",
+        "org/playbooks",
         data,
         *sandbox_tenant.db_auths,
         status_code=200 if expected_error is None else 400,
@@ -1228,7 +1228,7 @@ def test_config_update(sandbox_tenant, ob_configuration):
     assert ob_config["status"] == new_status
 
     # Verify the update
-    body = get(f"org/onboarding_configs?page_size=100", None, *sandbox_tenant.db_auths)
+    body = get(f"org/playbooks?page_size=100", None, *sandbox_tenant.db_auths)
     configs = body["data"]
     ob_config = next(i for i in configs if i["id"] == ob_configuration.id)
     assert ob_config["name"] == new_name
@@ -1253,7 +1253,7 @@ def test_business_only_obc(sandbox_tenant):
         verification_checks=[{"kind": "kyb", "data": {"ein_only": False}}],
     )
     res = post(
-        "org/onboarding_configs",
+        "org/playbooks",
         data,
         *sandbox_tenant.db_auths,
         status_code=200,
@@ -1265,7 +1265,7 @@ def test_business_only_obc(sandbox_tenant):
 def test_default_rules(sandbox_tenant):
     collect_data = ["name", "full_address", "phone_number", "email", "ssn9"]
     obc = post(
-        "org/onboarding_configs",
+        "org/playbooks",
         dict(
             name="test_default_rules",
             must_collect_data=collect_data,
@@ -1447,7 +1447,7 @@ def test_playbook_versions(sandbox_tenant, tenant):
         "skip_kyc": False,
     }
     obc_v1_resp = post(
-        "org/onboarding_configs",
+        "org/playbooks",
         obc_v1_req,
         *sandbox_tenant.db_auths,
     )

@@ -9,7 +9,7 @@ def latest_audit_event_for(fp_id, tenant):
 
 def list_audit_events_with_details(tenant, name, **kwargs):
     data = dict(names=[name])
-    audit_events = get("org/audit_events", data, *tenant.db_auths)
+    audit_events = get("org/audit_events?page_size=100", data, *tenant.db_auths)
     for event in audit_events["data"]:
         matches = True
         for key, value in kwargs.items():

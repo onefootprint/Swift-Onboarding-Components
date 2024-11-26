@@ -9,19 +9,12 @@ use api_core::State;
 use api_wire_types::OnboardingConfigFilters;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::ob_configuration::ObConfigurationQuery;
-use macros::route_alias;
 use newtypes::PlaybookId;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
 use paperclip::actix::web;
 use paperclip::actix::web::Json;
 
-// TODO: migrate clients to /org/playbooks
-#[route_alias(get(
-    "/org/onboarding_configs",
-    tags(Playbooks, Organization, Private),
-    description = "Returns a list of playbooks owned by the tenant."
-))]
 #[api_v2_operation(
     tags(Playbooks, Organization, Private),
     description = "Returns a list of playbooks owned by the tenant."
