@@ -5921,122 +5921,6 @@
                 ]
             }
         },
-        "/org/onboarding_configs": {
-            "get": {
-                "tags": [
-                    "Playbooks",
-                    "Organization",
-                    "Private"
-                ],
-                "description": "Returns a list of playbooks owned by the tenant.",
-                "parameters": [
-                    {
-                        "in": "query",
-                        "name": "kinds",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "form"
-                    },
-                    {
-                        "in": "query",
-                        "name": "search",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "form"
-                    },
-                    {
-                        "in": "query",
-                        "name": "status",
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "disabled",
-                                "enabled"
-                            ]
-                        },
-                        "style": "form"
-                    },
-                    {
-                        "in": "query",
-                        "name": "page",
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64"
-                        },
-                        "style": "form"
-                    },
-                    {
-                        "in": "query",
-                        "name": "page_size",
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64"
-                        },
-                        "style": "form"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/OffsetPaginatedOnboardingConfiguration"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Dashboard Token": []
-                    },
-                    {
-                        "Firm Employee Assume Token": []
-                    }
-                ]
-            },
-            "post": {
-                "tags": [
-                    "Playbooks",
-                    "Organization",
-                    "Private"
-                ],
-                "description": "Creates a new playbook.",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/CreateOnboardingConfigurationRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/OnboardingConfiguration"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Dashboard Token": []
-                    },
-                    {
-                        "Firm Employee Assume Token": []
-                    }
-                ]
-            }
-        },
         "/org/onboarding_configs/{id}": {
             "get": {
                 "tags": [
@@ -9524,12 +9408,12 @@
                     "data": {
                         "type": "object",
                         "properties": {
-                            "ob_configuration_id": {
-                                "type": "string"
+                            "playbook": {
+                                "$ref": "#/components/schemas/AuditEventPlaybook"
                             }
                         },
                         "required": [
-                            "ob_configuration_id"
+                            "playbook"
                         ]
                     },
                     "kind": {
@@ -9804,12 +9688,12 @@
                     "data": {
                         "type": "object",
                         "properties": {
-                            "ob_configuration_id": {
-                                "type": "string"
+                            "playbook": {
+                                "$ref": "#/components/schemas/AuditEventPlaybook"
                             }
                         },
                         "required": [
-                            "ob_configuration_id"
+                            "playbook"
                         ]
                     },
                     "kind": {
@@ -10261,6 +10145,21 @@
                 "required": [
                     "email",
                     "id"
+                ]
+            },
+            "AuditEventPlaybook": {
+                "type": "object",
+                "properties": {
+                    "ob_configuration_id": {
+                        "type": "string"
+                    },
+                    "playbook_id": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "ob_configuration_id",
+                    "playbook_id"
                 ]
             },
             "AuthEvent": {

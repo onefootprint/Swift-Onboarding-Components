@@ -55,6 +55,7 @@ import type {
   AuditEventDetailUpdateUserData,
   AuditEventName,
   AuditEventOrgMember,
+  AuditEventPlaybook,
   AuthEvent,
   AuthEventKind,
   AuthMethodKind,
@@ -1093,7 +1094,10 @@ export const getAuditEventDetailCreatePlaybook = (
   deepmerge<AuditEventDetailCreatePlaybook>(
     {
       data: {
-        obConfigurationId: '3ecfc294-f88c-4cc1-ad64-9d06724f607f',
+        playbook: {
+          obConfigurationId: '4f4f8217-338f-43f6-9ac1-639eddc2cba8',
+          playbookId: '285cb331-d637-4884-ae9c-dae8bc57a977',
+        },
       },
       kind: 'create_playbook',
     },
@@ -1286,7 +1290,10 @@ export const getAuditEventDetailEditPlaybook = (
   deepmerge<AuditEventDetailEditPlaybook>(
     {
       data: {
-        obConfigurationId: 'fa7d1a85-7b91-4add-8562-0595aab3d270',
+        playbook: {
+          obConfigurationId: '4f2850a2-be36-4175-a8a6-b1bb5a6496cf',
+          playbookId: 'c99c9bdf-514c-42cc-aef6-794e15f76098',
+        },
       },
       kind: 'edit_playbook',
     },
@@ -1689,6 +1696,19 @@ export const getAuditEventOrgMember = (
       firstName: 'Esteban',
       id: '1279605f-4d2b-4a82-8583-686ee9db76a0',
       lastName: 'Rau',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getAuditEventPlaybook = (
+  props: Partial<AuditEventPlaybook>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEventPlaybook =>
+  deepmerge<AuditEventPlaybook>(
+    {
+      obConfigurationId: '02623709-9d9b-40a4-933d-e881ff5f03a3',
+      playbookId: '36a5f1f5-b3df-4102-9da7-369f967fd5a6',
     },
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },

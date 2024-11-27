@@ -78,7 +78,6 @@ import type {
   GetOrgMetricsData,
   GetOrgOnboardingConfigsByIdData,
   GetOrgOnboardingConfigsByObcIdRulesData,
-  GetOrgOnboardingConfigsData,
   GetOrgPlaybooksByPlaybookIdVersionsData,
   GetOrgPlaybooksData,
   GetOrgProxyConfigsByProxyConfigIdData,
@@ -263,9 +262,6 @@ import type {
   PostOrgOnboardingConfigsByObcIdRulesEvaluateData,
   PostOrgOnboardingConfigsByObcIdRulesEvaluateError,
   PostOrgOnboardingConfigsByObcIdRulesEvaluateResponse,
-  PostOrgOnboardingConfigsData,
-  PostOrgOnboardingConfigsError,
-  PostOrgOnboardingConfigsResponse,
   PostOrgPartnersByPartnershipIdDocumentsByDocumentIdAssignmentsData,
   PostOrgPartnersByPartnershipIdDocumentsByDocumentIdAssignmentsError,
   PostOrgPartnersByPartnershipIdDocumentsByDocumentIdAssignmentsResponse,
@@ -426,7 +422,6 @@ import {
   getOrgMemberInProgressOnboardings,
   getOrgMembers,
   getOrgMetrics,
-  getOrgOnboardingConfigs,
   getOrgOnboardingConfigsById,
   getOrgOnboardingConfigsByObcIdRules,
   getOrgPlaybooks,
@@ -504,7 +499,6 @@ import {
   postOrgListsByListIdEntries,
   postOrgMembers,
   postOrgMembersByTenantUserIdDeactivate,
-  postOrgOnboardingConfigs,
   postOrgOnboardingConfigsByIdCopy,
   postOrgOnboardingConfigsByObcIdRulesEvaluate,
   postOrgPartnersByPartnershipIdDocumentsByDocumentIdAssignments,
@@ -3167,62 +3161,6 @@ export const getOrgMetricsOptions = (options?: Options<GetOrgMetricsData>) => {
     },
     queryKey: getOrgMetricsQueryKey(options),
   });
-};
-
-export const getOrgOnboardingConfigsQueryKey = (options?: Options<GetOrgOnboardingConfigsData>) => [
-  createQueryKey('getOrgOnboardingConfigs', options),
-];
-
-export const getOrgOnboardingConfigsOptions = (options?: Options<GetOrgOnboardingConfigsData>) => {
-  return queryOptions({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getOrgOnboardingConfigs({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getOrgOnboardingConfigsQueryKey(options),
-  });
-};
-
-export const postOrgOnboardingConfigsQueryKey = (options: Options<PostOrgOnboardingConfigsData>) => [
-  createQueryKey('postOrgOnboardingConfigs', options),
-];
-
-export const postOrgOnboardingConfigsOptions = (options: Options<PostOrgOnboardingConfigsData>) => {
-  return queryOptions({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await postOrgOnboardingConfigs({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: postOrgOnboardingConfigsQueryKey(options),
-  });
-};
-
-export const postOrgOnboardingConfigsMutation = (options?: Partial<Options<PostOrgOnboardingConfigsData>>) => {
-  const mutationOptions: UseMutationOptions<
-    PostOrgOnboardingConfigsResponse,
-    AxiosError<PostOrgOnboardingConfigsError>,
-    Options<PostOrgOnboardingConfigsData>
-  > = {
-    mutationFn: async localOptions => {
-      const { data } = await postOrgOnboardingConfigs({
-        ...options,
-        ...localOptions,
-        throwOnError: true,
-      });
-      return data;
-    },
-  };
-  return mutationOptions;
 };
 
 export const getOrgOnboardingConfigsByIdQueryKey = (options: Options<GetOrgOnboardingConfigsByIdData>) => [

@@ -200,7 +200,7 @@ export type AuditEventDetailCreateOrgRole = {
 export type kind13 = 'create_org_role';
 export type AuditEventDetailCreatePlaybook = {
   data: {
-    obConfigurationId: string;
+    playbook: AuditEventPlaybook;
   };
   kind: 'create_playbook';
 };
@@ -272,7 +272,7 @@ export type AuditEventDetailDisablePlaybook = {
 export type kind23 = 'disable_playbook';
 export type AuditEventDetailEditPlaybook = {
   data: {
-    obConfigurationId: string;
+    playbook: AuditEventPlaybook;
   };
   kind: 'edit_playbook';
 };
@@ -418,6 +418,10 @@ export type AuditEventOrgMember = {
   firstName?: string;
   id: string;
   lastName?: string;
+};
+export type AuditEventPlaybook = {
+  obConfigurationId: string;
+  playbookId: string;
 };
 export type AuthEvent = {
   createdAt: string;
@@ -9151,34 +9155,6 @@ export type GetOrgMetricsData = {
 };
 export type GetOrgMetricsResponse = OrgMetricsResponse;
 export type GetOrgMetricsError = unknown;
-export type GetOrgOnboardingConfigsData = {
-  headers?: {
-    /**
-     * Short-lived token for an authenticated dashboard user.
-     */
-    'X-Fp-Dashboard-Authorization'?: string;
-  };
-  query?: {
-    kinds?: string;
-    page?: number;
-    pageSize?: number;
-    search?: string;
-    status?: 'disabled' | 'enabled';
-  };
-};
-export type GetOrgOnboardingConfigsResponse = OffsetPaginatedOnboardingConfiguration;
-export type GetOrgOnboardingConfigsError = unknown;
-export type PostOrgOnboardingConfigsData = {
-  body: CreateOnboardingConfigurationRequest;
-  headers?: {
-    /**
-     * Short-lived token for an authenticated dashboard user.
-     */
-    'X-Fp-Dashboard-Authorization'?: string;
-  };
-};
-export type PostOrgOnboardingConfigsResponse = OnboardingConfiguration;
-export type PostOrgOnboardingConfigsError = unknown;
 export type GetOrgOnboardingConfigsByIdData = {
   headers?: {
     /**
@@ -11010,26 +10986,6 @@ export type $OpenApiTs = {
          * OK
          */
         '200': OrgMetricsResponse;
-      };
-    };
-  };
-  '/org/onboarding_configs': {
-    get: {
-      req: GetOrgOnboardingConfigsData;
-      res: {
-        /**
-         * OK
-         */
-        '200': OffsetPaginatedOnboardingConfiguration;
-      };
-    };
-    post: {
-      req: PostOrgOnboardingConfigsData;
-      res: {
-        /**
-         * OK
-         */
-        '200': OnboardingConfiguration;
       };
     };
   };

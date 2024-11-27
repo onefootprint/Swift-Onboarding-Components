@@ -170,9 +170,6 @@ import type {
   GetOrgOnboardingConfigsByObcIdRulesData,
   GetOrgOnboardingConfigsByObcIdRulesError,
   GetOrgOnboardingConfigsByObcIdRulesResponse,
-  GetOrgOnboardingConfigsData,
-  GetOrgOnboardingConfigsError,
-  GetOrgOnboardingConfigsResponse,
   GetOrgPlaybooksByPlaybookIdVersionsData,
   GetOrgPlaybooksByPlaybookIdVersionsError,
   GetOrgPlaybooksByPlaybookIdVersionsResponse,
@@ -395,9 +392,6 @@ import type {
   PostOrgOnboardingConfigsByObcIdRulesEvaluateData,
   PostOrgOnboardingConfigsByObcIdRulesEvaluateError,
   PostOrgOnboardingConfigsByObcIdRulesEvaluateResponse,
-  PostOrgOnboardingConfigsData,
-  PostOrgOnboardingConfigsError,
-  PostOrgOnboardingConfigsResponse,
   PostOrgPartnersByPartnershipIdDocumentsByDocumentIdAssignmentsData,
   PostOrgPartnersByPartnershipIdDocumentsByDocumentIdAssignmentsError,
   PostOrgPartnersByPartnershipIdDocumentsByDocumentIdAssignmentsResponse,
@@ -1912,34 +1906,6 @@ export const getOrgMetrics = <ThrowOnError extends boolean = false>(
   return (options?.client ?? client).get<GetOrgMetricsResponse, GetOrgMetricsError, ThrowOnError>({
     ...options,
     url: '/org/metrics',
-  });
-};
-
-/**
- * Returns a list of playbooks owned by the tenant.
- */
-export const getOrgOnboardingConfigs = <ThrowOnError extends boolean = false>(
-  options?: Options<GetOrgOnboardingConfigsData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).get<GetOrgOnboardingConfigsResponse, GetOrgOnboardingConfigsError, ThrowOnError>({
-    ...options,
-    url: '/org/onboarding_configs',
-  });
-};
-
-/**
- * Creates a new playbook.
- */
-export const postOrgOnboardingConfigs = <ThrowOnError extends boolean = false>(
-  options: Options<PostOrgOnboardingConfigsData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).post<
-    PostOrgOnboardingConfigsResponse,
-    PostOrgOnboardingConfigsError,
-    ThrowOnError
-  >({
-    ...options,
-    url: '/org/onboarding_configs',
   });
 };
 
