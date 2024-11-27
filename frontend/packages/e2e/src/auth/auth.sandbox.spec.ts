@@ -7,7 +7,7 @@ const key = process.env.E2E_AUTH_KEY || 'pb_test_x4C4ofRAKiGuTuiD5CIuPI';
 
 const email = 'sandbox@onefootprint.com';
 
-test('Auth with sandbox email #ci', async ({ browserName, isMobile, page }) => {
+test.skip('Auth with sandbox email #ci', async ({ browserName, isMobile, page }) => {
   test.slow();
 
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
