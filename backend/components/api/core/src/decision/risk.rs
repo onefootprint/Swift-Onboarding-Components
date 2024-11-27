@@ -2,7 +2,6 @@ use super::onboarding::RulesOutcome;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use api_wire_types::RuleResultRuleAction;
-use db::models::business_workflow_link::BusinessWorkflowLink;
 use db::models::data_lifetime::DataLifetime;
 use db::models::document::Document;
 use db::models::manual_review::ManualReviewAction;
@@ -14,12 +13,10 @@ use db::models::onboarding_decision::OnboardingDecision;
 use db::models::playbook::Playbook;
 use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
-use db::models::user_timeline::UserTimeline;
 use db::models::workflow::Workflow;
 use db::TxnPgConn;
 use itertools::chain;
 use itertools::Itertools;
-use newtypes::BusinessOwnerCompletedKycInfo;
 use newtypes::DbActor;
 use newtypes::DecisionStatus;
 use newtypes::DocumentRequestConfig;
@@ -121,18 +118,6 @@ pub fn save_final_decision(
     let (wf, wf_delta, sv_delta) = Workflow::update_status_if_valid(wf, conn, obd.status.into())?;
     wf.maybe_fire_completed_webhook(conn, wf_delta, mr_deltas)?;
     wf.maybe_fire_status_changed_webhook(conn, sv_delta, mr_deltas)?;
-
-    // Handle situation where this workflow is a business owner completing a workflow
-    let bo_info = BusinessWorkflowLink::get_business_workflow_for_user_workflow(conn, &wf.id)?;
-    if let Some((bo, biz_wf)) = bo_info {
-        // Event is for _this_ user completing KYC
-        let event = BusinessOwnerCompletedKycInfo {
-            fp_id: sv.fp_id,
-            onboarding_decision_id: obd.id.clone(),
-        };
-        // Note: we associate this event with the corresponding _business_!
-        UserTimeline::create(conn, event, bo.business_vault_id, biz_wf.scoped_vault_id)?;
-    }
 
     log_canonical_line(&playbook, &obc, rules_outcome, &obd, &tenant);
 

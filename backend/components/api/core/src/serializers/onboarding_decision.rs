@@ -11,7 +11,7 @@ use newtypes::WorkflowFixtureResult;
 
 impl DbToApi<SaturatedOnboardingDecisionInfo> for api_wire_types::TimelineOnboardingDecision {
     fn from_db(
-        (decision, wf, obc, saturated_db_actor, cleared_mrs): SaturatedOnboardingDecisionInfo,
+        (decision, wf, _, obc, saturated_db_actor, cleared_mrs): SaturatedOnboardingDecisionInfo,
     ) -> Self {
         let OnboardingDecision {
             id,

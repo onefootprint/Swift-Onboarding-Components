@@ -17,7 +17,6 @@ use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
 use newtypes::DbActor;
 use newtypes::EntityAction;
-use newtypes::VaultKind;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::post;
 use paperclip::actix::web;
@@ -55,9 +54,6 @@ pub async fn post(
                 .map(|a| -> FpResult<EntityActionPostCommit> {
                     let action = match a {
                         EntityAction::Trigger(t) => {
-                            if sv.kind != VaultKind::Person {
-                                return BadRequestInto("Must be a person vault");
-                            }
                             apply_trigger_request(conn, t, &sv, actor.clone(), &session_key)?.into()
                         }
                         EntityAction::ClearReview => clear_review(conn, &sv, actor.clone())?,

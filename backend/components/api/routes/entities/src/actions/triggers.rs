@@ -104,6 +104,10 @@ pub(super) fn apply_trigger_request(
         fp_bid,
     } = request;
 
+    if su.kind != VaultKind::Person {
+        return BadRequestInto("Must be a person vault");
+    }
+
     let sb = fp_bid
         .as_ref()
         .map(|fp_bid| {

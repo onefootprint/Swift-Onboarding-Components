@@ -183,8 +183,8 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                 let OnboardingTimelineInfo { event, session_id } = e;
                 Self::OnboardingTimeline(api_wire_types::OnboardingTimelineInfo { event, session_id })
             }
-            SaturatedTimelineEvent::BusinessOwnerCompletedKyc(e) => {
-                let (fp_id, obd_info) = e;
+            SaturatedTimelineEvent::BusinessOwnerCompletedKyc(obd_info) => {
+                let fp_id = obd_info.2.fp_id.clone();
                 let decision = api_wire_types::TimelineOnboardingDecision::from_db(obd_info);
                 Self::BusinessOwnerCompletedKyc { fp_id, decision }
             }

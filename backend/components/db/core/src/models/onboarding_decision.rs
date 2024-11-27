@@ -1,8 +1,10 @@
+use super::business_workflow_link::BusinessWorkflowLink;
 use super::manual_review::ManualReview;
 use super::manual_review::ManualReviewArgs;
 use super::manual_review::ManualReviewDelta;
 use super::ob_configuration::ObConfiguration;
 use super::playbook::Playbook;
+use super::scoped_vault::ScopedVault;
 use super::user_timeline::UserTimeline;
 use crate::actor;
 use crate::actor::SaturatedActor;
@@ -18,6 +20,7 @@ use db_schema::schema::manual_review;
 use db_schema::schema::ob_configuration;
 use db_schema::schema::onboarding_decision;
 use db_schema::schema::playbook;
+use db_schema::schema::scoped_vault;
 use db_schema::schema::workflow;
 use diesel::dsl::not;
 use diesel::prelude::*;
@@ -25,6 +28,7 @@ use diesel::Insertable;
 use diesel::Queryable;
 use itertools::Itertools;
 use newtypes::AnnotationId;
+use newtypes::BusinessOwnerCompletedKycInfo;
 use newtypes::DataLifetimeSeqno;
 use newtypes::DbActor;
 use newtypes::DecisionStatus;
@@ -91,6 +95,7 @@ pub struct NewDecisionArgs {
 pub type SaturatedOnboardingDecisionInfo = (
     OnboardingDecision,
     Workflow,
+    ScopedVault,
     ObConfiguration,
     SaturatedActor,
     Vec<ManualReview>,
@@ -143,6 +148,19 @@ impl OnboardingDecision {
         };
         UserTimeline::create(conn, decision_info, vault_id, wf.scoped_vault_id.clone())?;
 
+        // If the Workflow that is getting a new decision is associated with a business, make a timeline
+        // event for the business
+        // Handle situation where this workflow is a business owner completing a workflow
+        let bo_info = BusinessWorkflowLink::get_business_workflow_for_user_workflow(conn, &wf.id)?;
+        if let Some((bo, biz_wf)) = bo_info {
+            // Event is for _this_ user completing KYC
+            let event = BusinessOwnerCompletedKycInfo {
+                onboarding_decision_id: result.id.clone(),
+            };
+            // Note: we associate this event with the corresponding _business_!
+            UserTimeline::create(conn, event, bo.business_vault_id, biz_wf.scoped_vault_id)?;
+        }
+
         let mr_deltas = ManualReview::apply_actions(conn, wf, &result, manual_reviews)?;
 
         Ok((result, mr_deltas))
@@ -155,8 +173,12 @@ impl OnboardingDecision {
     ) -> FpResult<HashMap<OnboardingDecisionId, SaturatedOnboardingDecisionInfo>> {
         use db_schema::schema::ob_configuration;
         use db_schema::schema::workflow;
-        let results: Vec<(Self, (Workflow, ObConfiguration))> = onboarding_decision::table
-            .inner_join(workflow::table.inner_join(ob_configuration::table))
+        let results: Vec<(Self, (Workflow, ObConfiguration, ScopedVault))> = onboarding_decision::table
+            .inner_join(
+                workflow::table
+                    .inner_join(ob_configuration::table)
+                    .inner_join(scoped_vault::table),
+            )
             .filter(onboarding_decision::id.eq_any(ids.clone()))
             .get_results(conn)?;
 
@@ -175,9 +197,9 @@ impl OnboardingDecision {
         let result_map = results
             .into_iter()
             .zip(onboarding_decisions_with_actors.into_iter())
-            .map(|((obd, (wf, obc)), (_, actor))| {
+            .map(|((obd, (wf, obc, sv)), (_, actor))| {
                 let cleared_mrs = manual_reviews.get(&obd.id).cloned().unwrap_or_default();
-                (obd, wf, obc, actor, cleared_mrs)
+                (obd, wf, sv, obc, actor, cleared_mrs)
             })
             .map(|d| (d.0.id.clone(), d))
             .collect();

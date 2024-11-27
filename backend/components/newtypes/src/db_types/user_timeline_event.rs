@@ -8,7 +8,6 @@ use crate::DataIdentifier;
 use crate::DbActor;
 use crate::DocumentId;
 use crate::DocumentRequestId;
-use crate::FpId;
 use crate::LabelId;
 use crate::LivenessEventId;
 use crate::ObConfigurationId;
@@ -175,6 +174,5 @@ pub struct OnboardingTimelineInfo {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BusinessOwnerCompletedKycInfo {
-    pub fp_id: FpId,
     pub onboarding_decision_id: OnboardingDecisionId,
 }

@@ -140,6 +140,67 @@ def test_get_business_owners(sandbox_tenant, kyb_sandbox_ob_config):
     assert body[1]["bo_status"] == "pass"
 
 
+def test_bo_timeline_events(sandbox_tenant, kyb_sandbox_ob_config):
+    # First, fail the user when onboarding onto this playbook
+    bifrost = BifrostClient.new_user(
+        kyb_sandbox_ob_config,
+        fixture_result="fail",
+        kyb_fixture_result="use_rules_outcome",
+    )
+    bifrost.data.update(BUSINESS_SECONDARY_BOS)
+    primary_bo = bifrost.run()
+    fp_bid = primary_bo.fp_bid
+
+    secondary_bo_token = extract_bo_token(primary_bo)
+
+    # Should have made an event on the business's timeline for the primary BO's onboarding
+    body = get(f"entities/{fp_bid}/timeline", None, *sandbox_tenant.db_auths)
+    event = next(
+        i["event"] for i in body if i["event"]["kind"] == "business_owner_completed_kyc"
+    )
+    assert event["data"]["fp_id"] == primary_bo.fp_id
+    assert event["data"]["decision"]["status"] == "fail"
+    assert event["data"]["decision"]["source"]["kind"] == "footprint"
+
+    # Make sure we can't see this event on the user timeline
+    body = get(f"entities/{primary_bo.fp_id}/timeline", None, *sandbox_tenant.db_auths)
+    assert not any(i["event"]["kind"] == "business_owner_completed_kyc" for i in body)
+
+    # Onboard the secondary BO
+    bifrost = BifrostClient.new_user(
+        kyb_sandbox_ob_config,
+        override_ob_config_auth=secondary_bo_token,
+        fixture_result="pass",
+    )
+    secondary_bo = bifrost.run()
+    assert secondary_bo.client.validate_response["user"]["status"] == "pass"
+    assert secondary_bo.client.validate_response["business"]["status"] == "fail"
+
+    # This should make another event
+    body = get(f"entities/{fp_bid}/timeline", None, *sandbox_tenant.db_auths)
+    event = next(
+        i["event"] for i in body if i["event"]["kind"] == "business_owner_completed_kyc"
+    )
+    assert event["data"]["fp_id"] == secondary_bo.fp_id
+    assert event["data"]["decision"]["status"] == "pass"
+
+    # Manually review the primary BO
+    action = dict(
+        kind="manual_decision", status="pass", annotation=dict(note="", is_pinned=False)
+    )
+    data = dict(actions=[action])
+    post(f"entities/{primary_bo.fp_id}/actions", data, *sandbox_tenant.db_auths)
+
+    # This should make another event
+    body = get(f"entities/{fp_bid}/timeline", None, *sandbox_tenant.db_auths)
+    event = next(
+        i["event"] for i in body if i["event"]["kind"] == "business_owner_completed_kyc"
+    )
+    assert event["data"]["fp_id"] == primary_bo.fp_id
+    assert event["data"]["decision"]["status"] == "pass"
+    assert event["data"]["decision"]["source"]["kind"] == "organization"
+
+
 def test_get_businesses(sandbox_tenant, primary_bo):
     """Test the user -> owned businesses lookup"""
     body = get(

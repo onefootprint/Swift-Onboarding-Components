@@ -135,6 +135,7 @@ impl BusinessWorkflowLink {
             .inner_join(workflow::table.on(workflow::id.eq(business_workflow_link::business_workflow_id)))
             .filter(business_workflow_link::user_workflow_id.eq(wf_id))
             .select((business_owner::all_columns, workflow::all_columns))
+            .order_by(workflow::created_at.desc())
             .first::<(BusinessOwner, Workflow)>(conn)
             .optional()?;
         Ok(result)

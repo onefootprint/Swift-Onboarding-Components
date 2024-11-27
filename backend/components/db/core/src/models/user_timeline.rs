@@ -34,7 +34,6 @@ use newtypes::DataLifetimeSeqno;
 use newtypes::DbUserTimelineEvent;
 use newtypes::DbUserTimelineEventKind;
 use newtypes::ExternalIntegrationInfo;
-use newtypes::FpId;
 use newtypes::ObConfigurationId;
 use newtypes::OnboardingTimelineInfo;
 use newtypes::ScopedVaultId;
@@ -103,7 +102,7 @@ pub enum SaturatedTimelineEvent {
     ExternalIntegrationCalled(ExternalIntegrationInfo),
     StepUp(Vec<DocumentRequest>),
     OnboardingTimeline(OnboardingTimelineInfo),
-    BusinessOwnerCompletedKyc((FpId, SaturatedOnboardingDecisionInfo)),
+    BusinessOwnerCompletedKyc(SaturatedOnboardingDecisionInfo),
 }
 
 pub type IsFromOtherTenant = bool;
@@ -366,7 +365,7 @@ impl UserTimeline {
                             .ok_or(DbError::RelatedObjectNotFound)?
                             .clone();
 
-                        SaturatedTimelineEvent::BusinessOwnerCompletedKyc((e.fp_id.clone(), obd))
+                        SaturatedTimelineEvent::BusinessOwnerCompletedKyc(obd)
                     }
                 };
                 Ok(UserTimelineInfo(ut, saturated_event))
