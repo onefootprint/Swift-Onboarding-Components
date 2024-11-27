@@ -6,6 +6,7 @@ import CreateOrgRole from './components/create-org-role';
 import CreatePlaybook from './components/create-playbook';
 import DeactivateOrgRole from './components/deactivate-org-role';
 import DecryptOrgApiKey from './components/decrypt-org-api-key';
+import EditPlaybook from './components/edit-playbook';
 import InviteOrgMember from './components/invite-org-member';
 import PrincipalActor from './components/principal-actor';
 import RemoveOrgMember from './components/remove-org-member';
@@ -59,6 +60,7 @@ const Event = ({ auditEvent }: { auditEvent: AuditEvent }) => {
       {kind === 'create_playbook' && (
         <CreatePlaybook detail={detail as AuditEventDetail} hasPrincipalActor={hasPrincipalActor} />
       )}
+      {kind === 'edit_playbook' && <EditPlaybook detail={detail as AuditEventDetail} hasPrincipalActor />}
     </Stack>
   );
 };

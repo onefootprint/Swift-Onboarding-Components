@@ -109,6 +109,7 @@
     },
     "playbooks": {
       "created-a-new": "created a new",
+      "edited-a": "edited a",
       "playbook": "playbook"
     },
     "remove": {

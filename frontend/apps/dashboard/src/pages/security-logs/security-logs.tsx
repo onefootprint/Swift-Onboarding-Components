@@ -38,6 +38,7 @@ const SecurityLogs = () => {
     'update_user_data',
     'delete_user_data',
     'create_playbook',
+    'edit_playbook',
   ];
 
   const isFirmEmployee = session?.user?.isFirmEmployee;
