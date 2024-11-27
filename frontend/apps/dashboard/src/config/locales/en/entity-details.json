@@ -898,6 +898,11 @@
       "free-form-note-event": {
         "note-added-by": "Note added by"
       },
+      "bo-completed-kyc": {
+        "header": "<beneficialOwner /> finished onboarding{{ outcome }}",
+        "manual-review-header": "<beneficialOwner /> was manually reviewed and marked as {{decision}} by <actor />",
+        "beneficial-owner": "A beneficial owner"
+      },
       "liveness-event": {
         "success-title": "Liveness check succeeded",
         "skipped-title": "Liveness check skipped",

@@ -17,6 +17,7 @@ import type {
 import { EntityKind, TimelineEventKind } from '@onefootprint/types';
 import type {
   AuthMethodUpdatedData,
+  BoCompletedKycEventData,
   LabelAddedEventData,
   WorkflowStartedEventData,
 } from '@onefootprint/types/src/data/timeline';
@@ -25,12 +26,14 @@ import { useTranslation } from 'react-i18next';
 import type { TimelineItem } from 'src/components/timeline';
 import Timeline from 'src/components/timeline';
 
+import useSession from 'src/hooks/use-session';
 import type { AuditTrailTimelineEvent } from 'src/utils/merge-audit-trail-timeline-events';
 import { AbandonedEventHeader } from './components/abandoned-event';
 import Actor from './components/actor';
 import AnnotationNote from './components/annotation-note';
 import AuthMethodUpdatedEventHeader from './components/auth-method-updated-event';
 import AwaitingBosEvent from './components/awaiting-bos-event';
+import { BoCompletedKycHeader } from './components/bo-completed-kyc';
 import DataCollectedEventHeader from './components/data-collected-event';
 import DocumentUploadedEventHeader from './components/document-uploaded-event';
 import {
@@ -52,6 +55,9 @@ export type AuditTrailTimelineProps = {
 
 const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
   const { t } = useTranslation('entity-details', { keyPrefix: 'audit-trail' });
+  const {
+    data: { user },
+  } = useSession();
 
   const items: TimelineItem[] = [];
   timeline.forEach(event => {
@@ -178,6 +184,14 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
         headerComponent: <StepUpEventHeader data={eventData} />,
         bodyComponent: <StepUpEventBody data={eventData} />,
       });
+    } else if (kind === TimelineEventKind.businessOwnerCompletedKyc && user?.isFirmEmployee) {
+      const eventData = data as BoCompletedKycEventData;
+      if (eventData.decision.workflowKind !== 'document') {
+        items.push({
+          time,
+          headerComponent: <BoCompletedKycHeader data={eventData} />,
+        });
+      }
     }
   });
 

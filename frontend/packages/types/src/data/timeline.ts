@@ -31,6 +31,7 @@ export enum TimelineEventKind {
   authMethodUpdated = 'auth_method_updated',
   externalIntegrationCalled = 'external_integration_called',
   stepUp = 'step_up',
+  businessOwnerCompletedKyc = 'business_owner_completed_kyc',
 }
 
 export type AbandonedEvent = {
@@ -256,6 +257,16 @@ export enum StepUpDocumentKind {
   proofOfAddress = 'proof_of_address',
 }
 
+export type BoCompletedKycEvent = {
+  kind: TimelineEventKind.businessOwnerCompletedKyc;
+  data: BoCompletedKycEventData;
+};
+
+export type BoCompletedKycEventData = {
+  fpId: string;
+  decision: OnboardingDecision;
+};
+
 export type TimelineEvent = {
   event:
     | AbandonedEvent
@@ -273,7 +284,8 @@ export type TimelineEvent = {
     | WorkflowStartedEvent
     | AuthMethodUpdatedEvent
     | ExternalIntegrationCalledEvent
-    | StepUpEvent;
+    | StepUpEvent
+    | BoCompletedKycEvent;
   timestamp: string;
   seqno: number;
 };
