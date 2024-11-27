@@ -1,7 +1,6 @@
 use crate::utils::headers::InsightHeaders;
 use crate::utils::headers::TelemetryHeaders;
 use actix_web::FromRequest;
-use actix_web::HttpMessage;
 use anyhow::Result;
 use api_errors::ResponseErrorContext;
 use db::models::scoped_vault::ScopedVault;
@@ -85,7 +84,7 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
         let (name, err_ctx) = match outcome {
             Ok(r) => {
                 let req = r.request();
-                let err_ctx = req.extensions().get::<ResponseErrorContext>().cloned();
+                let err_ctx = r.response().extensions().get::<ResponseErrorContext>().cloned();
                 let name = format!(
                     "{} {}",
                     req.method().as_str(),
