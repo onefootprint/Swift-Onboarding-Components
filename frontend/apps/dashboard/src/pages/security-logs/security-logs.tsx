@@ -37,6 +37,7 @@ const SecurityLogs = () => {
     // 'update_org_api_key_role',
     'update_user_data',
     'delete_user_data',
+    'create_playbook',
   ];
 
   const isFirmEmployee = session?.user?.isFirmEmployee;

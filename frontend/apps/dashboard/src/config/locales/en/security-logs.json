@@ -107,6 +107,10 @@
       "from": "from",
       "an-api-key": "an API key"
     },
+    "playbooks": {
+      "created-a-new": "created a new",
+      "playbook": "playbook"
+    },
     "remove": {
       "removed": "removed",
       "a-member": "a member",
