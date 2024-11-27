@@ -1,5 +1,8 @@
 import pytest
 import re
+from tests.bifrost.test_triggers import send_trigger
+from tests.identify_client import IdentifyClient
+from tests.bifrost.test_multi_kyc_kyb import extract_bo_token
 from tests.dashboard.utils import latest_audit_event_for
 from tests.bifrost_client import BifrostClient
 from tests.utils import get, post, patch
@@ -52,16 +55,89 @@ def test_get_entities(sandbox_tenant, primary_bo, populated_business_data):
     assert biz_name["value"] == primary_bo.client.data["business.name"]
 
 
-def test_get_business_owners(sandbox_tenant, primary_bo):
+def test_get_business_owners(sandbox_tenant, kyb_sandbox_ob_config):
     """Test the business -> users (owners) lookup"""
+    bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
+    bifrost.data.update(BUSINESS_SECONDARY_BOS)
+    primary_bo = bifrost.run()
+    fp_bid = primary_bo.fp_bid
+
+    # Before secondary BO completes, we see awaiting_kyc
     body = get(
         f"entities/{primary_bo.fp_bid}/business_owners", None, *sandbox_tenant.db_auths
     )
-    assert len(body) == 1
+    assert len(body) == 2
     assert body[0]["fp_id"] == primary_bo.fp_id
     assert body[0]["ownership_stake"] == 50
-    assert body[0]["status"] == "pass"
+    assert body[0]["bo_status"] == "pass"
     assert body[0]["kind"] == "primary"
+    assert not body[1]["fp_id"]
+    assert body[1]["bo_status"] == "awaiting_kyc"
+    assert body[1]["kind"] == "secondary"
+
+    # After the secondary BO starts onboarding, we see incomplete
+    secondary_bo_token = extract_bo_token(primary_bo)
+    bifrost = BifrostClient.new_user(
+        kyb_sandbox_ob_config,
+        override_ob_config_auth=secondary_bo_token,
+        fixture_result="fail",
+    )
+
+    body = get(f"entities/{fp_bid}/business_owners", None, *sandbox_tenant.db_auths)
+    assert body[1]["fp_id"]
+    assert body[1]["bo_status"] == "incomplete"
+
+    # After they finish onobarding, their status is failed
+    secondary_bo = bifrost.run()
+    body = get(f"entities/{fp_bid}/business_owners", None, *sandbox_tenant.db_auths)
+    assert body[1]["fp_id"] == secondary_bo.fp_id
+    assert body[1]["bo_status"] == "fail"
+
+    # Should be able to manually review BO and see status propagate.
+    action = dict(
+        kind="manual_decision", status="pass", annotation=dict(note="", is_pinned=False)
+    )
+    data = dict(actions=[action])
+    post(f"entities/{secondary_bo.fp_id}/actions", data, *sandbox_tenant.db_auths)
+
+    secondary_bo = bifrost.run()
+    body = get(f"entities/{fp_bid}/business_owners", None, *sandbox_tenant.db_auths)
+    assert body[1]["bo_status"] == "pass"
+
+    # But BO onboarding onto other KYC playbooks should not affect the status on the business detail page
+    kyc_obc = sandbox_tenant.default_ob_config
+    bifrost = BifrostClient.login_user(
+        kyc_obc, bifrost.sandbox_id, fixture_result="fail"
+    )
+    bifrost.run()
+    assert bifrost.validate_response["user"]["status"] == "fail"
+
+    secondary_bo = bifrost.run()
+    body = get(f"entities/{fp_bid}/business_owners", None, *sandbox_tenant.db_auths)
+    assert body[1]["bo_status"] == "pass"  # Status should be unchanged by KYC workflow
+
+    # Request a document from the business. The users' statuses should not change
+    document_config = dict(
+        kind="custom", data=dict(name="biz doc", identifier="document.custom.biz_doc")
+    )
+    trigger = dict(
+        kind="document",
+        data=dict(configs=[], business_configs=[document_config]),
+    )
+    initial_auth_token = send_trigger(
+        primary_bo.fp_id, sandbox_tenant, trigger, fp_bid=fp_bid
+    )
+    stepped_up_auth_token = IdentifyClient.from_token(initial_auth_token).step_up(
+        assert_had_no_scopes=True
+    )
+    bifrost = BifrostClient.raw_auth(
+        kyb_sandbox_ob_config, stepped_up_auth_token, primary_bo.client.sandbox_id
+    )
+    bifrost.run()
+
+    body = get(f"entities/{fp_bid}/business_owners", None, *sandbox_tenant.db_auths)
+    assert body[0]["bo_status"] == "pass"
+    assert body[1]["bo_status"] == "pass"
 
 
 def test_get_businesses(sandbox_tenant, primary_bo):

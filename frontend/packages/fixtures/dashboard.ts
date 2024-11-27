@@ -61,6 +61,7 @@ import type {
   AuthMethodKind,
   AuthMethodUpdated,
   AuthOrgMember,
+  BeneficialOwnerStatus,
   BooleanOperator,
   BusinessDetail,
   BusinessInsights,
@@ -1848,6 +1849,7 @@ export const getAuthOrgMember = (
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+export const getBeneficialOwnerStatus = (props: BeneficialOwnerStatus): BeneficialOwnerStatus => props ?? 'none';
 export const getBooleanOperator = (props: BooleanOperator): BooleanOperator => props ?? 'not_eq';
 
 export const getBusinessDetail = (
@@ -4766,52 +4768,11 @@ export const getEntityAction = (
       note: 'Duis qui',
       trigger: {
         data: {
-          businessConfigs: [
-            {
-              data: {
-                collectSelfie: true,
-                documentTypesAndCountries: {
-                  countrySpecific: {},
-                  global: ['permit', 'voter_identification', 'drivers_license'],
-                },
-              },
-              kind: 'identity',
-            },
-            {
-              data: {
-                requiresHumanReview: false,
-              },
-              kind: 'proof_of_ssn',
-            },
-            {
-              data: {
-                requiresHumanReview: true,
-              },
-              kind: 'proof_of_address',
-            },
-          ],
-          configs: [
-            {
-              data: {
-                requiresHumanReview: false,
-              },
-              kind: 'proof_of_address',
-            },
-            {
-              data: {
-                requiresHumanReview: false,
-              },
-              kind: 'proof_of_ssn',
-            },
-            {
-              data: {
-                requiresHumanReview: true,
-              },
-              kind: 'proof_of_ssn',
-            },
-          ],
+          playbookId: '13b49c69-81e1-4c70-a694-04506823a6f7',
+          recollectAttributes: ['business_tin', 'name', 'email'],
+          reuseExistingBoKyc: true,
         },
-        kind: 'document',
+        kind: 'onboard',
       },
     },
     props,
@@ -8855,6 +8816,7 @@ export const getPrivateBusinessOwner = (
 ): PrivateBusinessOwner =>
   deepmerge<PrivateBusinessOwner>(
     {
+      boStatus: 'awaiting_kyc',
       fpId: 'af38c335-844c-4bcc-b380-fa0a21e03e81',
       id: '60bd9d13-4b29-4879-a6af-6b29c73107e2',
       kind: 'primary',

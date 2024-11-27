@@ -4,20 +4,47 @@ use crate::auth::CanDecrypt;
 use crate::auth::IsGuardMet;
 use crate::utils::db2api::DbToApi;
 use crate::utils::vault_wrapper::BusinessOwnerInfo;
+use api_wire_types::BeneficialOwnerStatus;
 use db::models::business_owner::BusinessOwner;
 use db::models::business_owner::UserData;
+use db::models::onboarding_decision::OnboardingDecision;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
+use db::models::workflow::Workflow;
 use newtypes::BusinessDataKind as BDK;
 use newtypes::DataIdentifier as DI;
+use newtypes::DecisionStatus;
 use newtypes::IdentityDataKind as IDK;
+use newtypes::OnboardingStatus;
 use newtypes::PiiString;
 use newtypes::SessionAuthToken;
 
-impl<'a> DbToApi<(BusinessOwnerInfo, &'a Box<dyn TenantAuth>)> for api_wire_types::PrivateBusinessOwner {
-    fn from_db((bo, auth): (BusinessOwnerInfo, &'a Box<dyn TenantAuth>)) -> Self {
+type BusinessOwnerSerializableInfo<'a> = (
+    BusinessOwnerInfo,
+    &'a Box<dyn TenantAuth>,
+    Option<(Workflow, Option<OnboardingDecision>)>,
+);
+
+impl<'a> DbToApi<BusinessOwnerSerializableInfo<'a>> for api_wire_types::PrivateBusinessOwner {
+    fn from_db((bo, auth, wf): BusinessOwnerSerializableInfo<'a>) -> Self {
         let name = bo_name(&bo, auth);
         let ownership_stake_di = DI::Business(BDK::BeneficialOwnerStake(bo.bo.link_id));
+
+        let (wf_status, obd_status) = wf.map(|(wf, obd)| (wf.status, obd.map(|obd| obd.status))).unzip();
+        let bo_status = match (wf_status, obd_status.flatten()) {
+            // Prefer to take the status from the onboarding decision
+            (_, Some(s)) => match s {
+                DecisionStatus::Pass => BeneficialOwnerStatus::Pass,
+                DecisionStatus::Fail => BeneficialOwnerStatus::Fail,
+                DecisionStatus::None => BeneficialOwnerStatus::None,
+                DecisionStatus::StepUp => BeneficialOwnerStatus::AwaitingKyc,
+            },
+            // If there's no onboarding decision, the workflow must be incomplete
+            (Some(OnboardingStatus::Incomplete), None) => BeneficialOwnerStatus::Incomplete,
+            (Some(OnboardingStatus::Pending), None) => BeneficialOwnerStatus::Pending,
+            // Everything else (really just None) maps to AwaitingKyc
+            (_, None) => BeneficialOwnerStatus::AwaitingKyc,
+        };
 
         Self {
             id: bo.bo.id,
@@ -28,6 +55,7 @@ impl<'a> DbToApi<(BusinessOwnerInfo, &'a Box<dyn TenantAuth>)> for api_wire_type
             kind: bo.bo.kind,
             source: bo.bo.source,
             name,
+            bo_status,
         }
     }
 }

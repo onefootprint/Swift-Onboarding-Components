@@ -10279,6 +10279,17 @@
                     "tenant"
                 ]
             },
+            "BeneficialOwnerStatus": {
+                "type": "string",
+                "enum": [
+                    "fail",
+                    "pass",
+                    "none",
+                    "awaiting_kyc",
+                    "incomplete",
+                    "pending"
+                ]
+            },
             "BooleanOperator": {
                 "type": "string",
                 "enum": [
@@ -17492,6 +17503,17 @@
             "PrivateBusinessOwner": {
                 "type": "object",
                 "properties": {
+                    "bo_status": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/BeneficialOwnerStatus"
+                            },
+                            {
+                                "description": "The status of the beneficial owner, computed from the latest onboarding decision on the\n user's workflow associated with the business's latest KYB workflow.",
+                                "type": "string"
+                            }
+                        ]
+                    },
                     "fp_id": {
                         "type": "string"
                     },
@@ -17523,10 +17545,19 @@
                         "$ref": "#/components/schemas/BusinessOwnerSource"
                     },
                     "status": {
-                        "$ref": "#/components/schemas/OnboardingStatus"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/OnboardingStatus"
+                            },
+                            {
+                                "description": "DEPRECATED. The status of the business owner's scoped vault",
+                                "type": "string"
+                            }
+                        ]
                     }
                 },
                 "required": [
+                    "bo_status",
                     "id",
                     "kind",
                     "ownership_stake_di",

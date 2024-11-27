@@ -71,6 +71,7 @@ impl BusinessWorkflowLink {
     pub fn get_latest_user_decisions(
         conn: &mut PgConn,
         biz_wf_id: &WorkflowId,
+        only_footprint_decisions: bool,
     ) -> FpResult<HashMap<BoId, (Workflow, Option<OnboardingDecision>)>> {
         use db_schema::schema::onboarding_decision;
         use db_schema::schema::workflow;
@@ -83,10 +84,13 @@ impl BusinessWorkflowLink {
         // NOTE: we retrieve the Footprint decision for a workflow even if it's deactivated (by a manual
         // review) since we only use Footprint decisions on users to determine the KYB status.
         // There could also be multiple Footprint decisions per workflow in the step-up case.
-        let decisions = onboarding_decision::table
+        let mut decisions_query = onboarding_decision::table
             .filter(onboarding_decision::workflow_id.eq_any(wf_ids))
-            .filter(onboarding_decision::actor.eq(DbActor::Footprint))
-            .get_results::<OnboardingDecision>(conn)?;
+            .into_boxed();
+        if only_footprint_decisions {
+            decisions_query = decisions_query.filter(onboarding_decision::actor.eq(DbActor::Footprint));
+        }
+        let decisions = decisions_query.get_results::<OnboardingDecision>(conn)?;
         let mut decisions = decisions.into_iter().into_group_map_by(|d| d.workflow_id.clone());
         let res = res
             .into_iter()

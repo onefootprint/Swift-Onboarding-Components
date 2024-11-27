@@ -181,6 +181,7 @@ import type {
   AuthMethodKind,
   AuthMethodUpdated,
   AuthOrgMember,
+  BeneficialOwnerStatus,
   BooleanOperator,
   BusinessDetail,
   BusinessInsights,
@@ -4537,6 +4538,7 @@ export const dashboard_AuthOrgMember: AuthOrgMember = {
     websiteUrl: 'https://biodegradable-adaptation.com/',
   },
 };
+export const dashboard_BeneficialOwnerStatus: BeneficialOwnerStatus = 'none';
 export const dashboard_BooleanOperator: BooleanOperator = 'not_eq';
 export const dashboard_BusinessDetail: BusinessDetail = {
   entityType: 'dolore',
@@ -6752,52 +6754,11 @@ export const dashboard_EntityAction: EntityAction = {
   note: 'Duis qui',
   trigger: {
     data: {
-      businessConfigs: [
-        {
-          data: {
-            collectSelfie: true,
-            documentTypesAndCountries: {
-              countrySpecific: {},
-              global: ['permit', 'voter_identification', 'drivers_license'],
-            },
-          },
-          kind: 'identity',
-        },
-        {
-          data: {
-            requiresHumanReview: false,
-          },
-          kind: 'proof_of_ssn',
-        },
-        {
-          data: {
-            requiresHumanReview: true,
-          },
-          kind: 'proof_of_address',
-        },
-      ],
-      configs: [
-        {
-          data: {
-            requiresHumanReview: false,
-          },
-          kind: 'proof_of_address',
-        },
-        {
-          data: {
-            requiresHumanReview: false,
-          },
-          kind: 'proof_of_ssn',
-        },
-        {
-          data: {
-            requiresHumanReview: true,
-          },
-          kind: 'proof_of_ssn',
-        },
-      ],
+      playbookId: '13b49c69-81e1-4c70-a694-04506823a6f7',
+      recollectAttributes: ['business_tin', 'name', 'email'],
+      reuseExistingBoKyc: true,
     },
-    kind: 'document',
+    kind: 'onboard',
   },
 };
 export const dashboard_EntityActionClearReview: EntityActionClearReview = {
@@ -10089,6 +10050,7 @@ export const dashboard_PlainCustomHeader: PlainCustomHeader = {
 };
 export const dashboard_PreviewApi: PreviewApi = 'decisions_list';
 export const dashboard_PrivateBusinessOwner: PrivateBusinessOwner = {
+  boStatus: 'awaiting_kyc',
   fpId: 'af38c335-844c-4bcc-b380-fa0a21e03e81',
   id: '60bd9d13-4b29-4879-a6af-6b29c73107e2',
   kind: 'primary',

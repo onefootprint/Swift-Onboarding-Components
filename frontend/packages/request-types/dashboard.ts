@@ -457,6 +457,7 @@ export type AuthOrgMember = {
   scopes: Array<TenantScope>;
   tenant: Organization;
 };
+export type BeneficialOwnerStatus = 'fail' | 'pass' | 'none' | 'awaiting_kyc' | 'incomplete' | 'pending';
 export type BooleanOperator = 'eq' | 'not_eq';
 /**
  * Details about the business
@@ -4260,6 +4261,11 @@ export type PreviewApi =
   | 'client_vaulting_docs'
   | 'list_duplicate_users';
 export type PrivateBusinessOwner = {
+  /**
+   * The status of the beneficial owner, computed from the latest onboarding decision on the
+   * user's workflow associated with the business's latest KYB workflow.
+   */
+  boStatus: BeneficialOwnerStatus;
   fpId?: string;
   id: string;
   kind: BusinessOwnerKind;
@@ -4270,6 +4276,9 @@ export type PrivateBusinessOwner = {
    */
   ownershipStakeDi: DataIdentifier;
   source: BusinessOwnerSource;
+  /**
+   * DEPRECATED. The status of the business owner's scoped vault
+   */
   status?: OnboardingStatus;
 };
 export type PrivateBusinessOwnerKycLink = {
