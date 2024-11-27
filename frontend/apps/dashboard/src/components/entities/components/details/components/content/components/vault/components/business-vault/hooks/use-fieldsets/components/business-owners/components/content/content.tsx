@@ -33,8 +33,8 @@ const BusinessOwnersField = ({ businessOwners, explanationMessage }: ContentProp
                 <Text variant="body-3" color="tertiary">
                   {allT('di.business.beneficial_owners')}
                 </Text>
-                {businessOwner.status ? (
-                  <StatusBadge status={businessOwner.status as EntityStatus} />
+                {businessOwner.boStatus !== 'awaiting_kyc' ? (
+                  <StatusBadge status={businessOwner.boStatus as EntityStatus} />
                 ) : (
                   <Badge variant="info">{t('status.awaiting-kyc')}</Badge>
                 )}

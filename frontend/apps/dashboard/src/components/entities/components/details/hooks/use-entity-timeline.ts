@@ -28,7 +28,9 @@ const useEntityTimeline = (id: string) => {
 
       if (entity.data?.status === EntityStatus.incomplete) {
         const hasPendingBos = bosQuery.data?.some(bo => {
-          return bo.name && (bo.status === 'incomplete' || bo.status == null);
+          const isIncomplete =
+            bo.boStatus === 'incomplete' || bo.boStatus === 'awaiting_kyc' || bo.boStatus === 'pending';
+          return bo.name && isIncomplete;
         });
         mergedEvents.unshift({
           event: {
