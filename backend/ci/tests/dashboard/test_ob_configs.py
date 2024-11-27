@@ -128,7 +128,7 @@ def test_config_create(sandbox_tenant):
     assert_has_audit_event_with_details(
         sandbox_tenant,
         "create_playbook",
-        ob_configuration_id=obc.id,
+        playbook={"ob_configuration_id": obc.id},
     )
 
     sandbox_id = _gen_random_sandbox_id()
@@ -1533,7 +1533,7 @@ def test_playbook_versions(sandbox_tenant, tenant):
     assert_has_audit_event_with_details(
         sandbox_tenant,
         "edit_playbook",
-        ob_configuration_id=obc_v2_id,
+        playbook={"ob_configuration_id": obc_v2_id},
     )
 
     want_obc_v2_resp = obc_v1_resp | {

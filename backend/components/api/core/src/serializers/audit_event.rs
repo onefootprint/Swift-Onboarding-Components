@@ -6,6 +6,7 @@ use api_errors::ServerErrInto;
 use api_wire_types::Actor;
 use api_wire_types::AuditEvent;
 use api_wire_types::AuditEventDetail;
+use api_wire_types::AuditEventPlaybook;
 use api_wire_types::InsightEvent;
 use api_wire_types::OrganizationRole;
 use db::models::audit_event::AuditEventBulkSecondaryData;
@@ -219,16 +220,26 @@ impl<'a> TryDbToApi<(JoinedAuditEvent, &'a AuditEventBulkSecondaryData)> for Aud
                     .ok_or(ServerErr("list_entry is not available for this event"))?
                     .id,
             },
-            AuditEventMetadata::CreatePlaybook => AuditEventDetail::CreatePlaybook {
-                ob_configuration_id: ob_configuration
-                    .ok_or(ServerErr("ob_configuration is not available for this event"))?
-                    .id,
-            },
-            AuditEventMetadata::EditPlaybook => AuditEventDetail::EditPlaybook {
-                ob_configuration_id: ob_configuration
-                    .ok_or(ServerErr("ob_configuration is not available for this event"))?
-                    .id,
-            },
+            AuditEventMetadata::CreatePlaybook => {
+                let ob_configuration =
+                    ob_configuration.ok_or(ServerErr("ob_configuration is not available for this event"))?;
+                AuditEventDetail::CreatePlaybook {
+                    playbook: AuditEventPlaybook {
+                        ob_configuration_id: ob_configuration.id,
+                        playbook_id: ob_configuration.playbook_id,
+                    },
+                }
+            }
+            AuditEventMetadata::EditPlaybook => {
+                let ob_configuration =
+                    ob_configuration.ok_or(ServerErr("ob_configuration is not available for this event"))?;
+                AuditEventDetail::EditPlaybook {
+                    playbook: AuditEventPlaybook {
+                        ob_configuration_id: ob_configuration.id,
+                        playbook_id: ob_configuration.playbook_id,
+                    },
+                }
+            }
             AuditEventMetadata::DisablePlaybook => AuditEventDetail::DisablePlaybook,
             AuditEventMetadata::ManuallyReviewEntity {
                 onboarding_decision_id,

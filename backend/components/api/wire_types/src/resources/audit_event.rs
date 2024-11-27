@@ -11,6 +11,7 @@ use newtypes::ListEntryId;
 use newtypes::ListId;
 use newtypes::ObConfigurationId;
 use newtypes::OrgMemberEmail;
+use newtypes::PlaybookId;
 use newtypes::TenantApiKeyId;
 use newtypes::TenantId;
 use newtypes::TenantRoleId;
@@ -131,7 +132,7 @@ pub enum AuditEventDetail {
         status: ApiKeyStatus,
     },
     CreatePlaybook {
-        ob_configuration_id: ObConfigurationId,
+        playbook: AuditEventPlaybook,
     },
     DisablePlaybook,
     ManuallyReviewEntity {
@@ -139,7 +140,7 @@ pub enum AuditEventDetail {
         fp_id: FpId,
     },
     EditPlaybook {
-        ob_configuration_id: ObConfigurationId,
+        playbook: AuditEventPlaybook,
     },
     DeactivateOrgRole {
         tenant_role_id: TenantRoleId,
@@ -168,4 +169,10 @@ pub struct AuditEventOrgMember {
     pub first_name: Option<String>,
     pub last_name: Option<String>,
     pub email: OrgMemberEmail,
+}
+
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+pub struct AuditEventPlaybook {
+    pub ob_configuration_id: ObConfigurationId,
+    pub playbook_id: PlaybookId,
 }
