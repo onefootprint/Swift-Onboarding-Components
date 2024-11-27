@@ -1,9 +1,8 @@
-import type { GetEntityResponse } from '@onefootprint/types';
+import request from '@onefootprint/request';
+import type { GetEntityRequest, GetEntityResponse } from '@onefootprint/types';
 import { BusinessDI, type EntityStatus } from '@onefootprint/types/src/data';
 import { useQueries } from '@tanstack/react-query';
-import useSession from 'src/hooks/use-session';
-
-import { getEntity } from './use-entity';
+import useSession, { type AuthHeaders } from 'src/hooks/use-session';
 import useGetEntityOwnedBusinessIds from './use-get-entity-owned-business-ids';
 
 export type EntityOwnedBusinessInfo = {
@@ -18,6 +17,17 @@ export enum EntityOwnedBusinessRequestStatus {
   ERROR = 'ERROR',
   SUCCESS = 'SUCCESS',
 }
+
+// TODO: replace with the one from @onefootprint/axios/dashboard
+const getEntity = async (authHeaders: AuthHeaders, { id }: GetEntityRequest) => {
+  const response = await request<GetEntityResponse>({
+    method: 'GET',
+    url: `/entities/${id}`,
+    headers: authHeaders,
+  });
+
+  return response.data;
+};
 
 const useEntityOwnedBusinesses = (id: string) => {
   const businessIdsMutation = useGetEntityOwnedBusinessIds(id);

@@ -1,6 +1,6 @@
 import { useEntityContext } from '@/entity/hooks/use-entity-context';
 import { getEntitiesByFpIdBusinessOwnersOptions } from '@onefootprint/axios/dashboard';
-import { EntityKind } from '@onefootprint/types';
+import { type Entity, EntityKind } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import useLabel from 'src/hooks/use-label';
 import useEntityVault from '../../../hooks/use-entity-vault';
@@ -23,7 +23,8 @@ const useEntityInitialData = () => {
   const isBusiness = kind === EntityKind.business;
   const entityQuery = useCurrentEntity();
   const entityTimelineQuery = useEntityTimeline(id);
-  const entityVaultQuery = useEntityVault(id, entityQuery.data);
+  // TODO: fix the types
+  const entityVaultQuery = useEntityVault(id, entityQuery.data as Entity);
   const entityRiskSignalsQuery = useEntityRiskSignals(id, seqno);
   const entityLivenessQuery = useEntityLiveness(id);
   const entityAnnotations = useEntityAnnotations(id);

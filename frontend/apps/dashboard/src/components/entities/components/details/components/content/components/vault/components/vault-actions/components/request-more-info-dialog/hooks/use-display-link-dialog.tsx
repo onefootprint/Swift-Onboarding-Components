@@ -1,4 +1,4 @@
-import type { TriggerResponse } from '@onefootprint/types';
+import type { Entity, TriggerResponse } from '@onefootprint/types';
 import { IdDI, TokenKind } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
@@ -22,7 +22,8 @@ const useDisplayLinkDialog = ({ linkData, onClose, entityId }: UseDisplayLinkDia
     keyPrefix: 'actions.request-more-info',
   });
   const entity = useEntity(entityId)?.data;
-  const userHasPhone = hasDataIdentifier(entity, IdDI.phoneNumber);
+  // TODO: fix the types
+  const userHasPhone = hasDataIdentifier(entity as Entity, IdDI.phoneNumber);
 
   const component = <LinkDisplay linkData={linkData} />;
 

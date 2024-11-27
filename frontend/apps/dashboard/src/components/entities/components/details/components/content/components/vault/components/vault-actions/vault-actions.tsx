@@ -1,4 +1,4 @@
-import { EntityKind, RoleScopeKind } from '@onefootprint/types';
+import { EntityKind, type EntityStatus, RoleScopeKind } from '@onefootprint/types';
 import { Button, Portal, SplitButton, Stack, Tooltip } from '@onefootprint/ui';
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -82,7 +82,8 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
         )}
         {shouldRenderManualReview && (
           <PermissionGate scopeKind={RoleScopeKind.manualReview} fallbackText={t('manual-review-not-allowed')}>
-            <ManualReview status={entityData.status} kind={entityData.kind} />
+            {/* TODO: fix the types */}
+            <ManualReview status={entityData.status as EntityStatus} kind={entityData.kind as EntityKind} />
           </PermissionGate>
         )}
         {entity.kind === EntityKind.person ? <UserActions /> : <BusinessActions />}

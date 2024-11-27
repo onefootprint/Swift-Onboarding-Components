@@ -1,6 +1,6 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import request from '@onefootprint/request';
-import type { CustomDocumentIdentifier } from '@onefootprint/types';
+import type { CustomDocumentIdentifier, Entity } from '@onefootprint/types';
 import { DataKind } from '@onefootprint/types';
 import { detectMimeType, useToast } from '@onefootprint/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -45,7 +45,8 @@ const useUploadDoc = () => {
   const toast = useToast();
   const toastError = useRequestErrorToast();
   const entity = useCurrentEntity();
-  const entityVault = useEntityVault(entity.data?.id, entity.data);
+  // TODO: fix the types
+  const entityVault = useEntityVault(entity.data?.id, entity.data as Entity);
 
   async function updateEntityVault(payload: {
     identifier: CustomDocumentIdentifier;

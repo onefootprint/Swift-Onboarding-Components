@@ -15,6 +15,7 @@ export function updateExports(filePath: string) {
 
   content += "export * from './@tanstack/react-query.gen';\n";
 
+  content += 'export * from "axios";\n';
   // Write the updated content back to index.ts
   fs.writeFileSync(indexPath, content, 'utf8');
 

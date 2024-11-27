@@ -1,4 +1,4 @@
-import { type Entity, EntityStatus } from '@onefootprint/types';
+import type { Entity } from '@onefootprint/request-types/dashboard';
 import { InlineAlert, Radio, Stack, Text } from '@onefootprint/ui';
 import { useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -16,7 +16,7 @@ const KindForm = ({ children, entity }: KindFormProps) => {
     defaultValues: { requestType: 'uploadDocument' },
   });
   const requestType = useWatch({ control, name: 'requestType' });
-  const showStatusWarning = entity.status === EntityStatus.inProgress || entity.status === EntityStatus.incomplete;
+  const showStatusWarning = entity.status === 'in_progress' || entity.status === 'incomplete';
   const showRequestBosOption = !!entity.workflows.length;
 
   return (

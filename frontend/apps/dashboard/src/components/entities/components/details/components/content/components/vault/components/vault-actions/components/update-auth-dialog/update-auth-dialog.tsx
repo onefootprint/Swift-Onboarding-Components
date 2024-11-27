@@ -1,5 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import { IdDI, TokenKind } from '@onefootprint/types';
+import { type Entity, IdDI, TokenKind } from '@onefootprint/types';
 import { Dialog, Shimmer, Stack, Text, TextInput, useToast } from '@onefootprint/ui';
 import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -27,7 +27,8 @@ const UpdateAuthDialog = ({ open, onClose }: UpdateAuthDialogProps) => {
   const showRequestErrorToast = useRequestErrorToast();
   const entityId = useEntityId();
   const entity = useEntity(entityId)?.data;
-  const userHasPhone = hasDataIdentifier(entity, IdDI.phoneNumber);
+  // TODO: fix the types
+  const userHasPhone = hasDataIdentifier(entity as Entity, IdDI.phoneNumber);
 
   const handleClose = useCallback(() => {
     generateTokenMutation.reset();

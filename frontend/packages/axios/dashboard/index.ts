@@ -2,3 +2,4 @@
 
 export * from './services.gen';
 export * from './@tanstack/react-query.gen';
+export * from 'axios';

@@ -1,5 +1,11 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import { type DataIdentifier, type EntityVault, SupportedIdDocTypes, type VaultValue } from '@onefootprint/types';
+import {
+  type DataIdentifier,
+  type Entity,
+  type EntityVault,
+  SupportedIdDocTypes,
+  type VaultValue,
+} from '@onefootprint/types';
 
 import useCurrentEntity from '@/entity/hooks/use-current-entity';
 import useDocuments from '@/entity/hooks/use-documents';
@@ -51,7 +57,8 @@ const useDecryptControls = () => {
 
   const getAllDecryptableDocuments = () => {
     const decryptableDocumentKinds = (documents || [])
-      .filter(d => d.uploads.map(u => u.identifier).every(di => isDiDecryptable(entity, di)))
+      // TODO: fix the types
+      .filter(d => d.uploads.map(u => u.identifier).every(di => isDiDecryptable(entity as Entity, di)))
       // Custom documents are currently handled in another section and are just decrypted by DI
       .filter(d => d.kind !== SupportedIdDocTypes.custom)
       .map(d => d.kind);
@@ -61,7 +68,8 @@ const useDecryptControls = () => {
   /** Decrypt all decryptable fields on the vault */
   const submitAllFields = () => {
     const documentKinds = getAllDecryptableDocuments();
-    const decryptableDIs = getDecryptableDIs(entity);
+    // TODO: fix the types
+    const decryptableDIs = getDecryptableDIs(entity as Entity);
     submitFields(decryptableDIs, documentKinds);
   };
 

@@ -1,12 +1,22 @@
 import useEntity from '@/entity/hooks/use-entity';
 import useEntityId from '@/entity/hooks/use-entity-id';
+import type { EntityWorkflow } from '@onefootprint/request-types/dashboard';
 import { OnboardingConfigKind } from '@onefootprint/types';
-import { mostRecentWorkflow } from '@onefootprint/types/src/data/entity';
 import { Box, Select, Shimmer } from '@onefootprint/ui';
 import { useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import usePlaybookOptions from 'src/hooks/use-playbook-options';
+
+const mostRecentWorkflow = (wf1: EntityWorkflow, wf2: EntityWorkflow) => {
+  if (wf1.createdAt > wf2.createdAt) {
+    return -1;
+  }
+  if (wf1.createdAt < wf2.createdAt) {
+    return 1;
+  }
+  return 0;
+};
 
 const RequestOnboard = () => {
   const { t } = useTranslation('entity-details', {

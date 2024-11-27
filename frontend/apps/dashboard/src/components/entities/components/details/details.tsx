@@ -1,10 +1,10 @@
+import type { AxiosError } from '@onefootprint/axios/dashboard';
 import type { EntityKind } from '@onefootprint/types';
 import { Box } from '@onefootprint/ui';
 import { ErrorComponent } from 'src/components';
-
+import Page404 from 'src/components/404';
 import Content from './components/content';
 import Loading from './components/loading';
-import TenantSwitcher from './components/tenant-switcher';
 import useEntity from './hooks/use-entity';
 import Provider from './hooks/use-entity-context';
 import useEntityId from './hooks/use-entity-id';
@@ -23,12 +23,12 @@ const Details = ({ kind, listPath }: DetailsProps) => {
     return <Loading />;
   }
 
+  if ((error as AxiosError)?.response?.status === 404) {
+    return <Page404 />;
+  }
+
   if (error) {
-    return (
-      <TenantSwitcher entityId={id} Loading={Loading}>
-        <ErrorComponent error={error} />
-      </TenantSwitcher>
-    );
+    return <ErrorComponent error={error} />;
   }
 
   return <EntityDetails kind={kind} listPath={listPath} />;
