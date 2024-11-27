@@ -9,6 +9,7 @@ import {
   verifyPhoneNumber,
 } from '../utils/commands';
 
+const backendUrl = process.env.E2E_BACKEND_URL || 'https://api.dev.onefootprint.com';
 const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
 const pbKey = process.env.E2E_OB_KYB || 'pb_test_irxUbxvVOevFXVmhIvHdrf';
 const fpSKey = process.env.E2E_SECRET_API_KEY_DEV || '';
@@ -36,55 +37,61 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
   test.skip(isMobile, 'skip test for mobile'); // eslint-disable-line playwright/no-skipped-test
 
   // Create a user
-  const user = await page.evaluate(async (secretKey: string) => {
-    const response = await fetch('https://api.dev.onefootprint.com/users', {
-      method: 'POST',
-      headers: {
-        'X-Footprint-Secret-Key': secretKey,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        'id.first_name': 'Piip',
-        'id.last_name': 'Penguin',
-        'id.email': 'sandbox@onefootprint.com',
-        'id.phone_number': '+15555550100',
-      }),
-    });
+  const user = await page.evaluate(
+    async ([secretKey, backendUrl]) => {
+      const response = await fetch(`${backendUrl}/users`, {
+        method: 'POST',
+        headers: {
+          'X-Footprint-Secret-Key': secretKey,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          'id.first_name': 'Piip',
+          'id.last_name': 'Penguin',
+          'id.email': 'sandbox@onefootprint.com',
+          'id.phone_number': '+15555550100',
+        }),
+      });
 
-    const data = (await response.json()) as { id: string };
-    return data;
-  }, fpSKey);
+      const data = (await response.json()) as { id: string };
+      return data;
+    },
+    [fpSKey, backendUrl],
+  );
 
   expect(user).toHaveProperty('id');
 
   // Create a business
-  const business = await page.evaluate(async (secretKey: string) => {
-    const response = await fetch('https://api.dev.onefootprint.com/businesses', {
-      method: 'POST',
-      headers: {
-        'X-Footprint-Secret-Key': secretKey,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        'business.name': 'Printfoot',
-        'business.tin': '121231234',
-        'business.address_line1': '1 Hayes St',
-        'business.city': 'San Francisco',
-        'business.state': 'CA',
-        'business.country': 'US',
-      }),
-    });
+  const business = await page.evaluate(
+    async ([secretKey, backendUrl]) => {
+      const response = await fetch(`${backendUrl}/businesses`, {
+        method: 'POST',
+        headers: {
+          'X-Footprint-Secret-Key': secretKey,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          'business.name': 'Printfoot',
+          'business.tin': '121231234',
+          'business.address_line1': '1 Hayes St',
+          'business.city': 'San Francisco',
+          'business.state': 'CA',
+          'business.country': 'US',
+        }),
+      });
 
-    const data = (await response.json()) as { id: string };
-    return data;
-  }, fpSKey);
+      const data = (await response.json()) as { id: string };
+      return data;
+    },
+    [fpSKey, backendUrl],
+  );
 
   expect(business).toHaveProperty('id');
 
   // Link the user as an owner of the business
   const linkOwner = await page.evaluate(
-    async ([secretKey, fpId, fpBid]) => {
-      const response = await fetch(`https://api.dev.onefootprint.com/businesses/${fpBid}/owners`, {
+    async ([secretKey, fpId, fpBid, backendUrl]) => {
+      const response = await fetch(`${backendUrl}/businesses/${fpBid}/owners`, {
         method: 'POST',
         headers: {
           'X-Footprint-Secret-Key': secretKey,
@@ -96,15 +103,15 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
       const data = (await response.json()) as {};
       return data;
     },
-    [fpSKey, user.id, business.id],
+    [fpSKey, user.id, business.id, backendUrl],
   );
 
   expect(linkOwner).toEqual({});
 
   // Create a user-specific session token
   const userSession = await page.evaluate(
-    async ([secretKey, playBookKey, fpId, fpBid]) => {
-      const response = await fetch(`https://api.dev.onefootprint.com/users/${fpId}/token`, {
+    async ([secretKey, playBookKey, fpId, fpBid, backendUrl]) => {
+      const response = await fetch(`${backendUrl}/users/${fpId}/token`, {
         method: 'POST',
         headers: {
           'X-Footprint-Secret-Key': secretKey,
@@ -120,7 +127,7 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
       const data = (await response.json()) as { token: string };
       return data;
     },
-    [fpSKey, pbKey, user.id, business.id],
+    [fpSKey, pbKey, user.id, business.id, backendUrl],
   );
 
   expect(userSession).toHaveProperty('token');

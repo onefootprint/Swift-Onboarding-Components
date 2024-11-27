@@ -89,6 +89,7 @@ describe('getMethods', () => {
     [ChallengeKind.sms]: 'entry.sms',
     [ChallengeKind.email]: 'entry.email',
     [ChallengeKind.biometric]: 'entry.bio',
+    [ChallengeKind.smsLink]: 'entry.sms',
   };
   const IconComponent = expect.any(Function);
 

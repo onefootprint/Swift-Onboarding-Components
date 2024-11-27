@@ -25,7 +25,12 @@ const requestFn = async ({ phoneNumber, email, authToken, obConfigAuth, sandboxI
     headers,
   });
 
-  return response.data;
+  const responseData = { ...response.data };
+  if (responseData.user?.availableChallengeKinds.length) {
+    responseData.user.availableChallengeKinds = responseData.user.availableChallengeKinds.filter(k => k !== 'sms_link');
+  }
+
+  return responseData;
 };
 
 const useIdentify = (basePayload: BasePayload) =>

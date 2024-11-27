@@ -79,16 +79,18 @@ export const withIdentify = (context?: {
     method: 'post',
     path: '/hosted/identify',
     response: {
-      user: userFound && {
-        token: 'utok_xxx',
-        isUnverified: isUnverified ?? false,
-        availableChallengeKinds,
-        authMethods,
-        hasSyncablePasskey: true,
-        scrubbedPhone: '+1 (***) ***-**99',
-        tokenScopes: tokenScopes ?? [],
-        matchingFps: matchingFps ?? [IdDI.phoneNumber],
-      },
+      user: userFound
+        ? {
+            token: 'utok_xxx',
+            isUnverified: isUnverified ?? false,
+            availableChallengeKinds,
+            authMethods,
+            hasSyncablePasskey: true,
+            scrubbedPhone: '+1 (***) ***-**99',
+            tokenScopes: tokenScopes ?? [],
+            matchingFps: matchingFps ?? [IdDI.phoneNumber],
+          }
+        : undefined,
     },
   });
 };

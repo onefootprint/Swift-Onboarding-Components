@@ -17,6 +17,7 @@ import { IdentifyVariant, SuccessfulIdentifier } from './types';
 const challengeKindToAuthMethod: Record<ChallengeKind, AuthMethodKind> = {
   [ChallengeKind.biometric]: AuthMethodKind.passkey,
   [ChallengeKind.sms]: AuthMethodKind.phone,
+  [ChallengeKind.smsLink]: AuthMethodKind.phone,
   [ChallengeKind.email]: AuthMethodKind.email,
 };
 

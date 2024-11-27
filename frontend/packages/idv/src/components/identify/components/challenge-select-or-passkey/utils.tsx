@@ -16,11 +16,13 @@ const challengeIcons: Record<ChallengeKind, Icon> = {
   [ChallengeKind.sms]: IcoSmartphone16,
   [ChallengeKind.email]: IcoEmail16,
   [ChallengeKind.biometric]: IcoFaceid16,
+  [ChallengeKind.smsLink]: IcoSmartphone16,
 };
 const challengePriority: Record<ChallengeKind, number> = {
   [ChallengeKind.biometric]: 0,
   [ChallengeKind.sms]: 1,
   [ChallengeKind.email]: 2,
+  [ChallengeKind.smsLink]: 3,
 };
 
 const sortChallenges = (a: ChallengeKind, b: ChallengeKind) => challengePriority[a] - challengePriority[b];
@@ -86,6 +88,7 @@ export const getChallengeTitleByKind = (
   context: Pick<IdentifyMachineContext, 'identify' | 'email' | 'phoneNumber'>,
 ): TitleMap => ({
   [ChallengeKind.sms]: getChallengeTitlePhone(t, context),
+  [ChallengeKind.smsLink]: getChallengeTitlePhone(t, context),
   [ChallengeKind.email]: getChallengeTitleEmail(t, context),
   [ChallengeKind.biometric]: t('challenge-select-or-biometric.passkey'),
 });
