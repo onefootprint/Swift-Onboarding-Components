@@ -1,0 +1,1 @@
+ALTER TABLE tenant_user ALTER COLUMN is_risk_ops DROP DEFAULT;
