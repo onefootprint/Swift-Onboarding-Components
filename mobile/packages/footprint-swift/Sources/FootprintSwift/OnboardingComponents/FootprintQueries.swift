@@ -152,9 +152,13 @@ internal class FootprintQueries {
     
     func initOnboarding(
         authToken: String,
-        overallOutcome: OverallOutcome? = OverallOutcome.pass
+        overallOutcome: OverallOutcome?
     ) async throws -> OnboardingResponse {
-        let request = PostOnboardingRequest(fixtureResult: PostOnboardingRequest.FixtureResult(rawValue: overallOutcome!.rawValue))
+        var fixtureResult: PostOnboardingRequest.FixtureResult? = nil
+        if let overallOutcome {
+            fixtureResult = PostOnboardingRequest.FixtureResult(rawValue: overallOutcome.rawValue)
+        }
+        let request = PostOnboardingRequest(fixtureResult: fixtureResult)
         do{
             return try await OnboardingAPI.onboarding(xFpAuthorization: authToken, postOnboardingRequest: request, openAPIClient: client)
         } catch let errorResponse as ErrorResponse {

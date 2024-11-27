@@ -14,6 +14,7 @@ public struct IdentifyResponseUser: Codable, JSONEncodable, Hashable {
         case sms = "sms"
         case biometric = "biometric"
         case email = "email"
+        case smsLink = "sms_link"
     }
     public enum MatchingFps: String, Codable, CaseIterable {
         case idPeriodFirstName = "id.first_name"
