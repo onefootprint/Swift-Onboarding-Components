@@ -447,7 +447,7 @@ pub async fn adhoc_document_process(
         .db_query(move |conn| {
             let ctx = RequirementContext {
                 user_values: &decrypted_values,
-                business_owners: &[],
+                kyb_bo_features: &Default::default(),
                 auth_events: &[],
                 is_secondary_bo: false,
                 playbook: &playbook,

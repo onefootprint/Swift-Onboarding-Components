@@ -50,7 +50,7 @@ pub async fn post(
         return BadRequestInto("Can only create KYC links for business scoped vaults");
     }
 
-    let KybBoFeatures { bvw, bos } = KybBoFeatures::build(&state, &biz_wf.id).await?;
+    let (KybBoFeatures { bos }, bvw, _) = KybBoFeatures::build(&state, &biz_wf.id).await?;
     let tokens = generate_secondary_bo_links(&state, None, &biz_wf, &bos).await?;
 
     let links_to_send = (tokens.iter())

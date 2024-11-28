@@ -206,13 +206,13 @@ pub async fn progress_business_workflow(
     if !matches!(biz_wf.state, WorkflowState::Kyb(KybState::AwaitingBoKyc)) {
         return Ok(());
     }
-    let kyb_features = KybBoFeatures::build(state, &biz_wf.id).await?;
+    let (kyb_features, bvw, biz_wf) = KybBoFeatures::build(state, &biz_wf.id).await?;
     // Check if we're still waiting for BOs OR for the business to finish uploading a required document
     // before sending out links
     let is_waiting_for_bo_kyc = !kyb_features.all_bos_have_kyc_results();
     tracing::info!(is_waiting_for_bo_kyc, "is_waiting_for_bo_kyc");
     if is_waiting_for_bo_kyc && !is_secondary_bo {
-        let KybBoFeatures { bos, bvw } = kyb_features;
+        let KybBoFeatures { bos } = kyb_features;
         let tokens = generate_secondary_bo_links(state, su, &biz_wf, &bos).await?;
         send_missing_secondary_bo_links(state, &bvw, &bos, tokens, tenant).await?;
     }
@@ -220,7 +220,7 @@ pub async fn progress_business_workflow(
         return Ok(());
     }
 
-    let ww = WorkflowWrapper::init(state, biz_wf.clone(), seqno).await?;
+    let ww = WorkflowWrapper::init(state, biz_wf, seqno).await?;
     let res = ww
         .run(state, WorkflowActions::BoKycCompleted(BoKycCompleted {}))
         .await;

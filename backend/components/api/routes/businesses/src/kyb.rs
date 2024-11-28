@@ -3,6 +3,7 @@ use crate::auth::tenant::TenantApiKeyAuth;
 use crate::auth::tenant::TenantGuard;
 use crate::types::ApiResponse;
 use crate::State;
+use api_core::decision::biz_risk::KybBoFeatures;
 use api_core::errors::onboarding::OnboardingError;
 use api_core::errors::onboarding::UnmetRequirements;
 use api_core::errors::tenant::TenantError;
@@ -153,9 +154,10 @@ pub async fn post(
             let (biz_wf, _) = Workflow::get_or_create_onboarding(conn, ob_create_args, allow_reonboard)?;
 
             // Check requirements for this Business vault w.r.t the OBC
+            let (kyb_bo_features, biz_wf) = KybBoFeatures::build_with_bos(conn, dbos, &biz_wf.id)?;
             let ctx = RequirementContext {
                 user_values: &UserDecryptResultForReqs::empty(),
-                business_owners: &dbos,
+                kyb_bo_features: &kyb_bo_features,
                 auth_events: &[],
                 is_secondary_bo: false,
                 playbook: &playbook,

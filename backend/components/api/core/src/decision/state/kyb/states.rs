@@ -100,7 +100,7 @@ impl OnAction<Authorize, KybState> for KybDataCollection {
         _action: Authorize,
         state: &State,
     ) -> FpResult<Self::AsyncRes> {
-        let kyb_features = KybBoFeatures::build(state, &self.wf_id).await?;
+        let (kyb_features, _, _) = KybBoFeatures::build(state, &self.wf_id).await?;
         Ok(kyb_features)
     }
 
@@ -187,7 +187,7 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
         _action: BoKycCompleted,
         state: &State,
     ) -> FpResult<Self::AsyncRes> {
-        let kyb_features = KybBoFeatures::build(state, &self.wf_id).await?;
+        let (kyb_features, _, _) = KybBoFeatures::build(state, &self.wf_id).await?;
         Ok(kyb_features)
     }
 

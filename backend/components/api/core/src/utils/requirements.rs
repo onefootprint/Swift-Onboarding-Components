@@ -1,10 +1,10 @@
 use super::vault_wrapper::Any;
-use super::vault_wrapper::Business;
 use super::vault_wrapper::BusinessOwnerInfo;
 use super::vault_wrapper::TenantVw;
 use crate::auth::session::user::AssociatedAuthEvent;
 use crate::auth::user::load_auth_events;
 use crate::auth::user::CheckUserWfAuthContext;
+use crate::decision::biz_risk::KybBoFeatures;
 use crate::utils::vault_wrapper::DecryptUncheckedResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
@@ -92,26 +92,16 @@ pub async fn get_requirements_for_person_and_maybe_business(
     let playbook = user_auth.playbook.clone();
     let person_obc = user_auth.ob_config.clone();
     let su_id = user_auth.scoped_user.id.clone();
-    let sb_id = user_auth.sb_id.clone();
-    let biz_wf_id = user_auth.biz_wf_id.clone();
-    let (uvw, biz_wf_info) = state
-        .db_query(move |conn| {
-            let uvw = VaultWrapper::<Any>::build_for_tenant(conn, &su_id)?;
-            let biz_wf_info = if let Some((sb_id, biz_wf_id)) = sb_id.zip(biz_wf_id) {
-                let bvw = VaultWrapper::<Business>::build_for_tenant(conn, &sb_id)?;
-                let (biz_wf, _) = Workflow::get_all(conn, &biz_wf_id)?;
-                Some((bvw, biz_wf))
-            } else {
-                None
-            };
-            Ok((uvw, biz_wf_info))
-        })
+    let uvw = state
+        .db_query(move |conn| VaultWrapper::<Any>::build_for_tenant(conn, &su_id))
         .await?;
     let user_values = UserDecryptResultForReqs::get_decrypted_values(state, &uvw).await?;
-    let business_owners = if let Some((bvw, _)) = biz_wf_info.as_ref() {
-        bvw.decrypt_business_owners(state).await?
+
+    let (kyb_bo_features, biz_wf_info) = if let Some(biz_wf_id) = user_auth.biz_wf_id.as_ref() {
+        let (kyb_bo_features, bvw, biz_wf) = KybBoFeatures::build(state, biz_wf_id).await?;
+        (kyb_bo_features, Some((bvw, biz_wf)))
     } else {
-        vec![]
+        (Default::default(), None)
     };
 
     let require_capture_on_stepup = state
@@ -130,7 +120,7 @@ pub async fn get_requirements_for_person_and_maybe_business(
         .db_query(move |conn| {
             let ctx = RequirementContext {
                 user_values: &user_values,
-                business_owners: &business_owners,
+                kyb_bo_features: &kyb_bo_features,
                 auth_events: &auth_events,
                 is_secondary_bo,
                 opts: requirement_opts,
@@ -176,7 +166,7 @@ pub fn requires_biz_workflow(person_wf: &Workflow, person_obc: &ObConfiguration)
 #[derive(Clone, Copy)]
 pub struct RequirementContext<'a> {
     pub user_values: &'a UserDecryptResultForReqs,
-    pub business_owners: &'a [BusinessOwnerInfo],
+    pub kyb_bo_features: &'a KybBoFeatures,
     pub auth_events: &'a [AssociatedAuthEvent],
     pub is_secondary_bo: bool,
     pub playbook: &'a Playbook,
@@ -249,8 +239,8 @@ fn is_cdo_met<Type>(ctx: RequirementContext, vw: &VaultWrapper<Type>, cdo: &CDO)
             // fields extracted as possible
         }
         CDO::BusinessKycedBeneficialOwners => {
-            let is_not_empty = !ctx.business_owners.is_empty();
-            let are_bos_populated = ctx.business_owners.iter().all(|bo| {
+            let is_not_empty = !ctx.kyb_bo_features.bos.is_empty();
+            let are_bos_populated = ctx.kyb_bo_features.bos.iter().all(|bo| {
                 let vd_exists =
                     (BusinessOwnerInfo::USER_DIS.iter()).all(|i| bo.data.iter().any(|(di, _)| di == i));
                 let stake_di = DataIdentifier::Business(BDK::BeneficialOwnerStake(bo.bo.link_id.clone()));
@@ -593,8 +583,8 @@ fn get_authorize_requirement<T>(
     }))
 }
 
-fn get_process_requirement(user_wf: &Workflow) -> Option<OnboardingRequirement> {
-    if user_wf.state.requires_user_input() {
+fn get_process_requirement(wf: &Workflow) -> Option<OnboardingRequirement> {
+    if wf.state.requires_user_input() {
         Some(OnboardingRequirement::Process)
     } else {
         None

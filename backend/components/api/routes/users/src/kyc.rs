@@ -217,7 +217,7 @@ pub async fn post(
             // Also does not check any requirements for the Business vault if this person is a primary BO for
             // a Business
             let ctx = RequirementContext {
-                business_owners: &[],
+                kyb_bo_features: &Default::default(),
                 user_values: &decrypted_values,
                 auth_events: &[],
                 is_secondary_bo: false,

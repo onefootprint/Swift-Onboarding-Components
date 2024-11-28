@@ -10,6 +10,7 @@ use db::models::business_workflow_link::BusinessWorkflowLink;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::workflow::Workflow;
+use db::PgConn;
 use itertools::Itertools;
 use newtypes::OnboardingStatus;
 use newtypes::WorkflowId;
@@ -44,34 +45,51 @@ impl BoWithKycInfo {
     }
 }
 
+#[derive(Default)]
 pub struct KybBoFeatures {
+    /// The decrypted BOs along with their KYC results. Empty if the playbook does not require KYC.
     pub bos: Vec<BoWithKycInfo>,
-    pub bvw: TenantVw<Business>,
 }
 
 impl KybBoFeatures {
-    pub async fn build(state: &State, biz_wf_id: &WorkflowId) -> FpResult<Self> {
-        let wfid = biz_wf_id.clone();
-        let (mut user_decisions, bvw, obc) = state
+    pub async fn build(
+        state: &State,
+        biz_wf_id: &WorkflowId,
+    ) -> FpResult<(Self, TenantVw<Business>, Workflow)> {
+        let biz_wf_id = biz_wf_id.clone();
+        let (bvw, biz_wf) = state
             .db_query(move |conn| {
-                let biz_wf = Workflow::get(conn, &wfid)?;
-                let user_decisions = BusinessWorkflowLink::get_latest_user_decisions(conn, &biz_wf.id, true)?;
+                let biz_wf = Workflow::get(conn, &biz_wf_id)?;
                 let bvw = VaultWrapper::<Business>::build_for_tenant(conn, &biz_wf.scoped_vault_id)?;
-                let (_, obc) = ObConfiguration::get(conn, &biz_wf.id)?;
-                Ok((user_decisions, bvw, obc))
+                Ok((bvw, biz_wf))
             })
             .await?;
 
-        if obc.verification_checks().skip_kyc() {
-            return Ok(Self { bos: vec![], bvw });
-        }
-
         let dbos = bvw.decrypt_business_owners(state).await?;
-        let bos = dbos
-            .into_iter()
-            .map(|bo| BoWithKycInfo(user_decisions.remove(&bo.bo.id), bo))
-            .collect_vec();
-        Ok(Self { bos, bvw })
+        let (res, biz_wf) = state
+            .db_query(move |conn| Self::build_with_bos(conn, dbos, &biz_wf.id))
+            .await?;
+        Ok((res, bvw, biz_wf))
+    }
+
+    pub fn build_with_bos(
+        conn: &mut PgConn,
+        dbos: Vec<BusinessOwnerInfo>,
+        biz_wf_id: &WorkflowId,
+    ) -> FpResult<(Self, Workflow)> {
+        let biz_wf = Workflow::get(conn, biz_wf_id)?;
+        let mut user_decisions = BusinessWorkflowLink::get_latest_user_decisions(conn, &biz_wf.id, true)?;
+        let (_, obc) = ObConfiguration::get(conn, &biz_wf.id)?;
+
+        let bos = if obc.verification_checks().skip_kyc() {
+            vec![]
+        } else {
+            dbos.into_iter()
+                .map(|bo| BoWithKycInfo(user_decisions.remove(&bo.bo.id), bo))
+                .collect_vec()
+        };
+
+        Ok((Self { bos }, biz_wf))
     }
 
     /// Unpacks all BOs into their underlying Workflows and OnboardingDecisions.
