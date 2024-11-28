@@ -117,8 +117,7 @@ impl OnAction<Authorize, KybState> for KybDataCollection {
         };
         let rsg = RiskSignalGroup::create(conn, scope, RiskSignalGroupKind::Kyb)?;
 
-        let bo_ownership_total = async_res
-            .bos
+        let bo_ownership_total = (async_res.bos)
             .iter()
             .filter_map(|bo| bo.ownership_stake)
             .sum::<u32>();

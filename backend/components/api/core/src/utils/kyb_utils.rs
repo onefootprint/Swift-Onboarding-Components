@@ -41,9 +41,10 @@ pub async fn generate_secondary_bo_links<'a>(
 ) -> FpResult<Vec<(&'a BoWithKycInfo, SessionAuthToken)>> {
     let missing_kyc_secondary_bos = bos
         .iter()
+        .filter(|bo| bo.requires_kyc)
         .filter(|bo| !bo.has_kyc_result())
         // Don't send link to self
-        .filter(|bo| !su.zip(bo.1.user_vault_id.as_ref()).is_some_and(|(su, bo_uv_id)| &su.vault_id == bo_uv_id))
+        .filter(|bo| !su.zip(bo.user_vault_id.as_ref()).is_some_and(|(su, bo_uv_id)| &su.vault_id == bo_uv_id))
         .collect_vec();
     if missing_kyc_secondary_bos.is_empty() {
         return Ok(vec![]);
@@ -95,11 +96,11 @@ pub async fn send_missing_secondary_bo_links(
     tenant: &Tenant,
 ) -> FpResult<()> {
     // Generate a link for each business owner
-    let BoWithKycInfo(_, primary_bo) = bos
+    let primary_bo = bos
         .iter()
         .find(|bo| bo.bo.kind == BusinessOwnerKind::Primary)
         .ok_or(BusinessError::PrimaryBoNotFound)?;
-    let primary_bo = primary_bo.clone();
+    let primary_bo = primary_bo.bo.clone();
 
     let (first_name, last_name) = primary_bo.name().ok_or(BadRequest("No name"))?;
     let inviter = PiiString::new(format!("{} {}", first_name.leak(), last_name.leak()));

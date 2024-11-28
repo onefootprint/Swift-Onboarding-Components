@@ -16,18 +16,20 @@ use newtypes::OnboardingStatus;
 use newtypes::WorkflowId;
 
 #[derive(derive_more::Deref)]
-pub struct BoWithKycInfo(
-    pub Option<(Workflow, Option<OnboardingDecision>)>,
-    #[deref] pub BusinessOwnerInfo,
-);
+pub struct BoWithKycInfo {
+    pub kyc_info: Option<(Workflow, Option<OnboardingDecision>)>,
+    #[deref]
+    pub bo: BusinessOwnerInfo,
+    pub requires_kyc: bool,
+}
 
 impl BoWithKycInfo {
     /// Unpacks the BoWithDecision into its underlying Workflow and OnboardingDecision, if there is
     /// a terminal OnboardingDecision for the BO.
     /// If not, returns an error with context on what is missing.
     pub fn try_get_ready_result(&self) -> FpResult<(&Workflow, &OnboardingDecision, &BusinessOwnerInfo)> {
-        let Self(wf_obd, bo) = self;
-        let (wf, obd) = wf_obd
+        let Self { kyc_info, bo, .. } = self;
+        let (wf, obd) = kyc_info
             .as_ref()
             .ok_or(BadRequest("Beneficial owner hasn't started onboarding"))?;
         let obd = obd
@@ -47,7 +49,7 @@ impl BoWithKycInfo {
 
 #[derive(Default)]
 pub struct KybBoFeatures {
-    /// The decrypted BOs along with their KYC results. Empty if the playbook does not require KYC.
+    /// The decrypted BOs along with their KYC results.
     pub bos: Vec<BoWithKycInfo>,
 }
 
@@ -81,13 +83,18 @@ impl KybBoFeatures {
         let mut user_decisions = BusinessWorkflowLink::get_latest_user_decisions(conn, &biz_wf.id, true)?;
         let (_, obc) = ObConfiguration::get(conn, &biz_wf.id)?;
 
-        let bos = if obc.verification_checks().skip_kyc() {
-            vec![]
-        } else {
-            dbos.into_iter()
-                .map(|bo| BoWithKycInfo(user_decisions.remove(&bo.bo.id), bo))
-                .collect_vec()
-        };
+        let requires_kyc = !obc.verification_checks().skip_kyc();
+        let bos = dbos
+            .into_iter()
+            .map(|bo| {
+                let kyc_info = user_decisions.remove(&bo.bo.id);
+                BoWithKycInfo {
+                    kyc_info,
+                    bo,
+                    requires_kyc,
+                }
+            })
+            .collect_vec();
 
         Ok((Self { bos }, biz_wf))
     }
@@ -97,7 +104,11 @@ impl KybBoFeatures {
     pub fn try_get_ready_results(
         &self,
     ) -> FpResult<Vec<(&Workflow, &OnboardingDecision, &BusinessOwnerInfo)>> {
-        self.bos.iter().map(|bo| bo.try_get_ready_result()).collect()
+        self.bos
+            .iter()
+            .filter(|bo| bo.requires_kyc)
+            .map(|bo| bo.try_get_ready_result())
+            .collect()
     }
 
     pub fn all_bos_have_kyc_results(&self) -> bool {

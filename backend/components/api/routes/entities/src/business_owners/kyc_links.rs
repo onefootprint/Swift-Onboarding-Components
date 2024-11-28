@@ -63,7 +63,7 @@ pub async fn post(
         .into_iter()
         .map(|(bo, token)| {
             let url = (state.config.service_config).generate_link(LinkKind::VerifyBusinessOwner, &token);
-            (&bo.1, &auth, url, token)
+            (&bo.bo, &auth, url, token)
         })
         .map(api_wire_types::PrivateBusinessOwnerKycLink::from_db)
         .collect();
