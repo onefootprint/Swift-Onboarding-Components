@@ -616,6 +616,39 @@ def test_kyb_step_up(kyb_sandbox_ob_config, sandbox_tenant):
     assert body["manual_review_kinds"] == ["document_needs_review"]
 
 
+def test_same_bos_two_businesses(kyb_sandbox_ob_config):
+    """
+    Onboard the same set of BOs onto two different businesses.
+    """
+    bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
+    bifrost.data.update(BUSINESS_SECONDARY_BOS)
+    primary_bo = bifrost.run()
+
+    secondary_bo_token = extract_bo_token(primary_bo)
+    bifrost2 = BifrostClient.new_user(
+        kyb_sandbox_ob_config, override_ob_config_auth=secondary_bo_token
+    )
+    secondary_bo = bifrost2.run()
+
+    # Now, onboard a second business with the exact same two BOs
+    bifrost = BifrostClient.login_user(kyb_sandbox_ob_config, bifrost.sandbox_id)
+    bifrost.data.update(BUSINESS_SECONDARY_BOS)
+    primary_bo2 = bifrost.run()
+    assert primary_bo2.fp_bid != primary_bo.fp_bid
+
+    secondary_bo_token = extract_bo_token(primary_bo2)
+    bifrost2 = BifrostClient.login_user(
+        kyb_sandbox_ob_config,
+        secondary_bo.client.sandbox_id,
+        override_ob_config_auth=secondary_bo_token,
+    )
+    secondary_bo2 = bifrost2.run()
+    assert any(r["kind"] == "process" for r in bifrost2.handled_requirements)
+
+    assert secondary_bo2.client.validate_response["user"]["status"] == "pass"
+    assert secondary_bo2.client.validate_response["business"]["status"] == "pass"
+
+
 def extract_bo_session_sms(twilio, phone_number, business_name):
     def inner():
         messages = twilio.messages.list(to=phone_number, limit=25)

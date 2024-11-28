@@ -42,12 +42,14 @@ use newtypes::IdentityDataKind as IDK;
 use newtypes::InvestorProfileDeclaration;
 use newtypes::InvestorProfileKind as IPK;
 use newtypes::Iso3166TwoDigitCountryCode;
+use newtypes::KybState;
 use newtypes::LivenessSource;
 use newtypes::OnboardingRequirement;
 use newtypes::Selfie;
 use newtypes::UsLegalStatus;
 use newtypes::WorkflowConfig;
 use newtypes::WorkflowKind;
+use newtypes::WorkflowState;
 use std::str::FromStr;
 
 /// Wrapper type around DecryptUncheckedResult that is guaranteed to have all the IDKs we need for
@@ -583,9 +585,14 @@ fn get_authorize_requirement<T>(
     }))
 }
 
-fn get_process_requirement(wf: &Workflow) -> Option<OnboardingRequirement> {
+fn get_process_requirement(ctx: RequirementContext, wf: &Workflow) -> Option<OnboardingRequirement> {
+    // We really need to serialize a process requirement just when a workflow is "proceed-able." But
+    // that's evidently a little bit difficult
     if wf.state.requires_user_input() {
         Some(OnboardingRequirement::Process)
+    } else if matches!(wf.state, WorkflowState::Kyb(KybState::AwaitingBoKyc)) {
+        let is_ready = ctx.kyb_bo_features.all_bos_have_kyc_results();
+        is_ready.then_some(OnboardingRequirement::Process)
     } else {
         None
     }
@@ -607,18 +614,18 @@ pub fn get_requirements_for_wf<T>(
             get_register_passkey_requirement(conn, ctx, wf)?,
             get_collect_document_requirements(conn, ctx, wf)?,
             get_authorize_requirement(conn, ctx, vw, wf)?,
-            get_process_requirement(wf),
+            get_process_requirement(ctx, wf),
         )
         .collect_vec(),
         WorkflowKind::Kyb => chain!(
             get_collect_kyb_data_requirement(ctx, vw, wf)?,
             get_collect_document_requirements(conn, ctx, wf)?,
-            get_process_requirement(wf),
+            get_process_requirement(ctx, wf),
         )
         .collect_vec(),
         WorkflowKind::Document => chain!(
             get_collect_document_requirements(conn, ctx, wf)?,
-            get_process_requirement(wf),
+            get_process_requirement(ctx, wf),
         )
         .collect_vec(),
     };
