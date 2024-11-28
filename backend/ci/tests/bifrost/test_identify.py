@@ -624,6 +624,7 @@ def test_cannot_set_verified_ci(sandbox_tenant):
         )
 
 
+@pytest.mark.flaky
 def test_sms_link(twilio, sandbox_tenant, live_phone_number):
     #
     # First, create a user with the live phone number
@@ -693,7 +694,9 @@ def test_sms_link(twilio, sandbox_tenant, live_phone_number):
 
     data = dict(preferred_challenge_kind="sms_link", scope="onboarding")
     session_id_h = SessionId(str(uuid4()))
-    initiate_challenge = lambda: post("hosted/identify/login_challenge", data, token, session_id_h)
+    initiate_challenge = lambda: post(
+        "hosted/identify/login_challenge", data, token, session_id_h
+    )
     # Rate limiting may take a while
     body = try_until_success(initiate_challenge, 20)
 
