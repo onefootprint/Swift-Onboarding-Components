@@ -33,6 +33,10 @@
         }
       }
     },
+    "cta": "Filters",
+    "apply-filters": "Apply filters",
+    "clear-filters": "Clear filters",
+    "apply": "Apply",
     "date-range": {
       "label": "Date"
     }

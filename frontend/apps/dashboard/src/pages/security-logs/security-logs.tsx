@@ -7,6 +7,7 @@ import { MAIN_PAGE_ID } from 'src/config/constants';
 import useGetAccessEvents from 'src/hooks/use-get-access-events';
 import useSession from 'src/hooks/use-session';
 import useSecurityLogsFilters from '../../hooks/use-security-logs-filters';
+import Filters from './components/filters';
 import SecurityLogsFilters from './components/security-logs-filters';
 import Timeline from './components/timeline';
 
@@ -101,6 +102,7 @@ const SecurityLogs = () => {
               placeholder={t('filters.search')}
             />
             <SecurityLogsFilters />
+            {isFirmEmployee && <Filters />}
           </Stack>
           <Stack gap={0} alignItems="center">
             <Toggle
