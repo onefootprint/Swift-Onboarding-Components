@@ -106,12 +106,7 @@ impl RiskSignal {
         risk_group_kind: RiskSignalGroupKind,
         hidden: bool,
     ) -> FpResult<Vec<Self>> {
-        let sv_id = risk_group_scope.scoped_vault_id();
         let rsg = RiskSignalGroup::create(conn.conn(), risk_group_scope, risk_group_kind)?;
-        let duplicates = Self::generate_duplicate_frc_by_reason_code_and_vendor_api(signals.clone());
-        if !duplicates.is_empty() {
-            tracing::error!(reason_codes=format!("{:?}", duplicates), scoped_vault_id =%sv_id, "duplicate reason codes produced");
-        }
         Self::bulk_add(conn, signals, hidden, rsg.id)
     }
 
@@ -126,6 +121,11 @@ impl RiskSignal {
     where
         T: Into<NewRiskSignalArgs> + Clone + Eq + PartialEq + std::hash::Hash,
     {
+        let duplicates = Self::generate_duplicate_frc_by_reason_code_and_vendor_api(signals.clone());
+        if !duplicates.is_empty() {
+            tracing::info!(reason_codes=format!("{:?}", duplicates), rsg_id =%rsg_id, "duplicate_reason_codes");
+        }
+
         let seqno = DataLifetime::get_current_seqno(conn)?;
         let new_risk_signals: Vec<NewRiskSignal> = signals
             .into_iter()
@@ -151,9 +151,19 @@ impl RiskSignal {
         Ok(result)
     }
 
-    fn generate_duplicate_frc_by_reason_code_and_vendor_api(
-        signals: Vec<(FootprintReasonCode, VendorAPI, VerificationResultId)>,
-    ) -> Vec<(FootprintReasonCode, VendorAPI, VerificationResultId)> {
+    fn generate_duplicate_frc_by_reason_code_and_vendor_api<T>(
+        signals: Vec<T>,
+    ) -> Vec<(FootprintReasonCode, VendorAPI, Option<VerificationResultId>)>
+    where
+        T: Into<NewRiskSignalArgs> + Clone + Eq + PartialEq + std::hash::Hash,
+    {
+        let signals = signals
+            .into_iter()
+            .map(|s| {
+                let args = s.into();
+                (args.reason_code, args.vendor_api, args.verification_result_id)
+            })
+            .collect_vec();
         signals
             .into_iter()
             .fold(
@@ -165,7 +175,7 @@ impl RiskSignal {
             )
             .into_iter()
             .filter(|(_, count)| *count > 1)
-            .collect::<HashMap<(FootprintReasonCode, VendorAPI, VerificationResultId), i32>>()
+            .collect::<HashMap<(FootprintReasonCode, VendorAPI, Option<VerificationResultId>), i32>>()
             .keys()
             .cloned()
             .collect()
