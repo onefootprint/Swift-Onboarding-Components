@@ -35,6 +35,7 @@ use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
+use api_errors::FpError;
 use async_trait::async_trait;
 use db::models::document_request::DocumentRequest;
 use db::models::list_entry::ListEntry;
@@ -150,6 +151,14 @@ impl KycVendorCalls {
     }
 }
 
+fn log_optional_vendor_error(vendor_api: VendorAPI, err: FpError) {
+    tracing::warn!(
+        ?vendor_api,
+        ?err,
+        "error running vendor call in KYC State machine"
+    );
+}
+
 #[async_trait]
 impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
     type AsyncRes = Box<(
@@ -212,7 +221,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             match common::run_curp_check(state, &self.wf_id).await {
                 Ok(res) => res,
                 Err(err) => {
-                    tracing::error!(?err, wf_id=?self.wf_id, "error running curp validation");
+                    log_optional_vendor_error(VendorAPI::IncodeCurpValidation, err);
                     None
                 }
             }
@@ -228,7 +237,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             match common::run_twilio_check(state, &self.wf_id, &obc).await {
                 Ok(res) => res,
                 Err(err) => {
-                    tracing::error!(?err, wf_id=?self.wf_id, "error running twilio");
+                    log_optional_vendor_error(VendorAPI::TwilioLookupV2, err);
                     None
                 }
             }
@@ -245,7 +254,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             match common::run_neuro_check(state, &self.wf_id, &self.t_id).await {
                 Ok(res) => res,
                 Err(err) => {
-                    tracing::warn!(?err, wf_id=?self.wf_id, "error running NeuroID");
+                    log_optional_vendor_error(VendorAPI::NeuroIdAnalytics, err);
                     None
                 }
             }
@@ -268,7 +277,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             match common::run_application_risk(state, &self.wf_id, &self.t_id).await {
                 Ok(res) => res,
                 Err(err) => {
-                    tracing::warn!(?err, wf_id=?self.wf_id, "error running sentilink");
+                    log_optional_vendor_error(VendorAPI::SentilinkApplicationRisk, err);
                     None
                 }
             }
@@ -276,11 +285,11 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             None
         };
 
-        // Run samba if needed
+        // Run samba if needed. THIS ONLY RUNS FOR ACTIVITY HISTORY, PLEASE CHANGE IF YOU ADD OTHER PRODUCTS
         match common::run_samba_if_needed(state, &self.wf_id, &playbook, &obc).await {
             Ok(()) => (),
             Err(err) => {
-                tracing::warn!(?err, wf_id=?self.wf_id, "non-Samba related error running Samba");
+                log_optional_vendor_error(VendorAPI::SambaActivityHistoryCreate, err);
             }
         }
 
