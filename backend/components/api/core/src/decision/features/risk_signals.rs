@@ -2,7 +2,6 @@ use super::curp_validation;
 use super::experian;
 use super::idology_expectid;
 use super::lexis;
-use super::neuro_id;
 use crate::decision::vendor::vendor_result::VendorResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
@@ -79,7 +78,6 @@ pub fn parse_reason_codes(
         ParsedResponse::IncodeCurpValidation(ref r) => {
             curp_validation::footprint_reason_codes(r).into_iter().collect()
         }
-        ParsedResponse::NeuroIdAnalytics(ref r) => neuro_id::footprint_reason_codes(r).into_iter().collect(),
         _ => vec![],
     }
 }

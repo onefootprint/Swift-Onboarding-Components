@@ -1,5 +1,6 @@
 use idv::neuro_id::response::Model;
 use idv::neuro_id::response::NeuroIdAnalyticsResponse;
+use itertools::Itertools;
 use newtypes::DecisionStatus;
 use newtypes::FootprintReasonCode as FRC;
 pub fn footprint_reason_codes(res: &NeuroIdAnalyticsResponse) -> Vec<FRC> {
@@ -59,7 +60,7 @@ pub fn footprint_reason_codes(res: &NeuroIdAnalyticsResponse) -> Vec<FRC> {
         .flat_map(|signal| model_to_frc(&signal.model()))
         .for_each(|frc| frcs.push(frc));
 
-    frcs.into_iter().collect()
+    frcs.into_iter().unique().collect()
 }
 
 #[derive(PartialOrd, Ord, PartialEq, Eq, Copy, Clone, Debug)]
