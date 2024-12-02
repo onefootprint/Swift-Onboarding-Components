@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 const authAppUrl = process.env.E2E_AUTH_BASE_URL || 'http://localhost:3011';
 const uToken = process.env.E2E_UPDATE_UTOKEN || '';
 
-test.skip('Checks if the legacy config opens the flow #ci', async ({ browserName, isMobile, page }) => {
+test('Checks if the legacy config opens the flow #ci', async ({ browserName, isMobile, page }) => {
   test.slow();
   test.skip(isMobile, 'skip on mobile'); // eslint-disable-line playwright/no-skipped-test
   expect(uToken, 'Missing E2E_UPDATE_UTOKEN').toBeTruthy();
