@@ -25,6 +25,7 @@ import type {
   AuditEventDetailCompleteUserCheckLiveness,
   AuditEventDetailCompleteUserCheckWatchlist,
   AuditEventDetailCompleteUserVerification,
+  AuditEventDetailCopyPlaybook,
   AuditEventDetailCreateListEntry,
   AuditEventDetailCreateOrg,
   AuditEventDetailCreateOrgApiKey,
@@ -995,6 +996,25 @@ export const getAuditEventDetailCompleteUserVerification = (
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 
+export const getAuditEventDetailCopyPlaybook = (
+  props: Partial<AuditEventDetailCopyPlaybook>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AuditEventDetailCopyPlaybook =>
+  deepmerge<AuditEventDetailCopyPlaybook>(
+    {
+      data: {
+        playbook: {
+          obConfigurationId: 'cc7e8495-331c-4f5f-9b56-5d1e72872877',
+          playbookId: 'c7d21502-f130-4028-a069-6dd451b27b78',
+        },
+        targetTenantName: 'Rosalie Will',
+      },
+      kind: 'copy_playbook',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
 export const getAuditEventDetailCreateListEntry = (
   props: Partial<AuditEventDetailCreateListEntry>,
   options: { overwriteArray: boolean } = { overwriteArray: true },
@@ -1354,6 +1374,7 @@ export const getAuditEventDetailManuallyReviewEntity = (
       data: {
         decisionStatus: 'step_up',
         fpId: '4a037525-46d5-4bd0-b110-10a334dcd750',
+        kind: 'business',
       },
       kind: 'manually_review_entity',
     },

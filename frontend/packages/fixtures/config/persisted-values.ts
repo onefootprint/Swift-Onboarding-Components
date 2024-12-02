@@ -145,6 +145,7 @@ import type {
   AuditEventDetailCompleteUserCheckLiveness,
   AuditEventDetailCompleteUserCheckWatchlist,
   AuditEventDetailCompleteUserVerification,
+  AuditEventDetailCopyPlaybook,
   AuditEventDetailCreateListEntry,
   AuditEventDetailCreateOrg,
   AuditEventDetailCreateOrgApiKey,
@@ -3984,6 +3985,16 @@ export const dashboard_AuditEventDetailCompleteUserCheckWatchlist: AuditEventDet
 export const dashboard_AuditEventDetailCompleteUserVerification: AuditEventDetailCompleteUserVerification = {
   kind: 'complete_user_verification',
 };
+export const dashboard_AuditEventDetailCopyPlaybook: AuditEventDetailCopyPlaybook = {
+  data: {
+    playbook: {
+      obConfigurationId: 'cc7e8495-331c-4f5f-9b56-5d1e72872877',
+      playbookId: 'c7d21502-f130-4028-a069-6dd451b27b78',
+    },
+    targetTenantName: 'Rosalie Will',
+  },
+  kind: 'copy_playbook',
+};
 export const dashboard_AuditEventDetailCreateListEntry: AuditEventDetailCreateListEntry = {
   data: {
     listEntryCreationId: '9f3fbdc0-a348-428e-ad43-9622a052d59c',
@@ -4181,6 +4192,7 @@ export const dashboard_AuditEventDetailManuallyReviewEntity: AuditEventDetailMan
   data: {
     decisionStatus: 'step_up',
     fpId: '4a037525-46d5-4bd0-b110-10a334dcd750',
+    kind: 'business',
   },
   kind: 'manually_review_entity',
 };
