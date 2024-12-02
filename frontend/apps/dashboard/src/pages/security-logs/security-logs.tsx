@@ -22,10 +22,8 @@ const SecurityLogs = () => {
     getAccessEvents.data?.pages.reduce<AuditEvent[]>((allPages, page) => [...allPages, ...(page?.data ?? [])], []) ??
     [];
 
-  const accessEventsToShow = ['decrypt_user_data'];
-
-  const extendedAccessEventsToShow = [
-    ...accessEventsToShow,
+  const accessEventsToShow = [
+    'decrypt_user_data',
     'create_org_role',
     'update_org_role',
     'deactivate_org_role',
@@ -38,9 +36,18 @@ const SecurityLogs = () => {
     'update_org_api_key_role',
     'update_user_data',
     'delete_user_data',
+    'manually_review_entity',
+  ];
+
+  const extendedAccessEventsToShow = [
+    ...accessEventsToShow,
+    // These two are done, but we leave behind a gate so we can release
+    // all playbook events at once
     'create_playbook',
     'edit_playbook',
-    'manually_review_entity',
+    'copy_playbook',
+    // TODO - BE support + backfill
+    'update_playbook_status',
   ];
 
   const isFirmEmployee = session?.user?.isFirmEmployee;
