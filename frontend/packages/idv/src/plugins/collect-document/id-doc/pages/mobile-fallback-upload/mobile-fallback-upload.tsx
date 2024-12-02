@@ -55,7 +55,13 @@ const MobileFallbackUpload = ({ imageType, onTakePhotoClick }: MobileFallbackUpl
         leftButton={{ variant: 'back', onBack: () => send({ type: 'navigatedToPrev' }) }}
         position="floating"
       />
-      <HeaderTitle title={t(getTitle(imageType))} subtitle={subtitle} icon={IcoClock40} />
+      <HeaderTitle
+        title={t(getTitle(imageType))}
+        subtitle={subtitle}
+        icon={IcoClock40}
+        display="flex"
+        flexDirection="column"
+      />
       <IdDocPhotoButtons
         onComplete={payload => send({ type: 'receivedImage', payload })}
         allowPdf={allowPdf}
