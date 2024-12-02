@@ -259,15 +259,17 @@ impl<'a> TryDbToApi<(JoinedAuditEvent, &'a AuditEventBulkSecondaryData)> for Aud
             AuditEventMetadata::ManuallyReviewEntity {
                 onboarding_decision_id,
             } => {
-                let fp_id = scoped_vault
-                    .ok_or(ServerErr("scoped vault is not available for this event"))?
-                    .fp_id;
+                let scoped_vault =
+                    scoped_vault.ok_or(ServerErr("scoped vault is not available for this event"))?;
+                let fp_id = scoped_vault.fp_id;
+                let kind = scoped_vault.kind;
                 let onboarding_decision = secondary_data
                     .onboarding_decisions
                     .get(&onboarding_decision_id)
                     .ok_or(ServerErr("onboarding decision is not available for this event"))?;
                 AuditEventDetail::ManuallyReviewEntity {
                     decision_status: onboarding_decision.0.status,
+                    kind,
                     fp_id,
                 }
             }

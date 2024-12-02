@@ -17,6 +17,7 @@ use newtypes::TenantId;
 use newtypes::TenantRoleId;
 use newtypes::TenantScope;
 use newtypes::TenantUserId;
+use newtypes::VaultKind;
 use strum_macros::Display;
 
 /// Describes an event relevant to security as seen by tenants.
@@ -137,6 +138,7 @@ pub enum AuditEventDetail {
     DisablePlaybook,
     ManuallyReviewEntity {
         decision_status: DecisionStatus,
+        kind: VaultKind,
         fp_id: FpId,
     },
     EditPlaybook {

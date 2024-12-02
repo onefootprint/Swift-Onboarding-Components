@@ -64,6 +64,7 @@ def test_manual_decision_action(sandbox_tenant, kyb_sandbox_ob_config):
         sandbox_tenant,
         "manually_review_entity",
         fp_id=user.fp_id,
+        kind="person",
         decision_status="fail",
     )
 
@@ -82,6 +83,7 @@ def test_manual_decision_action(sandbox_tenant, kyb_sandbox_ob_config):
         sandbox_tenant,
         "manually_review_entity",
         fp_id=user.fp_bid,
+        kind="business",
         decision_status="fail",
     )
 
