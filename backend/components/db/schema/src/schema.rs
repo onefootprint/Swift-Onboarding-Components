@@ -810,7 +810,7 @@ diesel::table! {
         deactivated_at -> Nullable<Timestamptz>,
         status -> Text,
         actor -> Jsonb,
-        seqno -> Nullable<Int8>,
+        seqno -> Int8,
         workflow_id -> Text,
         rule_set_result_id -> Nullable<Text>,
         failed_for_doc_review -> Bool,

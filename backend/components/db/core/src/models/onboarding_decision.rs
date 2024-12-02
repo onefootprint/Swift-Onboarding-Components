@@ -53,7 +53,7 @@ pub struct OnboardingDecision {
     pub deactivated_at: Option<DateTime<Utc>>,
     pub status: DecisionStatus,
     pub actor: DbActor,
-    pub seqno: Option<DataLifetimeSeqno>,
+    pub seqno: DataLifetimeSeqno,
     // TODO we should add scoped_vault_id to this table since not all decisions really affect a workflow
     // anymore
     pub workflow_id: WorkflowId,

@@ -298,7 +298,7 @@ async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: Docum
 
     assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state);
     assert_eq!(OnboardingStatus::Pass, wf.status);
-    assert_eq!(obd.as_ref().unwrap().seqno.unwrap(), portablized_seqno);
+    assert_eq!(obd.as_ref().unwrap().seqno, portablized_seqno);
     assert!(obd.unwrap().rule_set_result_id.is_some());
     assert!(mrs.is_empty());
 
@@ -682,7 +682,6 @@ async fn redo_and_pass(
     let obd = obd.unwrap();
     assert!(obd.id != prior_obd.id);
     assert!(obd.status == DecisionStatus::Pass);
-    assert!(obd.seqno.is_some());
     assert!(obd.rule_set_result_id.is_some());
     assert!(matches!(obd.actor, DbActor::Footprint));
     assert_eq!(OnboardingStatus::Pass, wf.status);

@@ -145,11 +145,9 @@ async fn test(
     if expected_status == OnboardingStatus::Fail {
         assert!(!mrs.is_empty());
         assert_eq!(obd.status, DecisionStatus::Fail);
-        assert!(obd.seqno.is_some());
     } else {
         assert!(mrs.is_empty());
         assert_eq!(obd.status, DecisionStatus::Pass);
-        assert!(obd.seqno.is_some());
     }
 
     AmlKind::iter().for_each(|k| {

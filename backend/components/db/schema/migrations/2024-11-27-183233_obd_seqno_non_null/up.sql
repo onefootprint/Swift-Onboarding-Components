@@ -1,0 +1,1 @@
+ALTER TABLE onboarding_decision ALTER COLUMN seqno SET NOT NULL;

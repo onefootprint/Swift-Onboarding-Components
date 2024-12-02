@@ -214,7 +214,7 @@ async fn run_kyc_for_bo(
     let portablized_seqno = query_portablized_seqno(state, &svid).await;
     if matches!(expected_ob_status, OnboardingStatus::Pass) {
         let seq = portablized_seqno.unwrap();
-        assert_eq!(obd.as_ref().unwrap().seqno.unwrap(), seq);
+        assert_eq!(obd.as_ref().unwrap().seqno, seq);
     } else {
         assert!(portablized_seqno.is_none());
     }
