@@ -5,6 +5,7 @@ import { ErrorComponent } from 'src/components';
 import Page404 from 'src/components/404';
 import Content from './components/content';
 import Loading from './components/loading';
+import TenantSwitcher from './components/tenant-switcher';
 import useEntity from './hooks/use-entity';
 import Provider from './hooks/use-entity-context';
 import useEntityId from './hooks/use-entity-id';
@@ -23,12 +24,16 @@ const Details = ({ kind, listPath }: DetailsProps) => {
     return <Loading />;
   }
 
-  if ((error as AxiosError)?.response?.status === 404) {
-    return <Page404 />;
-  }
-
   if (error) {
-    return <ErrorComponent error={error} />;
+    let errorComponent = <ErrorComponent error={error} />;
+    if ((error as AxiosError)?.response?.status === 404) {
+      errorComponent = <Page404 />;
+    }
+    return (
+      <TenantSwitcher entityId={id} Loading={Loading}>
+        {errorComponent}
+      </TenantSwitcher>
+    );
   }
 
   return <EntityDetails kind={kind} listPath={listPath} />;
