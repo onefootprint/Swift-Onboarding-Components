@@ -260,14 +260,11 @@ def test_get_members_filter_role_id(run_id, sandbox_tenant, admin_role):
         )
 
 
-def test_update_name(sandbox_tenant, limited_role, run_id):
-    email = f"custom_it_user.{run_id}+222@onefootprint.com"
-    tenant_user = create_tenant_user(
-        sandbox_tenant, limited_role, email, "Flerp", "Grinman"
+def test_update_name(sandbox_tenant):
+    first_name = (
+        f"Footprint {_gen_random_n_digit_number(5)} (updated by test_update_name)"
     )
-
-    first_name = f"Footprint {_gen_random_n_digit_number(5)}"
-    last_name = f"Integration Testing {_gen_random_n_digit_number(5)}"
+    last_name = f"Integration Testing {_gen_random_n_digit_number(5)} (updated by test_update_name)"
     data = dict(first_name=first_name, last_name=last_name)
     body = patch(f"org/member", data, *sandbox_tenant.db_auths)
     assert body["first_name"] == first_name

@@ -1560,6 +1560,8 @@ def test_playbook_versions(sandbox_tenant, tenant):
         "created_at": obc_v2_resp["created_at"],
         # Rule set version restarts at 1
         "rule_set": {"version": 1},
+        # Author name may be changed dynamically.
+        "author": obc_v2_resp["author"],
     }
 
     assert_has_audit_event_with_details(
@@ -1574,6 +1576,8 @@ def test_playbook_versions(sandbox_tenant, tenant):
         "name": "Test Playbook Version 2",
         # Rule set version restarts at 1
         "rule_set": {"version": 1},
+        # Author name may be changed dynamically.
+        "author": obc_v2_resp["author"],
         "documents_to_collect": [
             {"kind": "proof_of_address", "data": {"requires_human_review": True}}
         ],
@@ -1607,6 +1611,8 @@ def test_playbook_versions(sandbox_tenant, tenant):
     assert get_obc_v1["deactivated_at"]
     assert get_obc_v1 == obc_v1_with_rules_edit | {
         "deactivated_at": get_obc_v1["deactivated_at"],
+        # Author name may be changed dynamically.
+        "author": get_obc_v1["author"],
     }
 
     get_obc_v2 = get(
