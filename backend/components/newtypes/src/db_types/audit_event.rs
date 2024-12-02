@@ -10,6 +10,7 @@ use crate::ObConfigurationId;
 use crate::OnboardingDecisionId;
 use crate::ScopedVaultId;
 use crate::TenantApiKeyId;
+use crate::TenantId;
 use crate::TenantRoleId;
 use crate::TenantScope;
 use crate::TenantUserId;
@@ -137,6 +138,10 @@ pub enum AuditEventDetail {
     },
     EditPlaybook {
         ob_configuration_id: ObConfigurationId,
+    },
+    CopyPlaybook {
+        ob_configuration_id: ObConfigurationId,
+        target_tenant_id: TenantId,
     },
 }
 
@@ -428,6 +433,16 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
                     ..Default::default()
                 },
             },
+            AuditEventDetail::CopyPlaybook {
+                ob_configuration_id,
+                target_tenant_id,
+            } => Self {
+                metadata: AuditEventMetadata::CopyPlaybook { target_tenant_id },
+                args: AuditEventOptionalArgs {
+                    ob_configuration_id: Some(ob_configuration_id),
+                    ..Default::default()
+                },
+            },
         }
     }
 }
@@ -523,6 +538,9 @@ pub enum AuditEventMetadata {
     DeleteListEntry,
     CreatePlaybook,
     DisablePlaybook,
+    CopyPlaybook {
+        target_tenant_id: TenantId,
+    },
     ManuallyReviewEntity {
         onboarding_decision_id: OnboardingDecisionId,
     },

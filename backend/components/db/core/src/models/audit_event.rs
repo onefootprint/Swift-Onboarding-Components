@@ -423,6 +423,7 @@ impl AuditEvent {
 pub struct AuditEventBulkSecondaryData {
     pub tenant_roles: HashMap<TenantRoleId, TenantRole>,
     pub onboarding_decisions: HashMap<OnboardingDecisionId, SaturatedOnboardingDecisionInfo>,
+    pub tenants: HashMap<TenantId, Tenant>,
 }
 
 impl AuditEventBulkSecondaryData {
@@ -456,7 +457,14 @@ impl AuditEventBulkSecondaryData {
                     .unwrap_or_default(),
                 _ => vec![],
             });
-        let tenant_roles = TenantRole::get_bulk(conn, tr_ids.collect())?;
+
+        let tenant_ids = joined_events
+            .iter()
+            .flat_map(|je| match &je.audit_event.metadata {
+                AuditEventMetadata::CopyPlaybook { target_tenant_id } => vec![target_tenant_id],
+                _ => vec![],
+            })
+            .collect_vec();
 
         let onboarding_decision_ids = joined_events
             .iter()
@@ -467,10 +475,15 @@ impl AuditEventBulkSecondaryData {
                 _ => None,
             })
             .collect();
+
+
+        let tenant_roles = TenantRole::get_bulk(conn, tr_ids.collect())?;
+        let tenants = Tenant::get_bulk(conn, tenant_ids)?;
         let onboarding_decisions = OnboardingDecision::get_bulk(conn, onboarding_decision_ids)?;
 
         Ok(Self {
             tenant_roles,
+            tenants,
             onboarding_decisions,
         })
     }

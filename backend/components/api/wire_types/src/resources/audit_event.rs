@@ -153,6 +153,10 @@ pub enum AuditEventDetail {
         last_name: Option<String>,
         email: OrgMemberEmail,
     },
+    CopyPlaybook {
+        playbook: AuditEventPlaybook,
+        target_tenant_name: String,
+    },
 }
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]

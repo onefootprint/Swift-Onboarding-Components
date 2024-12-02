@@ -341,6 +341,17 @@ impl Tenant {
         Ok(result)
     }
 
+    #[tracing::instrument("Tenant::get_bulk", skip_all)]
+    pub fn get_bulk(conn: &mut PgConn, ids: Vec<&TenantId>) -> FpResult<HashMap<TenantId, Tenant>> {
+        let tenants = tenant::table
+            .filter(tenant::id.eq_any(ids))
+            .get_results::<Self>(conn)?
+            .into_iter()
+            .map(|l| (l.id.clone(), l))
+            .collect();
+        Ok(tenants)
+    }
+
     #[tracing::instrument("Tenant::list_by_user_vault_id", skip_all)]
     pub fn list_by_user_vault_id(conn: &mut PgConn, vault_id: &VaultId) -> FpResult<Vec<Tenant>> {
         let res = scoped_vault::table

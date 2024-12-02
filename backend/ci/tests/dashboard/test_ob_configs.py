@@ -10,7 +10,11 @@ from tests.utils import (
     create_ob_config,
     _gen_random_sandbox_id,
 )
-from tests.dashboard.utils import update_rules, assert_has_audit_event_with_details
+from tests.dashboard.utils import (
+    update_rules,
+    assert_has_audit_event_with_details,
+    list_audit_events_with_details,
+)
 from tests.headers import (
     DryRun,
     IsLive,
@@ -1400,6 +1404,34 @@ def test_copy_playbook(
         r["rule_id"] for r in original_rules
     )
     assert len(overlapping_rule_ids) == 0
+
+    if copy_to_different_target_tenant:
+        # Event on source tenant should be copy_playbook
+        assert_has_audit_event_with_details(
+            sandbox_tenant,
+            "copy_playbook",
+            target_tenant_name=foo_sandbox_tenant.name,
+            playbook={"ob_configuration_id": obc.id},
+        )
+
+        # Event on target tenant should be create_playbook
+        assert_has_audit_event_with_details(
+            foo_sandbox_tenant,
+            "create_playbook",
+            is_live=target_is_live,
+            playbook={"ob_configuration_id": copied_id},
+        )
+    else:
+        # When copying to same tenant, only expect a create_playbook event
+        assert_has_audit_event_with_details(
+            sandbox_tenant,
+            "create_playbook",
+            is_live=target_is_live,
+            playbook={
+                "ob_configuration_id": copied_id,
+                "playbook_id": copied["playbook_id"],
+            },
+        )
 
 
 def test_cannot_copy_with_read_perms(sandbox_tenant, foo_sandbox_tenant):

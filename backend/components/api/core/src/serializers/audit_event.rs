@@ -240,6 +240,21 @@ impl<'a> TryDbToApi<(JoinedAuditEvent, &'a AuditEventBulkSecondaryData)> for Aud
                     },
                 }
             }
+            AuditEventMetadata::CopyPlaybook { target_tenant_id } => {
+                let destination_tenant = (secondary_data.tenants)
+                    .get(&target_tenant_id)
+                    .ok_or(ServerErr("target tenant is not available for this event"))?;
+                // source ob_configuration is available in the event
+                let ob_configuration =
+                    ob_configuration.ok_or(ServerErr("ob_configuration is not available for this event"))?;
+                AuditEventDetail::CopyPlaybook {
+                    playbook: api_wire_types::AuditEventPlaybook {
+                        ob_configuration_id: ob_configuration.id,
+                        playbook_id: ob_configuration.playbook_id,
+                    },
+                    target_tenant_name: destination_tenant.name.clone(),
+                }
+            }
             AuditEventMetadata::DisablePlaybook => AuditEventDetail::DisablePlaybook,
             AuditEventMetadata::ManuallyReviewEntity {
                 onboarding_decision_id,

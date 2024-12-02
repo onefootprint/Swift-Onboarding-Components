@@ -1,4 +1,5 @@
 from tests.utils import get, patch, post, _gen_random_n_digit_number
+from tests.headers import IsLive
 
 
 def latest_audit_event_for(fp_id, tenant):
@@ -7,9 +8,17 @@ def latest_audit_event_for(fp_id, tenant):
     return audit_events[0]
 
 
-def list_audit_events_with_details(tenant, name, **kwargs):
+def list_audit_events_with_details(tenant, name, is_live=None, **kwargs):
     data = dict(names=[name])
-    audit_events = get("org/audit_events?page_size=100", data, *tenant.db_auths)
+    url = "org/audit_events?page_size=100"
+
+    # Use custom auth headers based on is_live parameter
+    if is_live is not None:
+        auth_headers = [tenant.auth_token, IsLive("true" if is_live else "false")]
+    else:
+        auth_headers = tenant.db_auths
+
+    audit_events = get(url, data, *auth_headers)
     for event in audit_events["data"]:
         matches = True
         for key, value in kwargs.items():
@@ -33,12 +42,14 @@ def list_audit_events_with_details(tenant, name, **kwargs):
             yield event
 
 
-def get_audit_event_with_details(tenant, name, **kwargs):
-    return next(list_audit_events_with_details(tenant, name, **kwargs), None)
+def get_audit_event_with_details(tenant, name, is_live=None, **kwargs):
+    return next(
+        list_audit_events_with_details(tenant, name, is_live=is_live, **kwargs), None
+    )
 
 
-def assert_has_audit_event_with_details(tenant, name, **kwargs):
-    event = get_audit_event_with_details(tenant, name, **kwargs)
+def assert_has_audit_event_with_details(tenant, name, is_live=None, **kwargs):
+    event = get_audit_event_with_details(tenant, name, is_live=is_live, **kwargs)
     assert (
         event
     ), f"Expected to find audit event with name={name} and details={kwargs} but found none"
