@@ -7,7 +7,6 @@ import { MAIN_PAGE_ID } from 'src/config/constants';
 import useGetAccessEvents from 'src/hooks/use-get-access-events';
 import useSession from 'src/hooks/use-session';
 import useSecurityLogsFilters from '../../hooks/use-security-logs-filters';
-import Filters from './components/filters';
 import SecurityLogsFilters from './components/security-logs-filters';
 import Timeline from './components/timeline';
 
@@ -29,7 +28,7 @@ const SecurityLogs = () => {
     'deactivate_org_role',
     'invite_org_member',
     'update_org_member',
-    'remote_org_member',
+    'remove_org_member',
     'decrypt_org_api_key',
     'update_org_api_key_status',
     'create_org_api_key',
@@ -110,7 +109,7 @@ const SecurityLogs = () => {
               placeholder={t('filters.search')}
             />
             <SecurityLogsFilters />
-            {isFirmEmployee && <Filters />}
+            {/* {isFirmEmployee && <Filters />} */}
           </Stack>
           <Stack gap={0} alignItems="center">
             <Toggle
