@@ -10,7 +10,8 @@ const ManuallyReviewEntity = ({ detail, hasPrincipalActor }: ManuallyReviewEntit
   const { t } = useTranslation('security-logs', { keyPrefix: 'events.manual-review' });
   if (detail.kind !== 'manually_review_entity') return null;
 
-  const { decisionStatus, fpId } = detail.data;
+  const { decisionStatus, fpId, kind } = detail.data;
+  const url = kind === 'person' ? `/users/${fpId}` : `/businesses/${fpId}`;
 
   return (
     <>
@@ -18,11 +19,10 @@ const ManuallyReviewEntity = ({ detail, hasPrincipalActor }: ManuallyReviewEntit
         {hasPrincipalActor ? t('manually-reviewed-and') : capitalize(t('manually-reviewed-and'))}
       </Text>
       <Text variant="body-3" color="tertiary" tag="span">
-        {t('marked-an')}
+        {t('marked-a')}
       </Text>
-      {/* TODO: make this work for users and businesses */}
-      <LinkButton href={`/users/${fpId}`} target="_blank" iconComponent={IcoArrowTopRight16}>
-        {t('entity')}
+      <LinkButton href={url} target="_blank" iconComponent={IcoArrowTopRight16}>
+        {kind === 'person' ? t('user') : t('business')}
       </LinkButton>
       <Text variant="body-3" color="tertiary" tag="span">
         {t('as', { status: decisionStatus })}.

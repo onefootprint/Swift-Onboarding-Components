@@ -162,9 +162,11 @@
     },
     "manual-review": {
       "manually-reviewed-and": "manually reviewed and",
-      "marked-an": "marked an",
+      "marked-a": "marked a",
       "entity": "entity",
-      "as": "as {{status}}"
+      "as": "as {{status}}",
+      "user": "user",
+      "business": "business"
     },
     "body": {
       "decryption-reason": {
