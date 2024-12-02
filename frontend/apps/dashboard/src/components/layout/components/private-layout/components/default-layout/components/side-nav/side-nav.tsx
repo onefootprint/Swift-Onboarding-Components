@@ -35,7 +35,7 @@ const Nav = () => {
       {
         async onSuccess({ token }) {
           await logIn({ auth: token });
-          router.reload();
+          router.push('/users');
         },
         onError: showErrorToast,
       },
