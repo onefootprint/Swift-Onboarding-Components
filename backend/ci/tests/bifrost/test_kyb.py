@@ -24,14 +24,6 @@ def incomplete_bifrost(kyb_sandbox_ob_config, kyb_cdos):
     return bifrost
 
 
-@pytest.fixture(scope="session")
-def allow_reonboard_kyb_playbook(sandbox_tenant, must_collect_data, kyb_cdos):
-    cdos = must_collect_data + kyb_cdos
-    return create_ob_config(
-        sandbox_tenant, "Allow-reonboard KYB", cdos, kind="kyb", allow_reonboard=True
-    )
-
-
 @pytest.mark.parametrize(
     "business_data,expected_status_code",
     [
