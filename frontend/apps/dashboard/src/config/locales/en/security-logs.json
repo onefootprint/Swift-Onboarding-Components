@@ -50,6 +50,9 @@
       "manually_review_entity": "Entity manually reviewed",
       "header": "Events"
     },
+    "dates": {
+      "header": "Dates"
+    },
     "cta": "Filters",
     "apply-filters": "Apply filters",
     "clear-filters": "Clear filters",
