@@ -105,23 +105,29 @@ def print_invoice_comparison(invoice: stripe.Invoice):
             ),
             dollar_fmt(last_month_li.amount) if last_month_li else "-",
         ]
+        is_li_missing = False
         if line[1] == "-" and line[4] != "-":
             # The quantity for this line item is 0, but it was non-zero last month
             line[1] = colored(line[1], "red")
+            is_li_missing = True
         if line[2] != "-" and line[2] != line[5]:
             # The price for this line item has changed since last month, highlight it
             line[2] = colored(line[2], "yellow")
         lines.append(line)
+        return is_li_missing
 
     # Add all lines for the current month's invoice
+    has_missing_li = False
     for li in this_month:
-        add_line(li.price.product.name)
+        is_li_missing = add_line(li.price.product.name)
+        has_missing_li = has_missing_li or is_li_missing
 
     # And any other products that were only included in last month's invoice
     for li in last_month:
         if li.price.product.name in (li.price.product.name for li in this_month):
             continue
-        add_line(li.price.product.name)
+        is_li_missing = add_line(li.price.product.name)
+        has_missing_li = has_missing_li or is_li_missing
 
     HEADERS = [
         "Product",
@@ -159,6 +165,8 @@ def print_invoice_comparison(invoice: stripe.Invoice):
         print(colored("Note: includes monthly minimum", "red"))
     if not invoice.customer_email:
         print(colored("Note: No customer email on file", "red"))
+    if has_missing_li:
+        print(colored("Note: Potentially missing line item", "yellow"))
 
     print("")
 
