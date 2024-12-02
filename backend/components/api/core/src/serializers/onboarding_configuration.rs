@@ -218,12 +218,14 @@ impl DbToApi<ObConfiguration> for api_wire_types::TimelinePlaybook {
     fn from_db(ob_configuration: ObConfiguration) -> Self {
         let ObConfiguration {
             id,
+            playbook_id,
             name,
             must_collect_data,
             ..
         } = ob_configuration;
         api_wire_types::TimelinePlaybook {
             id,
+            playbook_id,
             name,
             must_collect_data,
         }

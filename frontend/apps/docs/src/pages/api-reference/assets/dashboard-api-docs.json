@@ -19535,12 +19535,16 @@
                     },
                     "name": {
                         "type": "string"
+                    },
+                    "playbook_id": {
+                        "type": "string"
                     }
                 },
                 "required": [
                     "id",
                     "must_collect_data",
-                    "name"
+                    "name",
+                    "playbook_id"
                 ]
             },
             "TokenOperationKind": {

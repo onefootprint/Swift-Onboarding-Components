@@ -10095,6 +10095,7 @@ export const getTimelineOnboardingDecision = (
       id: 'a879cd2d-fb65-4fc0-b790-6700284dd6ac',
       obConfiguration: {
         id: '4ba02c9d-8a73-400e-b0eb-e2bfc584d6fc',
+        playbookId: '4ba02c9d-8a73-400e-b0eb-e2bfc584d6fc',
         mustCollectData: ['business_address', 'ssn4', 'full_address'],
         name: 'Elmer Green-Bode',
       },
@@ -10121,6 +10122,7 @@ export const getTimelinePlaybook = (
       id: '367621e6-a7ff-43f5-9764-6199e904bb6a',
       mustCollectData: ['business_phone_number', 'business_address', 'business_website'],
       name: 'Clara Herzog',
+      playbookId: '361de12a-32b0-45f0-8515-4247ed3a7126',
     },
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
@@ -10602,6 +10604,7 @@ export const getUserTimelineEventBusinessOwnerCompletedKyc = (
           id: '5f2f3ae5-8758-462a-854a-0c4195cb469e',
           obConfiguration: {
             id: '03eae7be-3038-487c-8a46-b071fff01b4d',
+            playbookId: '4ba02c9d-8a73-400e-b0eb-e2bfc584d6fc',
             mustCollectData: ['card', 'us_legal_status', 'us_legal_status'],
             name: 'Guadalupe Nitzsche',
           },
@@ -10771,6 +10774,7 @@ export const getUserTimelineEventOnboardingDecision = (
           id: '2b64a4e6-4941-438c-88f8-d7dfaaa72dc8',
           obConfiguration: {
             id: '4422c4b8-d424-49f8-89be-6d02a7ba71c5',
+            playbookId: '4ba02c9d-8a73-400e-b0eb-e2bfc584d6fc',
             mustCollectData: ['business_name', 'phone_number', 'business_tin'],
             name: 'Alfredo King',
           },
@@ -10881,6 +10885,7 @@ export const getUserTimelineEventWorkflowStarted = (
           id: 'eb6f55e8-7b9e-4302-8b07-9dafb30bed16',
           mustCollectData: ['business_kyced_beneficial_owners', 'ssn4', 'business_website'],
           name: 'Ed Koelpin',
+          playbookId: 'b3dc7a1e-49f8-44aa-8270-9fb3975de584',
         },
         workflowSource: 'tenant',
       },
@@ -11438,6 +11443,7 @@ export const getWorkflowStarted = (
         id: 'b1526656-9e3e-4a7b-810b-02974920798a',
         mustCollectData: ['business_address', 'ssn9', 'bank'],
         name: 'Glenn Balistreri',
+        playbookId: '9d60e3d4-895e-4a5a-96e2-8e86b303fd91',
       },
       workflowSource: 'tenant',
     },

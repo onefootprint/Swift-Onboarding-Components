@@ -5204,6 +5204,7 @@ export type TimelinePlaybook = {
   id: string;
   mustCollectData: Array<CollectedDataOption>;
   name: string;
+  playbookId: string;
 };
 export type TokenOperationKind = 'onboard' | 'inherit' | 'update_auth_methods';
 export type UnvalidatedRuleExpression = Array<RuleExpressionCondition>;

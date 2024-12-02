@@ -5,6 +5,7 @@ use newtypes::DecisionStatus;
 use newtypes::ManualReviewKind;
 use newtypes::ObConfigurationId;
 use newtypes::OnboardingDecisionId;
+use newtypes::PlaybookId;
 use newtypes::PublishablePlaybookKey;
 use newtypes::RuleSetResultId;
 use newtypes::WorkflowKind;
@@ -36,6 +37,7 @@ pub struct ManualReview {
 
 pub struct TimelinePlaybook {
     pub id: ObConfigurationId,
+    pub playbook_id: PlaybookId,
     pub name: String,
     pub must_collect_data: Vec<CollectedDataOption>,
 }
