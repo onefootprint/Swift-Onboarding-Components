@@ -19,17 +19,15 @@ const WorkflowStartedEventHeader = ({ data }: WorkflowStartedEventHeaderProps) =
       transKey = 'audit-trail.timeline.workflow-started-event.started-running-playbook';
     }
     return (
-      <>
-        <Text variant="body-3" color="tertiary">
-          <Trans
-            ns="entity-details"
-            i18nKey={transKey}
-            components={{
-              playbook: <PlaybookLink playbook={data.playbook} />,
-            }}
-          />
-        </Text>
-      </>
+      <Text variant="body-3" color="tertiary" display="flex" alignItems="center" gap={2}>
+        <Trans
+          ns="entity-details"
+          i18nKey={transKey}
+          components={{
+            playbook: <PlaybookLink playbook={data.playbook} />,
+          }}
+        />
+      </Text>
     );
   }
   if (data.kind === WorkflowStartedEventKind.document) {
