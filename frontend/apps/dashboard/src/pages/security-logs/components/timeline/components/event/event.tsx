@@ -8,6 +8,7 @@ import DeactivateOrgRole from './components/deactivate-org-role';
 import DecryptOrgApiKey from './components/decrypt-org-api-key';
 import EditPlaybook from './components/edit-playbook';
 import InviteOrgMember from './components/invite-org-member';
+import ManuallyReviewEntity from './components/manually-review-entity';
 import PrincipalActor from './components/principal-actor';
 import RemoveOrgMember from './components/remove-org-member';
 import UpdateOrgApiKeyRole from './components/update-org-api-key-role';
@@ -61,6 +62,9 @@ const Event = ({ auditEvent }: { auditEvent: AuditEvent }) => {
         <CreatePlaybook detail={detail as AuditEventDetail} hasPrincipalActor={hasPrincipalActor} />
       )}
       {kind === 'edit_playbook' && <EditPlaybook detail={detail as AuditEventDetail} hasPrincipalActor />}
+      {kind === 'manually_review_entity' && (
+        <ManuallyReviewEntity detail={detail as AuditEventDetail} hasPrincipalActor />
+      )}
     </Stack>
   );
 };

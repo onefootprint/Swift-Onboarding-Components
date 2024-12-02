@@ -34,12 +34,13 @@ const SecurityLogs = () => {
     'remote_org_member',
     'decrypt_org_api_key',
     'update_org_api_key_status',
-    // 'create_org_api_key',
-    // 'update_org_api_key_role',
+    'create_org_api_key',
+    'update_org_api_key_role',
     'update_user_data',
     'delete_user_data',
     'create_playbook',
     'edit_playbook',
+    'manually_review_entity',
   ];
 
   const isFirmEmployee = session?.user?.isFirmEmployee;

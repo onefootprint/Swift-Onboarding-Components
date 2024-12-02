@@ -160,6 +160,12 @@
       "role": "Role",
       "permissions": "Permissions"
     },
+    "manual-review": {
+      "manually-reviewed-and": "manually reviewed and",
+      "marked-an": "marked an",
+      "entity": "entity",
+      "as": "as {{status}}"
+    },
     "body": {
       "decryption-reason": {
         "aria-label": "Decryption reason body",
