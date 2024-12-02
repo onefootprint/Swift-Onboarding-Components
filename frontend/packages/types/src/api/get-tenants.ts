@@ -39,6 +39,7 @@ export enum TenantPreviewApi {
   ListDuplicateUsers = 'list_duplicate_users',
   ManageVerifiedContactInfo = 'manage_verified_contact_info',
   SoftDeleteUsers = 'soft_delete_users',
+  PostKycStepupLinks = 'post_kyc_stepup_links',
 }
 
 export enum TenantBillingProfileProduct {

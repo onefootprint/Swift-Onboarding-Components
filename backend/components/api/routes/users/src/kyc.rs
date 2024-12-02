@@ -86,7 +86,9 @@ pub async fn post(
         generate_link_on_stepup,
     } = request.into_inner();
     let allow_reonboard = allow_reonboard.unwrap_or(true);
-    // For backwards compatibility
+    if generate_link_on_stepup && !tenant.can_access_preview(&PreviewApi::PostKycStepupLinks) {
+        return BadRequestInto("You are not allowed to access this `generate_link_on_stepup` preview feature. Please contact us if you'd like to use this functionality");
+    }
     match onboarding_config_key {
         Some(_) => root_span.record("meta", "with_legacy_onboarding_key"),
         None => root_span.record("meta", "with_modern_key"),
