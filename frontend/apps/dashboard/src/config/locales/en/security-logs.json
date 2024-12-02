@@ -33,6 +33,23 @@
         }
       }
     },
+    "events": {
+      "update_user_data": "User data updated",
+      "delete_user_data": "User data deleted",
+      "decrypt_user_data": "User data decrypted",
+      "create_org_role": "Role created",
+      "update_org_role": "Role updated",
+      "deactivate_org_role": "Role deactivated",
+      "invite_org_member": "Member invited",
+      "update_org_member": "Member updated",
+      "remove_org_member": "Member removed",
+      "create_playbook": "Playbook created",
+      "decrypt_org_api_key": "API key decrypted",
+      "update_org_api_key_status": "API key status updated",
+      "update_org_api_key_role": "API key role updated",
+      "manually_review_entity": "Entity manually reviewed",
+      "header": "Events"
+    },
     "cta": "Filters",
     "apply-filters": "Apply filters",
     "clear-filters": "Clear filters",

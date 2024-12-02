@@ -3,6 +3,7 @@ export type SecurityLogsQueryString = {
   data_attributes_personal?: string[];
   date_range?: string | string[];
   search?: string;
+  names?: string[];
 };
 
 export type SecurityLogsFilterValues = {
@@ -10,4 +11,5 @@ export type SecurityLogsFilterValues = {
   dataAttributesPersonal: string[];
   dateRange: string[];
   search: string;
+  names: string[];
 };

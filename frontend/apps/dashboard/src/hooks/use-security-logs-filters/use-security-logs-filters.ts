@@ -9,6 +9,7 @@ const defaultQueryString = {
   data_attributes_personal: undefined,
   date_range: undefined,
   search: undefined,
+  names: undefined,
 };
 
 const useSecurityLogsFilters = () => {

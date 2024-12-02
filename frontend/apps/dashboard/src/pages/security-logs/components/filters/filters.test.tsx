@@ -1,7 +1,14 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
+import mockRouter from 'next-router-mock';
 import Filters from './filters';
 
+jest.mock('next/router', () => jest.requireActual('next-router-mock'));
+
 describe('<Filters />', () => {
+  beforeEach(() => {
+    mockRouter.setCurrentUrl('/security-logs');
+  });
+
   it('should open the drawer when the button is clicked', async () => {
     const user = userEvent.setup();
     customRender(<Filters />);
