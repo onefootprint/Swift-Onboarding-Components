@@ -113,6 +113,13 @@ impl<'a> PlaybookIdentifier<'a> {
 }
 
 
+#[derive(Default, AsChangeset)]
+#[diesel(table_name = playbook)]
+pub struct PlaybookUpdate {
+    pub status: Option<ApiKeyStatus>,
+}
+
+
 impl Playbook {
     #[tracing::instrument("Playbook::create", skip_all)]
     pub fn create(
@@ -207,5 +214,19 @@ impl Playbook {
             return Err(DbError::PlaybookDisabled.into());
         }
         Ok((playbook, obc, tenant))
+    }
+
+    #[tracing::instrument("Playbook::update", skip_all)]
+    pub fn update(
+        conn: &mut TxnPgConn,
+        // Consume since Playbook may become outdated.
+        playbook: Locked<Self>,
+        update: PlaybookUpdate,
+    ) -> FpResult<Locked<Self>> {
+        let result: Self = diesel::update(playbook::table)
+            .filter(playbook::id.eq(&playbook.id))
+            .set(update)
+            .get_result(conn.conn())?;
+        Ok(Locked::new(result))
     }
 }

@@ -44,7 +44,7 @@ fn test_ob_config(conn: &mut TestPgConn) {
         status: Some(ApiKeyStatus::Disabled),
         ..Default::default()
     };
-    ObConfiguration::update(conn, &playbook, &ob_config.id, update).expect("Couldn't update");
+    ObConfiguration::update(conn, playbook, &ob_config.id, update).expect("Couldn't update");
 
     // Enforce it does not exist
     ObConfiguration::get_enabled(conn, &ob_config.id).expect_err("Shouldn't find disabled ob config");

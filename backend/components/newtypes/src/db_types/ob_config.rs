@@ -30,7 +30,7 @@ use strum_macros::EnumString;
 #[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "PascalCase")]
 #[diesel(sql_type = Text)]
-#[derive(Default)]
+#[derive(Default, Copy)]
 pub enum ApiKeyStatus {
     #[default]
     Disabled,

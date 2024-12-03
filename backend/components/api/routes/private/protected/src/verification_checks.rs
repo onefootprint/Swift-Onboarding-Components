@@ -69,7 +69,7 @@ async fn update_verification_checks(
                 verification_checks: Some(new_checks),
                 ..Default::default()
             };
-            let obc = ObConfiguration::update(conn, &playbook, &obc.id, update)?;
+            let obc = ObConfiguration::update(conn, playbook, &obc.id, update)?;
 
             Ok(obc)
         })

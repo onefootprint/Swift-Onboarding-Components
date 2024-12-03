@@ -189,7 +189,7 @@ pub async fn patch(
                     detail,
                 )?;
             }
-            if let Some(new_status) = status.clone() {
+            if let Some(new_status) = status {
                 let detail = AuditEventDetail::UpdateOrgApiKeyStatus {
                     is_live,
                     tenant_api_key_id: id.clone(),

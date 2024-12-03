@@ -62,7 +62,7 @@ async fn patch(
                 ..Default::default()
             };
             let playbook = Playbook::lock(conn, (&obc_id, &tenant_id, is_live))?;
-            let obc = ObConfiguration::update(conn, &playbook, &obc_id, update)?;
+            let obc = ObConfiguration::update(conn, playbook, &obc_id, update)?;
             let (obc, actor) = db::actor::saturate_actor_nullable(conn, obc)?;
             let rs = RuleSet::get_active(conn, &obc.id)?;
             Ok((obc, actor, rs))
