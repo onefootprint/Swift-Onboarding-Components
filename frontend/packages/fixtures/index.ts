@@ -3670,6 +3670,7 @@ export const getOnboardingStatusResponse = (
           },
         },
       ],
+      canUpdateUserData: true,
     },
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },

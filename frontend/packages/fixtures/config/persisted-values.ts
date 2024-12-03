@@ -3242,6 +3242,7 @@ export const hosted_OnboardingStatusResponse: OnboardingStatusResponse = {
       },
     },
   ],
+  canUpdateUserData: true,
 };
 export const hosted_PostBusinessOnboardingRequest: PostBusinessOnboardingRequest = {
   inheritBusinessId: 'f6863402-d987-4c0d-bb28-6f65d008a1ef',

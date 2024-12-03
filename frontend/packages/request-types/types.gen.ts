@@ -1911,6 +1911,10 @@ export type OnboardingSessionResponse = {
 };
 export type OnboardingStatusResponse = {
   allRequirements: Array<ApiOnboardingRequirement>;
+  /**
+   * When true, this session can update their data via `PATCH /hosted/user/vault`
+   */
+  canUpdateUserData: boolean;
 };
 export type PostBusinessOnboardingRequest = {
   /**

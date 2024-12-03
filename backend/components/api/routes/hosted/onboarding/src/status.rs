@@ -1,11 +1,12 @@
 use crate::auth::user::UserAuthScope;
-use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::auth::user::UserWfAuthContext;
 use api_core::types::ApiResponse;
 use api_core::utils::requirements::get_requirements_for_person_and_maybe_business;
 use api_wire_types::hosted::onboarding_status::OnboardingStatusResponse;
+use api_wire_types::onboarding_status::ApiOnboardingRequirement;
 use newtypes::OrderedOnboardingRequirements;
+use newtypes::WorkflowGuard;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
 use paperclip::actix::{
@@ -27,5 +28,17 @@ pub async fn get(
     let ob_config = &user_auth.ob_config;
     let all_requirements = OrderedOnboardingRequirements::from_unordered(reqs, ob_config.is_doc_first);
 
-    Ok(OnboardingStatusResponse::from_db(all_requirements))
+    let all_requirements = all_requirements
+        .into_iter()
+        .map(|r| ApiOnboardingRequirement {
+            is_met: r.is_met(),
+            old_requirement: r.clone(),
+            requirement: r,
+        })
+        .collect();
+    let can_update_user_data = user_auth.check_workflow_guard(WorkflowGuard::AddData).is_ok();
+    Ok(OnboardingStatusResponse {
+        all_requirements,
+        can_update_user_data,
+    })
 }

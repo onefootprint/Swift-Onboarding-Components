@@ -5,6 +5,8 @@ use newtypes::OnboardingRequirement;
 #[derive(Debug, Clone, serde::Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct OnboardingStatusResponse {
     pub all_requirements: Vec<ApiOnboardingRequirement>,
+    /** When true, this session can update their data via `PATCH /hosted/user/vault` */
+    pub can_update_user_data: bool,
 }
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Response, macros::JsonResponder)]

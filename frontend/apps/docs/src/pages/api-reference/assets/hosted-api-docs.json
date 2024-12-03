@@ -6949,10 +6949,15 @@
                         "items": {
                             "$ref": "#/components/schemas/ApiOnboardingRequirement"
                         }
+                    },
+                    "can_update_user_data": {
+                        "description": "When true, this session can update their data via `PATCH /hosted/user/vault`",
+                        "type": "boolean"
                     }
                 },
                 "required": [
-                    "all_requirements"
+                    "all_requirements",
+                    "can_update_user_data"
                 ]
             },
             "PostBusinessOnboardingRequest": {
