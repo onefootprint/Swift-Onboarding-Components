@@ -146,7 +146,7 @@ describe.skip('<List />', () => {
         await renderEntitiesAndWaitData();
 
         await filterEvents.apply({
-          trigger: 'On a watchlist',
+          trigger: 'Continuous monitoring watchlist hit',
           options: ['Yes'],
         });
 

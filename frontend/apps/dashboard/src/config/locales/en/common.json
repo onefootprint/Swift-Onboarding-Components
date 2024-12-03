@@ -840,7 +840,7 @@
           },
           "other": {
             "label": "Other filters",
-            "on-watchlist": "On a watchlist",
+            "on-watchlist": "Continuous monitoring watchlist hit",
             "has-outstanding-workflow-request": "Info requested",
             "show-unverified": "Show unverified users",
             "external-id-placeholder": "Search...",
