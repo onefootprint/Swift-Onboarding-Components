@@ -1,28 +1,24 @@
-import type { DataIdentifier } from '@onefootprint/request-types/dashboard';
 import { Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
-import { MAX_VISIBLE_FIELDS } from '../../constants';
 
 type FirstFieldsTextProps = {
   fields: string[];
+  hasCollapsedFields?: boolean;
 };
 
-const FirstFieldsText = ({ fields }: FirstFieldsTextProps) => {
+const FirstFieldsText = ({ fields, hasCollapsedFields }: FirstFieldsTextProps) => {
   const { t } = useTranslation('security-logs', { keyPrefix: 'events.user-data' });
-  const { t: allT } = useTranslation('common', { keyPrefix: 'di' });
 
   const getFieldText = () => {
-    const translatedFields = fields.map(field => allT(field as DataIdentifier));
+    if (fields.length === 1) return fields[0];
+    if (fields.length === 2) return `${fields[0]} ${t('and')} ${fields[1]}`;
 
-    if (translatedFields.length === 1) return translatedFields[0];
-    if (translatedFields.length === 2) return `${translatedFields[0]} ${t('and')} ${translatedFields[1]}`;
+    const allFields = [...fields];
+    const lastField = allFields.pop();
 
-    const displayFields = translatedFields.slice(0, MAX_VISIBLE_FIELDS);
-    const lastField = displayFields.pop();
-
-    return fields.length <= MAX_VISIBLE_FIELDS
-      ? `${displayFields.join(', ')}, ${t('and')} ${lastField}`
-      : `${displayFields.join(', ')}, ${lastField} ${t('and')}`;
+    return hasCollapsedFields
+      ? `${allFields.join(', ')}, ${lastField}, ${t('and')}`
+      : `${allFields.join(', ')}, ${t('and')} ${lastField}`;
   };
 
   const text = getFieldText();

@@ -1,4 +1,3 @@
-import type { DataIdentifier } from '@onefootprint/request-types';
 import { Stack, Text } from '@onefootprint/ui';
 import * as HoverCard from '@radix-ui/react-hover-card';
 import { useTranslation } from 'react-i18next';
@@ -9,10 +8,10 @@ import FinancialDataDetails from '../financial-data-details/financial-data-detai
 type FinancialDataProps = {
   cards: FinancialDataItem[];
   bankAccounts: FinancialDataItem[];
-  nonFinancialFields: DataIdentifier[];
+  hasNonFinancialFields: boolean;
 };
 
-const FinancialData = ({ cards, bankAccounts, nonFinancialFields }: FinancialDataProps) => {
+const FinancialData = ({ cards, bankAccounts, hasNonFinancialFields }: FinancialDataProps) => {
   const { t } = useTranslation('security-logs', { keyPrefix: 'events.user-data' });
 
   return (
@@ -21,7 +20,7 @@ const FinancialData = ({ cards, bankAccounts, nonFinancialFields }: FinancialDat
         <HoverCard.Trigger asChild>
           <Text variant="label-3" textDecoration="underline">
             {t('financial-data')}
-            {nonFinancialFields.length > 0 && ','}
+            {hasNonFinancialFields && ','}
           </Text>
         </HoverCard.Trigger>
       </Stack>
