@@ -26,6 +26,7 @@ use strum_macros::EnumString;
     EnumString,
     AsRefStr,
     macros::SerdeAttr,
+    derive_more::IsVariant,
 )]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
@@ -38,6 +39,16 @@ pub enum LabelKind {
     OffboardFraud,
     /// User was offboarded (not for fraud)
     OffboardOther,
+}
+
+impl LabelKind {
+    // Enumerating cases because we want to not forget other variants in the future
+    pub fn is_fraud(&self) -> bool {
+        match self {
+            Self::OffboardFraud => true,
+            Self::Active | Self::OffboardOther => false,
+        }
+    }
 }
 
 impl_enum_str_diesel!(LabelKind);

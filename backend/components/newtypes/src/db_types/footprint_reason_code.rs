@@ -1216,6 +1216,14 @@ footprint_reason_code_enum! {
         #[scope = SignalScope::Name, additional_scopes = vec![], match_level = None]
         #[note = "Visa is expiring soon or has expired", severity = SignalSeverity::High,  description = "The user's visa expires within 90 days or has already expired"]
         VisaExpiredOrExpiringSoon,
+
+        // ~~~~~~~~~ Duplicates ~~~~~~~~~~
+        #[scope = SignalScope::Name, additional_scopes = vec![SignalScope::Dob, SignalScope::Ssn, SignalScope::Device, SignalScope::Document], match_level = None]
+        #[note = "User has strong connection to a labeled fraud user", severity = SignalSeverity::High,  description = "Strong connection to a labeled fraud user. The user shares the Name+Dob, SSN, Identity Document Number, Device ID/Cookie ID etc with another user that was labeled as `Offboard(fraud)` by your organization."]
+        StrongConnectionToLabeledFraud,
+        #[scope = SignalScope::Name, additional_scopes = vec![SignalScope::Dob, SignalScope::Ssn, SignalScope::Document], match_level = None]
+        #[note = "User has medium connection to a labeled fraud user", severity = SignalSeverity::High,  description = "Medium strength connection to a labeled fraud user. The user shares the Name+Dob, SSN4, etc with another user that was labeled as `Offboard(fraud)` by your organization."]
+        MediumConnectionToLabeledFraud,
         //
         //
         // ~~~~~~~~~ KYB ~~~~~~~~~~~
@@ -1625,6 +1633,8 @@ impl FootprintReasonCode {
                 | Self::SentilinkIdentityTheftLowRisk
                 | Self::BeneficialOwnerFailedKyc
                 | Self::BeneficialOwnerPossibleMissingBo
+                | Self::StrongConnectionToLabeledFraud
+                | Self::MediumConnectionToLabeledFraud
         )
     }
 

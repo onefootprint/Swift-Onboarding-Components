@@ -1,4 +1,5 @@
 pub mod curp_validation;
+pub mod duplicates;
 pub mod experian;
 pub mod fp_device_attestation;
 pub mod helpers;

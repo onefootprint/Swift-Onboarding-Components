@@ -42,6 +42,7 @@ pub async fn get(
                 label,
                 tags,
                 kind,
+                sv_id: _,
             } = dd;
             PublicDuplicateFingerprint {
                 fp_id,

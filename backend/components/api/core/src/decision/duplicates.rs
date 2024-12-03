@@ -5,6 +5,7 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault_label::ScopedVaultLabel;
 use db::models::scoped_vault_tag::ScopedVaultTag;
 use db::OffsetPagination;
+use db::PgConn;
 use itertools::Itertools;
 use newtypes::DupeKind;
 use newtypes::FpId;
@@ -25,6 +26,7 @@ pub type DuplicateInputData = (
 #[derive(Debug, Clone)]
 pub struct DuplicateData {
     pub fp_id: FpId,
+    pub sv_id: ScopedVaultId,
     pub label: Option<LabelKind>,
     pub tags: Vec<TagKind>,
     pub kind: DupeKind,
@@ -40,19 +42,32 @@ pub async fn fetch_duplicate_data(
     state
         .db_query(move |conn| {
             let scoped_vault = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            // TODO: add neuro dupes
-            let (fingerprints, next_page) = Fingerprint::get_internal_dupes(conn, &scoped_vault, pagination)?;
-            let sv_ids = fingerprints.iter().map(|fp| &fp.scoped_vault_id).collect_vec();
-            let labels = ScopedVaultLabel::bulk_get_active(conn, sv_ids.clone())?;
-            let tags = ScopedVaultTag::bulk_get_active(conn, sv_ids.clone())?;
-            let scoped_vaults = ScopedVault::bulk_get(conn, sv_ids, &tenant_id, is_live)?
-                .iter()
-                .map(|(scoped_vault, _)| scoped_vault.clone())
-                .collect_vec();
-            Ok((fingerprints, scoped_vaults, labels, tags, next_page))
+            let res = fetch_duplicate_data_unchecked(conn, scoped_vault, pagination)?;
+            Ok(res)
         })
         .await
 }
+
+/// Fetch duplicate data without checking ownership of the ScopedVault (used for internal APIs)
+#[tracing::instrument(skip_all)]
+pub fn fetch_duplicate_data_unchecked(
+    conn: &mut PgConn,
+    scoped_vault: ScopedVault,
+    pagination: OffsetPagination,
+) -> FpResult<DuplicateInputData> {
+    // TODO: add neuro dupes
+    let (fingerprints, next_page) = Fingerprint::get_internal_dupes(conn, &scoped_vault, pagination)?;
+    let sv_ids = fingerprints.iter().map(|fp| &fp.scoped_vault_id).collect_vec();
+    let labels = ScopedVaultLabel::bulk_get_active(conn, sv_ids.clone())?;
+    let tags = ScopedVaultTag::bulk_get_active(conn, sv_ids.clone())?;
+    let scoped_vaults = ScopedVault::bulk_get(conn, sv_ids, &scoped_vault.tenant_id, scoped_vault.is_live)?
+        .iter()
+        .map(|(scoped_vault, _)| scoped_vault.clone())
+        .collect_vec();
+    Ok((fingerprints, scoped_vaults, labels, tags, next_page))
+}
+
+
 #[tracing::instrument(skip_all)]
 pub fn build_duplicate_responses(
     fingerprints: Vec<Fingerprint>,
@@ -93,6 +108,7 @@ pub fn build_duplicate_responses(
             match DupeKind::try_from(fingerprint.kind) {
                 Ok(kind) => Some(DuplicateData {
                     fp_id: fp_id.clone(),
+                    sv_id: fingerprint.scoped_vault_id.clone(),
                     label,
                     tags,
                     kind,
