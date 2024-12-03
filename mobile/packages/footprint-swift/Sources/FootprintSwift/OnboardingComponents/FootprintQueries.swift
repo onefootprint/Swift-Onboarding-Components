@@ -49,7 +49,7 @@ internal class FootprintQueries {
             throw FootprintError(kind: .initializationError, message: "Get onboarding config request failed. \(error.localizedDescription)")
         }
     }
-
+    
     
     func identify(email: String? = nil,
                   phoneNumber: String? = nil,
@@ -262,9 +262,13 @@ internal class FootprintQueries {
     }
     
     func process(authToken: String,
-                 overallOutcome: OverallOutcome? = OverallOutcome.pass
+                 overallOutcome: OverallOutcome?
     ) async throws -> JSONValue {
-        let request = ProcessRequest(fixtureResult: ProcessRequest.FixtureResult(rawValue: overallOutcome!.rawValue))
+        var fixtureResult: ProcessRequest.FixtureResult? = nil
+        if let overallOutcome {
+            fixtureResult = ProcessRequest.FixtureResult(rawValue: overallOutcome.rawValue)
+        }
+        let request = ProcessRequest(fixtureResult:fixtureResult)
         
         do{
             return try await OnboardingAPI.process(xFpAuthorization: authToken, processRequest: request, openAPIClient: client)

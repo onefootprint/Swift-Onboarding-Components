@@ -58,6 +58,7 @@ public final class FootprintProvider {
     public func initialize(configKey: String,
                            authToken: String? = nil,
                            sandboxId: String? = nil,
+                           sessionId: String = UUID().uuidString,
                            sandboxOutcome: SandboxOutcome? = nil,
                            options: FootprintOptions? = nil,
                            l10n: FootprintL10n? = nil,
@@ -75,7 +76,8 @@ public final class FootprintProvider {
         self.sandboxOutcome = sandboxOutcome
         let packageInfo = PackageInfo.getCurrentPackageInfo()
         self.client.customHeaders = [
-            "x-fp-client-version": "footprint-swift-\(packageInfo.installationType):\(packageInfo.version ?? "unknown")",
+            "X-Fp-Client-Version": "footprint-swift-\(packageInfo.installationType):\(packageInfo.version ?? "unknown")",
+            "X-Fp-Session-Id": sessionId
         ]
         self.queries = FootprintQueries(client: self.client, configKey: self.configKey)
         self.onboardingConfig  = try await self.queries.getOnboardingConfig()
