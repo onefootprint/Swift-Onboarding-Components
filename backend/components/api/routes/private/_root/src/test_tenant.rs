@@ -38,6 +38,7 @@ struct NewClientRequest {
 #[derive(Debug, Clone, serde::Serialize, macros::JsonResponder)]
 struct NewClientResponse {
     org_id: TenantId,
+    org_name: String,
     keys: Vec<api_wire_types::DashboardSecretApiKey>,
     auth_token: SessionAuthToken,
     ro_auth_token: SessionAuthToken,
@@ -208,6 +209,7 @@ async fn post(
     // Get the actual raw API key value
     let response = NewClientResponse {
         org_id: tenant.id,
+        org_name: tenant.name,
         keys,
         auth_token,
         ro_auth_token,

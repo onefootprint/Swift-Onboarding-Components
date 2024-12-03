@@ -9,16 +9,17 @@ def latest_audit_event_for(fp_id, tenant):
 
 
 def list_audit_events_with_details(tenant, name, is_live=None, **kwargs):
-    data = dict(names=[name])
-    url = "org/audit_events?page_size=100"
-
     # Use custom auth headers based on is_live parameter
     if is_live is not None:
         auth_headers = [tenant.auth_token, IsLive("true" if is_live else "false")]
     else:
         auth_headers = tenant.db_auths
 
-    audit_events = get(url, data, *auth_headers)
+    audit_events = get(
+        "org/audit_events",
+        {"page_size": 100, "names": name},
+        *auth_headers,
+    )
     for event in audit_events["data"]:
         matches = True
         for key, value in kwargs.items():
