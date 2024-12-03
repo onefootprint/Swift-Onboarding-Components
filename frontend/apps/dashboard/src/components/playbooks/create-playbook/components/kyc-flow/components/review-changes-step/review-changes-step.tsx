@@ -1,4 +1,5 @@
 import { putOrgPlaybooksByPlaybookIdMutation } from '@onefootprint/axios/dashboard';
+import { getErrorMessage } from '@onefootprint/request';
 import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
 import { InlineAlert, LoadingSpinner, Stack } from '@onefootprint/ui';
 import { useMutation } from '@tanstack/react-query';
@@ -40,20 +41,15 @@ const WithChanges = ({ onBack, onSubmit, meta: { playbook, formData } }: ReviewC
   );
 
   const validateChanges = async () => {
-    try {
-      await mutation.mutateAsync({
-        path: {
-          playbookId: playbook.playbookId,
-        },
-        body: {
-          expectedLatestObcId: playbook.id,
-          newOnboardingConfig: createPayload(formData),
-        },
-      });
-    } catch (error) {
-      // TODO: handle error
-      console.log(error);
-    }
+    mutation.mutate({
+      path: {
+        playbookId: playbook.playbookId,
+      },
+      body: {
+        expectedLatestObcId: playbook.id,
+        newOnboardingConfig: createPayload(formData),
+      },
+    });
   };
 
   useEffect(() => {
@@ -84,6 +80,7 @@ const WithChanges = ({ onBack, onSubmit, meta: { playbook, formData } }: ReviewC
             </div>
           )}
           {mutation.data && <PlaybookDiff playbookA={playbook} playbookB={mutation.data} />}
+          {mutation.error && <InlineAlert variant="error">{getErrorMessage(mutation.error)}</InlineAlert>}
         </div>
       </div>
     </form>
