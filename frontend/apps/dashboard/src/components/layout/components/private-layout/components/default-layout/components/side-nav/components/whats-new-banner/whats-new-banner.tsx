@@ -53,6 +53,8 @@ const Container = styled(motion.div)`
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
     padding: ${theme.spacing[5]} ${theme.spacing[5]} ${theme.spacing[4]} ${theme.spacing[5]};
     border-radius: ${theme.borderRadius.default};
+    background-color: ${theme.backgroundColor.primary};
+    z-index: ${theme.zIndex.sticky};
   `}
 `;
 
