@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { GHOST_API_URL, GHOST_CONTENT_API_KEY } from 'src/config/constants';
 
-import type { PostDetails } from '../../whats-new.types';
+import type { PostDetails } from '../../side-nav.types';
 
 const getChangelogArticles = async () => {
   const { data } = await request<{ posts: PostDetails[] }>(

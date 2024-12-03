@@ -3,27 +3,28 @@ import { IcoArrowTopRight16, IcoDotsHorizontal24, IcoLogOut16 } from '@onefootpr
 import { Box, Dropdown, IconButton } from '@onefootprint/ui';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { Suspense, lazy, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { GetAuthRolesOrg } from '@onefootprint/types';
 import type { UserSession } from 'src/hooks/use-session';
 import styled, { css } from 'styled-components';
+import type { PostDetails } from '../../side-nav.types';
+import WhatsNewDialog from '../whats-new-dialog';
+import PgpUploadTool from './components/pgp-upload-tool';
+import RiskSignalsGlossary from './components/risk-signals-glossary';
 import TenantsList from './components/tenants-list';
 import UserName from './components/user-name/user-name';
-
-const WhatsNew = lazy(() => import('./components/whats-new'));
-const PgpUploadTool = lazy(() => import('./components/pgp-upload-tool'));
-const RiskSignalsGlossary = lazy(() => import('./components/risk-signals-glossary'));
 
 export type NavDropdownProps = {
   tenants: GetAuthRolesOrg[];
   currTenantId: string;
   onAssumeTenant: (tenantId: string) => void;
+  posts: PostDetails[];
   user: UserSession;
 };
 
-const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdownProps) => {
+const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user, posts }: NavDropdownProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'components.private-layout.nav' });
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isGlossaryOpen, setIsGlossaryOpen] = useState(false);
@@ -123,11 +124,9 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
           </Dropdown.Content>
         </Dropdown.Portal>
       </Dropdown.Root>
-      <Suspense fallback={<Box />}>
-        <RiskSignalsGlossary open={isGlossaryOpen} onClose={handleGlossaryClose} />
-        <PgpUploadTool open={isPgpHelperOpen} onClose={handlePgpHelperClose} />
-        <WhatsNew open={isWhatsNewOpen} onClose={handleWhatsNewClose} />
-      </Suspense>
+      <RiskSignalsGlossary open={isGlossaryOpen} onClose={handleGlossaryClose} />
+      <PgpUploadTool open={isPgpHelperOpen} onClose={handlePgpHelperClose} />
+      <WhatsNewDialog open={isWhatsNewOpen} onClose={handleWhatsNewClose} posts={posts} />
     </>
   );
 };

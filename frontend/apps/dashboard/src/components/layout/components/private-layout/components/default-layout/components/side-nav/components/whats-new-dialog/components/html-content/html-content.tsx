@@ -37,7 +37,7 @@ const Content = styled.div`
     }
 
     strong {
-      ${createFontStyles('label-3')}
+      font-weight: 700;
     }
 
     h2,

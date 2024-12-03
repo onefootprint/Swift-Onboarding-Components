@@ -637,7 +637,13 @@
           "description": "Check out the latest updates to Footprint",
           "more-details": "More details",
           "want-to-know-more": "Want to know more about what we've been working on?",
-          "view-full-changelog": "View full changelog"
+          "view-full-changelog": "View full changelog",
+          "banner": {
+            "title": "We made a few updates!",
+            "subtitle": "Check out the latest updates to Footprint",
+            "see-updates": "See updates",
+            "dismiss": "Dismiss"
+          }
         },
         "log-out": "Log out"
       },

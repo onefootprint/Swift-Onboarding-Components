@@ -39,7 +39,7 @@ describe('<SideNav />', () => {
         withOrgAuthRolesError();
         renderSideNav();
 
-        const navDropdownButton = screen.getByTestId('nav-dropdown-button');
+        const navDropdownButton = await screen.findByTestId('nav-dropdown-button');
         await userEvent.click(navDropdownButton);
 
         await waitFor(() => {
@@ -58,7 +58,7 @@ describe('<SideNav />', () => {
       it('should show a list of tenants', async () => {
         renderSideNav();
 
-        const navDropdownButton = screen.getByTestId('nav-dropdown-button');
+        const navDropdownButton = await screen.findByTestId('nav-dropdown-button');
         await userEvent.click(navDropdownButton);
 
         await waitFor(() => {
@@ -81,7 +81,7 @@ describe('<SideNav />', () => {
         withOrgAssumeRole();
         renderSideNav();
 
-        const navDropdownButton = screen.getByTestId('nav-dropdown-button');
+        const navDropdownButton = await screen.findByTestId('nav-dropdown-button');
         await userEvent.click(navDropdownButton);
 
         const tenant = getOrgAuthRoleFixture[2];
@@ -103,7 +103,7 @@ describe('<SideNav />', () => {
         withOrgAssumeRoleError();
         renderSideNav();
 
-        const navDropdownButton = screen.getByTestId('nav-dropdown-button');
+        const navDropdownButton = await screen.findByTestId('nav-dropdown-button');
         await userEvent.click(navDropdownButton);
 
         const tenant = getOrgAuthRoleFixture[2];
@@ -124,7 +124,7 @@ describe('<SideNav />', () => {
         withSevenOrgAuthRoles();
         renderSideNav();
 
-        const navDropdownButton = screen.getByTestId('nav-dropdown-button');
+        const navDropdownButton = await screen.findByTestId('nav-dropdown-button');
         await userEvent.click(navDropdownButton);
 
         await waitFor(() => {

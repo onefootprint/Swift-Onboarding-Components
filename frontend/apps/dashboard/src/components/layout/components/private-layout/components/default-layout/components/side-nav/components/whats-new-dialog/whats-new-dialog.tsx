@@ -4,20 +4,19 @@ import { Box, Dialog, LinkButton, Stack, Text } from '@onefootprint/ui';
 import Image from 'next/image';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
+import type { PostDetails } from '../../side-nav.types';
 import Author from './components/author';
 import DateRow from './components/date-row';
 import HtmlContent from './components/html-content';
-import useChangelogArticles from './hooks/use-changelog-articles';
-import type { PostDetails } from './whats-new.types';
 
-type WhatsNewProps = {
+type WhatsNewDialogProps = {
   onClose: () => void;
   open: boolean;
+  posts: PostDetails[];
 };
 
-const WhatsNew = ({ open, onClose }: WhatsNewProps) => {
+const WhatsNewDialog = ({ open, onClose, posts }: WhatsNewDialogProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'components.private-layout.nav' });
-  const { data: posts = [] } = useChangelogArticles();
 
   return (
     <>
@@ -74,4 +73,4 @@ const TextContainer = styled(Stack)`
   `}
 `;
 
-export default WhatsNew;
+export default WhatsNewDialog;
