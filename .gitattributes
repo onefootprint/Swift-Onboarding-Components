@@ -1,10 +1,9 @@
 frontend/apps/docs/src/pages/api-reference/assets/*.json linguist-generated
-frontend/packages/request-types/types.gen.ts linguist-generated
 frontend/packages/request-types/dashboard.ts linguist-generated
 frontend/packages/fixtures/dashboard.ts linguist-generated
 frontend/packages/fixtures/index.ts linguist-generated
 frontend/packages/fixtures/config/persisted-values.ts linguist-generated
 frontend/packages/axios/index.ts linguist-generated
-frontend/packages/axios/services.gen.ts linguist-generated
 frontend/packages/fetch/index.ts linguist-generated
-frontend/packages/fetch/services.gen.ts linguist-generated
+**/*.gen.ts linguist-generated
+mobile/NativeOnboardingComponents/shared/src/commonMain/kotlin/com/onefootprint/native_onboarding_components/client/models/*.kt linguist-generated
