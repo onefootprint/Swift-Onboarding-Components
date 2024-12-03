@@ -3,6 +3,7 @@ import {
   getEntitiesByFpIdBusinessOwnersOptions,
   getEntitiesByFpIdTimelineOptions,
 } from '@onefootprint/axios/dashboard';
+import type { UserTimeline } from '@onefootprint/request-types/dashboard';
 import { EntityStatus, type TimelineEvent, TimelineEventKind } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
@@ -21,9 +22,19 @@ const useEntityTimeline = (id: string) => {
   return useQuery({
     ...getEntitiesByFpIdTimelineOptions({
       path: { fpId: id },
-      query: {},
+      query: { pageSize: 100 },
     }),
-    select: events => {
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    select: (response: any) => {
+      let events;
+      // TODO: migrate to expect only the modern paginated API repsonse
+      if (Array.isArray(response)) {
+        // For legacy API response
+        events = response as UserTimeline[];
+      } else {
+        // For modern API response
+        events = response.data as UserTimeline[];
+      }
       const mergedEvents = mergeAuditTrailTimelineEvents(events as TimelineEvent[]);
 
       if (entity.data?.status === EntityStatus.incomplete) {
