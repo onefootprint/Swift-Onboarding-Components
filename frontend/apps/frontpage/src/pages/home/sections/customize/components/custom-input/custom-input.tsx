@@ -73,6 +73,7 @@ const StyledInput = styled.input`
     border: 1px solid ${theme.borderColor.tertiary};
     border-radius: ${theme.borderRadius.default};
     padding: ${theme.spacing[3]};
+    width: 100%;
     -moz-appearance: textfield;
     &::-webkit-outer-spin-button,
     &::-webkit-inner-spin-button {
