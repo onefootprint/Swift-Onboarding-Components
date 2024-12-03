@@ -35,7 +35,7 @@ use paperclip::actix::web::Json;
     description = "Creates a new version (onboarding configuration) for the given playbook.",
     tags(Playbooks, Organization, Private)
 )]
-#[put("/org/playbooks/{playbook_id}")]
+#[put("/org/playbooks/{id}")]
 pub async fn put_create_version(
     state: web::Data<State>,
     playbook_id: web::Path<PlaybookId>,

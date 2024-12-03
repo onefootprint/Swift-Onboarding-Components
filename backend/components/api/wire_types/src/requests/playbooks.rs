@@ -1,4 +1,5 @@
 use super::CreateOnboardingConfigurationRequest;
+use newtypes::ApiKeyStatus;
 use newtypes::ObConfigurationId;
 use paperclip::actix::Apiv2Schema;
 
@@ -21,4 +22,10 @@ pub struct RestoreOnboardingConfigurationRequest {
     pub expected_latest_obc_id: ObConfigurationId,
     /// The OBC ID that should be restored.
     pub restore_obc_id: ObConfigurationId,
+}
+
+#[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
+#[serde(rename_all = "snake_case")]
+pub struct UpdatePlaybookRequest {
+    pub status: Option<ApiKeyStatus>,
 }
