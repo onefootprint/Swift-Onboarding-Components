@@ -1,0 +1,132 @@
+---
+page: default
+slug: /articles/guides/vault-disaster-recovery-operations
+category: Guides
+subcategory: Vault Disaster Recovery
+title: Operations
+meta:
+  { title: "Vault Disaster Recovery Operations", description: "Secure, customer-owned vault data backups that maintain low risk" }
+---
+
+## Checking Backup Status
+
+Run `footprint-dr status [--sandbox/--live]` to check the current status of your Vault Disaster Recovery backups:
+
+```text filename="Example Output"
+$ footprint-dr status --live
+Logged in to Acme Inc. (Live)
+
+Enrolled in Vault Disaster Recovery since: 2024-04-17 23:22:42.272984 UTC
+
+Organization Public Keys:
+  age1yubikey1qgceu0h4fzsv46jg32gnfz0hf5lnaaqm8wn8skxf33qm0t4v4rz427fh79x
+  age1yubikey1q2eggw2hftplqfr27s9h8nwuez39m45ms6qv78m9m6kfhmsyf6gacj2km7u
+
+Storage Configuration:
+  AWS Account ID:   123456789012
+  AWS Role Name:    acme-inc-footprint-disaster-recovery
+  S3 Bucket Name:   acme-inc-footprint-encrypted-data
+  Bucket Namespace: a39evoii5rgqhdz4jansho3tten4z0oz
+
+Latest Backup Record Timestamp: 2024-04-29T22:27:21Z
+Backup Lag: 7 seconds
+```
+
+Once the initial backup is complete, the expected lag should be at most several minutes.
+
+## Inspecting Unencrypted Metadata
+
+Using one of the [standard AWS CLI login methods](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html), log in to an AWS role that has `s3:ListBucket` and `s3:GetObject` access on the backup bucket.
+
+To inspect the list of vaults in your backup bucket, run `footprint-dr list-vaults [--sandbox/--live]`.:
+
+```text filename="Example Output"
+$ footprint-dr list-vaults --live
+fp_id_4acxG4NxFTlGaE6b2WyDIc
+fp_id_WFVkUyTeuWNy0GlrOPdPBO
+fp_id_rwSYNkPIrDFogXYjCJ1KrQ
+...
+```
+
+To list all records, run `footprint-dr list-records [--sandbox/--live]`.
+
+```text filename="Example Output"
+$ footprint-dr list-records --live
+{"fp_id": "fp_id_rwSYNkPIrDFogXYjCJ1KrQ", "version": 2, "fields": ["id.first_name", "id.last_name", "id.phone_number"]}
+{"fp_id": "fp_id_4acxG4NxFTlGaE6b2WyDIc", "version": 1, "fields": ["id.first_name", "id.last_name", "id.phone_number"]}
+{"fp_id": "fp_id_WFVkUyTeuWNy0GlrOPdPBO", "version": 4, "fields": ["id.first_name", "id.last_name", "id.phone_number"]}
+...
+```
+
+For manual pagination on either command, use the `--fp-id-gt` and `--limit` flags. Pass `--sandbox` to either command to inspect the sandbox dataset.
+
+To locate the bucket and namespace where the encrypted data is stored, by default these commands use the Footprint API. To bypass this dependency on the Footprint API, provide the `--bucket` and `--namespace` flags using the values from enrollment or from `footprint-dr status`.
+
+## Testing Recovery Flow
+
+Using one of the [standard AWS CLI login methods](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html), log in to an AWS role that has `s3:ListBucket` and `s3:GetObject` access to the backup bucket.
+
+Prepare a [line-separated JSON file](https://jsonlines.org/) `records.jsonl` that specifies what records you would like to decrypt for the test. For example:
+
+```jsonl
+{"fp_id": "fp_id_rwSYNkPIrDFogXYjCJ1KrQ", "version": 2, "fields": ["id.first_name", "id.last_name", "id.phone_number"]}
+{"fp_id": "fp_id_4acxG4NxFTlGaE6b2WyDIc", "version": 1, "fields": ["id.first_name", "id.last_name", "id.phone_number"]}
+{"fp_id": "fp_id_WFVkUyTeuWNy0GlrOPdPBO", "version": 4, "fields": ["id.first_name", "id.last_name", "id.phone_number"]}
+```
+
+For testing, decrypt just enough records to gain confidence that the backup recovery mechanism is functional. The output of `footprint-dr list-records --live --sample --limit 50` will likely suffice.
+
+Using one of the [standard AWS CLI login methods](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html), log in to an AWS role that has `s3:ListBucket` and `s3:GetObject` access on the backup bucket.
+
+Ensure you are logged in to the `footprint-dr`  CLI with an API key that has an appropriate `Decrypt Data` scope.
+
+Plug in your YubiKey and create an age identity file on disk that points to the YubiKey slot you used during enrollment. If you don’t remember the slot number, run `age-plugin-yubikey --list`.
+
+```bash
+age-plugin-yubikey --identity --slot 1 > org-identity.txt
+```
+
+Run `footprint decrypt` to test recovery of the desired records, like the following.
+
+```bash
+footprint-dr decrypt \
+  --live \
+  --records records.jsonl \
+  --org-identity org-identity.txt \
+  --output-dir /tmp/decrypt-output
+```
+
+Tap your YubiKey when prompted. This fetches the encrypted records from S3, fetches the wrapped record keys from Footprint’s testing API, unwraps each record key using your YubiKey, and decrypts the records using those record keys.
+
+## Full Recovery Flow
+
+In the catastrophic event a full recovery is needed, Footprint or the pre-arranged escrow will transfer the recovery payload to you, a file like `acme-inc-wrapped-recovery-key.age`. Take care to prevent leakage.
+
+Prepare a [line-separated JSON file](https://jsonlines.org/) `records.jsonl` that specifies what records you would like to decrypt for the test. For example:
+
+```jsonl
+{"fp_id": "fp_id_rwSYNkPIrDFogXYjCJ1KrQ", "version": 2, "fields": ["id.first_name", "id.last_name", "id.phone_number"]}
+{"fp_id": "fp_id_4acxG4NxFTlGaE6b2WyDIc", "version": 1, "fields": ["id.first_name", "id.last_name", "id.phone_number"]}
+{"fp_id": "fp_id_WFVkUyTeuWNy0GlrOPdPBO", "version": 4, "fields": ["id.first_name", "id.last_name", "id.phone_number"]}
+```
+
+Using one of the [standard AWS CLI login methods](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html), log in to an AWS role that has `s3:ListBucket` and `s3:GetObject` access on the backup bucket.
+
+Plug in your YubiKey and create an age identity file on disk that points to the YubiKey slot you used during enrollment. If you don’t remember the slot number, run `age-plugin-yubikey --list`.
+
+Then run a `footprint-dr decrypt` command providing the `--wrapped-recovery-key` flag. For example, to decrypt all records with no dependency on the Footprint API, run a command like the following:
+
+```bash
+footprint-dr decrypt \
+  --live \
+  --all \
+  --wrapped-recovery-key acme-inc-wrapped-recovery-key.age \
+  --org-identity org-identity.txt \
+  --bucket acme-inc-footprint-encrypted-data \
+  --namespace a39evoii5rgqhdz4jansho3tten4z0oz \
+  --output-dir /tmp/pii
+```
+
+Tap your YubiKey when prompted. This unwraps the recovery private key using your YubiKey, fetches the encrypted records from S3, and decrypts the records using the recovery private key. Rather than decrypting all records with the `--all` flag, customers with many records may prefer to batch or even parallelize the decryptions using multiple invocations with the `--records` flag using record batches from `footprint-dr list-records`.
+
+To maximize download and decryption speed, you can adjust the `--concurrency-limit` flag on `footprint-dr decrypt` . The default is `2 * number of CPUs`. Adjust according to the measured download speed in the output. Setting too high of a concurrency limit may be detrimental to performance or yield open file limit errors.

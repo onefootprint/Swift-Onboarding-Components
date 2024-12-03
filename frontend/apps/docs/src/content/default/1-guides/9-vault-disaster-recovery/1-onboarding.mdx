@@ -1,0 +1,306 @@
+---
+page: default
+slug: /articles/guides/vault-disaster-recovery-onboarding
+category: Guides
+subcategory: Vault Disaster Recovery
+title: Onboarding
+meta:
+  { title: "Vault Disaster Recovery Onboarding", description: "Secure, customer-owned vault data backups that maintain low risk" }
+---
+
+## Prerequisites
+
+- You must have an AWS account and permissions to configure AWS resources.
+- You must have the Admin role in the Footprint dashboard.
+- You must have a YubiKey that supports the PIV card interface over USB. A [YubiKey 5C](https://www.yubico.com/product/yubikey-5-series/yubikey-5c/) should suffice. Amazon often has the [YubiKey 5C NFC](https://www.amazon.com/Yubico-Two-factor-authentication-security-certified/dp/B08DHL1YDL) available for fast delivery.
+
+## 1. Install Vault Disaster Recovery tools
+
+First install the CLI tool used for enrollment and decryption. On a Mac, run:
+
+```bash
+brew install onefootprint/tap/footprint-dr
+```
+
+For other platforms, you can download releases from [here](https://github.com/onefootprint/footprint-dr-releases/releases).
+
+## 2. Create an API key and log in with the CLI
+
+Go to [the API Keys page](https://dashboard.onefootprint.com/api-keys) on the Footprint dashboard and use the toggle in the top right corner to select *Sandbox* or *Live* mode, depending on which data set you would like to enroll.
+
+Create a new API key with an admin scope.
+
+Run `footprint-dr login [--sandbox/--live]` and paste the API key at the prompt:
+
+```text filename="Example Output"
+$ footprint-dr login --live
+Enter Footprint Live API key: <hidden>
+```
+
+## 3. Create a bucket for encrypted data storage
+
+Footprint needs a dedicated customer-owned Amazon S3 bucket to store encrypted data. Create a new S3 bucket similar to the one in the Terraform example below. Ensure you are creating the bucket using the us-east-1 region for optimal performance.
+
+```terraform
+resource "aws_s3_bucket" "fp_vault_data" {
+  bucket = "acme-inc-footprint-vault-data"
+
+}
+
+resource "aws_s3_bucket_public_access_block" "fp_vault_data_public_access_block" {
+  bucket = aws_s3_bucket.fp_vault_data.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+```
+
+
+We recommend that you create this S3 Bucket in a dedicated AWS account with tight access controls. Keeping access to this bucket to a minimum helps reduce the impact of unintentional leaks of an org private key.
+
+We also recommend that you enable CloudTrail audit logs for data events on this bucket. See the following example Terraform:
+
+```terraform
+resource "aws_s3_bucket" "fp_vault_data_cloudtrail" {
+  bucket = "acme-inc-footprint-vault-data-cloudtrail"
+}
+
+resource "aws_s3_bucket_public_access_block" "fp_vault_data_cloudtrail_pab" {
+  bucket = aws_s3_bucket.fp_vault_data_cloudtrail.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+locals {
+  fp_vault_data_cloudtrail_name = "footprint-vault-data-cloudtrail"
+}
+
+data "aws_iam_policy_document" "fp_vault_data_cloudtrail" {
+  statement {
+    sid    = "AWSCloudTrailAclCheck"
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["cloudtrail.amazonaws.com"]
+    }
+
+    actions   = ["s3:GetBucketAcl"]
+    resources = [aws_s3_bucket.fp_vault_data_cloudtrail.arn]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceArn"
+      values   = ["arn:${data.aws_partition.current.partition}:cloudtrail:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:trail/${local.fp_vault_data_cloudtrail_name}"]
+    }
+  }
+
+  statement {
+    sid    = "AWSCloudTrailWrite"
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["cloudtrail.amazonaws.com"]
+    }
+
+    actions   = ["s3:PutObject"]
+    resources = ["${aws_s3_bucket.fp_vault_data_cloudtrail.arn}/AWSLogs/${data.aws_caller_identity.current.account_id}/*"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "s3:x-amz-acl"
+      values   = ["bucket-owner-full-control"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceArn"
+      values   = ["arn:${data.aws_partition.current.partition}:cloudtrail:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:trail/${local.fp_vault_data_cloudtrail_name}"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "fp_vault_data_cloudtrail" {
+  bucket = aws_s3_bucket.fp_vault_data_cloudtrail.id
+  policy = data.aws_iam_policy_document.fp_vault_data_cloudtrail.json
+}
+
+resource "aws_cloudtrail" "fp_vault_data_cloudtrail" {
+  name           = local.fp_vault_data_cloudtrail_name
+  s3_bucket_name = aws_s3_bucket.fp_vault_data_cloudtrail.id
+
+  include_global_service_events = false
+
+  depends_on = [aws_s3_bucket_policy.fp_vault_data_cloudtrail]
+
+  event_selector {
+    read_write_type           = "All"
+    include_management_events = true
+
+    data_resource {
+      type = "AWS::S3::Object"
+
+      values = ["${aws_s3_bucket.fp_vault_data.arn}/"]
+    }
+  }
+}
+```
+
+
+## 4. Fetch your external ID
+
+Your [external ID](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user_externalid.html) will help secure the cross-account IAM access. Run `footprint-dr get-external-id [--sandbox/--live]`  to fetch it:
+
+```text filename="Example Output"
+$ footprint-dr get-external-id --live
+42ee4f928973996f8f855aebaebf70cd
+```
+
+## 5. Create a IAM role for bucket management
+
+Footprint needs read and write access to the bucket to manage the encrypted data. Create a IAM role to delegate access like the one in the Terrraform examlpe below, substituting your external ID.
+
+```terraform
+locals {
+  external_id = "42ee4f928973996f8f855aebaebf70cd"
+}
+
+resource "aws_iam_role" "fp_vault_data_management" {
+  name = "fp-vault-data-management"
+
+  assume_role_policy = data.aws_iam_policy_document.fp_vault_data_management_assume_role_policy.json
+}
+
+data "aws_iam_policy_document" "fp_vault_data_management_assume_role_policy" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["725896863556"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "sts:ExternalId"
+      values   = [local.external_id]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "fp_vault_data_management_policy" {
+  statement {
+    sid = "AllowPutObject"
+
+    actions = [
+      "s3:PutObject",
+    ]
+
+    resources = [
+      "${aws_s3_bucket.fp_vault_data.arn}/*",
+    ]
+  }
+
+  statement {
+    sid = "AllowListBucket"
+
+    actions = [
+      "s3:ListBucket",
+    ]
+
+    resources = [
+      aws_s3_bucket.fp_vault_data.arn,
+    ]
+  }
+
+  statement {
+    sid = "AllowGetBucketLocation"
+
+    actions = [
+      "s3:GetBucketLocation",
+    ]
+
+    resources = [
+      aws_s3_bucket.fp_vault_data.arn,
+    ]
+  }
+}
+
+resource "aws_iam_policy" "fp_vault_data_management" {
+  name   = "fp-vault-data-management"
+  policy = data.aws_iam_policy_document.fp_vault_data_management_policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "fp_vault_data_management_assume_role" {
+  role       = aws_iam_role.fp_vault_data_delegate_access.name
+  policy_arn = aws_iam_policy.fp_vault_data_management.arn
+}
+```
+
+## 6. Generate your Disaster Recovery org key pair
+
+Org identities (private keys) are stored on one or more [YubiKeys](https://www.yubico.com/products/yubikey-5-overview/). Using hardware security tokens helps virtually eliminate the risk of accidentally leaking a private key, which is a sensitive component of the recovery flow. Depending on your data durability requirements, you may choose to mitigate the risk of lost or damaged hardware by registering redundant YubiKeys.
+
+The [age YubiKey plugin](https://github.com/str4d/age-plugin-yubikey) helps makes the enrollment process simple. Install [age](https://github.com/FiloSottile/age) and [age-plugin-yubikey](https://github.com/str4d/age-plugin-yubikey) on a workstation with a USB port for the YubiKey:
+
+```bash
+# On a Mac:
+brew install age age-plugin-yubikey ykman
+```
+
+Plug in the YubiKey. Now, change the management key by running the following command. Press the enter key to use the default management key, and enter the default YubiKey pin of 123456 at the prompt.
+
+```bash
+ykman piv access change-management-key -a TDES --protect
+```
+
+Then, run a command like the following to generate an age identity for your org. Adjust the name and mode (sandbox/live) for your own reference. You will be prompted to change your PIN/PUK. Choose a PIN and retain it in your password manager of choice. The PIN will be necessary to use your YubiKey to decrypt your Vault Disaster Recovery backups.
+
+```bash
+age-plugin-yubikey \
+  --generate \
+  --name "Footprint Vault DR org age identity: Acme Inc. Live" \
+  --pin-policy once \
+  --touch-policy cached \
+  --slot 1
+```
+
+You may choose a different slot number if slot 1 is already in use, though we advise using dedicated YubiKeys for live-mode Vault Disaster Recovery. We recommend the pin policy of `once` and the touch policy of `cached` to improve the experience of the test recovery flow.
+
+You do not need to save any of the output, but make note of the recipient (starting with `age1yubikey` which you will paste into the next step. You can retrieve the recipient again by running `age-plugin-yubikey --list`.
+
+Repeat the key generation step once for each YubiKey you wish to register for Vault Disaster recovery, collecting a list of your org’s `age1yubikey` age recipients.
+
+## 7. Complete enrollment
+
+Run `footprint-dr enroll [--sandbox/--live]` and follow the prompts:
+
+```text filename="Example Output"
+$ footprint-dr enroll --live
+Enrolling Acme Inc. (Live) in Vault Disaster Recovery.
+
+Enter org public key (age recipient): age1yubikey1qgceu0h4fzsv46jg32gnfz0hf5lnaaqm8wn8skxf33qm0t4v4rz427fh79x
+Add another org public key? [y/n] y
+Enter org public key (age recipient): age1yubikey1q2eggw2hftplqfr27s9h8nwuez39m45ms6qv78m9m6kfhmsyf6gacj2km7u
+Add another org public key? [y/n] n
+
+Enter AWS Account ID: 123456789012
+Enter AWS role name: acme-inc-footprint-disaster-recovery
+Enter S3 bucket name: acme-inc-footprint-encrypted-data
+
+Verifying configuration... OK
+
+Enrollment complete.
+
+Store the following information to locate your encrypted data:
+  S3 Bucket Name:   acme-inc-footprint-disaster-recovery
+  Bucket Namespace: a39evoii5rgqhdz4jansho3tten4z0oz
+```
+
+Unplug the YubiKey, clearly label it, and store it in a physically secure location (e.g. an office safe). You will need to retrieve the YubiKey to decrypt Disaster Recovery data.
+
+Store the printed `S3 Bucket Name` and `Bucket Namespace` in your records to ensure you can locate your Disaster Recovery data.

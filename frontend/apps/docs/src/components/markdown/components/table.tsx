@@ -49,7 +49,7 @@ const Container = styled.div`
     border-radius: ${theme.borderRadius.default};
     overflow: hidden;
     margin-bottom: ${theme.spacing[9]};
-    
+
     &[data-overflow-right='true'] {
       &::after {
         content: '';
@@ -62,7 +62,7 @@ const Container = styled.div`
         box-shadow: inset -${theme.spacing[4]} 0 ${theme.spacing[4]} -${theme.spacing[4]} ${theme.backgroundColor.senary};
         transition: box-shadow 0.3s ease;
         );
-        
+
       }
     }
 
@@ -122,10 +122,11 @@ const Content = styled.table`
       white-space: nowrap;
       background: ${theme.backgroundColor.secondary};
       border-bottom: 1px solid ${theme.borderColor.tertiary};
-      border-radius: ${theme.borderRadius.default} ${theme.borderRadius.default}
-        0 0;
       color: ${theme.color.primary};
       text-align: left;
+    }
+
+    thead th {
       text-transform: uppercase;
     }
 
