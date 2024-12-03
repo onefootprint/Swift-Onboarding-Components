@@ -23,15 +23,20 @@ export const getKeyForItemTime = (time: string) => {
 type TimelineProps = {
   auditEvents: AuditEvent[];
   isLoading: boolean;
+  isError: boolean;
   showDecryptionReason: boolean;
 };
 
-const Timeline = ({ auditEvents, isLoading, showDecryptionReason }: TimelineProps) => {
+const Timeline = ({ auditEvents, isLoading, showDecryptionReason, isError }: TimelineProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'components.timeline' });
   const filters = useSecurityLogsFilters();
 
   if (!filters.isReady || isLoading) {
     return <Loading />;
+  }
+
+  if (isError) {
+    return <Text variant="body-3">{t('error')}</Text>;
   }
 
   if (!auditEvents.length) {

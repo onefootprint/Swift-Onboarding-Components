@@ -581,7 +581,8 @@
       }
     },
     "timeline": {
-      "empty": "No items"
+      "empty": "No items",
+      "error": "An error occurred while fetching data."
     },
     "private-layout": {
       "nav": {

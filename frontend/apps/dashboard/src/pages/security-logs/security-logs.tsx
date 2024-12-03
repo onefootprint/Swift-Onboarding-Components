@@ -122,6 +122,7 @@ const SecurityLogs = () => {
         </Stack>
         <Divider />
         <Timeline
+          isError={getAccessEvents.isError}
           auditEvents={filteredAuditEvents}
           isLoading={getAccessEvents.isLoading}
           showDecryptionReason={showDecryptionReason}
