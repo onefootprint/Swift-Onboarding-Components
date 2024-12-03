@@ -162,3 +162,46 @@ def test_composite_dupes(sandbox_tenant, faker):
     )
     dupes = get(f"entities/{fp_id1}/dupes", None, sandbox_tenant.s_sk)
     assert not any(i["fp_id"] == fp_id3 for i in dupes["same_tenant"])
+
+
+def test_additional_dupes(sandbox_tenant, faker):
+    nonce = _gen_random_str(8)
+    dl_number = _gen_random_str(8)
+    ssn = _gen_random_ssn()
+    dob = faker.date()
+    data = {
+        "id.first_name": f"Hayes {nonce}",
+        "id.last_name": "Valley",
+        "id.dob": dob,
+        "id.ssn4": ssn[-4:],
+        "document.drivers_license.document_number": f"{dl_number}",
+    }
+
+    fp_id1 = post("users", data, sandbox_tenant.s_sk, IgnoreCardValidation("true"))[
+        "id"
+    ]
+    # Create another user with the same info, should have a lot of dupe kinds
+    fp_id2 = post("users", data, sandbox_tenant.s_sk, IgnoreCardValidation("true"))[
+        "id"
+    ]
+
+    # Create another user with different information, but same dob + ssn4
+    data2 = {
+        "id.first_name": f"Horsey {nonce}",
+        "id.last_name": "Valley",
+        "id.dob": dob,
+        "id.ssn4": ssn[-4:],
+        "document.drivers_license.document_number": f"{dl_number}_other",
+    }
+    fp_id3 = post("users", data2, sandbox_tenant.s_sk, IgnoreCardValidation("true"))[
+        "id"
+    ]
+
+    dupes = get(f"entities/{fp_id1}/dupes", None, sandbox_tenant.s_sk)
+    assert len(dupes["same_tenant"]) == 2
+    dupe_fp_id2 = next(d for d in dupes["same_tenant"] if d["fp_id"] == fp_id2)
+    assert set(dupe_fp_id2["dupe_kinds"]) == set(
+        ["identity_document_number", "name_dob", "dob_ssn4", "name_ssn4"]
+    )
+    dupe_fp_id3 = next(d for d in dupes["same_tenant"] if d["fp_id"] == fp_id3)
+    assert set(dupe_fp_id3["dupe_kinds"]) == set(["dob_ssn4"])

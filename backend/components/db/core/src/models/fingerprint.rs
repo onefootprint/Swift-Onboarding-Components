@@ -21,17 +21,20 @@ use itertools::Itertools;
 use newtypes::CompositeFingerprintKind;
 use newtypes::DataIdentifier as DI;
 use newtypes::DataLifetimeId;
+use newtypes::DocumentDiKind;
 use newtypes::Fingerprint as FingerprintData;
 use newtypes::FingerprintId;
 use newtypes::FingerprintKind;
 use newtypes::FingerprintScope;
 use newtypes::FingerprintVersion;
+use newtypes::IdDocKind;
 use newtypes::IdentityDataKind as IDK;
+use newtypes::OcrDataKind as ODK;
 use newtypes::PiiString;
 use newtypes::ScopedVaultId;
 use newtypes::TenantId;
 use newtypes::VaultId;
-
+use strum::IntoEnumIterator;
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = fingerprint)]
 pub struct Fingerprint {
@@ -239,6 +242,19 @@ impl Fingerprint {
         FingerprintKind::Composite(CompositeFingerprintKind::CardNumberCvc),
     ];
 
+    fn all_duplicate_kinds() -> Vec<FingerprintKind> {
+        let doc_number_dupes = IdDocKind::iter().map(|doc_kind| {
+            FingerprintKind::DI(DI::Document(DocumentDiKind::OcrData(
+                doc_kind,
+                ODK::DocumentNumber,
+            )))
+        });
+        Self::DUPLICATE_FINGERPRINT_KINDS
+            .into_iter()
+            .chain(doc_number_dupes)
+            .collect_vec()
+    }
+
     #[tracing::instrument("Fingerprint::get_dupes", skip_all)]
     pub fn get_dupes(conn: &mut PgConn, sv: &ScopedVault) -> FpResult<FingerprintDupesResult> {
         // TODO hide dupes at other tenants in sandbox in next PR
@@ -307,7 +323,7 @@ impl Fingerprint {
             .filter(fingerprint::scoped_vault_id.eq(&sv.id))
             .filter(fingerprint::deactivated_at.is_null())
             .filter(fingerprint::is_hidden.eq(false))
-            .filter(fingerprint::kind.eq_any(Self::DUPLICATE_FINGERPRINT_KINDS))
+            .filter(fingerprint::kind.eq_any(Self::all_duplicate_kinds()))
             .filter(fingerprint::sh_data.is_not_null())
             .select(fingerprint::all_columns)
             .get_results::<Fingerprint>(conn)?;
