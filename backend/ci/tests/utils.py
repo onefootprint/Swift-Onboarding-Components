@@ -288,7 +288,7 @@ def create_tenant(org_data, ob_conf_data):
             sk=sk,
             l_sk=TenantSecretAuth(live_key["key"]),
             s_sk=TenantSecretAuth(sandbox_key["key"]),
-            name=org_data["name"],
+            name=body["org_name"],
             db_auths=[auth_token, h_is_live],
             auth_token=auth_token,
             ro_db_auths=[ro_auth_token, h_is_live],
