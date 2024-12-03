@@ -15,7 +15,7 @@
 
 package org.openapitools.client.models
 
-import org.openapitools.client.models.OnboardingRequirement
+import org.openapitools.client.models.InsightEvent
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
@@ -24,16 +24,19 @@ import kotlinx.serialization.encoding.*
 /**
  * 
  *
- * @param isMet 
- * @param requirement 
+ * @param isVerified 
+ * @param originInsightEvent 
+ * @param tenantName 
  */
 @Serializable
 
-data class ApiOnboardingRequirement (
+data class GetVerifyContactInfoResponse (
 
-    @SerialName(value = "is_met") @Required val isMet: kotlin.Boolean,
+    @SerialName(value = "is_verified") @Required val isVerified: kotlin.Boolean,
 
-    @SerialName(value = "requirement") @Required val requirement: OnboardingRequirement
+    @SerialName(value = "origin_insight_event") @Required val originInsightEvent: InsightEvent,
+
+    @SerialName(value = "tenant_name") @Required val tenantName: kotlin.String
 
 ) {
 

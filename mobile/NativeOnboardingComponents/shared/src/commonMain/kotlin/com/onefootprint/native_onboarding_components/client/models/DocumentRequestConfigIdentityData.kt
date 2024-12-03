@@ -15,7 +15,7 @@
 
 package org.openapitools.client.models
 
-import org.openapitools.client.models.OnboardingRequirement
+import org.openapitools.client.models.DocumentAndCountryConfiguration
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
@@ -24,16 +24,16 @@ import kotlinx.serialization.encoding.*
 /**
  * 
  *
- * @param isMet 
- * @param requirement 
+ * @param collectSelfie 
+ * @param documentTypesAndCountries 
  */
 @Serializable
 
-data class ApiOnboardingRequirement (
+data class DocumentRequestConfigIdentityData (
 
-    @SerialName(value = "is_met") @Required val isMet: kotlin.Boolean,
+    @SerialName(value = "collect_selfie") @Required val collectSelfie: kotlin.Boolean,
 
-    @SerialName(value = "requirement") @Required val requirement: OnboardingRequirement
+    @SerialName(value = "document_types_and_countries") val documentTypesAndCountries: DocumentAndCountryConfiguration? = null
 
 ) {
 

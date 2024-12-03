@@ -15,7 +15,7 @@
 
 package org.openapitools.client.models
 
-import org.openapitools.client.models.OnboardingRequirement
+import org.openapitools.client.models.AuthV1SdkArgs
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
@@ -24,19 +24,28 @@ import kotlinx.serialization.encoding.*
 /**
  * 
  *
- * @param isMet 
- * @param requirement 
+ * @param `data` 
+ * @param kind 
  */
 @Serializable
 
-data class ApiOnboardingRequirement (
+data class SdkArgsAuthV1 (
 
-    @SerialName(value = "is_met") @Required val isMet: kotlin.Boolean,
+    @SerialName(value = "data") @Required val `data`: AuthV1SdkArgs,
 
-    @SerialName(value = "requirement") @Required val requirement: OnboardingRequirement
+    @SerialName(value = "kind") @Required val kind: SdkArgsAuthV1.Kind
 
 ) {
 
+    /**
+     * 
+     *
+     * Values: auth_v1
+     */
+    @Serializable
+    enum class Kind(val value: kotlin.String) {
+        @SerialName(value = "auth_v1") auth_v1("auth_v1");
+    }
 
 }
 

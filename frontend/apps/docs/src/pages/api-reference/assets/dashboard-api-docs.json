@@ -6501,7 +6501,7 @@
                 ]
             }
         },
-        "/org/playbooks/{playbook_id}": {
+        "/org/playbooks/{id}": {
             "put": {
                 "tags": [
                     "Playbooks",
@@ -6512,7 +6512,7 @@
                 "parameters": [
                     {
                         "in": "path",
-                        "name": "playbook_id",
+                        "name": "id",
                         "required": true,
                         "schema": {
                             "type": "string"
@@ -6534,6 +6534,55 @@
                         "application/json": {
                             "schema": {
                                 "$ref": "#/components/schemas/CreatePlaybookVersionRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OnboardingConfiguration"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Playbooks",
+                    "Organization",
+                    "Private"
+                ],
+                "description": "Updates an existing playbook.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdatePlaybookRequest"
                             }
                         }
                     },
@@ -19672,6 +19721,14 @@
                     },
                     "website_url": {
                         "type": "string"
+                    }
+                }
+            },
+            "UpdatePlaybookRequest": {
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "$ref": "#/components/schemas/ApiKeyStatus"
                     }
                 }
             },

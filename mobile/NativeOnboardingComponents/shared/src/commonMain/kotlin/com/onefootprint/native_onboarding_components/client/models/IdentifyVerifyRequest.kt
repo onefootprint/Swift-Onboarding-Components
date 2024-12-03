@@ -24,20 +24,20 @@ import kotlinx.serialization.encoding.*
 /**
  * 
  *
- * @param challengeResponse 
  * @param challengeToken Opaque challenge state token
  * @param scope 
+ * @param challengeResponse 
  */
 @Serializable
 
 data class IdentifyVerifyRequest (
 
-    @SerialName(value = "challenge_response") @Required val challengeResponse: kotlin.String,
-
     /* Opaque challenge state token */
     @SerialName(value = "challenge_token") @Required val challengeToken: kotlin.String,
 
-    @SerialName(value = "scope") @Required val scope: IdentifyScope
+    @SerialName(value = "scope") @Required val scope: IdentifyScope,
+
+    @SerialName(value = "challenge_response") val challengeResponse: kotlin.String? = null
 
 ) {
 

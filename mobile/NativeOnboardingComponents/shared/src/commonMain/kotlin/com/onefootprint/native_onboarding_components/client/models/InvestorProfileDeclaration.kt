@@ -21,22 +21,22 @@ import kotlinx.serialization.*
 /**
  * 
  *
- * Values: sms,sms_link,biometric,email
+ * Values: affiliated_with_us_broker,senior_executive,senior_political_figure,family_of_political_figure
  */
 @Serializable
-enum class ChallengeKind(val value: kotlin.String) {
+enum class InvestorProfileDeclaration(val value: kotlin.String) {
 
-    @SerialName(value = "sms")
-    sms("sms"),
+    @SerialName(value = "affiliated_with_us_broker")
+    affiliated_with_us_broker("affiliated_with_us_broker"),
 
-    @SerialName(value = "sms_link")
-    sms_link("sms_link"),
+    @SerialName(value = "senior_executive")
+    senior_executive("senior_executive"),
 
-    @SerialName(value = "biometric")
-    biometric("biometric"),
+    @SerialName(value = "senior_political_figure")
+    senior_political_figure("senior_political_figure"),
 
-    @SerialName(value = "email")
-    email("email");
+    @SerialName(value = "family_of_political_figure")
+    family_of_political_figure("family_of_political_figure");
 
     /**
      * Override [toString()] to avoid using the enum variable name as the value, and instead use
@@ -51,12 +51,12 @@ enum class ChallengeKind(val value: kotlin.String) {
         /**
          * Converts the provided [data] to a [String] on success, null otherwise.
          */
-        fun encode(data: kotlin.Any?): kotlin.String? = if (data is ChallengeKind) "$data" else null
+        fun encode(data: kotlin.Any?): kotlin.String? = if (data is InvestorProfileDeclaration) "$data" else null
 
         /**
-         * Returns a valid [ChallengeKind] for [data], null otherwise.
+         * Returns a valid [InvestorProfileDeclaration] for [data], null otherwise.
          */
-        fun decode(data: kotlin.Any?): ChallengeKind? = data?.let {
+        fun decode(data: kotlin.Any?): InvestorProfileDeclaration? = data?.let {
           val normalizedData = "$it".lowercase()
           values().firstOrNull { value ->
             it == value || normalizedData == "$value".lowercase()

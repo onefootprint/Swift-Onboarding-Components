@@ -21,7 +21,7 @@ import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
+ * A key-value map with the corresponding decrypted values
  *
  * @param businessAddressLine1 
  * @param businessAddressLine2 

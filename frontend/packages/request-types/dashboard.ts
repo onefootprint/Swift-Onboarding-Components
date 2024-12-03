@@ -5247,6 +5247,9 @@ export type UpdatePartnerTenantRequest = {
   name?: string;
   websiteUrl?: string;
 };
+export type UpdatePlaybookRequest = {
+  status?: ApiKeyStatus;
+};
 export type UpdateTenantAndroidAppMetaRequest = {
   apkCertSha256S?: Array<string>;
   integrityDecryptionKey?: string;
@@ -9330,7 +9333,7 @@ export type PostOrgPlaybooksData = {
 };
 export type PostOrgPlaybooksResponse = OnboardingConfiguration;
 export type PostOrgPlaybooksError = unknown;
-export type PutOrgPlaybooksByPlaybookIdData = {
+export type PutOrgPlaybooksByIdData = {
   body: CreatePlaybookVersionRequest;
   headers?: {
     /**
@@ -9343,11 +9346,25 @@ export type PutOrgPlaybooksByPlaybookIdData = {
     'X-Fp-Dry-Run'?: boolean;
   };
   path: {
-    playbookId: string;
+    id: string;
   };
 };
-export type PutOrgPlaybooksByPlaybookIdResponse = OnboardingConfiguration;
-export type PutOrgPlaybooksByPlaybookIdError = unknown;
+export type PutOrgPlaybooksByIdResponse = OnboardingConfiguration;
+export type PutOrgPlaybooksByIdError = unknown;
+export type PatchOrgPlaybooksByIdData = {
+  body: UpdatePlaybookRequest;
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
+  path: {
+    id: string;
+  };
+};
+export type PatchOrgPlaybooksByIdResponse = OnboardingConfiguration;
+export type PatchOrgPlaybooksByIdError = unknown;
 export type PostOrgPlaybooksByPlaybookIdRestoreData = {
   body: RestoreOnboardingConfigurationRequest;
   headers?: {
@@ -11125,9 +11142,18 @@ export type $OpenApiTs = {
       };
     };
   };
-  '/org/playbooks/{playbook_id}': {
+  '/org/playbooks/{id}': {
+    patch: {
+      req: PatchOrgPlaybooksByIdData;
+      res: {
+        /**
+         * OK
+         */
+        '200': OnboardingConfiguration;
+      };
+    };
     put: {
-      req: PutOrgPlaybooksByPlaybookIdData;
+      req: PutOrgPlaybooksByIdData;
       res: {
         /**
          * OK

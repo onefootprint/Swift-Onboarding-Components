@@ -202,7 +202,7 @@ const KycFlow = ({ onBack, onDone, playbook }: KycFlowProps) => {
                   newOnboardingConfig: createPayload(state.data),
                 },
                 path: {
-                  playbookId: playbook.playbookId,
+                  id: playbook.playbookId,
                 },
               },
               {

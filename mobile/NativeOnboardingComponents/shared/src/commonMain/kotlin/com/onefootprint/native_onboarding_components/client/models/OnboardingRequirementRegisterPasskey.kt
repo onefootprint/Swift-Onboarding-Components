@@ -15,28 +15,33 @@
 
 package org.openapitools.client.models
 
-import org.openapitools.client.models.OnboardingRequirement
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
+ * Register a passkey
  *
- * @param isMet 
- * @param requirement 
+ * @param kind 
  */
 @Serializable
 
-data class ApiOnboardingRequirement (
+data class OnboardingRequirementRegisterPasskey (
 
-    @SerialName(value = "is_met") @Required val isMet: kotlin.Boolean,
-
-    @SerialName(value = "requirement") @Required val requirement: OnboardingRequirement
+    @SerialName(value = "kind") @Required val kind: OnboardingRequirementRegisterPasskey.Kind
 
 ) {
 
+    /**
+     * 
+     *
+     * Values: liveness
+     */
+    @Serializable
+    enum class Kind(val value: kotlin.String) {
+        @SerialName(value = "liveness") liveness("liveness");
+    }
 
 }
 

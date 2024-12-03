@@ -483,6 +483,7 @@ import type {
   UpdateListRequest,
   UpdateObConfigRequest,
   UpdatePartnerTenantRequest,
+  UpdatePlaybookRequest,
   UpdateTenantAndroidAppMetaRequest,
   UpdateTenantIosAppMetaRequest,
   UpdateTenantRequest,
@@ -10745,9 +10746,9 @@ export const dashboard_TimelineOnboardingDecision: TimelineOnboardingDecision = 
   id: 'a879cd2d-fb65-4fc0-b790-6700284dd6ac',
   obConfiguration: {
     id: '4ba02c9d-8a73-400e-b0eb-e2bfc584d6fc',
-    playbookId: '4ba02c9d-8a73-400e-b0eb-e2bfc584d6fc',
     mustCollectData: ['business_address', 'ssn4', 'full_address'],
     name: 'Elmer Green-Bode',
+    playbookId: '4ba02c9d-8a73-400e-b0eb-e2bfc584d6fc',
   },
   ranRulesInSandbox: true,
   ruleSetResultId: '52f17b12-f513-4d68-8267-fab717c02d03',
@@ -10818,6 +10819,9 @@ export const dashboard_UpdatePartnerTenantRequest: UpdatePartnerTenantRequest = 
   allowDomainAccess: false,
   name: 'Dr. Deanna Morissette',
   websiteUrl: 'https://polite-bookend.com/',
+};
+export const dashboard_UpdatePlaybookRequest: UpdatePlaybookRequest = {
+  status: 'disabled',
 };
 export const dashboard_UpdateTenantAndroidAppMetaRequest: UpdateTenantAndroidAppMetaRequest = {
   apkCertSha256S: ['anim aliquip', 'nulla sint', 'voluptate dolore Excepteur est'],
@@ -10993,9 +10997,9 @@ export const dashboard_UserTimelineEventBusinessOwnerCompletedKyc: UserTimelineE
       id: '5f2f3ae5-8758-462a-854a-0c4195cb469e',
       obConfiguration: {
         id: '03eae7be-3038-487c-8a46-b071fff01b4d',
-        playbookId: '4ba02c9d-8a73-400e-b0eb-e2bfc584d6fc',
         mustCollectData: ['card', 'us_legal_status', 'us_legal_status'],
         name: 'Guadalupe Nitzsche',
+        playbookId: '4ba02c9d-8a73-400e-b0eb-e2bfc584d6fc',
       },
       ranRulesInSandbox: false,
       ruleSetResultId: '76777816-5588-44d3-9ce8-5dd62d2bd4da',
@@ -11109,9 +11113,9 @@ export const dashboard_UserTimelineEventOnboardingDecision: UserTimelineEventOnb
       id: '2b64a4e6-4941-438c-88f8-d7dfaaa72dc8',
       obConfiguration: {
         id: '4422c4b8-d424-49f8-89be-6d02a7ba71c5',
-        playbookId: '4ba02c9d-8a73-400e-b0eb-e2bfc584d6fc',
         mustCollectData: ['business_name', 'phone_number', 'business_tin'],
         name: 'Alfredo King',
+        playbookId: '4ba02c9d-8a73-400e-b0eb-e2bfc584d6fc',
       },
       ranRulesInSandbox: false,
       ruleSetResultId: 'faa372d0-3e7d-4faa-b967-32f9ef639a71',

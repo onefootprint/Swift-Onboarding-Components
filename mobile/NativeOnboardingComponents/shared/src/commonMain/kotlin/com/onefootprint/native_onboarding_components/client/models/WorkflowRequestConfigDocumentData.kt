@@ -15,25 +15,25 @@
 
 package org.openapitools.client.models
 
-import org.openapitools.client.models.OnboardingRequirement
+import org.openapitools.client.models.DocumentRequestConfig
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
+ * Upload a new document and re-run the decision engine
  *
- * @param isMet 
- * @param requirement 
+ * @param businessConfigs 
+ * @param configs 
  */
 @Serializable
 
-data class ApiOnboardingRequirement (
+data class WorkflowRequestConfigDocumentData (
 
-    @SerialName(value = "is_met") @Required val isMet: kotlin.Boolean,
+    @SerialName(value = "business_configs") @Required val businessConfigs: kotlin.collections.List<DocumentRequestConfig>,
 
-    @SerialName(value = "requirement") @Required val requirement: OnboardingRequirement
+    @SerialName(value = "configs") @Required val configs: kotlin.collections.List<DocumentRequestConfig>
 
 ) {
 

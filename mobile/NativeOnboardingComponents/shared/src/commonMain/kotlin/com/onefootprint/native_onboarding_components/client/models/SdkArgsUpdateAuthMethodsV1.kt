@@ -15,11 +15,7 @@
 
 package org.openapitools.client.models
 
-import org.openapitools.client.models.CustomDocumentConfig
-import org.openapitools.client.models.DocumentRequestConfigCustom
-import org.openapitools.client.models.DocumentRequestConfigIdentity
-import org.openapitools.client.models.DocumentRequestConfigProofOfAddress
-import org.openapitools.client.models.DocumentRequestConfigProofOfSsn
+import org.openapitools.client.models.UpdateAuthMethodsV1SdkArgs
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
@@ -33,22 +29,22 @@ import kotlinx.serialization.encoding.*
  */
 @Serializable
 
-data class DocumentRequestConfig (
+data class SdkArgsUpdateAuthMethodsV1 (
 
-    @SerialName(value = "data") @Required val `data`: CustomDocumentConfig,
+    @SerialName(value = "data") @Required val `data`: UpdateAuthMethodsV1SdkArgs,
 
-    @SerialName(value = "kind") @Required val kind: DocumentRequestConfig.Kind
+    @SerialName(value = "kind") @Required val kind: SdkArgsUpdateAuthMethodsV1.Kind
 
 ) {
 
     /**
      * 
      *
-     * Values: custom
+     * Values: update_auth_methods_v1
      */
     @Serializable
     enum class Kind(val value: kotlin.String) {
-        @SerialName(value = "custom") custom("custom");
+        @SerialName(value = "update_auth_methods_v1") update_auth_methods_v1("update_auth_methods_v1");
     }
 
 }

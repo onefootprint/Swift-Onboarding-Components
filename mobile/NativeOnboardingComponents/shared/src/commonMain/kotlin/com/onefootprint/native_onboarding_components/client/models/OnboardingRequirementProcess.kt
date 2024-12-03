@@ -15,28 +15,33 @@
 
 package org.openapitools.client.models
 
-import org.openapitools.client.models.OnboardingRequirement
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
+ * The client needs to tell us when user input is done in order for us to continue processing
  *
- * @param isMet 
- * @param requirement 
+ * @param kind 
  */
 @Serializable
 
-data class ApiOnboardingRequirement (
+data class OnboardingRequirementProcess (
 
-    @SerialName(value = "is_met") @Required val isMet: kotlin.Boolean,
-
-    @SerialName(value = "requirement") @Required val requirement: OnboardingRequirement
+    @SerialName(value = "kind") @Required val kind: OnboardingRequirementProcess.Kind
 
 ) {
 
+    /**
+     * 
+     *
+     * Values: process
+     */
+    @Serializable
+    enum class Kind(val value: kotlin.String) {
+        @SerialName(value = "process") process("process");
+    }
 
 }
 

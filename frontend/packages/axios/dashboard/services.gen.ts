@@ -265,6 +265,9 @@ import type {
   PatchOrgOnboardingConfigsByObcIdRulesData,
   PatchOrgOnboardingConfigsByObcIdRulesError,
   PatchOrgOnboardingConfigsByObcIdRulesResponse,
+  PatchOrgPlaybooksByIdData,
+  PatchOrgPlaybooksByIdError,
+  PatchOrgPlaybooksByIdResponse,
   PatchOrgProxyConfigsByProxyConfigIdData,
   PatchOrgProxyConfigsByProxyConfigIdError,
   PatchOrgProxyConfigsByProxyConfigIdResponse,
@@ -480,9 +483,9 @@ import type {
   PutOrgLogoData,
   PutOrgLogoError,
   PutOrgLogoResponse,
-  PutOrgPlaybooksByPlaybookIdData,
-  PutOrgPlaybooksByPlaybookIdError,
-  PutOrgPlaybooksByPlaybookIdResponse,
+  PutOrgPlaybooksByIdData,
+  PutOrgPlaybooksByIdError,
+  PutOrgPlaybooksByIdResponse,
   PutPartnerDocTemplatesByTemplateIdData,
   PutPartnerDocTemplatesByTemplateIdError,
   PutPartnerDocTemplatesByTemplateIdResponse,
@@ -2082,16 +2085,24 @@ export const postOrgPlaybooks = <ThrowOnError extends boolean = false>(
 /**
  * Creates a new version (onboarding configuration) for the given playbook.
  */
-export const putOrgPlaybooksByPlaybookId = <ThrowOnError extends boolean = false>(
-  options: Options<PutOrgPlaybooksByPlaybookIdData, ThrowOnError>,
+export const putOrgPlaybooksById = <ThrowOnError extends boolean = false>(
+  options: Options<PutOrgPlaybooksByIdData, ThrowOnError>,
 ) => {
-  return (options?.client ?? client).put<
-    PutOrgPlaybooksByPlaybookIdResponse,
-    PutOrgPlaybooksByPlaybookIdError,
-    ThrowOnError
-  >({
+  return (options?.client ?? client).put<PutOrgPlaybooksByIdResponse, PutOrgPlaybooksByIdError, ThrowOnError>({
     ...options,
-    url: '/org/playbooks/{playbookId}',
+    url: '/org/playbooks/{id}',
+  });
+};
+
+/**
+ * Updates an existing playbook.
+ */
+export const patchOrgPlaybooksById = <ThrowOnError extends boolean = false>(
+  options: Options<PatchOrgPlaybooksByIdData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).patch<PatchOrgPlaybooksByIdResponse, PatchOrgPlaybooksByIdError, ThrowOnError>({
+    ...options,
+    url: '/org/playbooks/{id}',
   });
 };
 

@@ -42,6 +42,7 @@ import org.openapitools.client.models.FingerprintVisitRequest
 import org.openapitools.client.models.GetDeviceAttestationChallengeRequest
 import org.openapitools.client.models.GetSdkArgsTokenResponse
 import org.openapitools.client.models.GetUserTokenResponse
+import org.openapitools.client.models.GetVerifyContactInfoResponse
 import org.openapitools.client.models.HostedBusiness
 import org.openapitools.client.models.HostedBusinessDetail
 import org.openapitools.client.models.HostedBusinessOwner
@@ -789,6 +790,74 @@ open class HostedApi : ApiClient {
         val localVariableConfig = RequestConfig<kotlin.Any?>(
             RequestMethod.POST,
             "/hosted/identify/validation_token",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = true,
+        )
+
+        return request(
+            localVariableConfig,
+            localVariableBody,
+            localVariableAuthNames
+        ).wrap()
+    }
+
+
+    /**
+     * 
+     * Get context on a verify contact info session.
+     * @param xFpAuthorization Short-lived auth token for async verification of contact info. (optional)
+     * @return GetVerifyContactInfoResponse
+     */
+    @Suppress("UNCHECKED_CAST")
+    open suspend fun hostedIdentifyVerifyContactInfoGet_0(xFpAuthorization: kotlin.String? = null): HttpResponse<GetVerifyContactInfoResponse> {
+
+        val localVariableAuthNames = listOf<String>("Async contact info verification token")
+
+        val localVariableBody = 
+            io.ktor.client.utils.EmptyContent
+
+        val localVariableQuery = mutableMapOf<String, List<String>>()
+        val localVariableHeaders = mutableMapOf<String, String>()
+        xFpAuthorization?.apply { localVariableHeaders["X-Fp-Authorization"] = this.toString() }
+
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.GET,
+            "/hosted/identify/verify_contact_info",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = true,
+        )
+
+        return request(
+            localVariableConfig,
+            localVariableBody,
+            localVariableAuthNames
+        ).wrap()
+    }
+
+
+    /**
+     * 
+     * Creates an auth event to mark the provided contact info as verified.
+     * @param xFpAuthorization Short-lived auth token for async verification of contact info. (optional)
+     * @return kotlin.String
+     */
+    @Suppress("UNCHECKED_CAST")
+    open suspend fun hostedIdentifyVerifyContactInfoPost_0(xFpAuthorization: kotlin.String? = null): HttpResponse<kotlin.String> {
+
+        val localVariableAuthNames = listOf<String>("Async contact info verification token")
+
+        val localVariableBody = 
+            io.ktor.client.utils.EmptyContent
+
+        val localVariableQuery = mutableMapOf<String, List<String>>()
+        val localVariableHeaders = mutableMapOf<String, String>()
+        xFpAuthorization?.apply { localVariableHeaders["X-Fp-Authorization"] = this.toString() }
+
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.POST,
+            "/hosted/identify/verify_contact_info",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = true,
@@ -1916,6 +1985,40 @@ open class HostedApi : ApiClient {
         ).wrap()
     }
 
+
+
+    /**
+     * 
+     * Expires the session defined by &#x60;x-fp-authorization&#x60;
+     * @param xFpAuthorization Short-lived auth token for a user. Issued by identify and contains scopes to perform specific user actions. (optional)
+     * @return kotlin.String
+     */
+    @Suppress("UNCHECKED_CAST")
+    open suspend fun hostedUserExpireSessionPost_0(xFpAuthorization: kotlin.String? = null): HttpResponse<kotlin.String> {
+
+        val localVariableAuthNames = listOf<String>("userToken")
+
+        val localVariableBody = 
+            io.ktor.client.utils.EmptyContent
+
+        val localVariableQuery = mutableMapOf<String, List<String>>()
+        val localVariableHeaders = mutableMapOf<String, String>()
+        xFpAuthorization?.apply { localVariableHeaders["X-Fp-Authorization"] = this.toString() }
+
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.POST,
+            "/hosted/user/expire_session",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = true,
+        )
+
+        return request(
+            localVariableConfig,
+            localVariableBody,
+            localVariableAuthNames
+        ).wrap()
+    }
 
 
     /**

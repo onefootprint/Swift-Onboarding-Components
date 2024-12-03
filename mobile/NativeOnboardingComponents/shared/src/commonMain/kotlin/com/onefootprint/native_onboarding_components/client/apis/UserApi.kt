@@ -234,6 +234,40 @@ open class UserApi : ApiClient {
 
     /**
      * 
+     * Expires the session defined by &#x60;x-fp-authorization&#x60;
+     * @param xFpAuthorization Short-lived auth token for a user. Issued by identify and contains scopes to perform specific user actions. (optional)
+     * @return kotlin.String
+     */
+    @Suppress("UNCHECKED_CAST")
+    open suspend fun hostedUserExpireSessionPost(xFpAuthorization: kotlin.String? = null): HttpResponse<kotlin.String> {
+
+        val localVariableAuthNames = listOf<String>("userToken")
+
+        val localVariableBody = 
+            io.ktor.client.utils.EmptyContent
+
+        val localVariableQuery = mutableMapOf<String, List<String>>()
+        val localVariableHeaders = mutableMapOf<String, String>()
+        xFpAuthorization?.apply { localVariableHeaders["X-Fp-Authorization"] = this.toString() }
+
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.POST,
+            "/hosted/user/expire_session",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = true,
+        )
+
+        return request(
+            localVariableConfig,
+            localVariableBody,
+            localVariableAuthNames
+        ).wrap()
+    }
+
+
+    /**
+     * 
      * Returns information about the auth token. Can only be used in sandbox mode for demo tenants.
      * @param xFpAuthorization Short-lived auth token for an integration testing user during bifrost. (optional)
      * @return void

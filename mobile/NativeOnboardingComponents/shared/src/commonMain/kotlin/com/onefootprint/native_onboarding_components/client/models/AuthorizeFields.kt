@@ -15,7 +15,8 @@
 
 package org.openapitools.client.models
 
-import org.openapitools.client.models.OnboardingRequirement
+import org.openapitools.client.models.CollectedDataOption
+import org.openapitools.client.models.DocumentKind
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
@@ -24,16 +25,16 @@ import kotlinx.serialization.encoding.*
 /**
  * 
  *
- * @param isMet 
- * @param requirement 
+ * @param collectedData 
+ * @param documentTypes 
  */
 @Serializable
 
-data class ApiOnboardingRequirement (
+data class AuthorizeFields (
 
-    @SerialName(value = "is_met") @Required val isMet: kotlin.Boolean,
+    @SerialName(value = "collected_data") @Required val collectedData: kotlin.collections.List<CollectedDataOption>,
 
-    @SerialName(value = "requirement") @Required val requirement: OnboardingRequirement
+    @SerialName(value = "document_types") @Required val documentTypes: kotlin.collections.List<DocumentKind>
 
 ) {
 

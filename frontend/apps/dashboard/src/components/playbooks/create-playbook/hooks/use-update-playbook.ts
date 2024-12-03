@@ -1,6 +1,6 @@
-import { putOrgPlaybooksByPlaybookId } from '@onefootprint/axios/dashboard';
+import { putOrgPlaybooksById } from '@onefootprint/axios/dashboard';
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import type { PutOrgPlaybooksByPlaybookIdData } from '@onefootprint/request-types/dashboard';
+import type { PutOrgPlaybooksByIdData } from '@onefootprint/request-types/dashboard';
 import { useToast } from '@onefootprint/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
@@ -17,9 +17,9 @@ const useCreatePlaybook = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (payload: PutOrgPlaybooksByPlaybookIdData) => {
+    mutationFn: (payload: PutOrgPlaybooksByIdData) => {
       buttons.setBusy(true);
-      return putOrgPlaybooksByPlaybookId(payload);
+      return putOrgPlaybooksById(payload);
     },
     onSuccess: response => {
       console.log(response);

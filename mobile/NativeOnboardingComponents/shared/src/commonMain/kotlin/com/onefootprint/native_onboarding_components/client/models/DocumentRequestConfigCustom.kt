@@ -16,10 +16,6 @@
 package org.openapitools.client.models
 
 import org.openapitools.client.models.CustomDocumentConfig
-import org.openapitools.client.models.DocumentRequestConfigCustom
-import org.openapitools.client.models.DocumentRequestConfigIdentity
-import org.openapitools.client.models.DocumentRequestConfigProofOfAddress
-import org.openapitools.client.models.DocumentRequestConfigProofOfSsn
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
@@ -33,11 +29,11 @@ import kotlinx.serialization.encoding.*
  */
 @Serializable
 
-data class DocumentRequestConfig (
+data class DocumentRequestConfigCustom (
 
     @SerialName(value = "data") @Required val `data`: CustomDocumentConfig,
 
-    @SerialName(value = "kind") @Required val kind: DocumentRequestConfig.Kind
+    @SerialName(value = "kind") @Required val kind: DocumentRequestConfigCustom.Kind
 
 ) {
 

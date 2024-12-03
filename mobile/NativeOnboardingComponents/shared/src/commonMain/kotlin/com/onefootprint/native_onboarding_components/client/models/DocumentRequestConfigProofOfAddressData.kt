@@ -15,7 +15,6 @@
 
 package org.openapitools.client.models
 
-import org.openapitools.client.models.OnboardingRequirement
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
@@ -24,16 +23,13 @@ import kotlinx.serialization.encoding.*
 /**
  * 
  *
- * @param isMet 
- * @param requirement 
+ * @param requiresHumanReview 
  */
 @Serializable
 
-data class ApiOnboardingRequirement (
+data class DocumentRequestConfigProofOfAddressData (
 
-    @SerialName(value = "is_met") @Required val isMet: kotlin.Boolean,
-
-    @SerialName(value = "requirement") @Required val requirement: OnboardingRequirement
+    @SerialName(value = "requires_human_review") @Required val requiresHumanReview: kotlin.Boolean
 
 ) {
 

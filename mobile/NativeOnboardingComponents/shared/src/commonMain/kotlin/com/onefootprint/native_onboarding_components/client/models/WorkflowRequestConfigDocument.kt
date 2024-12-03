@@ -15,9 +15,7 @@
 
 package org.openapitools.client.models
 
-import org.openapitools.client.models.WorkflowRequestConfigDocument
 import org.openapitools.client.models.WorkflowRequestConfigDocumentData
-import org.openapitools.client.models.WorkflowRequestConfigOnboard
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
@@ -31,12 +29,12 @@ import kotlinx.serialization.encoding.*
  */
 @Serializable
 
-data class WorkflowRequestConfig (
+data class WorkflowRequestConfigDocument (
 
     @SerialName(value = "data") @Required val `data`: WorkflowRequestConfigDocumentData,
 
     /* Upload a new document and re-run the decision engine */
-    @SerialName(value = "kind") @Required val kind: WorkflowRequestConfig.Kind
+    @SerialName(value = "kind") @Required val kind: WorkflowRequestConfigDocument.Kind
 
 ) {
 

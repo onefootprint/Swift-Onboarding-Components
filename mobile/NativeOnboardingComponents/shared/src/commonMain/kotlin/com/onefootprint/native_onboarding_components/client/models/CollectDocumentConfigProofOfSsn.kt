@@ -15,7 +15,6 @@
 
 package org.openapitools.client.models
 
-import org.openapitools.client.models.OnboardingRequirement
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
@@ -24,19 +23,25 @@ import kotlinx.serialization.encoding.*
 /**
  * 
  *
- * @param isMet 
- * @param requirement 
+ * @param kind 
  */
 @Serializable
 
-data class ApiOnboardingRequirement (
+data class CollectDocumentConfigProofOfSsn (
 
-    @SerialName(value = "is_met") @Required val isMet: kotlin.Boolean,
-
-    @SerialName(value = "requirement") @Required val requirement: OnboardingRequirement
+    @SerialName(value = "kind") @Required val kind: CollectDocumentConfigProofOfSsn.Kind
 
 ) {
 
+    /**
+     * 
+     *
+     * Values: proof_of_ssn
+     */
+    @Serializable
+    enum class Kind(val value: kotlin.String) {
+        @SerialName(value = "proof_of_ssn") proof_of_ssn("proof_of_ssn");
+    }
 
 }
 

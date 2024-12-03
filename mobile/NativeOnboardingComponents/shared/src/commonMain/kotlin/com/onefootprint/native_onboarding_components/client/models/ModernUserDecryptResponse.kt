@@ -15,13 +15,17 @@
 
 package org.openapitools.client.models
 
+import org.openapitools.client.models.InvestorProfileDeclaration
+import org.openapitools.client.models.InvestorProfileFundingSource
+import org.openapitools.client.models.InvestorProfileInvestmentGoal
+import org.openapitools.client.models.Iso3166TwoDigitCountryCode
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
+ * A key-value map with the corresponding decrypted values
  *
  * @param bankStarAccountType 
  * @param bankStarAchAccountId 
@@ -830,7 +834,7 @@ data class ModernUserDecryptResponse (
 
     @SerialName(value = "id.address_line2") val idAddressLine2: kotlin.String? = null,
 
-    @SerialName(value = "id.citizenships") val idCitizenships: kotlin.String? = null,
+    @SerialName(value = "id.citizenships") val idCitizenships: kotlin.collections.List<Iso3166TwoDigitCountryCode>? = null,
 
     @SerialName(value = "id.city") val idCity: kotlin.String? = null,
 
@@ -876,17 +880,17 @@ data class ModernUserDecryptResponse (
 
     @SerialName(value = "investor_profile.brokerage_firm_employer") val investorProfileBrokerageFirmEmployer: kotlin.String? = null,
 
-    @SerialName(value = "investor_profile.declarations") val investorProfileDeclarations: kotlin.String? = null,
+    @SerialName(value = "investor_profile.declarations") val investorProfileDeclarations: kotlin.collections.List<InvestorProfileDeclaration>? = null,
 
     @SerialName(value = "investor_profile.employer") val investorProfileEmployer: kotlin.String? = null,
 
     @SerialName(value = "investor_profile.employment_status") val investorProfileEmploymentStatus: kotlin.String? = null,
 
-    @SerialName(value = "investor_profile.family_member_names") val investorProfileFamilyMemberNames: kotlin.String? = null,
+    @SerialName(value = "investor_profile.family_member_names") val investorProfileFamilyMemberNames: kotlin.collections.List<kotlin.String>? = null,
 
-    @SerialName(value = "investor_profile.funding_sources") val investorProfileFundingSources: kotlin.String? = null,
+    @SerialName(value = "investor_profile.funding_sources") val investorProfileFundingSources: kotlin.collections.List<InvestorProfileFundingSource>? = null,
 
-    @SerialName(value = "investor_profile.investment_goals") val investorProfileInvestmentGoals: kotlin.String? = null,
+    @SerialName(value = "investor_profile.investment_goals") val investorProfileInvestmentGoals: kotlin.collections.List<InvestorProfileInvestmentGoal>? = null,
 
     @SerialName(value = "investor_profile.net_worth") val investorProfileNetWorth: kotlin.String? = null,
 
@@ -896,7 +900,7 @@ data class ModernUserDecryptResponse (
 
     @SerialName(value = "investor_profile.risk_tolerance") val investorProfileRiskTolerance: kotlin.String? = null,
 
-    @SerialName(value = "investor_profile.senior_executive_symbols") val investorProfileSeniorExecutiveSymbols: kotlin.String? = null
+    @SerialName(value = "investor_profile.senior_executive_symbols") val investorProfileSeniorExecutiveSymbols: kotlin.collections.List<kotlin.String>? = null
 
 ) {
 

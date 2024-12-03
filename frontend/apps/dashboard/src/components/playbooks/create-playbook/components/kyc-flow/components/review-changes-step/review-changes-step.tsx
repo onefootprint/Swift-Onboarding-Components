@@ -1,4 +1,4 @@
-import { putOrgPlaybooksByPlaybookIdMutation } from '@onefootprint/axios/dashboard';
+import { putOrgPlaybooksByIdMutation } from '@onefootprint/axios/dashboard';
 import { getErrorMessage } from '@onefootprint/request';
 import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
 import { InlineAlert, LoadingSpinner, Stack } from '@onefootprint/ui';
@@ -35,7 +35,7 @@ const ReviewChangesStep = ({ onBack, onSubmit, meta }: ReviewChangesStepProps) =
 const WithChanges = ({ onBack, onSubmit, meta: { playbook, formData } }: ReviewChangesStepProps) => {
   const { t } = useTranslation('playbooks', { keyPrefix: 'create.review-changes' });
   const mutation = useMutation(
-    putOrgPlaybooksByPlaybookIdMutation({
+    putOrgPlaybooksByIdMutation({
       headers: { 'X-Fp-Dry-Run': true },
     }),
   );
@@ -43,7 +43,7 @@ const WithChanges = ({ onBack, onSubmit, meta: { playbook, formData } }: ReviewC
   const validateChanges = async () => {
     mutation.mutate({
       path: {
-        playbookId: playbook.playbookId,
+        id: playbook.playbookId,
       },
       body: {
         expectedLatestObcId: playbook.id,

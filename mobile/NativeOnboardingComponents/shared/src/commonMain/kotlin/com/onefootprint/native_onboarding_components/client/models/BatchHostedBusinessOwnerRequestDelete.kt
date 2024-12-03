@@ -15,7 +15,6 @@
 
 package org.openapitools.client.models
 
-import org.openapitools.client.models.OnboardingRequirement
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
@@ -24,19 +23,28 @@ import kotlinx.serialization.encoding.*
 /**
  * 
  *
- * @param isMet 
- * @param requirement 
+ * @param op 
+ * @param uuid 
  */
 @Serializable
 
-data class ApiOnboardingRequirement (
+data class BatchHostedBusinessOwnerRequestDelete (
 
-    @SerialName(value = "is_met") @Required val isMet: kotlin.Boolean,
+    @SerialName(value = "op") @Required val op: BatchHostedBusinessOwnerRequestDelete.Op,
 
-    @SerialName(value = "requirement") @Required val requirement: OnboardingRequirement
+    @SerialName(value = "uuid") @Required val uuid: kotlin.String
 
 ) {
 
+    /**
+     * 
+     *
+     * Values: delete
+     */
+    @Serializable
+    enum class Op(val value: kotlin.String) {
+        @SerialName(value = "delete") delete("delete");
+    }
 
 }
 

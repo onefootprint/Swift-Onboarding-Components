@@ -135,6 +135,9 @@ import type {
   PatchOrgOnboardingConfigsByObcIdRulesData,
   PatchOrgOnboardingConfigsByObcIdRulesError,
   PatchOrgOnboardingConfigsByObcIdRulesResponse,
+  PatchOrgPlaybooksByIdData,
+  PatchOrgPlaybooksByIdError,
+  PatchOrgPlaybooksByIdResponse,
   PatchOrgProxyConfigsByProxyConfigIdData,
   PatchOrgProxyConfigsByProxyConfigIdError,
   PatchOrgProxyConfigsByProxyConfigIdResponse,
@@ -350,9 +353,9 @@ import type {
   PutOrgLogoData,
   PutOrgLogoError,
   PutOrgLogoResponse,
-  PutOrgPlaybooksByPlaybookIdData,
-  PutOrgPlaybooksByPlaybookIdError,
-  PutOrgPlaybooksByPlaybookIdResponse,
+  PutOrgPlaybooksByIdData,
+  PutOrgPlaybooksByIdError,
+  PutOrgPlaybooksByIdResponse,
   PutPartnerDocTemplatesByTemplateIdData,
   PutPartnerDocTemplatesByTemplateIdError,
   PutPartnerDocTemplatesByTemplateIdResponse,
@@ -459,6 +462,7 @@ import {
   patchOrgMembersByTenantUserId,
   patchOrgOnboardingConfigsById,
   patchOrgOnboardingConfigsByObcIdRules,
+  patchOrgPlaybooksById,
   patchOrgProxyConfigsByProxyConfigId,
   patchOrgRolesByTenantRoleId,
   patchPartner,
@@ -531,7 +535,7 @@ import {
   postWebhooksSambaHandleWebhook,
   postWebhooksTwilioStatusCallback,
   putOrgLogo,
-  putOrgPlaybooksByPlaybookId,
+  putOrgPlaybooksById,
   putPartnerDocTemplatesByTemplateId,
   putPartnerLogo,
 } from '../services.gen';
@@ -3502,14 +3506,32 @@ export const postOrgPlaybooksMutation = (options?: Partial<Options<PostOrgPlaybo
   return mutationOptions;
 };
 
-export const putOrgPlaybooksByPlaybookIdMutation = (options?: Partial<Options<PutOrgPlaybooksByPlaybookIdData>>) => {
+export const putOrgPlaybooksByIdMutation = (options?: Partial<Options<PutOrgPlaybooksByIdData>>) => {
   const mutationOptions: UseMutationOptions<
-    PutOrgPlaybooksByPlaybookIdResponse,
-    AxiosError<PutOrgPlaybooksByPlaybookIdError>,
-    Options<PutOrgPlaybooksByPlaybookIdData>
+    PutOrgPlaybooksByIdResponse,
+    AxiosError<PutOrgPlaybooksByIdError>,
+    Options<PutOrgPlaybooksByIdData>
   > = {
     mutationFn: async localOptions => {
-      const { data } = await putOrgPlaybooksByPlaybookId({
+      const { data } = await putOrgPlaybooksById({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const patchOrgPlaybooksByIdMutation = (options?: Partial<Options<PatchOrgPlaybooksByIdData>>) => {
+  const mutationOptions: UseMutationOptions<
+    PatchOrgPlaybooksByIdResponse,
+    AxiosError<PatchOrgPlaybooksByIdError>,
+    Options<PatchOrgPlaybooksByIdData>
+  > = {
+    mutationFn: async localOptions => {
+      const { data } = await patchOrgPlaybooksById({
         ...options,
         ...localOptions,
         throwOnError: true,

@@ -15,6 +15,7 @@
 
 package org.openapitools.client.apis
 
+import org.openapitools.client.models.GetVerifyContactInfoResponse
 import org.openapitools.client.models.IdentifyChallengeResponse
 import org.openapitools.client.models.IdentifyRequest
 import org.openapitools.client.models.IdentifyResponse
@@ -239,6 +240,74 @@ open class IdentifyApi : ApiClient {
         ).wrap()
     }
 
+
+
+    /**
+     * 
+     * Get context on a verify contact info session.
+     * @param xFpAuthorization Short-lived auth token for async verification of contact info. (optional)
+     * @return GetVerifyContactInfoResponse
+     */
+    @Suppress("UNCHECKED_CAST")
+    open suspend fun hostedIdentifyVerifyContactInfoGet(xFpAuthorization: kotlin.String? = null): HttpResponse<GetVerifyContactInfoResponse> {
+
+        val localVariableAuthNames = listOf<String>("Async contact info verification token")
+
+        val localVariableBody = 
+            io.ktor.client.utils.EmptyContent
+
+        val localVariableQuery = mutableMapOf<String, List<String>>()
+        val localVariableHeaders = mutableMapOf<String, String>()
+        xFpAuthorization?.apply { localVariableHeaders["X-Fp-Authorization"] = this.toString() }
+
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.GET,
+            "/hosted/identify/verify_contact_info",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = true,
+        )
+
+        return request(
+            localVariableConfig,
+            localVariableBody,
+            localVariableAuthNames
+        ).wrap()
+    }
+
+
+    /**
+     * 
+     * Creates an auth event to mark the provided contact info as verified.
+     * @param xFpAuthorization Short-lived auth token for async verification of contact info. (optional)
+     * @return kotlin.String
+     */
+    @Suppress("UNCHECKED_CAST")
+    open suspend fun hostedIdentifyVerifyContactInfoPost(xFpAuthorization: kotlin.String? = null): HttpResponse<kotlin.String> {
+
+        val localVariableAuthNames = listOf<String>("Async contact info verification token")
+
+        val localVariableBody = 
+            io.ktor.client.utils.EmptyContent
+
+        val localVariableQuery = mutableMapOf<String, List<String>>()
+        val localVariableHeaders = mutableMapOf<String, String>()
+        xFpAuthorization?.apply { localVariableHeaders["X-Fp-Authorization"] = this.toString() }
+
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.POST,
+            "/hosted/identify/verify_contact_info",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = true,
+        )
+
+        return request(
+            localVariableConfig,
+            localVariableBody,
+            localVariableAuthNames
+        ).wrap()
+    }
 
 
     /**

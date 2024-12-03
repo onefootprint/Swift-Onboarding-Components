@@ -51,6 +51,7 @@ open class ApiClient(
 
     private val authentications: kotlin.collections.Map<String, Authentication> by lazy {
         mapOf(
+                "Async contact info verification token" to ApiKeyAuth("header", "X-Fp-Authorization"), 
                 "businessOwnerToken" to ApiKeyAuth("header", "X-Kyb-Bo-Token"), 
                 "integrationTestingUserOnboardingToken" to ApiKeyAuth("header", "X-Fp-Authorization"), 
                 "onboardingConfigPublishableKey" to ApiKeyAuth("header", "X-Onboarding-Config-Key"), 
