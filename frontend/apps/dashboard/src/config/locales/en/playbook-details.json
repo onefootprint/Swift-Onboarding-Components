@@ -415,7 +415,7 @@
     "configurations": "Configurations",
     "restore-confirmation": {
       "title": "Restore version",
-      "description": "Are you sure you want to restore this version? This will overwrite the current version.",
+      "description": "Are you sure you want to restore this version? This will create and activate a new version identical to the selected one.",
       "cta": "Restore",
       "cancel": "Cancel"
     },
