@@ -169,6 +169,7 @@ export const timelineFixture: Timeline = [
           workflowKind: WorkflowKind.Kyc,
           obConfiguration: {
             id: 'ob_config_id_3o5SdynZVGO1icDm8Z6llC',
+            playbookId: 'pb_cnHbDNQ2AENjW4bC5wBY3v',
             name: 'My Playbook',
             mustCollectData: [],
           },

@@ -245,6 +245,7 @@ export const workflowStartedEventFixture = {
       playbook: {
         id: 'ob_config_id_3o5SdynZVGO1icDm8Z6llC',
         name: 'My Playbook',
+        playbookId: 'pb_cnHbDNQ2AENjW4bC5wBY3v',
         mustCollectData: [],
       },
       kind: WorkflowStartedEventKind.playbook,

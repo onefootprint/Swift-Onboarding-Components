@@ -20,6 +20,7 @@ export type OnboardingDecision = {
 
 export type TimelinePlaybook = {
   id: string;
+  playbookId: string;
   name: string;
   mustCollectData: CollectedDataOption[];
 };

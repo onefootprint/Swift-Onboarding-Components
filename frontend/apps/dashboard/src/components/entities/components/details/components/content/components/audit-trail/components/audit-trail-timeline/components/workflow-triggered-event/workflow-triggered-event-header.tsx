@@ -33,10 +33,7 @@ const WorkflowTriggeredEventHeader = ({ data }: WorkflowTriggeredEventHeaderProp
 };
 
 const PlaybookContext = ({ data }: WorkflowTriggeredEventHeaderProps) => {
-  const { t } = useTranslation('entity-details', {
-    keyPrefix: 'audit-trail.timeline.workflow-triggered-event',
-  });
-
+  const { t } = useTranslation('entity-details', { keyPrefix: 'audit-trail.timeline.workflow-triggered-event' });
   const playbookId = data.config.kind === TriggerKind.Onboard ? data.config.data.playbookId : '';
   const { data: playbook, isError } = usePlaybook(playbookId);
   if (!playbookId) {
@@ -49,7 +46,16 @@ const PlaybookContext = ({ data }: WorkflowTriggeredEventHeaderProps) => {
       </Text>
     );
   }
-  return playbook ? <PlaybookLink playbook={playbook} /> : <Shimmer width="120px" height="20px" />;
+  return playbook ? (
+    <PlaybookLink
+      playbook={{
+        name: playbook.name,
+        id: playbookId,
+      }}
+    />
+  ) : (
+    <Shimmer width="120px" height="20px" />
+  );
 };
 
 export default WorkflowTriggeredEventHeader;

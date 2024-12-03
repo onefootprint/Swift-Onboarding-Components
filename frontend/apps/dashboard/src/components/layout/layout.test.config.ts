@@ -101,3 +101,10 @@ export const withOrg = () =>
       },
     },
   });
+
+export const withGhostPosts = () =>
+  mockRequest({
+    method: 'get',
+    path: '/ghost/api/v3/content/posts/',
+    response: { posts: [] },
+  });
