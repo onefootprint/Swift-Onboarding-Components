@@ -8,6 +8,7 @@ const useRequestParams = ({
   dataAttributesBusiness,
   dataAttributesPersonal,
   search,
+  names,
 }: SecurityLogsFilterValues) => {
   const requestParams = useMemo(() => {
     const params: Record<string, unknown> = {};
@@ -27,8 +28,11 @@ const useRequestParams = ({
       const mergedAttrs = [...dataAttributesBusiness, ...dataAttributesPersonal];
       params.targets = mergedAttrs.join();
     }
+    if (names.length) {
+      params.names = names.join();
+    }
     return params;
-  }, [dateRange, search, dataAttributesBusiness, dataAttributesPersonal]);
+  }, [dateRange, search, dataAttributesBusiness, dataAttributesPersonal, names]);
 
   return requestParams;
 };
