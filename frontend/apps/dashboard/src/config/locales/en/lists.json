@@ -1,0 +1,215 @@
+{
+  "list": {
+    "page-title": "Footprint | Lists",
+    "header": {
+      "title": "Lists",
+      "subtitle": "Lists are used to manage and organize blocked users and businesses."
+    },
+    "create-button": "Create list",
+    "empty-description": "You haven't created any lists just yet.",
+    "cta-not-allowed": "You're not allowed to create lists",
+    "table": {
+      "aria-label": "Lists",
+      "header": {
+        "name": "List name",
+        "alias": "Alias",
+        "entries": "Entries",
+        "used-in-rules": "Used in rules",
+        "created": "Created at"
+      },
+      "empty-state": "You haven't created any lists.",
+      "row": {
+        "used-in-rules": {
+          "yes": "Yes",
+          "no": "No"
+        }
+      }
+    },
+    "dialog": {
+      "title": "Create List",
+      "cta": {
+        "create": {
+          "label": "Create",
+          "aria-label": "Create list"
+        },
+        "cancel": "Cancel"
+      },
+      "form": {
+        "name": {
+          "label": "List name",
+          "hint": "Will appear in rules as \"{{alias}}\"",
+          "placeholder": "e.g. Blocked users",
+          "errors": {
+            "required": "Please enter a name for the list."
+          }
+        },
+        "kind": {
+          "label": "Type",
+          "placeholder": "Select",
+          "errors": {
+            "required": "Please select a type."
+          },
+          "options": {
+            "email_address": "Email address",
+            "email_domain": "Email domain",
+            "ssn9": "SSN",
+            "phone_number": "Phone number",
+            "phone_country_code": "Phone country code",
+            "ip_address": "IP address"
+          }
+        },
+        "entries": {
+          "label": "Enter values manually",
+          "placeholder": "List entries",
+          "hint": "Separated by commas"
+        }
+      },
+      "feedback": {
+        "success": {
+          "title": "Success",
+          "description": "List created successfully."
+        },
+        "error": {
+          "title": "Error creating list",
+          "description": "Something went wrong, please try again."
+        }
+      }
+    }
+  },
+  "details": {
+    "html-title": "Footprint | List details",
+    "breadcrumb": {
+      "title": "Lists",
+      "details": "Details"
+    },
+    "header": {
+      "kind": "Match type:",
+      "edit": "Edit name",
+      "cta-edit-not-allowed": "You're not allowed to edit lists",
+      "cta-delete-not-allowed": "You're not allowed to delete lists",
+      "actions": {
+        "delete": "Delete",
+        "delete-confirmation": {
+          "title": "Delete list",
+          "description": "Are you sure you want to delete this list?",
+          "cta": {
+            "delete": "Delete",
+            "cancel": "Cancel"
+          },
+          "feedback": {
+            "success": {
+              "title": "Success",
+              "description": "List deleted successfully."
+            },
+            "error": {
+              "title": "Error deleting list",
+              "description": "Something went wrong, please try again."
+            }
+          }
+        }
+      },
+      "edit-dialog": {
+        "title": "Edit list",
+        "cta": {
+          "save": {
+            "label": "Save",
+            "aria-label": "Save"
+          },
+          "cancel": "Cancel"
+        },
+        "feedback": {
+          "success": {
+            "title": "Success",
+            "description": "List updated successfully."
+          },
+          "error": {
+            "title": "Error updating list",
+            "description": "Something went wrong, please try again."
+          }
+        },
+        "form": {
+          "name": {
+            "label": "List name",
+            "placeholder": "e.g. Blocked users",
+            "hint": "Will appear in rules as \"{{alias}}\"",
+            "errors": {
+              "required": "Please enter a name for the list."
+            }
+          }
+        }
+      }
+    },
+    "entries": {
+      "title": "Entries",
+      "search-placeholder": "Find...",
+      "entries-more": "{{count}} entries more",
+      "show-all": "Show all",
+      "show-less": "Show fewer entries",
+      "add": "Add entry",
+      "cta-not-allowed": "You're not allowed to add entries to this list",
+      "delete-not-allowed": "You're not allowed to delete entries",
+      "empty": "No entries found",
+      "add-entries-dialog": {
+        "title": "New entries",
+        "form": {
+          "entries": {
+            "label": "Add entries",
+            "placeholder": "List entries",
+            "hint": "Separated by commas",
+            "errors": {
+              "required": "Please enter at least one entry for the list."
+            }
+          }
+        },
+        "cta": {
+          "save": {
+            "label": "Save",
+            "aria-label": "Save"
+          },
+          "cancel": "Cancel"
+        },
+        "feedback": {
+          "success": {
+            "title": "Success",
+            "description": "Entries added successfully."
+          },
+          "error": {
+            "title": "Error adding entries",
+            "description": "Something went wrong, please try again."
+          }
+        }
+      },
+      "deleted-toast": {
+        "title": "Deletion successful",
+        "description": "Entry deleted successfully."
+      }
+    },
+    "playbooks": {
+      "title": "Playbooks using {{alias}}",
+      "empty": "There are no playbooks using this list",
+      "details": "Go to playbook",
+      "in-rule": "In rule:",
+      "if": "if",
+      "and": "and"
+    },
+    "activity-log": {
+      "title": "Activity log",
+      "empty": "No activity found",
+      "create-list-entry": {
+        "verb": "added"
+      },
+      "delete-list-entry": {
+        "verb": "removed"
+      }
+    }
+  },
+  "entries-validation": {
+    "required": "Please enter at least one entry for the list.",
+    "email-address-invalid": "Please enter a valid email address.",
+    "email-domain-invalid": "Please enter a valid email domain.",
+    "ssn9-invalid": "Please enter a valid SSN.",
+    "phone-number-invalid": "Please enter a valid phone number.",
+    "phone-country-code-invalid": "Please enter a valid phone country code.",
+    "ip-address-invalid": "Please enter a valid IP address."
+  }
+}

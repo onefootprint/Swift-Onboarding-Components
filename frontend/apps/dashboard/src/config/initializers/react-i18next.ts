@@ -12,6 +12,7 @@ import entityDetails from '../locales/en/entity-details.json';
 import entityDocuments from '../locales/en/entity-documents.json';
 import home from '../locales/en/home.json';
 import internal from '../locales/en/internal.json';
+import lists from '../locales/en/lists.json';
 import onboarding from '../locales/en/onboarding.json';
 import playbookDetails from '../locales/en/playbook-details.json';
 import playbooks from '../locales/en/playbooks.json';
@@ -43,6 +44,7 @@ const configureReactI18next = () => {
         common,
         home,
         internal,
+        lists,
         onboarding,
         playbooks,
         roles,
