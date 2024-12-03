@@ -7,17 +7,33 @@ type PlaybookConfigProps = {
   playbook: OnboardingConfiguration;
   isTabsDisabled?: boolean;
   toggleDisableHeading?: (disable: boolean) => void;
+  options?: {
+    hideSettings?: boolean;
+  };
 };
 
-const PlaybookConfig = ({ playbook, isTabsDisabled = false, toggleDisableHeading = noop }: PlaybookConfigProps) => {
+const PlaybookConfig = ({
+  playbook,
+  isTabsDisabled = false,
+  toggleDisableHeading = noop,
+  options = {
+    hideSettings: false,
+  },
+}: PlaybookConfigProps) => {
   return (
     <>
       {playbook.kind === 'auth' ? (
         <AuthOnly playbook={playbook} />
       ) : (
-        <Tabs playbook={playbook} isTabsDisabled={isTabsDisabled} toggleDisableHeading={toggleDisableHeading} />
+        <Tabs
+          playbook={playbook}
+          isTabsDisabled={isTabsDisabled}
+          toggleDisableHeading={toggleDisableHeading}
+          hideSettings={options.hideSettings || false}
+        />
       )}
     </>
   );
 };
+
 export default PlaybookConfig;

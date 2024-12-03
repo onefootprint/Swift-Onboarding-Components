@@ -1,45 +1,29 @@
 import { tabsRouterSchema } from '@/playbooks/utils/schema';
-import type { PlaybookTabs } from '@/playbooks/utils/schema/schema';
 import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
 import type { OnboardingConfig } from '@onefootprint/types';
 import { Stack, Tabs as UITabs } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
-import { useTranslation } from 'react-i18next';
 import useGetQueryParam from 'src/hooks/use-query-param';
 import DataCollection from './components/data-collection';
 import Information from './components/information';
 import Rules from './components/rules';
 import Settings from './components/settings';
 import VerificationChecks from './components/verification-checks';
+import useTabOptions from './hooks/use-tab-options';
 
 export type TabsProps = {
   playbook: OnboardingConfiguration;
   isTabsDisabled: boolean;
   toggleDisableHeading: (disable: boolean) => void;
+  hideSettings: boolean;
 };
 
-type OptionsProps = { label: string; value: PlaybookTabs }[];
-
-const Tabs = ({ playbook, isTabsDisabled, toggleDisableHeading }: TabsProps) => {
-  const { t } = useTranslation('playbook-details');
+const Tabs = ({ playbook, isTabsDisabled, toggleDisableHeading, hideSettings }: TabsProps) => {
   const { tab } = useGetQueryParam(tabsRouterSchema);
   const router = useRouter();
+  const options = useTabOptions(playbook, hideSettings);
 
-  const options: OptionsProps =
-    playbook.kind === 'document'
-      ? [
-          { value: 'data', label: t('tabs.data-collection') },
-          { value: 'rules', label: t('tabs.rules') },
-        ]
-      : [
-          { value: 'data', label: t('tabs.data-collection') },
-          { value: 'verification-checks', label: t('tabs.verification-checks') },
-          { value: 'rules', label: t('tabs.rules') },
-          { value: 'settings', label: t('tabs.settings') },
-          { value: 'information', label: t('tabs.information') },
-        ];
-
-  const handleChange = (tab: PlaybookTabs) => {
+  const handleChange = (tab: string) => {
     router.replace({
       query: { ...router.query, tab },
     });

@@ -82,7 +82,7 @@ const VersionDetails = ({ isCurrent, isOriginal, onRestore, playbook, previousPl
         {nav === 'diff' && playbook && previousPlaybook && (
           <PlaybookDiff playbookA={previousPlaybook} playbookB={playbook} />
         )}
-        {nav === 'config' && playbook && <PlaybookConfig playbook={playbook} />}
+        {nav === 'config' && playbook && <PlaybookConfig playbook={playbook} options={{ hideSettings: true }} />}
       </div>
     </div>
   );
