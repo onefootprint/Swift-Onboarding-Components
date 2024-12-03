@@ -28,7 +28,7 @@ const Nav = () => {
   const { data: posts = [] } = useChangelogArticles();
 
   const [recentPosts, setRecentPosts] = useState<PostDetails[]>([]);
-  const [showBanner, setShowBanner] = useState(true);
+  const [showBanner, setShowBanner] = useState(false);
   const [openWhatsNewDialog, setOpenWhatsNewDialog] = useState(false);
 
   const {
