@@ -1,7 +1,6 @@
 import type {
   ActorApiKey,
   Annotation,
-  CollectedDataEventData,
   CombinedWatchlistChecksEvent,
   DocumentUploadedEventData,
   Entity,
@@ -26,6 +25,7 @@ import { useTranslation } from 'react-i18next';
 import type { TimelineItem } from 'src/components/timeline';
 import Timeline from 'src/components/timeline';
 
+import type { DataCollectedInfo } from '@onefootprint/request-types/dashboard';
 import useSession from 'src/hooks/use-session';
 import type { AuditTrailTimelineEvent } from 'src/utils/merge-audit-trail-timeline-events';
 import { AbandonedEventHeader } from './components/abandoned-event';
@@ -35,6 +35,7 @@ import AuthMethodUpdatedEventHeader from './components/auth-method-updated-event
 import AwaitingBosEvent from './components/awaiting-bos-event';
 import { BoCompletedKycHeader } from './components/bo-completed-kyc';
 import DataCollectedEventHeader from './components/data-collected-event';
+import getVisibleDis from './components/data-collected-event/utils';
 import DocumentUploadedEventHeader from './components/document-uploaded-event';
 import {
   ExternalIntegrationCalledEventBody,
@@ -91,8 +92,9 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
         headerComponent: <LabelAddedEventHeader data={eventData} />,
       });
     } else if (kind === TimelineEventKind.dataCollected) {
-      const eventData = data as CollectedDataEventData;
-      if (eventData.attributes.length) {
+      const eventData = data as DataCollectedInfo;
+      const { visibleDis, visibleAttributes } = getVisibleDis(eventData.targets || [], eventData.attributes);
+      if (visibleAttributes.length || visibleDis.length) {
         items.push({
           time,
           headerComponent: <DataCollectedEventHeader data={eventData} />,

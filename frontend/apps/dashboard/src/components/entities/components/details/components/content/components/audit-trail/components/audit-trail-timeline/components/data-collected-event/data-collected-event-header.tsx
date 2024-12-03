@@ -1,43 +1,43 @@
-import type { CollectedDataEventData } from '@onefootprint/types';
-import { CollectedInvestorProfileDataOption } from '@onefootprint/types';
+import type { CollectedDataOption, DataCollectedInfo, DataIdentifier } from '@onefootprint/request-types/dashboard';
+import type { Actor as TActor } from '@onefootprint/types';
 import { Text, createFontStyles } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
+import FieldList from 'src/pages/security-logs/components/timeline/components/event/components/user-data/components/field-list';
 import Actor from '../actor';
-import CdoList, { InvestorProfileDiList } from './components/cdo-list';
+import getVisibleDis from './utils';
 
 type DataCollectedEventHeaderProps = {
-  data: CollectedDataEventData;
+  data: DataCollectedInfo;
 };
-
-const isInvestorProfileOnly = (attributes: CollectedDataEventData['attributes']): boolean =>
-  attributes.length === 1 && attributes[0] === CollectedInvestorProfileDataOption.investorProfile;
 
 const DataCollectedEventHeader = ({ data }: DataCollectedEventHeaderProps) => {
   const { t } = useTranslation('entity-details', {
     keyPrefix: 'audit-trail.timeline.data-collected-event',
   });
-  const { attributes } = data;
+  const { attributes, targets } = data;
 
   let title = <TertiaryColor>{data.isPrefill ? t('title-prefill') : t('title')}</TertiaryColor>;
   if (data.actor) {
     title = (
       <>
-        <Actor actor={data.actor} />
+        <Actor actor={data.actor as TActor} />
         <TertiaryColor>{t('title-edited')}</TertiaryColor>
       </>
     );
   }
 
+  const { visibleDis, visibleAttributes } = getVisibleDis(targets || [], attributes);
+
   return (
-    <Container data-testid="data-collected-event-header">
+    <Container aria-label={t('aria-label')}>
       <Title>{title}</Title>
-      {isInvestorProfileOnly(attributes) ? (
-        <InvestorProfileDiList diList={data.targets} />
-      ) : (
-        <CdoList cdos={attributes} />
-      )}
+      <FieldList
+        fields={visibleDis as DataIdentifier[]}
+        cdos={visibleAttributes as CollectedDataOption[]}
+        numVisibleFields={7}
+      />
       {data.isPrefill && (
         <Text variant="body-3" color="tertiary">
           {t('end-prefill')}

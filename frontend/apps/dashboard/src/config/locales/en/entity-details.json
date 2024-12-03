@@ -928,6 +928,7 @@
         }
       },
       "data-collected-event": {
+        "aria-label": "Data collected event",
         "title": "Collected",
         "title-prefill": "Prefilled",
         "title-from-other-org": "Collected (from other companies) ",

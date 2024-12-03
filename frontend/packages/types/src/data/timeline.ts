@@ -7,7 +7,7 @@ import type {
   CollectedKybDataOption,
   CollectedKycDataOption,
 } from './collected-data-option';
-import type { InvestorProfileDI } from './di';
+import type { DataIdentifier } from './di';
 import type { DocumentRequestConfig } from './document-request-config';
 import type { EntityLabel } from './entity';
 import type { IdDocStatus, SupportedIdDocTypes } from './id-doc-type';
@@ -62,7 +62,7 @@ export type CollectedDataEventData = {
   isPrefill: boolean;
   attributes: (CollectedKybDataOption | CollectedKycDataOption | CollectedInvestorProfileDataOption)[];
   actor?: Actor;
-  targets?: InvestorProfileDI[];
+  targets?: DataIdentifier[];
 };
 
 export type FreeFormNoteEvent = {

@@ -1,4 +1,4 @@
-import type { DataIdentifier } from '@onefootprint/request-types/dashboard';
+import type { CollectedDataOption, DataIdentifier } from '@onefootprint/request-types/dashboard';
 import { Text, Tooltip } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import FinancialData from '../components/financial-data';
@@ -9,19 +9,32 @@ const DEFAULT_NUM_VISIBLE_FIELDS = 3;
 
 type FieldListProps = {
   fields: DataIdentifier[];
+  cdos?: CollectedDataOption[];
   numVisibleFields?: number;
 };
 
-/** Renders the list of fields and CDOs. If CDOs are provided, will prefer to render a CDO rather than its constituent DI fields, but will still render DIs that don't belong to any provided CDO. */
-const FieldList = ({ fields, numVisibleFields = DEFAULT_NUM_VISIBLE_FIELDS }: FieldListProps) => {
+const FieldList = ({ fields, cdos = [], numVisibleFields = DEFAULT_NUM_VISIBLE_FIELDS }: FieldListProps) => {
   const { t } = useTranslation('security-logs', { keyPrefix: 'events.user-data' });
   const { t: diT } = useTranslation('common', { keyPrefix: 'di' });
+  const { t: cdoT } = useTranslation('common', { keyPrefix: 'cdo' });
+
+  const translateDi = (di: DataIdentifier) => {
+    if (di.startsWith('custom.')) return di;
+    if (di.startsWith('business.beneficial_owners.')) return diT('business.beneficial_owners');
+    // @ts-expect-error: Display undocumented DI as "Beneficial owners"
+    if (di === 'business.beneficial_owner_explanation_message') return diT('business.beneficial_owners');
+    return diT(di as DataIdentifier);
+  };
 
   const { cards, bankAccounts, nonFinancialFields, hasFinancialData } = getFinancialData(fields);
 
-  const allNonFinancialsFieldsTranslated = nonFinancialFields.map(field => diT(field));
-  const visibleFields = allNonFinancialsFieldsTranslated.slice(0, numVisibleFields);
-  const collapsedFields = allNonFinancialsFieldsTranslated.slice(numVisibleFields);
+  // TODO sort fields?
+  const allNonFinancialFieldsTranslated = [
+    ...nonFinancialFields.map(field => translateDi(field as DataIdentifier)),
+    ...cdos.map(c => cdoT(c)),
+  ];
+  const visibleFields = allNonFinancialFieldsTranslated.slice(0, numVisibleFields);
+  const collapsedFields = allNonFinancialFieldsTranslated.slice(numVisibleFields);
   const collapsedFieldsStr = collapsedFields.join('; ');
 
   return (

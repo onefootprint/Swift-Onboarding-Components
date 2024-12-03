@@ -81,7 +81,9 @@
       "country_of_birth": "Country of birth",
       "citizenships": "Citizenship",
       "visa_kind": "Visa type",
-      "visa_expiration_date": "Visa expiration date"
+      "visa_expiration_date": "Visa expiration date",
+      "drivers_license_number": "Driver's license number",
+      "drivers_license_state": "Driver's license state"
     },
     "investor_profile": {
       "employment_status": "Employment status",
@@ -384,7 +386,8 @@
       "website": "Website",
       "phone_number": "Phone number",
       "tin": "TIN (EIN)",
-      "beneficial_owners": "Business beneficial owners",
+      "beneficial_owners": "Beneficial owners",
+      "beneficial_owner_explanation_message": "Beneficial ownership stake explanation",
       "address_line1": "Address line 1",
       "address_line2": "Address line 2",
       "city": "City",

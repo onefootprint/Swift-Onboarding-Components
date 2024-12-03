@@ -10,6 +10,7 @@ const FirstFieldsText = ({ fields, hasCollapsedFields }: FirstFieldsTextProps) =
   const { t } = useTranslation('security-logs', { keyPrefix: 'events.user-data' });
 
   const getFieldText = () => {
+    if (fields.length === 0) return '';
     if (fields.length === 1) return fields[0];
     if (fields.length === 2) return `${fields[0]} ${t('and')} ${fields[1]}`;
 
