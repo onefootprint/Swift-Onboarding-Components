@@ -71,7 +71,7 @@ pub struct ScopedVault {
     /// The seqno at which the SV was created or refreshed.
     /// Data _before_ this seqno and tenat-scoped data _after_ this seqno are used to contruct the
     /// VW
-    pub snapshot_seqno: DataLifetimeSeqno,
+    pub snapshot_seqno: Option<DataLifetimeSeqno>,
     /// An optional external (customer-specified) identifier for the scoped vault
     pub external_id: Option<ExternalId>,
     /// An arbitrarily-defined timestamp for when "activity" has occurred on the vault. Users in

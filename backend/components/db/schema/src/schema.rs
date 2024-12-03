@@ -1134,7 +1134,7 @@ diesel::table! {
         is_live -> Bool,
         status -> Text,
         last_heartbeat_at -> Timestamptz,
-        snapshot_seqno -> Int8,
+        snapshot_seqno -> Nullable<Int8>,
         external_id -> Nullable<Text>,
         last_activity_at -> Timestamptz,
         deactivated_at -> Nullable<Timestamptz>,
