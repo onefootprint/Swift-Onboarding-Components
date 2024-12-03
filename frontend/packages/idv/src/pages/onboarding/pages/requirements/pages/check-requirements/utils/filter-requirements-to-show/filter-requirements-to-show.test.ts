@@ -29,6 +29,7 @@ describe('computeRequirementsToShow', () => {
       ],
       // Not used
       obConfiguration: {} as PublicOnboardingConfig,
+      canUpdateUserData: true,
     };
     it('should return met KYC requirement when not yet shown', () => {
       const context = {
@@ -96,6 +97,7 @@ describe('computeRequirementsToShow', () => {
       allRequirements: [{ ...collectKycDataRequirement, isMet: true }],
       // Not used
       obConfiguration: {} as PublicOnboardingConfig,
+      canUpdateUserData: true,
     };
     it('should not return KYC requirement on initial fetch', () => {
       const context = {
