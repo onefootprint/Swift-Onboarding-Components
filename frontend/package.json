@@ -36,7 +36,8 @@
     "jest-environment-jsdom": "^29.7.0",
     "jest-watch-typeahead": "^2.2.2",
     "turbo": "^2.2.3",
-    "webpack": "^5.94.0"
+    "webpack": "^5.94.0",
+    "tsx": "^4.19.1"
   },
   "overrides": {
     "@onefootprint/e2e": {
