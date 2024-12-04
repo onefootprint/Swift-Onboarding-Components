@@ -10,7 +10,7 @@ meta:
 
 ## Overview
 
-Vault Disaster Recovery (DR) is an enterprise feature that provides organizations with increased control over their data vaulted with Footprint in the case of an emergency while maintaining high security and low risk.
+Vault Disaster Recovery (DR) is an enterprise feature that provides organizations with increased control over their data vaulted with Footprint in case of an emergency while maintaining high security and low risk.
 
 With Vault Disaster Recovery enabled, Footprint continuously backs up vaulted data to customer-owned cloud storage (like Amazon S3) in an encrypted format. During normal operation, the organization maintains low risk, as access to the vaulted data is protected and audited by the Footprint platform. However, in a catastrophic situation, if the customer wishes to "break glass" and gain access to their data without using Footprint services, Footprint or an escrow will securely disclose a payload that can be used to decrypt the cloud storage backups.
 
@@ -24,7 +24,7 @@ No system or person has the ability to unilaterally decrypt Vault Disaster Recov
 - The customer can decrypt individual Vault DR records to test recovery functionality via an audited and access-controlled API, similar to Footprint Vault’s standard decryption API.
 - The customer cannot decrypt Vault DR records outside the Footprint platform until Footprint or an escrow discloses a "recovery payload."
 
-These properties are made possible through a simple protocol using three different kinds of cryptographic keys:
+These properties are made possible through a simple protocol using three different kinds of cryptographic keys.
 
 ### 1. Org Keys
 The customer generates one or more org-scoped key pairs during the onboarding process. These keys are stored on YubiKeys using P-256 elliptic curve cryptography. Other private keys are encrypted to (or "wrapped" by) the org public keys, which enables Footprint to securely store and transfer those private keys to the customer without maintaining unused long-term access to them. The customer maintains access to the org private keys, which can be used in cooperation with Footprint or an escrow to recover data from the cloud storage bucket.
@@ -42,8 +42,7 @@ In either case, the customer does not store the recovery payload themselves to a
 
 ## Security Model
 
-The table below outlines the the different conditions or capabilities necessary for vault decryption in the three possible flows:
-
+The table below outlines the different conditions or capabilities necessary for vault decryption in the three possible flows:
 
 <table>
   <thead>
@@ -86,7 +85,7 @@ The table below outlines the the different conditions or capabilities necessary 
       <td></td>
     </tr>
     <tr>
-      <th>Recovery payload<br />(held by Footprint or escrowed)</th>
+      <th>Recovery payload<br />(held by Footprint or an escrow)</th>
       <td></td>
       <td></td>
       <td>Required</td>

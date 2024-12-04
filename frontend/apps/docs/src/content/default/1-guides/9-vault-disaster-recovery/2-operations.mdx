@@ -10,7 +10,7 @@ meta:
 
 ## Checking Backup Status
 
-Run `footprint-dr status [--sandbox/--live]` to check the current status of your Vault Disaster Recovery backups:
+Run `footprint-dr status [--sandbox/--live]` to check the current status of your Vault Disaster Recovery backups.
 
 ```text filename="Example Output"
 $ footprint-dr status --live
@@ -38,7 +38,7 @@ Once the initial backup is complete, the expected lag should be at most several 
 
 Using one of the [standard AWS CLI login methods](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html), log in to an AWS role that has `s3:ListBucket` and `s3:GetObject` access on the backup bucket.
 
-To inspect the list of vaults in your backup bucket, run `footprint-dr list-vaults [--sandbox/--live]`.:
+To inspect the list of vaults in your backup bucket, run `footprint-dr list-vaults [--sandbox/--live]`.
 
 ```text filename="Example Output"
 $ footprint-dr list-vaults --live
@@ -66,7 +66,7 @@ To locate the bucket and namespace where the encrypted data is stored, by defaul
 
 Using one of the [standard AWS CLI login methods](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html), log in to an AWS role that has `s3:ListBucket` and `s3:GetObject` access to the backup bucket.
 
-Prepare a [line-separated JSON file](https://jsonlines.org/) `records.jsonl` that specifies what records you would like to decrypt for the test. For example:
+Prepare a [line-separated JSON file](https://jsonlines.org/) `records.jsonl` that specifies which records you would like to decrypt for the test. For example:
 
 ```jsonl
 {"fp_id": "fp_id_rwSYNkPIrDFogXYjCJ1KrQ", "version": 2, "fields": ["id.first_name", "id.last_name", "id.phone_number"]}
@@ -78,7 +78,7 @@ For testing, decrypt just enough records to gain confidence that the backup reco
 
 Using one of the [standard AWS CLI login methods](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html), log in to an AWS role that has `s3:ListBucket` and `s3:GetObject` access on the backup bucket.
 
-Ensure you are logged in to the `footprint-dr`  CLI with an API key that has an appropriate `Decrypt Data` scope.
+Ensure you are logged in to the `footprint-dr` CLI with an API key that has an appropriate `Decrypt Data` scope.
 
 Plug in your YubiKey and create an age identity file on disk that points to the YubiKey slot you used during enrollment. If you don’t remember the slot number, run `age-plugin-yubikey --list`.
 
@@ -102,7 +102,7 @@ Tap your YubiKey when prompted. This fetches the encrypted records from S3, fetc
 
 In the catastrophic event a full recovery is needed, Footprint or the pre-arranged escrow will transfer the recovery payload to you, a file like `acme-inc-wrapped-recovery-key.age`. Take care to prevent leakage.
 
-Prepare a [line-separated JSON file](https://jsonlines.org/) `records.jsonl` that specifies what records you would like to decrypt for the test. For example:
+Prepare a [line-separated JSON file](https://jsonlines.org/) `records.jsonl` that specifies what records you would like to decrypt. For example:
 
 ```jsonl
 {"fp_id": "fp_id_rwSYNkPIrDFogXYjCJ1KrQ", "version": 2, "fields": ["id.first_name", "id.last_name", "id.phone_number"]}

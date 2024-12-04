@@ -16,7 +16,7 @@ meta:
 
 ## 1. Install Vault Disaster Recovery tools
 
-First install the CLI tool used for enrollment and decryption. On a Mac, run:
+First install the CLI tool used for enrollment and decryption. On a Mac, run the following:
 
 ```bash
 brew install onefootprint/tap/footprint-dr
@@ -30,7 +30,7 @@ Go to [the API Keys page](https://dashboard.onefootprint.com/api-keys) on the Fo
 
 Create a new API key with an admin scope.
 
-Run `footprint-dr login [--sandbox/--live]` and paste the API key at the prompt:
+Run `footprint-dr login [--sandbox/--live]` and paste the API key at the prompt.
 
 ```text filename="Example Output"
 $ footprint-dr login --live
@@ -153,16 +153,16 @@ resource "aws_cloudtrail" "fp_vault_data_cloudtrail" {
 
 ## 4. Fetch your external ID
 
-Your [external ID](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user_externalid.html) will help secure the cross-account IAM access. Run `footprint-dr get-external-id [--sandbox/--live]`  to fetch it:
+Your [external ID](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user_externalid.html) will help secure the cross-account IAM access. Run `footprint-dr get-external-id [--sandbox/--live]`  to fetch it.
 
 ```text filename="Example Output"
 $ footprint-dr get-external-id --live
 42ee4f928973996f8f855aebaebf70cd
 ```
 
-## 5. Create a IAM role for bucket management
+## 5. Create an IAM role for bucket management
 
-Footprint needs read and write access to the bucket to manage the encrypted data. Create a IAM role to delegate access like the one in the Terrraform examlpe below, substituting your external ID.
+Footprint needs read and write access to the bucket to manage the encrypted data. Create a IAM role to delegate access like the one in the Terraform example below, substituting your external ID.
 
 ```terraform
 locals {
@@ -236,7 +236,7 @@ resource "aws_iam_policy" "fp_vault_data_management" {
 }
 
 resource "aws_iam_role_policy_attachment" "fp_vault_data_management_assume_role" {
-  role       = aws_iam_role.fp_vault_data_delegate_access.name
+  role       = aws_iam_role.fp_vault_data_management.name
   policy_arn = aws_iam_policy.fp_vault_data_management.arn
 }
 ```
@@ -245,7 +245,7 @@ resource "aws_iam_role_policy_attachment" "fp_vault_data_management_assume_role"
 
 Org identities (private keys) are stored on one or more [YubiKeys](https://www.yubico.com/products/yubikey-5-overview/). Using hardware security tokens helps virtually eliminate the risk of accidentally leaking a private key, which is a sensitive component of the recovery flow. Depending on your data durability requirements, you may choose to mitigate the risk of lost or damaged hardware by registering redundant YubiKeys.
 
-The [age YubiKey plugin](https://github.com/str4d/age-plugin-yubikey) helps makes the enrollment process simple. Install [age](https://github.com/FiloSottile/age) and [age-plugin-yubikey](https://github.com/str4d/age-plugin-yubikey) on a workstation with a USB port for the YubiKey:
+The [age YubiKey plugin](https://github.com/str4d/age-plugin-yubikey) helps makes the enrollment process simple. Install [age](https://github.com/FiloSottile/age) and [age-plugin-yubikey](https://github.com/str4d/age-plugin-yubikey) on a workstation with a USB port for the YubiKey.
 
 ```bash
 # On a Mac:
@@ -271,13 +271,17 @@ age-plugin-yubikey \
 
 You may choose a different slot number if slot 1 is already in use, though we advise using dedicated YubiKeys for live-mode Vault Disaster Recovery. We recommend the pin policy of `once` and the touch policy of `cached` to improve the experience of the test recovery flow.
 
-You do not need to save any of the output, but make note of the recipient (starting with `age1yubikey` which you will paste into the next step. You can retrieve the recipient again by running `age-plugin-yubikey --list`.
+You do not need to save any of the output, but make note of the recipient (starting with `age1yubikey`) which you will paste into the next step. You can retrieve the recipient again by running the following:
+
+```bash
+age-plugin-yubikey --list
+```
 
 Repeat the key generation step once for each YubiKey you wish to register for Vault Disaster recovery, collecting a list of your org’s `age1yubikey` age recipients.
 
 ## 7. Complete enrollment
 
-Run `footprint-dr enroll [--sandbox/--live]` and follow the prompts:
+Run `footprint-dr enroll [--sandbox/--live]` and follow the prompts.
 
 ```text filename="Example Output"
 $ footprint-dr enroll --live
