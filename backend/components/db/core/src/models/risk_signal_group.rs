@@ -34,9 +34,11 @@ struct NewRiskSignalGroup {
 
 #[derive(Clone, Debug, derive_more::From)]
 pub enum RiskSignalGroupScope<'a> {
+    // Risk signals are scoped to a ScopedVault. You almost certainly DO NOT want to use this.
     ScopedVaultId {
         id: &'a ScopedVaultId,
     },
+    // Risk Signals are scoped to a WorkflowId. You almost certainly want to use this.
     WorkflowId {
         id: &'a WorkflowId,
         sv_id: &'a ScopedVaultId,

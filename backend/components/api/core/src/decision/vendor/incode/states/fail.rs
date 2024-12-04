@@ -21,6 +21,7 @@ use newtypes::ScopedVaultId;
 use newtypes::VaultId;
 use newtypes::VendorAPI;
 use newtypes::VerificationResultId;
+use newtypes::WorkflowId;
 
 // TODO this is more like the other workflow state transitions where it has behavior that must be
 // atomic with entering the state.
@@ -33,6 +34,7 @@ impl Fail {
         conn: &mut TxnPgConn,
         sv_id: &ScopedVaultId,
         vault_id: &VaultId,
+        wf_id: &WorkflowId,
         id_doc_id: &DocumentId,
         vres_id: VerificationResultId,
         vendor_api: VendorAPI,
@@ -42,9 +44,7 @@ impl Fail {
             status: Some(DocumentStatus::Failed),
             ..Default::default()
         };
-        // TODO: fix this to add wf_id
-        // https://linear.app/footprint/issue/BE-1605/fix-failenter-to-have-rsg-scope-wf
-        let scope = RiskSignalGroupScope::ScopedVaultId { id: sv_id };
+        let scope = RiskSignalGroupScope::WorkflowId { id: wf_id, sv_id };
         let _ = RiskSignal::bulk_save_for_scope(
             conn,
             scope,

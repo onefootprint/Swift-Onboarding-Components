@@ -217,6 +217,7 @@ where
                                 conn,
                                 &ctx.sv_id,
                                 &ctx.vault.id,
+                                &ctx.wf_id,
                                 &ctx.id_doc_id,
                                 vres_id,
                                 vendor_api,
