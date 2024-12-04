@@ -69,7 +69,7 @@ pub fn fetch_duplicate_data_unchecked(
 
 
 #[tracing::instrument(skip_all)]
-pub fn build_duplicate_responses(
+pub fn build_duplicate_data(
     fingerprints: Vec<Fingerprint>,
     scoped_vaults: Vec<ScopedVault>,
     labels: Vec<ScopedVaultLabel>,
@@ -120,4 +120,24 @@ pub fn build_duplicate_responses(
             }
         })
         .collect_vec()
+}
+
+#[tracing::instrument(skip(state))]
+pub async fn get_duplicate_data_for_risk_signals(
+    state: &State,
+    sv_id: &ScopedVaultId,
+) -> FpResult<Vec<DuplicateData>> {
+    let svid = sv_id.clone();
+    let pagination = OffsetPagination::new(Some(0), 100);
+    let (fingerprints, scoped_vaults, labels, tags, _) = state
+        .db_query(move |conn| {
+            let scoped_vault = ScopedVault::get(conn, &svid)?;
+            let res = fetch_duplicate_data_unchecked(conn, scoped_vault, pagination)?;
+            Ok(res)
+        })
+        .await?;
+
+    let duplicate_data = build_duplicate_data(fingerprints, scoped_vaults, labels, tags);
+
+    Ok(duplicate_data)
 }

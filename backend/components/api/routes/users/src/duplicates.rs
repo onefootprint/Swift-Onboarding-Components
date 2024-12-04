@@ -34,7 +34,7 @@ pub async fn get(
     let (fingerprints, scoped_vaults, labels, tags, next_page) =
         duplicates::fetch_duplicate_data(&state, fp_id, tenant_id, is_live, pagination).await?;
 
-    let responses = duplicates::build_duplicate_responses(fingerprints, scoped_vaults, labels, tags)
+    let responses = duplicates::build_duplicate_data(fingerprints, scoped_vaults, labels, tags)
         .into_iter()
         .map(|dd| {
             let duplicates::DuplicateData {

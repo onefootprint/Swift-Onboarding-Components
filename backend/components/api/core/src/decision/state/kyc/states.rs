@@ -6,6 +6,8 @@ use super::KycState;
 use super::KycVendorCalls;
 use super::MakeDecision;
 use super::MakeVendorCalls;
+use crate::decision::duplicates::DuplicateData;
+use crate::decision::features::duplicates;
 use crate::decision::features::risk_signals::parse_reason_codes;
 use crate::decision::features::risk_signals::parse_reason_codes_from_vendor_result;
 use crate::decision::features::risk_signals::UserSubmittedInfoForFRC;
@@ -171,6 +173,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         Option<(NeuroIdAnalyticsResponse, VerificationResultId)>,
         Option<(LookupV2Response, VerificationResultId)>,
         Option<(ValidatedApplicationRiskResponse, VerificationResultId)>,
+        Vec<DuplicateData>,
     )>;
 
     #[tracing::instrument(
@@ -303,6 +306,9 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
 
         let ocr_reason_codes = common::maybe_generate_ocr_reason_codes(state, &self.wf_id, &vw).await?;
 
+        let duplicate_data =
+            decision::duplicates::get_duplicate_data_for_risk_signals(state, &self.sv_id).await?;
+
         Ok(Box::new((
             ocr_reason_codes,
             user_input_reason_codes,
@@ -313,6 +319,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             neuro_result,
             twilio_result,
             sentilink_result,
+            duplicate_data,
         )))
     }
 
@@ -333,6 +340,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             neuro_result,
             twilio_result,
             sentilink_result,
+            duplicate_data,
         ) = *async_res;
         let (vw, _, obc) = common::get_vw_and_obc(conn, &self.sv_id, self.seqno, &self.wf_id)?;
         let user_submitted_info = UserSubmittedInfoForFRC::new(&vw);
@@ -407,11 +415,8 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
                 .map(|frc| (frc, vendor_api, vres_id.clone()))
                 .collect();
 
-            let rsg = RiskSignalGroup::get_or_create(
-                conn,
-                risk_signal_group_scope.clone(),
-                RiskSignalGroupKind::Phone,
-            )?;
+            let rsg =
+                RiskSignalGroup::create(conn, risk_signal_group_scope.clone(), RiskSignalGroupKind::Phone)?;
             RiskSignal::bulk_add(conn, twilio_frc, false, rsg.id)?;
         }
 
@@ -435,13 +440,10 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
                 .into_iter()
                 .chain(user_input_risk_signals)
                 .collect();
-            RiskSignal::bulk_create(
-                conn,
-                risk_signal_group_scope.clone(),
-                rses,
-                RiskSignalGroupKind::Kyc,
-                false,
-            )?;
+
+            let rsg =
+                RiskSignalGroup::create(conn, risk_signal_group_scope.clone(), RiskSignalGroupKind::Kyc)?;
+            RiskSignal::bulk_add(conn, rses, false, rsg.id)?;
         }
 
         // Save AML risk signals from Aml call or Kyc call (or save nothing if neither called)
@@ -471,12 +473,22 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             let aml_risk_signals = common::get_aml_risk_signals_from_kyc_call(&vw, kyc_vendor_result)?;
             RiskSignal::bulk_create(
                 conn,
-                risk_signal_group_scope,
+                risk_signal_group_scope.clone(),
                 aml_risk_signals,
                 RiskSignalGroupKind::Aml,
                 false,
             )?;
         };
+
+        // Duplicates
+        let duplicate_risk_signals = duplicates::footprint_reason_codes(&self.sv_id, duplicate_data)
+            .into_iter()
+            .map(|frc| (frc, VendorAPI::Footprint, None))
+            .collect();
+        let dupe_rsg =
+            RiskSignalGroup::create(conn, risk_signal_group_scope, RiskSignalGroupKind::Duplicates)?;
+        let hidden = !self.t_id.is_triumph(); // rolling this out slightly safely
+        RiskSignal::bulk_add(conn, duplicate_risk_signals, hidden, dupe_rsg.id)?;
 
         Ok(KycState::from(KycDecisioning::new(
             self.wf_id, self.sv_id, self.t_id, self.seqno,

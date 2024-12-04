@@ -5,7 +5,6 @@ use newtypes::FootprintReasonCode;
 use newtypes::ScopedVaultId;
 
 
-// These are debatable at scale
 const STRONG_DUPE_KINDS: [DupeKind; 5] = [
     DupeKind::DeviceId,
     DupeKind::CookieId,

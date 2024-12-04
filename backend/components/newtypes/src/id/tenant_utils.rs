@@ -50,6 +50,10 @@ impl TenantId {
     pub fn is_footprint_live(&self) -> bool {
         self.0 == *"org_e2FHVfOM5Hd3Ce492o5Aat"
     }
+
+    pub fn is_triumph(&self) -> bool {
+        self.0 == *"org_hWdmCvlFkzckWRls6motLm"
+    }
 }
 
 #[derive(Debug, Clone, Copy, From, PartialEq, Eq)]
