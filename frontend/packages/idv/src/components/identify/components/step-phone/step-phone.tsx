@@ -3,10 +3,9 @@ import { useRequestErrorToast } from '@onefootprint/hooks';
 import noop from 'lodash/noop';
 import { useTranslation } from 'react-i18next';
 
-import { postHostedIdentifyMutation } from '@onefootprint/axios';
-import { useMutation } from '@tanstack/react-query';
 import { checkIsPhoneValid, getLogger } from '../../../../utils';
 import { useL10nContext } from '../../../l10n-provider';
+import { useIdentify } from '../../queries';
 import { useIdentifyMachine } from '../../state';
 import { SuccessfulIdentifier } from '../../state/types';
 import type { HeaderProps } from '../../types';
@@ -25,26 +24,7 @@ const StepPhone = ({ Header }: StepPhoneProps) => {
   const showRequestErrorToast = useRequestErrorToast();
   const l10n = useL10nContext();
   const options = COUNTRIES;
-  const mutIdentify = useMutation({
-    ...postHostedIdentifyMutation(),
-    onError: error => {
-      logError('Error while identify user on step-phone page:', error);
-      showRequestErrorToast(error);
-    },
-    onSuccess: (res, { body: { phoneNumber: phoneFromForm } }) => {
-      const userFound = !!res.user;
-      const successfulIdentifiers = userFound ? [SuccessfulIdentifier.phone] : undefined;
-      send({
-        type: 'identifyResult',
-        payload: {
-          // @ts-expect-error TODO: auto-generate types differ from the manual one
-          user: res.user,
-          phoneNumber: phoneFromForm,
-          successfulIdentifiers,
-        },
-      });
-    },
-  });
+  const mutIdentify = useIdentify({ obConfigAuth, sandboxId, scope });
 
   const handlePhoneValidation = (phone: string) => {
     const isPhoneValid = checkIsPhoneValid(phone, config?.isLive === false);
@@ -55,10 +35,27 @@ const StepPhone = ({ Header }: StepPhoneProps) => {
   const handleChangeEmail = () => send({ type: 'navigatedToPrevPage' });
 
   const handleSubmit = (phoneFromForm: string) => {
-    mutIdentify.mutate({
-      body: { phoneNumber: phoneFromForm, scope },
-      headers: { ...obConfigAuth, 'X-Sandbox-Id': sandboxId },
-    });
+    mutIdentify.mutate(
+      { phoneNumber: phoneFromForm },
+      {
+        onError: error => {
+          logError('Error while identify user on step-phone page:', error);
+          showRequestErrorToast(error);
+        },
+        onSuccess: res => {
+          const userFound = !!res.user;
+          const successfulIdentifiers = userFound ? [SuccessfulIdentifier.phone] : undefined;
+          send({
+            type: 'identifyResult',
+            payload: {
+              user: res.user,
+              phoneNumber: phoneFromForm,
+              successfulIdentifiers,
+            },
+          });
+        },
+      },
+    );
   };
 
   return (
