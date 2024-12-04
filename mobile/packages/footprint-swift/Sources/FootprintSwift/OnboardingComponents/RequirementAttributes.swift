@@ -11,6 +11,7 @@ public struct Requirements {
     public var isCompleted: Bool = false
     public var isMissing: Bool = false
     public var missing: [Requirement] = []
+    public var canUpdateUserData: Bool = true
 }
 
 public struct RequirementAttributes {
@@ -21,6 +22,7 @@ public struct RequirementAttributes {
         var fields = Fields()
         var requirements = Requirements()
         
+        requirements.canUpdateUserData = onboardingStatus.canUpdateUserData
         requirements.all = onboardingStatus.allRequirements
         requirements.missing = onboardingStatus.allRequirements.filter {
             switch $0 {

@@ -10,13 +10,16 @@ import Foundation
 public struct OnboardingStatusResponse: Codable, JSONEncodable, Hashable {
 
     public var allRequirements: [Requirement]
+    public var canUpdateUserData: Bool
 
-    public init(allRequirements: [Requirement]) {
+    public init(allRequirements: [Requirement], canUpdateUserData: Bool) {
         self.allRequirements = allRequirements
+        self.canUpdateUserData = canUpdateUserData
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
         case allRequirements = "all_requirements"
+        case canUpdateUserData = "can_update_user_data"
     }
 
     // Encodable protocol methods
@@ -24,6 +27,7 @@ public struct OnboardingStatusResponse: Codable, JSONEncodable, Hashable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(allRequirements, forKey: .allRequirements)
+        try container.encode(canUpdateUserData, forKey: .canUpdateUserData)
     }
 }
 

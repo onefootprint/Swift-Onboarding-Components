@@ -25,12 +25,16 @@ import kotlinx.serialization.encoding.*
  * 
  *
  * @param allRequirements 
+ * @param canUpdateUserData When true, this session can update their data via `PATCH /hosted/user/vault`
  */
 @Serializable
 
 data class OnboardingStatusResponse (
 
-    @SerialName(value = "all_requirements") @Required val allRequirements: kotlin.collections.List<ApiOnboardingRequirement>
+    @SerialName(value = "all_requirements") @Required val allRequirements: kotlin.collections.List<ApiOnboardingRequirement>,
+
+    /* When true, this session can update their data via `PATCH /hosted/user/vault` */
+    @SerialName(value = "can_update_user_data") @Required val canUpdateUserData: kotlin.Boolean
 
 ) {
 
