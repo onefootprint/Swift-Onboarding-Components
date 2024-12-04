@@ -13,7 +13,7 @@ const SandboxBanner = () => {
 
   return sandbox.isSandbox ? (
     <SandboxBannerContainer>
-      <StyledBanner variant="warning">
+      <Banner variant="warning" className="flex items-center justify-center gap-0.5">
         <Stack direction="row" align="center" justify="center">
           <span>{t('title')}</span>
           {sandbox.canToggle ? (
@@ -34,7 +34,7 @@ const SandboxBanner = () => {
             </>
           )}
         </Stack>
-      </StyledBanner>
+      </Banner>
     </SandboxBannerContainer>
   ) : null;
 };
@@ -53,16 +53,6 @@ const SandboxBannerContainer = styled.div`
         opacity: 0.7;
       }
     }
-  `};
-`;
-
-const StyledBanner = styled(Banner)`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: ${theme.spacing[1]};
   `};
 `;
 

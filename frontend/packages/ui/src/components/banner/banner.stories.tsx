@@ -1,60 +1,87 @@
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 
-import type { BannerProps } from './banner';
 import Banner from './banner';
 
-export default {
+const meta: Meta<typeof Banner> = {
   component: Banner,
   title: 'Components/Banner',
+  args: {
+    variant: 'info',
+  },
   argTypes: {
-    children: {
-      control: 'text',
-      description: 'Content to be rendered',
-      required: true,
-    },
     variant: {
       control: 'select',
-      description: 'Intent of the Banner',
+      description: 'Visual style and intent of the banner',
       options: ['info', 'error', 'warning', 'announcement'],
-      required: true,
+    },
+    children: {
+      control: 'text',
+      description: 'Content to be rendered inside the banner',
     },
   },
-} as Meta;
-
-const Template: StoryFn<BannerProps> = ({ children, variant: $variant }: BannerProps) => (
-  <Banner variant={$variant}>{children}</Banner>
-);
-
-export const Base = Template.bind({});
-Base.args = {
-  children: 'Critical message goes here.',
-  variant: 'error',
+  parameters: {
+    docs: {
+      description: {
+        component: 'Banner is a component used to display important messages, alerts, or announcements to users.',
+      },
+    },
+  },
 };
 
-export const Warning = Template.bind({});
-Warning.args = {
-  children: 'Warning message goes here.',
-  variant: 'warning',
+type Story = StoryObj<typeof Banner>;
+
+export const ErrorVariant: Story = {
+  name: 'Error',
+  args: {
+    children: 'This is an error message that requires immediate attention.',
+    variant: 'error',
+  },
 };
 
-export const Info = Template.bind({});
-Info.args = {
-  children: 'Info message goes here.',
-  variant: 'info',
+export const Warning: Story = {
+  args: {
+    children: 'This is a warning message you should be aware of.',
+    variant: 'warning',
+  },
 };
 
-export const Announcement = Template.bind({});
-Announcement.args = {
-  children: 'Announcement message goes here.',
-  variant: 'announcement',
+export const Info: Story = {
+  args: {
+    children: 'This is an informational message.',
+    variant: 'info',
+  },
 };
 
-export const WithLink = Template.bind({});
-WithLink.args = {
-  children: (
-    <>
-      Critical message goes here. <a href="/">Link</a>
-    </>
-  ),
-  variant: 'error',
+export const Announcement: Story = {
+  args: {
+    children: 'This is an announcement or promotional message.',
+    variant: 'announcement',
+  },
 };
+
+export const WithLink: Story = {
+  args: {
+    children: (
+      <>
+        This message contains a <a href="/">clickable link</a> for more details.
+      </>
+    ),
+    variant: 'error',
+  },
+};
+
+export const WithButton: Story = {
+  args: {
+    children: (
+      <>
+        This message contains an action.{' '}
+        <button type="button" onClick={() => alert('Clicked!')}>
+          Click here
+        </button>
+      </>
+    ),
+    variant: 'info',
+  },
+};
+
+export default meta;

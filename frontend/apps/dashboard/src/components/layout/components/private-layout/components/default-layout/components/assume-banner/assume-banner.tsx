@@ -24,7 +24,10 @@ const AssumeBanner = () => {
 
   return data.user?.isAssumedSession ? (
     <AssumeBannerContainer>
-      <StyledBanner variant={isAssumedSessionEditMode ? 'error' : 'info'}>
+      <Banner
+        variant={isAssumedSessionEditMode ? 'error' : 'info'}
+        className="flex items-center justify-center gap-0.5"
+      >
         <Stack direction="row" align="center" justify="center" gap={2}>
           <span>
             {t(isAssumedSessionEditMode ? 'edit-mode-title' : 'title', {
@@ -45,20 +48,10 @@ const AssumeBanner = () => {
             {t('log-out')}
           </button>
         </Stack>
-      </StyledBanner>
+      </Banner>
     </AssumeBannerContainer>
   ) : null;
 };
-
-const StyledBanner = styled(Banner)`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: ${theme.spacing[1]};
-  `};
-`;
 
 const AssumeBannerContainer = styled.div`
   ${({ theme }) => css`
