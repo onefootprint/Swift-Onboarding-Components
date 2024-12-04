@@ -7,7 +7,6 @@ use db::models::user_timeline::SaturatedTimelineEvent;
 use db::models::user_timeline::SaturatedWorkflowTriggeredEvent;
 use db::models::user_timeline::UserTimeline;
 use db::models::user_timeline::UserTimelineInfo;
-use itertools::chain;
 use itertools::Itertools;
 use newtypes::AuthMethodUpdatedInfo;
 use newtypes::ExternalIntegrationInfo;
@@ -36,33 +35,12 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                 targets,
                 actor,
                 is_prefill,
-            }) => {
-                // The attributes list only represents the FULL CDOs that were set in this update.
-                // Get the extra attributes that aren't encompassed by the attributes.
-                let dangling_attributes = targets.iter().filter(|di| {
-                    !attributes
-                        .iter()
-                        .any(|cdo| cdo.data_identifiers().unwrap_or_default().contains(di))
-                });
-
-                // And use these to compute some additional CDOs. In the dashboard, we want to display when
-                // even a part of the CDO was updated. For ex, we want to display that the
-                // name was updated, even if only id.first_name is edited.
-                // Also note, we choose the "largest" CDO for the edited CDs. This is arbitrary, but there
-                // aren't many CDs with multiple options
-                let edited_cdos = dangling_attributes
-                    .filter_map(|di| di.parent())
-                    .unique()
-                    .filter_map(|cd| cd.options().into_iter().last())
-                    .collect_vec();
-                let cdos = chain!(attributes, edited_cdos).unique().collect_vec();
-                Self::DataCollected(api_wire_types::user_timeline::DataCollectedInfo {
-                    attributes: cdos,
-                    targets,
-                    actor: actor.map(api_wire_types::Actor::from_db),
-                    is_prefill,
-                })
-            }
+            }) => Self::DataCollected(api_wire_types::user_timeline::DataCollectedInfo {
+                attributes,
+                targets,
+                actor: actor.map(api_wire_types::Actor::from_db),
+                is_prefill,
+            }),
             SaturatedTimelineEvent::Liveness(l, i) => {
                 Self::Liveness(api_wire_types::LivenessEvent::from_db((l, Some(i))))
             }

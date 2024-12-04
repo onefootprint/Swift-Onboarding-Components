@@ -1,13 +1,13 @@
 import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import UserData from './user-data';
 import {
+  fifteenFieldsFixture,
   financialWithManyFieldsFixture,
   financialWithThreeFieldsFixture,
   fiveFieldsFixture,
   fourFieldsFixture,
   oneFieldFixture,
   onlyFinancialFixture,
-  sixteenFieldsFixture,
   threeFieldsFixture,
   twoFieldsFixture,
 } from './user-data.test.config';
@@ -28,19 +28,19 @@ describe('<UserData />', () => {
   it('should render correctly with three fields', () => {
     customRender(<UserData detail={threeFieldsFixture} />);
     const elements = screen.getAllByRole('paragraph');
-    expect(elements.map(el => el.textContent).join('')).toBe('First name,Last name,and Date of birth');
+    expect(elements.map(el => el.textContent).join('')).toBe('Date of birth,First name,and Last name');
   });
 
   it('should render correctly with four fields', async () => {
     customRender(<UserData detail={fourFieldsFixture} />);
     const elements = screen.getAllByRole('paragraph');
-    expect(elements.map(el => el.textContent).join('')).toBe('First name,Last name,Date of birth,and');
+    expect(elements.map(el => el.textContent).join('')).toBe('Date of birth,Email,First name,and');
     const otherText = screen.getByText('1 other attribute');
     expect(otherText).toBeInTheDocument();
 
     await userEvent.hover(otherText);
     await waitFor(() => {
-      const tooltip = screen.getByRole('tooltip', { name: 'Email' });
+      const tooltip = screen.getByRole('tooltip', { name: 'Last name' });
       expect(tooltip).toBeInTheDocument();
     });
   });
@@ -48,28 +48,28 @@ describe('<UserData />', () => {
   it('should render correctly with five fields', async () => {
     customRender(<UserData detail={fiveFieldsFixture} />);
     const elements = screen.getAllByRole('paragraph');
-    expect(elements.map(el => el.textContent).join('')).toBe('First name,Last name,Date of birth,and');
+    expect(elements.map(el => el.textContent).join('')).toBe('Date of birth,Email,First name,and');
     const otherText = screen.getByText('2 other attributes');
     expect(otherText).toBeInTheDocument();
 
     await userEvent.hover(otherText);
     await waitFor(() => {
-      const tooltip = screen.getByRole('tooltip', { name: 'Email; Phone number' });
+      const tooltip = screen.getByRole('tooltip', { name: 'Last name; Phone number' });
       expect(tooltip).toBeInTheDocument();
     });
   });
 
-  it('should render correctly with twenty fields', async () => {
-    customRender(<UserData detail={sixteenFieldsFixture} />);
+  it('should render correctly with fifteen fields', async () => {
+    customRender(<UserData detail={fifteenFieldsFixture} />);
     const elements = screen.getAllByRole('paragraph');
-    expect(elements.map(el => el.textContent).join('')).toBe('First name,Last name,Date of birth,and');
-    const otherText = screen.getByText('13 other attributes');
+    expect(elements.map(el => el.textContent).join('')).toBe('Date of birth,Email,Address line 1,and');
+    const otherText = screen.getByText('12 other attributes');
     expect(otherText).toBeInTheDocument();
 
     await userEvent.hover(otherText);
     await waitFor(() => {
       const tooltip = screen.getByRole('tooltip', {
-        name: 'Email; Phone number; Nationality; Country; Nationality; SSN (Last 4); Citizenship; US Tax ID; Address line 1; Legal status; Visa expiration date; Visa type; Zip code',
+        name: 'Zip code; Country; First name; Last name; Nationality; Phone number; SSN (Last 4); Legal status; Visa type; Visa expiration date; Citizenship; US Tax ID',
       });
       expect(tooltip).toBeInTheDocument();
     });
@@ -146,7 +146,7 @@ describe('UserData with financial data', () => {
     expect(financialData).toBeInTheDocument();
 
     const elements = screen.getAllByRole('paragraph');
-    expect(elements.map(el => el.textContent).join('')).toBe('Financial data,First name,Last name,and Date of birth');
+    expect(elements.map(el => el.textContent).join('')).toBe('Financial data,Date of birth,First name,and Last name');
 
     await userEvent.hover(financialData);
     await waitFor(() => {
@@ -168,7 +168,7 @@ describe('UserData with financial data', () => {
     expect(financialData).toBeInTheDocument();
 
     const elements = screen.getAllByRole('paragraph');
-    expect(elements.map(el => el.textContent).join('')).toBe('Financial data,First name,Last name,Date of birth,and');
+    expect(elements.map(el => el.textContent).join('')).toBe('Financial data,Date of birth,Email,First name,and');
 
     const otherText = screen.getByText('3 other attributes');
     expect(otherText).toBeInTheDocument();
@@ -187,7 +187,7 @@ describe('UserData with financial data', () => {
 
     await userEvent.hover(otherText);
     await waitFor(() => {
-      const tooltip = screen.getByRole('tooltip', { name: 'Email; Phone number; Nationality' });
+      const tooltip = screen.getByRole('tooltip', { name: 'Last name; Nationality; Phone number' });
       expect(tooltip).toBeInTheDocument();
     });
   });

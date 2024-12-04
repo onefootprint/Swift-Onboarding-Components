@@ -14,11 +14,6 @@ const getVisibleDis = (targets: DataIdentifier[], attributes: CollectedDataOptio
   // @ts-expect-error - Remove the undocumented verified contact info DIs
   visibleDis = visibleDis.filter(di => di !== 'id.verified_phone_number' && di !== 'id.verified_email');
 
-  // Filter out beneficial owner fields - the backend will represent these as a CDO
-  // @ts-expect-error
-  visibleDis = visibleDis.filter(di => di !== 'business.beneficial_owner_explanation_message');
-  visibleDis = visibleDis.filter(di => !di.startsWith('business.beneficial_owners.'));
-
   if (visibleAttributes.some(cdo => cdo === 'ssn9')) {
     // Some custom logic to omit showing ssn4 when we are displaying ssn9.
     // We need this because CdoToAllDisMap is incorrect

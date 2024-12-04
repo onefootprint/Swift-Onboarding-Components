@@ -32,15 +32,15 @@ describe('DataCollectEventHeader', () => {
     {
       attributes: ['business_kyced_beneficial_owners'],
       targets: [],
-      x: ['Business beneficial owners'],
+      x: ['Beneficial owners'],
     },
     {
-      attributes: ['investor_profile'],
+      attributes: [],
       targets: ['investor_profile.net_worth'],
       x: ['Net worth'],
     },
     {
-      attributes: ['business_kyced_beneficial_owners'],
+      attributes: [],
       targets: [
         'business.beneficial_owners.bo_link_PKMnQ7mCPHcoCwRKTL51ra.ownership_stake',
         'business.beneficial_owners.bo_link_PKMnQ7mCPHcoCwRKTL51ra.id.phone_number',
@@ -48,7 +48,40 @@ describe('DataCollectEventHeader', () => {
         'business.beneficial_owners.bo_link_PKMnQ7mCPHcoCwRKTL51ra.id.email',
         'business.beneficial_owners.bo_link_PKMnQ7mCPHcoCwRKTL51ra.id.first_name',
       ],
-      x: ['Business beneficial owners'],
+      x: ['Beneficial owners'],
+    },
+    {
+      attributes: ['dob', 'ssn9', 'email', 'us_tax_id', 'phone_number'],
+      targets: [
+        'id.ssn9',
+        'card.flerp.number',
+        'card.derp.issuer',
+        'id.ssn4',
+        'id.citizenships',
+        'id.phone_number',
+        'id.city',
+        'id.address_line1',
+        'id.email',
+        'card.derp.number',
+        'card.flerp.issuer',
+        'id.us_tax_id',
+        'id.dob',
+        'card.derp.number_last4',
+        'id.first_name',
+        'investor_profile.declarations',
+        'card.flerp.number_last4',
+      ],
+      // Mix of CDOs and DIs displayed
+      x: [
+        'Financial data',
+        'Date of birth',
+        'Email',
+        'Address line 1',
+        'City',
+        'Declaration(s)',
+        'Phone number',
+        '3 other attributes',
+      ],
     },
   ])('.', ({ attributes, targets, x }) => {
     const eventDataWithDefaults = {

@@ -2,9 +2,10 @@ import type { DataIdentifier } from '@onefootprint/request-types/dashboard';
 import type { FinancialDataItem } from '../../types';
 
 const getFinancialData = (fields: DataIdentifier[]) => {
+  const sortedFields = fields.toSorted((a, b) => a.localeCompare(b));
   // Group card fields by ID
   const cardGroups: Record<string, string[]> = {};
-  fields.forEach(field => {
+  sortedFields.forEach(field => {
     if (field.startsWith('card.')) {
       const [, id] = field.split('card.');
       const [cardId] = id.split('.');
@@ -24,7 +25,7 @@ const getFinancialData = (fields: DataIdentifier[]) => {
 
   // Group bank fields by ID
   const bankGroups: Record<string, string[]> = {};
-  fields.forEach(field => {
+  sortedFields.forEach(field => {
     if (field.startsWith('bank.')) {
       const [, id] = field.split('bank.');
       const [bankId] = id.split('.');

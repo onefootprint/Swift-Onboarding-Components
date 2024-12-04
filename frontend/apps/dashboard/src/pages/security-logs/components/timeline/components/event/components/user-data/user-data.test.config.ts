@@ -50,7 +50,7 @@ export const fiveFieldsFixture = getAuditEventDetail({
   },
 });
 
-export const sixteenFieldsFixture = getAuditEventDetail({
+export const fifteenFieldsFixture = getAuditEventDetail({
   kind: 'decrypt_user_data',
   data: {
     context: 'api',
@@ -62,7 +62,6 @@ export const sixteenFieldsFixture = getAuditEventDetail({
       'id.phone_number',
       'id.nationality',
       'id.country',
-      'id.nationality',
       'id.ssn4',
       'id.citizenships',
       'id.us_tax_id',

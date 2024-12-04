@@ -25,7 +25,7 @@ describe('getFinancialData', () => {
       expect(data.cards).toHaveLength(1);
       expect(data.cards[0]).toEqual({
         name: '123',
-        fields: ['card.*.issuer', 'card.*.number_last4', 'card.*.name'],
+        fields: ['card.*.issuer', 'card.*.name', 'card.*.number_last4'],
       });
       expect(data.bankAccounts).toHaveLength(0);
       expect(data.hasFinancialData).toBe(true);
@@ -47,15 +47,15 @@ describe('getFinancialData', () => {
       expect(data.cards).toHaveLength(3);
       expect(data.cards[0]).toEqual({
         name: '123',
-        fields: ['card.*.issuer', 'card.*.number_last4', 'card.*.name'],
+        fields: ['card.*.issuer', 'card.*.name', 'card.*.number_last4'],
       });
       expect(data.cards[1]).toEqual({
         name: '456',
-        fields: ['card.*.issuer', 'card.*.number_last4', 'card.*.name'],
+        fields: ['card.*.issuer', 'card.*.name', 'card.*.number_last4'],
       });
       expect(data.cards[2]).toEqual({
         name: '789',
-        fields: ['card.*.issuer', 'card.*.number_last4', 'card.*.name'],
+        fields: ['card.*.issuer', 'card.*.name', 'card.*.number_last4'],
       });
       expect(data.bankAccounts).toHaveLength(0);
       expect(data.hasFinancialData).toBe(true);
@@ -74,7 +74,7 @@ describe('getFinancialData', () => {
       expect(data.bankAccounts).toHaveLength(1);
       expect(data.bankAccounts[0]).toEqual({
         name: '123',
-        fields: ['bank.*.name', 'bank.*.ach_routing_number', 'bank.*.ach_account_number'],
+        fields: ['bank.*.ach_account_number', 'bank.*.ach_routing_number', 'bank.*.name'],
       });
       expect(data.hasFinancialData).toBe(true);
     });
@@ -93,15 +93,15 @@ describe('getFinancialData', () => {
       expect(data.bankAccounts).toHaveLength(3);
       expect(data.bankAccounts[0]).toEqual({
         name: '123',
-        fields: ['bank.*.name', 'bank.*.ach_routing_number'],
+        fields: ['bank.*.ach_routing_number', 'bank.*.name'],
       });
       expect(data.bankAccounts[1]).toEqual({
         name: '456',
-        fields: ['bank.*.name', 'bank.*.ach_account_number'],
+        fields: ['bank.*.ach_account_number', 'bank.*.name'],
       });
       expect(data.bankAccounts[2]).toEqual({
         name: '789',
-        fields: ['bank.*.name', 'bank.*.ach_routing_number'],
+        fields: ['bank.*.ach_routing_number', 'bank.*.name'],
       });
       expect(data.hasFinancialData).toBe(true);
     });
@@ -120,12 +120,12 @@ describe('getFinancialData', () => {
       expect(data.cards).toHaveLength(1);
       expect(data.cards[0]).toEqual({
         name: '123',
-        fields: ['card.*.issuer', 'card.*.number_last4', 'card.*.name'],
+        fields: ['card.*.issuer', 'card.*.name', 'card.*.number_last4'],
       });
       expect(data.bankAccounts).toHaveLength(1);
       expect(data.bankAccounts[0]).toEqual({
         name: '456',
-        fields: ['bank.*.name', 'bank.*.ach_routing_number'],
+        fields: ['bank.*.ach_routing_number', 'bank.*.name'],
       });
       expect(data.hasFinancialData).toBe(true);
     });
@@ -152,28 +152,28 @@ describe('getFinancialData', () => {
       expect(data.cards).toHaveLength(3);
       expect(data.cards[0]).toEqual({
         name: '123',
-        fields: ['card.*.issuer', 'card.*.number_last4', 'card.*.name'],
+        fields: ['card.*.issuer', 'card.*.name', 'card.*.number_last4'],
       });
       expect(data.cards[1]).toEqual({
         name: '456',
-        fields: ['card.*.issuer', 'card.*.number_last4', 'card.*.name'],
+        fields: ['card.*.issuer', 'card.*.name', 'card.*.number_last4'],
       });
       expect(data.cards[2]).toEqual({
         name: '789',
-        fields: ['card.*.issuer', 'card.*.number_last4', 'card.*.name'],
+        fields: ['card.*.issuer', 'card.*.name', 'card.*.number_last4'],
       });
       expect(data.bankAccounts).toHaveLength(3);
       expect(data.bankAccounts[0]).toEqual({
         name: 'abc',
-        fields: ['bank.*.name', 'bank.*.ach_routing_number'],
+        fields: ['bank.*.ach_routing_number', 'bank.*.name'],
       });
       expect(data.bankAccounts[1]).toEqual({
         name: 'def',
-        fields: ['bank.*.name', 'bank.*.ach_account_number'],
+        fields: ['bank.*.ach_account_number', 'bank.*.name'],
       });
       expect(data.bankAccounts[2]).toEqual({
         name: 'ghi',
-        fields: ['bank.*.name', 'bank.*.ach_routing_number'],
+        fields: ['bank.*.ach_routing_number', 'bank.*.name'],
       });
       expect(data.hasFinancialData).toBe(true);
     });
