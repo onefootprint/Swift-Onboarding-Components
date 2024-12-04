@@ -542,6 +542,284 @@ describe('createDiff', () => {
     });
   });
 
+  describe('Business information', () => {
+    it('should show when business name required is removed', () => {
+      const oldPlaybook = getOnboardingConfiguration({
+        mustCollectData: ['business_name'],
+      });
+      const updatedPlaybook = getOnboardingConfiguration({
+        mustCollectData: [],
+      });
+      expect(createDiff(oldPlaybook, updatedPlaybook)).toEqual(
+        expect.arrayContaining([
+          {
+            label: 'Business information',
+            changes: [
+              {
+                alias: 'business-name-required-to-not-collected',
+                old: 'Business name required',
+                updated: 'Business name is not collected',
+              },
+            ],
+          },
+        ]),
+      );
+    });
+
+    it('should show when business name is added as required', () => {
+      const oldPlaybook = getOnboardingConfiguration({
+        mustCollectData: [],
+      });
+      const updatedPlaybook = getOnboardingConfiguration({
+        mustCollectData: ['business_name'],
+      });
+      expect(createDiff(oldPlaybook, updatedPlaybook)).toEqual(
+        expect.arrayContaining([
+          {
+            label: 'Business information',
+            changes: [
+              {
+                alias: 'business-name-not-collected-to-required',
+                old: 'Business name is not collected',
+                updated: 'Business name required',
+              },
+            ],
+          },
+        ]),
+      );
+    });
+
+    it('should show when business address required is removed', () => {
+      const oldPlaybook = getOnboardingConfiguration({
+        mustCollectData: ['business_address'],
+      });
+      const updatedPlaybook = getOnboardingConfiguration({
+        mustCollectData: [],
+      });
+      expect(createDiff(oldPlaybook, updatedPlaybook)).toEqual(
+        expect.arrayContaining([
+          {
+            label: 'Business information',
+            changes: [
+              {
+                alias: 'business-address-required-to-not-collected',
+                old: 'Business address required',
+                updated: 'Business address is not collected',
+              },
+            ],
+          },
+        ]),
+      );
+    });
+
+    it('should show when business address is added as required', () => {
+      const oldPlaybook = getOnboardingConfiguration({
+        mustCollectData: [],
+      });
+      const updatedPlaybook = getOnboardingConfiguration({
+        mustCollectData: ['business_address'],
+      });
+      expect(createDiff(oldPlaybook, updatedPlaybook)).toEqual(
+        expect.arrayContaining([
+          {
+            label: 'Business information',
+            changes: [
+              {
+                alias: 'business-address-not-collected-to-required',
+                old: 'Business address is not collected',
+                updated: 'Business address required',
+              },
+            ],
+          },
+        ]),
+      );
+    });
+
+    it('should show when business phone number required is removed', () => {
+      const oldPlaybook = getOnboardingConfiguration({
+        mustCollectData: ['business_phone_number'],
+      });
+      const updatedPlaybook = getOnboardingConfiguration({
+        mustCollectData: [],
+      });
+      expect(createDiff(oldPlaybook, updatedPlaybook)).toEqual(
+        expect.arrayContaining([
+          {
+            label: 'Business information',
+            changes: [
+              {
+                alias: 'business-phone-required-to-not-collected',
+                old: 'Business phone number required',
+                updated: 'Business phone number is not collected',
+              },
+            ],
+          },
+        ]),
+      );
+    });
+
+    it('should show when business phone number is added as required', () => {
+      const oldPlaybook = getOnboardingConfiguration({
+        mustCollectData: [],
+      });
+      const updatedPlaybook = getOnboardingConfiguration({
+        mustCollectData: ['business_phone_number'],
+      });
+      expect(createDiff(oldPlaybook, updatedPlaybook)).toEqual(
+        expect.arrayContaining([
+          {
+            label: 'Business information',
+            changes: [
+              {
+                alias: 'business-phone-not-collected-to-required',
+                old: 'Business phone number is not collected',
+                updated: 'Business phone number required',
+              },
+            ],
+          },
+        ]),
+      );
+    });
+
+    it('should show when business website required is removed', () => {
+      const oldPlaybook = getOnboardingConfiguration({
+        mustCollectData: ['business_website'],
+      });
+      const updatedPlaybook = getOnboardingConfiguration({
+        mustCollectData: [],
+      });
+      expect(createDiff(oldPlaybook, updatedPlaybook)).toEqual(
+        expect.arrayContaining([
+          {
+            label: 'Business information',
+            changes: [
+              {
+                alias: 'business-website-required-to-not-collected',
+                old: 'Business website required',
+                updated: 'Business website is not collected',
+              },
+            ],
+          },
+        ]),
+      );
+    });
+
+    it('should show when business website is added as required', () => {
+      const oldPlaybook = getOnboardingConfiguration({
+        mustCollectData: [],
+      });
+      const updatedPlaybook = getOnboardingConfiguration({
+        mustCollectData: ['business_website'],
+      });
+      expect(createDiff(oldPlaybook, updatedPlaybook)).toEqual(
+        expect.arrayContaining([
+          {
+            label: 'Business information',
+            changes: [
+              {
+                alias: 'business-website-not-collected-to-required',
+                old: 'Business website is not collected',
+                updated: 'Business website required',
+              },
+            ],
+          },
+        ]),
+      );
+    });
+
+    it('should show when EIN required is removed', () => {
+      const oldPlaybook = getOnboardingConfiguration({
+        mustCollectData: ['business_tin'],
+      });
+      const updatedPlaybook = getOnboardingConfiguration({
+        mustCollectData: [],
+      });
+      expect(createDiff(oldPlaybook, updatedPlaybook)).toEqual(
+        expect.arrayContaining([
+          {
+            label: 'Business information',
+            changes: [
+              {
+                alias: 'ein-required-to-not-collected',
+                old: 'EIN required',
+                updated: 'EIN is not collected',
+              },
+            ],
+          },
+        ]),
+      );
+    });
+
+    it('should show when EIN is added as required', () => {
+      const oldPlaybook = getOnboardingConfiguration({
+        mustCollectData: [],
+      });
+      const updatedPlaybook = getOnboardingConfiguration({
+        mustCollectData: ['business_tin'],
+      });
+      expect(createDiff(oldPlaybook, updatedPlaybook)).toEqual(
+        expect.arrayContaining([
+          {
+            label: 'Business information',
+            changes: [
+              {
+                alias: 'ein-not-collected-to-required',
+                old: 'EIN is not collected',
+                updated: 'EIN required',
+              },
+            ],
+          },
+        ]),
+      );
+    });
+
+    it('should show when business type required is removed', () => {
+      const oldPlaybook = getOnboardingConfiguration({
+        mustCollectData: ['business_corporation_type'],
+      });
+      const updatedPlaybook = getOnboardingConfiguration({
+        mustCollectData: [],
+      });
+      expect(createDiff(oldPlaybook, updatedPlaybook)).toEqual(
+        expect.arrayContaining([
+          {
+            label: 'Business information',
+            changes: [
+              {
+                alias: 'business-type-required-to-not-collected',
+                old: 'Business type required',
+                updated: 'Business type is not collected',
+              },
+            ],
+          },
+        ]),
+      );
+    });
+
+    it('should show when business type is added as required', () => {
+      const oldPlaybook = getOnboardingConfiguration({
+        mustCollectData: [],
+      });
+      const updatedPlaybook = getOnboardingConfiguration({
+        mustCollectData: ['business_corporation_type'],
+      });
+      expect(createDiff(oldPlaybook, updatedPlaybook)).toEqual(
+        expect.arrayContaining([
+          {
+            label: 'Business information',
+            changes: [
+              {
+                alias: 'business-type-not-collected-to-required',
+                old: 'Business type is not collected',
+                updated: 'Business type required',
+              },
+            ],
+          },
+        ]),
+      );
+    });
+  });
+
   describe('Investor questions', () => {
     it('should show when investor questions required is removed', () => {
       const oldPlaybook = getOnboardingConfiguration({
@@ -936,6 +1214,134 @@ describe('createDiff', () => {
     });
   });
 
+  describe('Business documents', () => {
+    it('should show when custom business documents are added', () => {
+      const oldPlaybook = getOnboardingConfiguration({
+        documentsToCollect: [],
+      });
+      const updatedPlaybook = getOnboardingConfiguration({
+        documentsToCollect: [
+          {
+            kind: 'custom',
+            data: {
+              identifier: 'document.custom.*',
+              name: 'Business License',
+              description: 'Business license document',
+              requiresHumanReview: true,
+              uploadSettings: 'prefer_capture',
+            },
+          },
+        ],
+      });
+
+      expect(createDiff(oldPlaybook, updatedPlaybook)).toEqual(
+        expect.arrayContaining([
+          {
+            label: 'Document requirements',
+            changes: [
+              {
+                alias: 'custom-doc-added-document.custom.*',
+                old: 'Custom document "document.custom.*" not collected',
+                updated: 'Custom document "document.custom.*" collected',
+              },
+            ],
+          },
+        ]),
+      );
+    });
+
+    it('should show when custom business documents are removed', () => {
+      const oldPlaybook = getOnboardingConfiguration({
+        documentsToCollect: [
+          {
+            kind: 'custom',
+            data: {
+              identifier: 'document.custom.*',
+              name: 'Business License',
+              description: 'Business license document',
+              requiresHumanReview: true,
+              uploadSettings: 'prefer_capture',
+            },
+          },
+        ],
+      });
+      const updatedPlaybook = getOnboardingConfiguration({
+        documentsToCollect: [],
+      });
+
+      expect(createDiff(oldPlaybook, updatedPlaybook)).toEqual(
+        expect.arrayContaining([
+          {
+            label: 'Document requirements',
+            changes: [
+              {
+                alias: 'custom-doc-removed-document.custom.*',
+                old: 'Custom document "document.custom.*" collected',
+                updated: 'Custom document "document.custom.*" not collected',
+              },
+            ],
+          },
+        ]),
+      );
+    });
+
+    it('should show when custom business document properties are modified', () => {
+      const oldPlaybook = getOnboardingConfiguration({
+        documentsToCollect: [
+          {
+            kind: 'custom',
+            data: {
+              identifier: 'document.custom.*',
+              name: 'Business License',
+              description: 'Old description',
+              requiresHumanReview: false,
+              uploadSettings: 'prefer_capture',
+            },
+          },
+        ],
+      });
+      const updatedPlaybook = getOnboardingConfiguration({
+        documentsToCollect: [
+          {
+            kind: 'custom',
+            data: {
+              identifier: 'document.custom.*',
+              name: 'Updated Business License',
+              description: 'New description',
+              requiresHumanReview: true,
+              uploadSettings: 'prefer_capture',
+            },
+          },
+        ],
+      });
+
+      expect(createDiff(oldPlaybook, updatedPlaybook)).toEqual(
+        expect.arrayContaining([
+          {
+            label: 'Document requirements',
+            changes: [
+              {
+                alias: 'custom-doc-name-updated-document.custom.*',
+                old: 'Custom document "document.custom.*" name: "Business License"',
+                updated: 'Custom document "document.custom.*" name: "Updated Business License"',
+              },
+              {
+                alias: 'custom-doc-description-changed-document.custom.*',
+                old: 'Custom document description: "Old description"',
+                updated: 'Custom document description: "New description"',
+              },
+              {
+                alias: 'custom-doc-review-changed-document.custom.*',
+                old: 'Custom document does not require human review',
+                updated: 'Custom document requires human review',
+              },
+            ],
+          },
+        ]),
+      );
+    });
+  });
+
   describe('Identity documents', () => {
     it('should show when global document types are added', () => {
       const oldPlaybook = getOnboardingConfiguration({
@@ -1102,7 +1508,7 @@ describe('createDiff', () => {
     });
   });
 
-  describe('verification checks', () => {
+  describe('Verification checks', () => {
     it('should show when KYC verification is added', () => {
       const oldPlaybook = getOnboardingConfiguration({
         verificationChecks: [],
@@ -1120,6 +1526,126 @@ describe('createDiff', () => {
                 alias: 'kyc-verification-added',
                 old: 'KYC verification not required',
                 updated: 'KYC verification required',
+              },
+            ],
+          },
+        ]),
+      );
+    });
+
+    it('should show when KYB verification is added', () => {
+      const oldPlaybook = getOnboardingConfiguration({
+        verificationChecks: [],
+      });
+      const updatedPlaybook = getOnboardingConfiguration({
+        verificationChecks: [{ kind: 'kyb', data: { einOnly: false } }],
+      });
+
+      expect(createDiff(oldPlaybook, updatedPlaybook)).toEqual(
+        expect.arrayContaining([
+          {
+            label: 'Verification checks',
+            changes: [
+              {
+                alias: 'kyb-verification-added',
+                old: 'KYB verification not required',
+                updated: 'KYB verification required',
+              },
+            ],
+          },
+        ]),
+      );
+    });
+
+    it('should show when KYB verification is removed', () => {
+      const oldPlaybook = getOnboardingConfiguration({
+        verificationChecks: [{ kind: 'kyb', data: { einOnly: false } }],
+      });
+      const updatedPlaybook = getOnboardingConfiguration({
+        verificationChecks: [],
+      });
+
+      expect(createDiff(oldPlaybook, updatedPlaybook)).toEqual(
+        expect.arrayContaining([
+          {
+            label: 'Verification checks',
+            changes: [
+              {
+                alias: 'kyb-verification-removed',
+                old: 'KYB verification required',
+                updated: 'KYB verification not required',
+              },
+            ],
+          },
+        ]),
+      );
+    });
+
+    it('should show when KYB EIN only setting is changed', () => {
+      const oldPlaybook = getOnboardingConfiguration({
+        verificationChecks: [{ kind: 'kyb', data: { einOnly: false } }],
+      });
+      const updatedPlaybook = getOnboardingConfiguration({
+        verificationChecks: [{ kind: 'kyb', data: { einOnly: true } }],
+      });
+
+      expect(createDiff(oldPlaybook, updatedPlaybook)).toEqual(
+        expect.arrayContaining([
+          {
+            label: 'Verification checks',
+            changes: [
+              {
+                alias: 'kyb-ein-only-updated',
+                old: 'Full KYB verification',
+                updated: 'EIN only verification',
+              },
+            ],
+          },
+        ]),
+      );
+    });
+
+    it('should show when Business AML verification is added', () => {
+      const oldPlaybook = getOnboardingConfiguration({
+        verificationChecks: [],
+      });
+      const updatedPlaybook = getOnboardingConfiguration({
+        verificationChecks: [{ kind: 'business_aml', data: {} }],
+      });
+
+      expect(createDiff(oldPlaybook, updatedPlaybook)).toEqual(
+        expect.arrayContaining([
+          {
+            label: 'Verification checks',
+            changes: [
+              {
+                alias: 'business-aml-verification-added',
+                old: 'Business AML verification not required',
+                updated: 'Business AML verification required',
+              },
+            ],
+          },
+        ]),
+      );
+    });
+
+    it('should show when Business AML verification is removed', () => {
+      const oldPlaybook = getOnboardingConfiguration({
+        verificationChecks: [{ kind: 'business_aml', data: {} }],
+      });
+      const updatedPlaybook = getOnboardingConfiguration({
+        verificationChecks: [],
+      });
+
+      expect(createDiff(oldPlaybook, updatedPlaybook)).toEqual(
+        expect.arrayContaining([
+          {
+            label: 'Verification checks',
+            changes: [
+              {
+                alias: 'business-aml-verification-removed',
+                old: 'Business AML verification required',
+                updated: 'Business AML verification not required',
               },
             ],
           },

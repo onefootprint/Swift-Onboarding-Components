@@ -195,6 +195,120 @@ const getBasicInfoChanges = (old: OnboardingConfiguration, updated: OnboardingCo
   return basicInfo;
 };
 
+const getBusinessChanges = (old: OnboardingConfiguration, updated: OnboardingConfiguration) => {
+  const businessChanges: Array<Diff> = [];
+
+  // Business name changes
+  if (old.mustCollectData.includes('business_name') && !updated.mustCollectData.includes('business_name')) {
+    businessChanges.push({
+      alias: 'business-name-required-to-not-collected',
+      old: 'Business name required',
+      updated: 'Business name is not collected',
+    });
+  } else if (!old.mustCollectData.includes('business_name') && updated.mustCollectData.includes('business_name')) {
+    businessChanges.push({
+      alias: 'business-name-not-collected-to-required',
+      old: 'Business name is not collected',
+      updated: 'Business name required',
+    });
+  }
+
+  // Business address changes
+  if (old.mustCollectData.includes('business_address') && !updated.mustCollectData.includes('business_address')) {
+    businessChanges.push({
+      alias: 'business-address-required-to-not-collected',
+      old: 'Business address required',
+      updated: 'Business address is not collected',
+    });
+  } else if (
+    !old.mustCollectData.includes('business_address') &&
+    updated.mustCollectData.includes('business_address')
+  ) {
+    businessChanges.push({
+      alias: 'business-address-not-collected-to-required',
+      old: 'Business address is not collected',
+      updated: 'Business address required',
+    });
+  }
+
+  // Business phone number changes
+  if (
+    old.mustCollectData.includes('business_phone_number') &&
+    !updated.mustCollectData.includes('business_phone_number')
+  ) {
+    businessChanges.push({
+      alias: 'business-phone-required-to-not-collected',
+      old: 'Business phone number required',
+      updated: 'Business phone number is not collected',
+    });
+  } else if (
+    !old.mustCollectData.includes('business_phone_number') &&
+    updated.mustCollectData.includes('business_phone_number')
+  ) {
+    businessChanges.push({
+      alias: 'business-phone-not-collected-to-required',
+      old: 'Business phone number is not collected',
+      updated: 'Business phone number required',
+    });
+  }
+
+  // Business website changes
+  if (old.mustCollectData.includes('business_website') && !updated.mustCollectData.includes('business_website')) {
+    businessChanges.push({
+      alias: 'business-website-required-to-not-collected',
+      old: 'Business website required',
+      updated: 'Business website is not collected',
+    });
+  } else if (
+    !old.mustCollectData.includes('business_website') &&
+    updated.mustCollectData.includes('business_website')
+  ) {
+    businessChanges.push({
+      alias: 'business-website-not-collected-to-required',
+      old: 'Business website is not collected',
+      updated: 'Business website required',
+    });
+  }
+
+  // EIN changes
+  if (old.mustCollectData.includes('business_tin') && !updated.mustCollectData.includes('business_tin')) {
+    businessChanges.push({
+      alias: 'ein-required-to-not-collected',
+      old: 'EIN required',
+      updated: 'EIN is not collected',
+    });
+  } else if (!old.mustCollectData.includes('business_tin') && updated.mustCollectData.includes('business_tin')) {
+    businessChanges.push({
+      alias: 'ein-not-collected-to-required',
+      old: 'EIN is not collected',
+      updated: 'EIN required',
+    });
+  }
+
+  // Business type changes
+  if (
+    old.mustCollectData.includes('business_corporation_type') &&
+    !updated.mustCollectData.includes('business_corporation_type')
+  ) {
+    businessChanges.push({
+      alias: 'business-type-required-to-not-collected',
+      old: 'Business type required',
+      updated: 'Business type is not collected',
+    });
+  } else if (
+    !old.mustCollectData.includes('business_corporation_type') &&
+    updated.mustCollectData.includes('business_corporation_type')
+  ) {
+    businessChanges.push({
+      alias: 'business-type-not-collected-to-required',
+      old: 'Business type is not collected',
+      updated: 'Business type required',
+    });
+  }
+
+  return businessChanges;
+};
+
 const getInvestorQuestionChanges = (old: OnboardingConfiguration, updated: OnboardingConfiguration) => {
   const investorChanges: Array<Diff> = [];
 
@@ -403,6 +517,90 @@ const getCustomDocsChanges = (old: OnboardingConfiguration, updated: OnboardingC
   ];
 };
 
+const getBusinessDocsChanges = (old: OnboardingConfiguration, updated: OnboardingConfiguration) => {
+  const oldDocs = old.businessDocumentsToCollect || [];
+  const updatedDocs = updated.businessDocumentsToCollect || [];
+
+  const getCustomDocChanges = (
+    oldDocs: OnboardingConfiguration['businessDocumentsToCollect'],
+    updatedDocs: OnboardingConfiguration['businessDocumentsToCollect'],
+  ) => {
+    const changes: Array<Diff> = [];
+
+    const oldCustomDocs = oldDocs?.filter(doc => doc.kind === 'custom') || [];
+    const updatedCustomDocs = updatedDocs?.filter(doc => doc.kind === 'custom') || [];
+
+    // Find removed docs
+    oldCustomDocs.forEach(oldDoc => {
+      const stillExists = updatedCustomDocs.find(updatedDoc => updatedDoc.data.identifier === oldDoc.data.identifier);
+
+      if (!stillExists) {
+        changes.push({
+          alias: `custom-doc-removed-${oldDoc.data.identifier}`,
+          old: `Custom document "${oldDoc.data.identifier}" collected`,
+          updated: `Custom document "${oldDoc.data.identifier}" not collected`,
+        });
+      }
+    });
+
+    // Find added docs
+    updatedCustomDocs.forEach(updatedDoc => {
+      const existedBefore = oldCustomDocs.find(oldDoc => oldDoc.data.identifier === updatedDoc.data.identifier);
+
+      if (!existedBefore) {
+        changes.push({
+          alias: `custom-doc-added-${updatedDoc.data.identifier}`,
+          old: `Custom document "${updatedDoc.data.identifier}" not collected`,
+          updated: `Custom document "${updatedDoc.data.identifier}" collected`,
+        });
+      }
+    });
+
+    // Find modified docs
+    updatedCustomDocs.forEach(updatedDoc => {
+      const oldDoc = oldCustomDocs.find(doc => doc.data.identifier === updatedDoc.data.identifier);
+
+      if (oldDoc) {
+        if (oldDoc.data.name !== updatedDoc.data.name) {
+          changes.push({
+            alias: `custom-doc-name-updated-${updatedDoc.data.identifier}`,
+            old: `Custom document "${updatedDoc.data.identifier}" name: "${oldDoc.data.name}"`,
+            updated: `Custom document "${updatedDoc.data.identifier}" name: "${updatedDoc.data.name}"`,
+          });
+        }
+
+        if (oldDoc.data.description !== updatedDoc.data.description) {
+          changes.push({
+            alias: `custom-doc-description-changed-${updatedDoc.data.identifier}`,
+            old: `Custom document description: "${oldDoc.data.description}"`,
+            updated: `Custom document description: "${updatedDoc.data.description}"`,
+          });
+        }
+
+        if (oldDoc.data.requiresHumanReview !== updatedDoc.data.requiresHumanReview) {
+          changes.push({
+            alias: `custom-doc-review-changed-${updatedDoc.data.identifier}`,
+            old: `Custom document ${oldDoc.data.requiresHumanReview ? 'requires' : 'does not require'} human review`,
+            updated: `Custom document ${updatedDoc.data.requiresHumanReview ? 'requires' : 'does not require'} human review`,
+          });
+        }
+
+        if (oldDoc.data.uploadSettings !== updatedDoc.data.uploadSettings) {
+          changes.push({
+            alias: `custom-doc-upload-settings-changed-${updatedDoc.data.identifier}`,
+            old: `Custom document upload settings: "${oldDoc.data.uploadSettings}"`,
+            updated: `Custom document upload settings: "${updatedDoc.data.uploadSettings}"`,
+          });
+        }
+      }
+    });
+
+    return changes;
+  };
+
+  return [...getCustomDocChanges(oldDocs, updatedDocs)];
+};
+
 const getDocumentTypesAndCountriesChanges = (old: OnboardingConfiguration, updated: OnboardingConfiguration) => {
   const changes: Array<Diff> = [];
   const oldDocConfig = old.documentTypesAndCountries;
@@ -494,6 +692,50 @@ const getVerificationCheckChanges = (old: OnboardingConfiguration, updated: Onbo
       alias: 'kyc-verification-removed',
       old: 'KYC verification required',
       updated: 'KYC verification not required',
+    });
+  }
+
+  // KYB verification changes
+  const oldKyb = old.verificationChecks?.find(check => check.kind === 'kyb');
+  const updatedKyb = updated.verificationChecks?.find(check => check.kind === 'kyb');
+
+  if (!oldKyb && updatedKyb) {
+    changes.push({
+      alias: 'kyb-verification-added',
+      old: 'KYB verification not required',
+      updated: 'KYB verification required',
+    });
+  } else if (oldKyb && !updatedKyb) {
+    changes.push({
+      alias: 'kyb-verification-removed',
+      old: 'KYB verification required',
+      updated: 'KYB verification not required',
+    });
+  }
+
+  if (oldKyb && updatedKyb && oldKyb.data.einOnly !== updatedKyb.data.einOnly) {
+    changes.push({
+      alias: 'kyb-ein-only-updated',
+      old: oldKyb.data.einOnly ? 'EIN only verification' : 'Full KYB verification',
+      updated: updatedKyb.data.einOnly ? 'EIN only verification' : 'Full KYB verification',
+    });
+  }
+
+  // Business AML verification changes
+  const oldBusinessAml = old.verificationChecks?.find(check => check.kind === 'business_aml');
+  const updatedBusinessAml = updated.verificationChecks?.find(check => check.kind === 'business_aml');
+
+  if (!oldBusinessAml && updatedBusinessAml) {
+    changes.push({
+      alias: 'business-aml-verification-added',
+      old: 'Business AML verification not required',
+      updated: 'Business AML verification required',
+    });
+  } else if (oldBusinessAml && !updatedBusinessAml) {
+    changes.push({
+      alias: 'business-aml-verification-removed',
+      old: 'Business AML verification required',
+      updated: 'Business AML verification not required',
     });
   }
 
@@ -610,6 +852,12 @@ const createDiff = (old: OnboardingConfiguration, updated: OnboardingConfigurati
     diff.push({ label: 'Basic information', changes: basicInfo });
   }
 
+  // Business info
+  const businessInfo = getBusinessChanges(old, updated);
+  if (businessInfo.length) {
+    diff.push({ label: 'Business information', changes: businessInfo });
+  }
+
   // Investor questions
   const investorQuestions = getInvestorQuestionChanges(old, updated);
   if (investorQuestions.length) {
@@ -632,6 +880,12 @@ const createDiff = (old: OnboardingConfiguration, updated: OnboardingConfigurati
   const customDocs = getCustomDocsChanges(old, updated);
   if (customDocs.length) {
     diff.push({ label: 'Document requirements', changes: customDocs });
+  }
+
+  // Business custom documents
+  const businessDocs = getBusinessDocsChanges(old, updated);
+  if (businessDocs.length) {
+    diff.push({ label: 'Business document requirements', changes: businessDocs });
   }
 
   // Verification checks

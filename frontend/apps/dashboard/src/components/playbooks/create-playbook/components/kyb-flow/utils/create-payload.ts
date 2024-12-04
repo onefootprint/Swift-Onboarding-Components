@@ -40,7 +40,6 @@ const createPayload = ({
     collectsBO,
   });
   const businessMustCollectData = createBusinessPayload(businessForm, { collectsBO });
-
   const mustCollectData = [...personMustCollectData, ...businessMustCollectData];
 
   return {
@@ -143,7 +142,7 @@ const createBusinessPayload = (
     mustCollectData.push('business_website');
   }
   if (businessForm.data.phoneNumber) {
-    mustCollectData.push('business_website');
+    mustCollectData.push('business_phone_number');
   }
   if (businessForm.data.type) {
     mustCollectData.push('business_corporation_type');

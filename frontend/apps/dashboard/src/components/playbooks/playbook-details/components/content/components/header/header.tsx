@@ -7,7 +7,6 @@ import type { ParseKeys } from 'i18next';
 import { Suspense, lazy, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
-import useSession from 'src/hooks/use-session';
 
 const Create = lazy(() => import('src/components/playbooks/create-playbook'));
 const Versions = lazy(() => import('../versions'));
@@ -20,12 +19,7 @@ export type HeaderProps = {
 
 const Header = ({ playbook, isDisabled, playbooks }: HeaderProps) => {
   const { t } = useTranslation('playbook-details', { keyPrefix: 'header' });
-  const {
-    data: { user },
-  } = useSession();
-  const showEdit =
-    user?.isFirmEmployee && (playbook.kind === 'kyc' || playbook.kind === 'auth' || playbook.kind === 'document');
-  const hasVersions = user?.isFirmEmployee && playbooks.length > 1;
+  const hasVersions = playbooks.length > 1;
 
   return (
     <>
@@ -44,7 +38,7 @@ const Header = ({ playbook, isDisabled, playbooks }: HeaderProps) => {
             </CodeInline>
             {hasVersions && <ManageVersions playbooks={playbooks} />}
           </div>
-          {showEdit && <EditButton playbook={playbook} />}
+          <EditButton playbook={playbook} />
         </div>
       </div>
     </>
