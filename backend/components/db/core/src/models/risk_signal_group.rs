@@ -32,7 +32,7 @@ struct NewRiskSignalGroup {
     pub workflow_id: Option<WorkflowId>,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, derive_more::From)]
 pub enum RiskSignalGroupScope<'a> {
     ScopedVaultId {
         id: &'a ScopedVaultId,
@@ -86,23 +86,27 @@ impl RiskSignalGroup {
         scope: RiskSignalGroupScope<'a>,
         kind: RiskSignalGroupKind,
     ) -> FpResult<Self> {
-        let existing = Self::latest_by_kind(conn, &scope.scoped_vault_id(), kind)?;
+        let existing = Self::latest_by_kind(conn, scope.clone(), kind)?;
         match existing {
             Some(e) => Ok(e),
             None => Self::create(conn, scope, kind),
         }
     }
 
-    // TODO: accept scope here
     #[tracing::instrument("RiskSignalGroup::latest_by_kind", skip(conn))]
-    pub fn latest_by_kind(
+    pub fn latest_by_kind<'a>(
         conn: &mut PgConn,
-        scoped_vault_id: &ScopedVaultId,
+        scope: RiskSignalGroupScope<'a>,
         kind: RiskSignalGroupKind,
     ) -> FpResult<Option<Self>> {
-        let res = risk_signal_group::table
-            .filter(risk_signal_group::scoped_vault_id.eq(scoped_vault_id))
+        let mut q = risk_signal_group::table
+            .filter(risk_signal_group::scoped_vault_id.eq(scope.scoped_vault_id()))
             .filter(risk_signal_group::kind.eq(kind))
+            .into_boxed();
+        if let Some(wf_id) = scope.workflow_id() {
+            q = q.filter(risk_signal_group::workflow_id.eq(wf_id));
+        }
+        let res = q
             .order_by(risk_signal_group::created_at.desc())
             .first(conn)
             .optional()?;

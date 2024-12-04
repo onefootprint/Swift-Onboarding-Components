@@ -98,6 +98,8 @@ pub enum RiskSignalFilter<'a> {
 pub struct AtSeqno(pub Option<DataLifetimeSeqno>);
 
 impl RiskSignal {
+    /// Create a new RiskSignalGroup for the provided scope and adds the provided risk signals
+    /// to it
     #[tracing::instrument("RiskSignal::bulk_create", skip_all)]
     pub fn bulk_create<'a>(
         conn: &mut TxnPgConn,
@@ -200,10 +202,8 @@ impl RiskSignal {
         kind: RiskSignalGroupKind,
     ) -> FpResult<Vec<Self>> {
         // TODO: For now we only pull risk signals by sv_id. Keep this interface as is for now
-        let rsg = RiskSignalGroup::latest_by_kind(conn, scoped_vault_id, kind)?;
+        let rsg = RiskSignalGroup::latest_by_kind(conn, scoped_vault_id.into(), kind)?;
         if let Some(rsg) = rsg {
-            // hmm, we need unhidden as well i guess here bc we are decisioning before we decide which ones to
-            // unhide
             let res = risk_signal::table
                 .filter(risk_signal::risk_signal_group_id.eq(rsg.id))
                 .get_results(conn)?;
