@@ -10,6 +10,7 @@ pub mod incode_utils;
 pub mod incode_watchlist;
 pub mod lexis;
 pub mod middesk;
+pub mod misc;
 pub mod neuro_id;
 pub mod risk_signals;
 pub mod sentilink;

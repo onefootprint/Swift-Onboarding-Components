@@ -40,6 +40,7 @@ pub enum RiskSignalGroupKind {
     Phone,
     Synthetic,
     Duplicates,
+    User,
 }
 
 impl_enum_str_diesel!(RiskSignalGroupKind);

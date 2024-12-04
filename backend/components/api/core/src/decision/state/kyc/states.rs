@@ -8,6 +8,7 @@ use super::MakeDecision;
 use super::MakeVendorCalls;
 use crate::decision::duplicates::DuplicateData;
 use crate::decision::features::duplicates;
+use crate::decision::features::misc::MiscReasonCodeConfig;
 use crate::decision::features::risk_signals::parse_reason_codes;
 use crate::decision::features::risk_signals::parse_reason_codes_from_vendor_result;
 use crate::decision::features::risk_signals::UserSubmittedInfoForFRC;
@@ -49,6 +50,7 @@ use db::models::risk_signal::RiskSignalFilter;
 use db::models::risk_signal_group::RiskSignalGroup;
 use db::models::risk_signal_group::RiskSignalGroupScope;
 use db::models::rule_instance::RuleInstance;
+use db::models::scoped_vault_label::ScopedVaultLabel;
 use db::models::tenant::Tenant;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow as DbWorkflow;
@@ -174,6 +176,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         Option<(LookupV2Response, VerificationResultId)>,
         Option<(ValidatedApplicationRiskResponse, VerificationResultId)>,
         Vec<DuplicateData>,
+        MiscReasonCodeConfig,
     )>;
 
     #[tracing::instrument(
@@ -309,6 +312,19 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         let duplicate_data =
             decision::duplicates::get_duplicate_data_for_risk_signals(state, &self.sv_id).await?;
 
+        // TODO: Find a better place for this
+        let svid = self.sv_id.clone();
+        let is_labeled_fraud = state
+            .db_query(move |conn| {
+                let label = ScopedVaultLabel::get_active(conn, &svid)?;
+                let is_labeled_fraud = label.map(|l| l.kind.is_fraud()).unwrap_or(false);
+                Ok(is_labeled_fraud)
+            })
+            .await?;
+        let misc_reason_code_config = MiscReasonCodeConfig {
+            user_is_labeled_fraud: is_labeled_fraud,
+        };
+
         Ok(Box::new((
             ocr_reason_codes,
             user_input_reason_codes,
@@ -320,6 +336,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             twilio_result,
             sentilink_result,
             duplicate_data,
+            misc_reason_code_config,
         )))
     }
 
@@ -341,6 +358,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             twilio_result,
             sentilink_result,
             duplicate_data,
+            misc_reason_code_config,
         ) = *async_res;
         let (vw, _, obc) = common::get_vw_and_obc(conn, &self.sv_id, self.seqno, &self.wf_id)?;
         let user_submitted_info = UserSubmittedInfoForFRC::new(&vw);
@@ -485,10 +503,23 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             .into_iter()
             .map(|frc| (frc, VendorAPI::Footprint, None))
             .collect();
-        let dupe_rsg =
-            RiskSignalGroup::create(conn, risk_signal_group_scope, RiskSignalGroupKind::Duplicates)?;
+        let dupe_rsg = RiskSignalGroup::create(
+            conn,
+            risk_signal_group_scope.clone(),
+            RiskSignalGroupKind::Duplicates,
+        )?;
         let hidden = !self.t_id.is_triumph(); // rolling this out slightly safely
         RiskSignal::bulk_add(conn, duplicate_risk_signals, hidden, dupe_rsg.id)?;
+
+
+        // User
+        let misc_reason_codes = features::misc::footprint_reason_codes(misc_reason_code_config)
+            .into_iter()
+            .map(|frc| (frc, VendorAPI::Footprint, None))
+            .collect();
+        let user_rsg = RiskSignalGroup::create(conn, risk_signal_group_scope, RiskSignalGroupKind::User)?;
+        RiskSignal::bulk_add(conn, misc_reason_codes, false, user_rsg.id)?;
+
 
         Ok(KycState::from(KycDecisioning::new(
             self.wf_id, self.sv_id, self.t_id, self.seqno,

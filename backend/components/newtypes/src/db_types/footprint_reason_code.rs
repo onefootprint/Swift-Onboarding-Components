@@ -1224,6 +1224,10 @@ footprint_reason_code_enum! {
         #[scope = SignalScope::Name, additional_scopes = vec![SignalScope::Dob, SignalScope::Ssn, SignalScope::Document], match_level = None]
         #[note = "User has medium connection to a labeled fraud user", severity = SignalSeverity::High,  description = "Medium strength connection to a labeled fraud user. The user shares the Name+Dob, SSN4, etc with another user that was labeled as `Offboard(fraud)` by your organization."]
         MediumConnectionToLabeledFraud,
+        // ~~~~~~~ Misc ~~~~~~~~
+        #[scope = SignalScope::Name, additional_scopes = vec![], match_level = None]
+        #[note = "User is labeled fraud", severity = SignalSeverity::High,  description = "The user has been labeled Offboard(fraud) by your organization"]
+        UserIsLabeledFraud,
         //
         //
         // ~~~~~~~~~ KYB ~~~~~~~~~~~
@@ -1635,6 +1639,7 @@ impl FootprintReasonCode {
                 | Self::BeneficialOwnerPossibleMissingBo
                 | Self::StrongConnectionToLabeledFraud
                 | Self::MediumConnectionToLabeledFraud
+                | Self::UserIsLabeledFraud
         )
     }
 

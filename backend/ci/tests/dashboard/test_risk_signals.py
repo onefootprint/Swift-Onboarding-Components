@@ -1,5 +1,5 @@
 from tests.bifrost_client import BifrostClient
-from tests.utils import get, post, create_ob_config
+from tests.utils import get, post, create_ob_config, _gen_random_sandbox_id
 from tests.integrations.test_alpaca import alpaca_kyc_ob_config
 
 
@@ -194,3 +194,76 @@ def test_onboarding(sandbox_tenant, must_collect_data):
     assert not set(["watchlist_hit_ofac", "adverse_media_hit"]) <= set(
         [rs["reason_code"] for rs in risk_signals]
     )
+
+
+def test_user_risk_signals(sandbox_tenant, must_collect_data):
+    # Run a user through the onboarding flow
+    bifrost = BifrostClient.new_user(
+        sandbox_tenant.default_ob_config,
+        fixture_result="pass",
+    )
+
+    user = bifrost.run()
+
+    onboardings = get(
+        f"entities/{user.fp_id}/onboardings", None, *sandbox_tenant.db_auths
+    )
+    assert len(onboardings["data"]) == 1
+    onboarding_id = onboardings["data"][0]["id"]
+
+    # Get the risk signals, none of them should be user_is_labeled_fraud
+    risk_signals = get(
+        f"entities/{user.fp_id}/onboardings/{onboarding_id}/risk_signals",
+        None,
+        *sandbox_tenant.db_auths,
+    )
+
+    assert not any(
+        [rs["reason_code"] == "user_is_labeled_fraud" for rs in risk_signals]
+    )
+    body = get(f"/entities/{user.fp_id}/label", None, *sandbox_tenant.db_auths)
+    assert body["kind"] is None
+
+    # Now label user
+    data = {"kind": "offboard_fraud"}
+    post(f"/entities/{user.fp_id}/label", data, *sandbox_tenant.db_auths)
+    body = get(f"/entities/{user.fp_id}/label", None, *sandbox_tenant.db_auths)
+    assert body["kind"] == "offboard_fraud"
+
+    other_obc = create_ob_config(
+        sandbox_tenant,
+        "other labeled fraud",
+        [
+            "name",
+            "ssn9",
+            "full_address",
+            "email",
+            "phone_number",
+            "nationality",
+            "dob",
+            "document_and_selfie",
+        ],
+        kind="kyc",
+    )
+    # Run a user through another pb
+    bifrost = BifrostClient.login_user(
+        other_obc,
+        bifrost.sandbox_id,
+    )
+    bifrost.run()
+    onboardings = get(
+        f"entities/{user.fp_id}/onboardings", None, *sandbox_tenant.db_auths
+    )
+    assert len(onboardings["data"]) == 2
+    sorted_onboardings = sorted(
+        onboardings["data"], key=lambda x: x["seqno"], reverse=True
+    )
+    onboarding_id = sorted_onboardings[0]["id"]
+
+    risk_signals = get(
+        f"entities/{user.fp_id}/onboardings/{onboarding_id}/risk_signals",
+        None,
+        *sandbox_tenant.db_auths,
+    )
+    # now we get the risk signal in the latest onboarding
+    assert any([rs["reason_code"] == "user_is_labeled_fraud" for rs in risk_signals])
