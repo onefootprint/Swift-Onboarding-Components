@@ -151,7 +151,7 @@ const Identify = ({ onDone }: { onDone: () => void }) => {
               Enter the 6-digit code sent to your phone
             </Text>
           </Box>
-          <Fp.PinInput onComplete={handleSubmitPin} autoFocus />
+          <Fp.PinInput onComplete={handleSubmitPin} autoFocus pinActiveClassName="fp-input-active" />
           {isPending && (
             <Box marginTop={6}>
               <LoadingSpinner />

@@ -48,7 +48,20 @@ const GlobalStyles = createGlobalStyle`
       }
     }
   }
-  
+
+  .fp-pin-input {
+    width: 40px;
+    height: 44px;
+    padding: 0;
+    text-align: center;
+  }
+
+  .fp-input-active {
+    background: rgb(255, 255, 255);
+    border-color: rgb(74, 36, 219);
+    box-shadow: rgba(74, 36, 219, 0.12) 0px 0px 0px 4px;
+  }
+
   .fp-select {
     font-family: inherit;
     font-size: 0.9375rem;
@@ -114,18 +127,6 @@ const GlobalStyles = createGlobalStyle`
     display: flex;
     flex-direction: column;
     gap: 12px;
-  }
-
-  .fp-pin-input-container {
-    display: flex;
-    gap: 8px;
-  }
-
-  .fp-pin-input {
-    width: 40px;
-    height: 44px;
-    padding: 0;
-    text-align: center;
   }
 `;
 

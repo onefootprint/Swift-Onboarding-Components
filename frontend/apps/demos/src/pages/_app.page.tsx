@@ -1,4 +1,4 @@
-import '@onefootprint/footprint-js/dist/footprint-js.css';
+import '@onefootprint/footprint-react/dist/footprint-react.css';
 
 import type { AppProps } from 'next/app';
 import Head from 'next/head';

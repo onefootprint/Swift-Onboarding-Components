@@ -1,3 +1,5 @@
+import './index.css';
+
 export { CORPORATION_TYPES, COUNTRY_CODES } from './constants';
 import Field from './components/field';
 import FieldErrors from './components/field-errors';

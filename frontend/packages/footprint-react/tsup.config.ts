@@ -1,3 +1,4 @@
+import fs from 'fs/promises';
 import { defineConfig } from 'tsup';
 
 export default defineConfig(options => ({
@@ -7,6 +8,7 @@ export default defineConfig(options => ({
   clean: true,
   treeshake: true,
   dts: true,
+  css: true,
   format: ['cjs', 'esm', 'iife'],
   watch: options.watch,
   minify: !options.watch,
@@ -32,5 +34,16 @@ export default defineConfig(options => ({
     return {
       js: '.js',
     };
+  },
+  async onSuccess() {
+    const data = await fs.readFile('./node_modules/@onefootprint/footprint-js/dist/footprint-js.css', 'utf8');
+
+    const destinationFile = './dist/footprint-react.css';
+    const cssFile = await fs.readFile(destinationFile, 'utf8');
+
+    const cssContent = cssFile.replace('@import "@onefootprint/footprint-js/dist/footprint-js.css";', data);
+
+    // Append the content to the destination file
+    await fs.writeFile(destinationFile, cssContent);
   },
 }));
