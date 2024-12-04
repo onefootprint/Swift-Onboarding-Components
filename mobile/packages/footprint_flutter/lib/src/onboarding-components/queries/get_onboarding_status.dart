@@ -17,11 +17,12 @@ typedef Requirements = ({
   bool isCompleted,
   bool isMissing,
   List<OnboardingRequirement> missing,
+  bool canUpdateUserData
 });
 
 typedef GetOnboardingStatusResult = ({
   Fields fields,
-  Requirements requirements,
+  Requirements requirements
 });
 
 Future<OnboardingStatusResponse> getOnboardingRequirements(
@@ -107,6 +108,7 @@ Future<GetOnboardingStatusResult> getOnboardingStatus(String authToken) async {
       isCompleted: allRequirements.every((element) => element.isMet),
       isMissing: allRequirements.any((element) => !element.isMet),
       missing: allRequirements.where((element) => !element.isMet).toList(),
-    ),
+      canUpdateUserData: onboardingStatusResponse.canUpdateUserData
+    )
   );
 }

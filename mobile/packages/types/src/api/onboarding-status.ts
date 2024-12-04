@@ -131,6 +131,7 @@ export type AuthorizeFields = {
 
 export type OnboardingStatusResponse = {
   allRequirements: OnboardingRequirement[];
+  canUpdateUserData: boolean;
 };
 
 export type RequirementForKind<K> = K extends OnboardingRequirementKind.liveness

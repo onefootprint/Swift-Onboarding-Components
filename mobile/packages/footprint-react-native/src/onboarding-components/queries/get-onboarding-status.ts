@@ -50,6 +50,7 @@ const getOnboardingStatus = async (options: { authToken: string }) => {
 
   const missingRequirements = allRequirements.filter(requirement => !requirement.isMet);
   const isCompleted = missingRequirements.length === 0;
+  const canUpdateUserData = response.canUpdateUserData;
 
   return {
     requirements: {
@@ -59,6 +60,7 @@ const getOnboardingStatus = async (options: { authToken: string }) => {
       missing: missingRequirements,
     },
     fields,
+    canUpdateUserData,
   };
 };
 

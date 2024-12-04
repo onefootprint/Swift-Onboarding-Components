@@ -125,21 +125,29 @@ class OnboardingRequirement {
 
 class OnboardingStatusResponse {
   final List<OnboardingRequirement> allRequirements;
+  final bool canUpdateUserData;
 
   OnboardingStatusResponse({
     required this.allRequirements,
+    required this.canUpdateUserData,
   });
 
   factory OnboardingStatusResponse.fromJson(Map<String, dynamic> json) {
     List<OnboardingRequirement> allRequirements = [];
+    bool canUpdateUserData = false;
+
     if (json['all_requirements'] != null) {
       for (var element in (json['all_requirements'] as List<dynamic>)) {
         allRequirements.add(OnboardingRequirement.fromJson(element));
       }
     }
+    if (json['can_update_user_data'] != null) {
+      canUpdateUserData = json['can_update_user_data'];
+    }
 
     return OnboardingStatusResponse(
       allRequirements: allRequirements,
+      canUpdateUserData: canUpdateUserData,
     );
   }
 }
