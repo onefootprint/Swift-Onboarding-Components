@@ -10,7 +10,6 @@ use super::vault::Vault;
 use super::watchlist_check::WatchlistCheck;
 use super::workflow::Workflow;
 use super::workflow_request::WorkflowRequest;
-use crate::models::data_lifetime::DataLifetime;
 use crate::models::scoped_vault_tag::ScopedVaultTag;
 use crate::models::workflow_request_junction::WorkflowRequestJunction;
 use crate::PgConn;
@@ -31,7 +30,6 @@ use diesel::Insertable;
 use diesel::Queryable;
 use itertools::Itertools;
 use newtypes::BoId;
-use newtypes::DataLifetimeSeqno;
 use newtypes::ExternalId;
 use newtypes::FireWebhookArgs;
 use newtypes::FpId;
@@ -68,10 +66,6 @@ pub struct ScopedVault {
     /// Last time we logged a hosted API interacted with this scoped vault. Vaults touched recently
     /// are considered in progress if their KYC status is still incomplete
     pub last_heartbeat_at: DateTime<Utc>,
-    /// The seqno at which the SV was created or refreshed.
-    /// Data _before_ this seqno and tenat-scoped data _after_ this seqno are used to contruct the
-    /// VW
-    pub snapshot_seqno: Option<DataLifetimeSeqno>,
     /// An optional external (customer-specified) identifier for the scoped vault
     pub external_id: Option<ExternalId>,
     /// An arbitrarily-defined timestamp for when "activity" has occurred on the vault. Users in
@@ -106,7 +100,6 @@ struct NewScopedVault<'a> {
     start_timestamp: DateTime<Utc>,
     is_live: bool,
     last_heartbeat_at: DateTime<Utc>,
-    snapshot_seqno: DataLifetimeSeqno,
     external_id: Option<&'a ExternalId>,
     last_activity_at: DateTime<Utc>,
     kind: VaultKind,
@@ -295,7 +288,6 @@ impl ScopedVault {
             status,
             external_id,
         } = args;
-        let seqno = DataLifetime::get_current_seqno(conn)?;
         let start_timestamp = Utc::now();
         let new = NewScopedVault {
             id: ScopedVaultId::generate(uv.kind),
@@ -307,7 +299,6 @@ impl ScopedVault {
             is_live: uv.is_live,
             last_heartbeat_at: start_timestamp,
             is_active,
-            snapshot_seqno: seqno,
             external_id,
             kind: uv.kind,
             status,
