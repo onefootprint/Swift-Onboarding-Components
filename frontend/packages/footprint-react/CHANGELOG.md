@@ -1,5 +1,11 @@
 # @onefootprint/footprint-react
 
+## 8.0.0
+
+### Major Changes
+
+- 447704fbaf: OTP input component reimplemented
+
 ## 7.8.4
 
 ### Patch Changes
