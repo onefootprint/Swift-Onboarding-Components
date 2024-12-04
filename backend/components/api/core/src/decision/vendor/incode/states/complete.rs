@@ -375,7 +375,7 @@ impl Complete {
 
         // Save Risk Signals
         let scope = RiskSignalGroupScope::WorkflowId { id: wf_id, sv_id };
-        RiskSignal::bulk_create(conn, scope, rs, newtypes::RiskSignalGroupKind::Doc, false)?;
+        RiskSignal::bulk_save_for_scope(conn, scope, rs, newtypes::RiskSignalGroupKind::Doc, false)?;
 
         // Then add some extracted OCR data to the vault.
         let seqno = uvw.patch_data(conn, ocr_data, DataRequestSource::Ocr)?.seqno;

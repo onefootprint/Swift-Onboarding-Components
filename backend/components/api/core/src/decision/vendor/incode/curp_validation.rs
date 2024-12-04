@@ -493,7 +493,7 @@ async fn handle_curp_error(
                     id: &wfid,
                     sv_id: &svid,
                 };
-                RiskSignal::bulk_create(
+                RiskSignal::bulk_save_for_scope(
                     conn,
                     risk_signal_group_scope.clone(),
                     new_reason_codes,

@@ -611,7 +611,7 @@ impl MiddeskState<Complete> {
                     id: &wf_id,
                     sv_id: &sv.id,
                 };
-                RiskSignal::bulk_create(
+                RiskSignal::bulk_save_for_scope(
                     conn,
                     risk_signal_group_scope.clone(),
                     risk_signals,

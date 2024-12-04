@@ -45,7 +45,7 @@ impl Fail {
         // TODO: fix this to add wf_id
         // https://linear.app/footprint/issue/BE-1605/fix-failenter-to-have-rsg-scope-wf
         let scope = RiskSignalGroupScope::ScopedVaultId { id: sv_id };
-        let _ = RiskSignal::bulk_create(
+        let _ = RiskSignal::bulk_save_for_scope(
             conn,
             scope,
             vec![(FootprintReasonCode::DocumentUploadFailed, vendor_api, vres_id)],

@@ -132,7 +132,7 @@ impl OnAction<Authorize, KybState> for KybDataCollection {
                 VendorAPI::Footprint,
                 None,
             )];
-            RiskSignal::bulk_create(conn, scope.clone(), bo_rs, RiskSignalGroupKind::Kyb, false)?;
+            RiskSignal::bulk_save_for_scope(conn, scope.clone(), bo_rs, RiskSignalGroupKind::Kyb, false)?;
         }
 
 
@@ -241,7 +241,7 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
             .flatten()
             .collect();
 
-            RiskSignal::bulk_create(conn, scope.clone(), bo_rs, RiskSignalGroupKind::Kyb, false)?;
+            RiskSignal::bulk_save_for_scope(conn, scope.clone(), bo_rs, RiskSignalGroupKind::Kyb, false)?;
         } else {
             // If we are running KYC on BOs, we expect there will be risk signals and we should take a look at
             // what's going on.

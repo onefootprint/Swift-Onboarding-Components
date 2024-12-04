@@ -364,7 +364,7 @@ mod tests {
             tests::fixtures::verification_request::create(conn, &sv.id, &di.id, VendorAPI::IdologyExpectId);
         let vres = tests::fixtures::verification_result::create(conn, &vreq.id, false);
         let scope = RiskSignalGroupScope::ScopedVaultId { id: &sv.id };
-        let risk_signals = RiskSignal::bulk_create(
+        let risk_signals = RiskSignal::bulk_save_for_scope(
             conn,
             scope,
             vec![(FRC::NameDoesNotMatch, vreq.vendor_api, vres.id.clone())],
@@ -445,7 +445,7 @@ mod tests {
             tests::fixtures::verification_request::create(conn, &sv.id, &di.id, VendorAPI::IdologyExpectId);
         let vres = tests::fixtures::verification_result::create(conn, &vreq.id, false);
         let scope = RiskSignalGroupScope::ScopedVaultId { id: &sv.id };
-        let risk_signals = RiskSignal::bulk_create(
+        let risk_signals = RiskSignal::bulk_save_for_scope(
             conn,
             scope,
             vec![(FRC::NameDoesNotMatch, vreq.vendor_api, vres.id.clone())],

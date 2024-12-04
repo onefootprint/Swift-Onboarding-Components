@@ -101,7 +101,7 @@ impl RiskSignal {
     /// Get or create a new RiskSignalGroup for the provided scope and adds the provided risk
     /// signals to it
     #[tracing::instrument("RiskSignal::bulk_create", skip_all)]
-    pub fn bulk_create<'a, T>(
+    pub fn bulk_save_for_scope<'a, T>(
         conn: &mut TxnPgConn,
         risk_group_scope: RiskSignalGroupScope<'a>,
         signals: Vec<T>,

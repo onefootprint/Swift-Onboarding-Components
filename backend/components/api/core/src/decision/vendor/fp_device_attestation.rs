@@ -119,7 +119,7 @@ pub fn save_vendor_result_and_risk_signals(
     };
 
     let scope = RiskSignalGroupScope::WorkflowId { id: wf_id, sv_id };
-    let rs = RiskSignal::bulk_create(
+    let rs = RiskSignal::bulk_save_for_scope(
         conn,
         scope,
         reason_codes

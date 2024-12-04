@@ -680,7 +680,7 @@ pub async fn mock_incode_doc_collection(
                 id: &wf_id,
                 sv_id: &scoped_vault_id,
             };
-            RiskSignal::bulk_create(conn, scope, signals, RiskSignalGroupKind::Doc, false)?;
+            RiskSignal::bulk_save_for_scope(conn, scope, signals, RiskSignalGroupKind::Doc, false)?;
 
             Ok(())
         })

@@ -171,7 +171,7 @@ pub fn write_kyb_fixture_vendor_result_and_risk_signals(
         .into_iter()
         .map(|s| (s.0, s.1, vres.id.clone()))
         .collect::<Vec<_>>();
-    RiskSignal::bulk_create(conn, scope.clone(), rses, RiskSignalGroupKind::Kyb, false)?;
+    RiskSignal::bulk_save_for_scope(conn, scope.clone(), rses, RiskSignalGroupKind::Kyb, false)?;
 
     // write fixture derived vault data
     // if the decision likely would result in real derived data

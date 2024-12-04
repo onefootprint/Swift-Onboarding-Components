@@ -477,7 +477,7 @@ mod tests {
         let vres = tests::fixtures::verification_result::create(conn, &vreq.id, false);
 
         let scope = RiskSignalGroupScope::ScopedVaultId { id: sv_id };
-        RiskSignal::bulk_create(
+        RiskSignal::bulk_save_for_scope(
             conn,
             scope,
             frcs.into_iter()

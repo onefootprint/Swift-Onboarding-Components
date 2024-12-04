@@ -152,7 +152,7 @@ fn save_successful_response(
         decision::features::stytch::lookup_response_to_footprint_reason_codes(&res.parsed_response);
     let scope = RiskSignalGroupScope::ScopedVaultId { id: sv_id };
 
-    let _rs = RiskSignal::bulk_create(
+    let _rs = RiskSignal::bulk_save_for_scope(
         conn,
         scope,
         reason_codes

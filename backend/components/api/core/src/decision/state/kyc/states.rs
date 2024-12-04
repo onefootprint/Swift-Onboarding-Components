@@ -385,7 +385,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         if !new_doc_reason_codes.is_empty() {
             // We save under the same RSG created during the incode state machine if it ran so we
             // don't invalidate the old RSG
-            RiskSignal::bulk_create(
+            RiskSignal::bulk_save_for_scope(
                 conn,
                 risk_signal_group_scope.clone(),
                 new_doc_reason_codes,
@@ -401,7 +401,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
                 .map(|frc| (frc, vendor_api, vres_id.clone()))
                 .collect();
 
-            RiskSignal::bulk_create(
+            RiskSignal::bulk_save_for_scope(
                 conn,
                 risk_signal_group_scope.clone(),
                 neuro_frc,
@@ -416,7 +416,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
                 .into_iter()
                 .map(|frc| (frc, vendor_api, vres_id.clone()))
                 .collect();
-            RiskSignal::bulk_create(
+            RiskSignal::bulk_save_for_scope(
                 conn,
                 risk_signal_group_scope.clone(),
                 sentilink_frc,
@@ -434,7 +434,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
                 .map(|frc| (frc, vendor_api, vres_id.clone()))
                 .collect();
 
-            RiskSignal::bulk_create(
+            RiskSignal::bulk_save_for_scope(
                 conn,
                 risk_signal_group_scope.clone(),
                 twilio_frc,
@@ -463,7 +463,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
                 .into_iter()
                 .chain(user_input_risk_signals)
                 .collect();
-            RiskSignal::bulk_create(
+            RiskSignal::bulk_save_for_scope(
                 conn,
                 risk_signal_group_scope.clone(),
                 rses,
@@ -488,7 +488,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
                     &watchlist_result_response,
                 )
             };
-            RiskSignal::bulk_create(
+            RiskSignal::bulk_save_for_scope(
                 conn,
                 risk_signal_group_scope.clone(),
                 aml_risk_signals,
@@ -497,7 +497,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             )?;
         } else if let Some(kyc_vendor_result) = kyc_vendor_result {
             let aml_risk_signals = common::get_aml_risk_signals_from_kyc_call(&vw, kyc_vendor_result)?;
-            RiskSignal::bulk_create(
+            RiskSignal::bulk_save_for_scope(
                 conn,
                 risk_signal_group_scope.clone(),
                 aml_risk_signals,
@@ -512,7 +512,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             .map(|frc| (frc, VendorAPI::Footprint, None))
             .collect();
         let hidden = !self.t_id.is_triumph(); // rolling this out slightly safely
-        RiskSignal::bulk_create(
+        RiskSignal::bulk_save_for_scope(
             conn,
             risk_signal_group_scope.clone(),
             duplicate_risk_signals,
@@ -526,7 +526,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             .into_iter()
             .map(|frc| (frc, VendorAPI::Footprint, None))
             .collect();
-        RiskSignal::bulk_create(
+        RiskSignal::bulk_save_for_scope(
             conn,
             risk_signal_group_scope.clone(),
             misc_reason_codes,

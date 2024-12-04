@@ -207,7 +207,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
                 )?;
 
                 let rsg_scope = RiskSignalGroupScope::ScopedVaultId { id: &sv.id };
-                RiskSignal::bulk_create(
+                RiskSignal::bulk_save_for_scope(
                     conn,
                     rsg_scope,
                     watchlist_result.reason_codes().unwrap_or(vec![]),
