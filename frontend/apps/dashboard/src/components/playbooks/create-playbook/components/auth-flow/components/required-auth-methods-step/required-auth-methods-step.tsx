@@ -3,24 +3,24 @@ import { Box, Checkbox, InlineAlert, Stack, Text } from '@onefootprint/ui';
 import { useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import Header from '../../../header';
-import type { AuthDetailsFormData } from './auth-details-step.types';
+import type { RequiredAuthMethodsFormData } from './required-auth-methods-step.types';
 
-export type AuthDetailsStepProps = {
-  defaultValues: AuthDetailsFormData;
+export type RequiredAuthMethodsStepProps = {
+  defaultValues: RequiredAuthMethodsFormData;
   onBack: () => void;
-  onSubmit: (data: AuthDetailsFormData) => void;
+  onSubmit: (data: RequiredAuthMethodsFormData) => void;
 };
 
-const AuthDetailsStep = ({
+const RequiredAuthMethodsStep = ({
   onSubmit,
   onBack,
   defaultValues = {
     email: false,
     phone: true,
   },
-}: AuthDetailsStepProps) => {
+}: RequiredAuthMethodsStepProps) => {
   const { t } = useTranslation('playbooks', { keyPrefix: 'create.settings-auth' });
-  const { handleSubmit, register, control } = useForm<AuthDetailsFormData>({ defaultValues });
+  const { handleSubmit, register, control } = useForm<RequiredAuthMethodsFormData>({ defaultValues });
   const [phone, email] = useWatch({ control, name: ['phone', 'email'] });
   const noRequiredAuthMethods = !phone && !email;
 
@@ -99,4 +99,4 @@ const AuthDetailsStep = ({
   );
 };
 
-export default AuthDetailsStep;
+export default RequiredAuthMethodsStep;

@@ -23,7 +23,7 @@ const Header = ({ playbook, isDisabled, playbooks }: HeaderProps) => {
   const {
     data: { user },
   } = useSession();
-  const showEdit = user?.isFirmEmployee && playbook.kind === 'kyc';
+  const showEdit = user?.isFirmEmployee && (playbook.kind === 'kyc' || playbook.kind === 'auth');
   const hasVersions = user?.isFirmEmployee && playbooks.length > 1;
 
   return (

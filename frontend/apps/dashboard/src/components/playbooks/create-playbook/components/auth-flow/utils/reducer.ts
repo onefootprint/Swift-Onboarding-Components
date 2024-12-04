@@ -1,20 +1,23 @@
+import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
 import type { NameFormData } from '../../name-step';
-import type { AuthDetailsFormData } from '../components/auth-details-step';
+import type { RequiredAuthMethodsFormData } from '../components/required-auth-methods-step';
 
-export type Step = 'name' | 'details';
+export type Step = 'name' | 'details' | 'reviewChanges';
 
 export type State = {
   step: Step;
   data: {
     nameForm: NameFormData;
-    authDetailsForm: AuthDetailsFormData;
+    requiredAuthMethodsForm: RequiredAuthMethodsFormData;
   };
 };
+
+export type StateFormData = State['data'];
 
 export type Action =
   | { type: 'updateStep'; payload: Step }
   | { type: 'updateNameData'; payload: Partial<NameFormData> }
-  | { type: 'updateDetailsData'; payload: Partial<AuthDetailsFormData> }
+  | { type: 'updateDetailsData'; payload: Partial<RequiredAuthMethodsFormData> }
   | { type: 'navigateStep'; payload: string };
 
 export const initialState: State = {
@@ -23,7 +26,7 @@ export const initialState: State = {
     nameForm: {
       name: '',
     },
-    authDetailsForm: {
+    requiredAuthMethodsForm: {
       email: false,
       phone: true,
     },
@@ -50,8 +53,8 @@ export const reducer = (state: State, action: Action): State => {
         ...state,
         data: {
           ...state.data,
-          authDetailsForm: {
-            ...state.data.authDetailsForm,
+          requiredAuthMethodsForm: {
+            ...state.data.requiredAuthMethodsForm,
             ...action.payload,
           },
         },
@@ -64,4 +67,21 @@ export const reducer = (state: State, action: Action): State => {
     default:
       return state;
   }
+};
+
+export const getInitialValues = (playbook?: OnboardingConfiguration): State => {
+  if (!playbook) return initialState;
+
+  return {
+    step: 'name',
+    data: {
+      nameForm: {
+        name: playbook.name,
+      },
+      requiredAuthMethodsForm: {
+        email: playbook.requiredAuthMethods?.includes('email') || false,
+        phone: playbook.requiredAuthMethods?.includes('phone') || false,
+      },
+    },
+  };
 };

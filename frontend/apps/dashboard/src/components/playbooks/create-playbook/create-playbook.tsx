@@ -69,7 +69,7 @@ const Form = ({ onDone, playbook }: { onDone: () => void; playbook?: OnboardingC
       <div className="mx-auto max-w-[520px] md:max-w-[580px]">
         {step === 'select-kind' && <StepKind defaultValues={{ kind }} onSubmit={handleSubmitStep} />}
         <Suspense fallback={null}>
-          {step === 'auth' && <AuthFlow onDone={onDone} onBack={handleBack} />}
+          {step === 'auth' && <AuthFlow onDone={onDone} onBack={handleBack} playbook={playbook} />}
           {step === 'document' && <DocumentFlow onDone={onDone} onBack={handleBack} />}
           {step === 'kyc' && <KycFlow onDone={onDone} onBack={handleBack} playbook={playbook} />}
           {step === 'kyb' && <KybFlow onDone={onDone} onBack={handleBack} />}

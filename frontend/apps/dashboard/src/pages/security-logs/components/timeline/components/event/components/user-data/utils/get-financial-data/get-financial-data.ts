@@ -2,7 +2,7 @@ import type { DataIdentifier } from '@onefootprint/request-types/dashboard';
 import type { FinancialDataItem } from '../../types';
 
 const getFinancialData = (fields: DataIdentifier[]) => {
-  const sortedFields = fields.toSorted((a, b) => a.localeCompare(b));
+  const sortedFields = [...fields].sort((a, b) => a.localeCompare(b));
   // Group card fields by ID
   const cardGroups: Record<string, string[]> = {};
   sortedFields.forEach(field => {

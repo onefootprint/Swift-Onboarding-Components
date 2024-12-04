@@ -1,4 +1,4 @@
-export type AuthDetailsFormData = {
+export type RequiredAuthMethodsFormData = {
   email: boolean;
   phone: boolean;
   hasOptionSelected?: boolean;

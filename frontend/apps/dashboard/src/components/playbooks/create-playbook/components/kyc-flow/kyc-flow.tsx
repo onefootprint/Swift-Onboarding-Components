@@ -29,9 +29,7 @@ type KycFlowProps = {
 
 const KycFlow = ({ onBack, onDone, playbook }: KycFlowProps) => {
   const { t } = useTranslation('playbooks', { keyPrefix: 'create.stepper' });
-  const initialState = useMemo(() => {
-    return getInitialValues(playbook);
-  }, [playbook]);
+  const initialState = useMemo(() => getInitialValues(playbook), [playbook]);
   const [state, dispatch] = useReducer(reducer, initialState);
   const createMutation = useCreatePlaybook();
   const updateMutation = useUpdatePlaybook();
@@ -168,16 +166,17 @@ const KycFlow = ({ onBack, onDone, playbook }: KycFlowProps) => {
           onSubmit={data => {
             dispatch({ type: 'updateVerificationChecksData', payload: data });
 
+            const formData = {
+              ...state.data,
+              verificationChecksForm: data,
+            };
             if (isEditing) {
               dispatch({ type: 'updateStep', payload: 'reviewChanges' });
-              if (isEqual(initialState.data, state.data)) {
+              if (isEqual(initialState.data, formData)) {
                 setPrimaryButton({ label: 'Save changes', disabled: true });
               }
             } else {
-              const payload = createPayload({
-                ...state.data,
-                verificationChecksForm: data,
-              });
+              const payload = createPayload(formData);
               createMutation.mutate(payload, { onSuccess: onDone });
             }
           }}
