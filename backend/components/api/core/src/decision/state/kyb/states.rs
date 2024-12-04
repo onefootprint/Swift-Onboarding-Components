@@ -38,7 +38,6 @@ use db::models::list_entry::ListWithDecryptedEntries;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::risk_signal::RiskSignal;
 use db::models::risk_signal::RiskSignalFilter;
-use db::models::risk_signal_group::RiskSignalGroup;
 use db::models::risk_signal_group::RiskSignalGroupScope;
 use db::models::rule_instance::RuleInstance;
 use db::models::scoped_vault::ScopedVault;
@@ -115,7 +114,6 @@ impl OnAction<Authorize, KybState> for KybDataCollection {
             id: &wf.id,
             sv_id: &wf.scoped_vault_id,
         };
-        let rsg = RiskSignalGroup::create(conn, scope, RiskSignalGroupKind::Kyb)?;
 
         let bo_ownership_total = (async_res.bos)
             .iter()
@@ -134,7 +132,7 @@ impl OnAction<Authorize, KybState> for KybDataCollection {
                 VendorAPI::Footprint,
                 None,
             )];
-            RiskSignal::bulk_add(conn, bo_rs, false, rsg.id)?;
+            RiskSignal::bulk_create(conn, scope.clone(), bo_rs, RiskSignalGroupKind::Kyb, false)?;
         }
 
 
@@ -204,7 +202,6 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
             id: &wf.id,
             sv_id: &wf.scoped_vault_id,
         };
-        let rsg = RiskSignalGroup::get_or_create(conn, scope, RiskSignalGroupKind::Kyb)?;
         // we need to find a vendor_api and vres_id for risk signals. this is annoying and we should drop
         // the not null constraint..
         let bo_rs_for_risk_signals = if let Some((wf, _, _)) = bo_obds.first() {
@@ -244,7 +241,7 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
             .flatten()
             .collect();
 
-            RiskSignal::bulk_add(conn, bo_rs, false, rsg.id)?;
+            RiskSignal::bulk_create(conn, scope.clone(), bo_rs, RiskSignalGroupKind::Kyb, false)?;
         } else {
             // If we are running KYC on BOs, we expect there will be risk signals and we should take a look at
             // what's going on.

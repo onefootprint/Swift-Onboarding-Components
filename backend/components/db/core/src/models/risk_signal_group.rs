@@ -60,11 +60,7 @@ impl<'a> RiskSignalGroupScope<'a> {
 
 
 impl RiskSignalGroup {
-    pub fn create(
-        conn: &mut PgConn,
-        scope: RiskSignalGroupScope,
-        kind: RiskSignalGroupKind,
-    ) -> FpResult<Self> {
+    fn create(conn: &mut PgConn, scope: RiskSignalGroupScope, kind: RiskSignalGroupKind) -> FpResult<Self> {
         let sv_id = scope.scoped_vault_id();
         let wf_id = scope.workflow_id();
         let new = NewRiskSignalGroup {
@@ -81,7 +77,7 @@ impl RiskSignalGroup {
     }
 
     #[tracing::instrument("RiskSignalGroup::get_or_create", skip(conn))]
-    pub fn get_or_create<'a>(
+    pub(crate) fn get_or_create<'a>(
         conn: &mut PgConn,
         scope: RiskSignalGroupScope<'a>,
         kind: RiskSignalGroupKind,

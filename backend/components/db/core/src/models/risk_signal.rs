@@ -98,23 +98,26 @@ pub enum RiskSignalFilter<'a> {
 pub struct AtSeqno(pub Option<DataLifetimeSeqno>);
 
 impl RiskSignal {
-    /// Create a new RiskSignalGroup for the provided scope and adds the provided risk signals
-    /// to it
+    /// Get or create a new RiskSignalGroup for the provided scope and adds the provided risk
+    /// signals to it
     #[tracing::instrument("RiskSignal::bulk_create", skip_all)]
-    pub fn bulk_create<'a>(
+    pub fn bulk_create<'a, T>(
         conn: &mut TxnPgConn,
         risk_group_scope: RiskSignalGroupScope<'a>,
-        signals: Vec<NewRiskSignalInfo>,
+        signals: Vec<T>,
         risk_group_kind: RiskSignalGroupKind,
         hidden: bool,
-    ) -> FpResult<Vec<Self>> {
-        let rsg = RiskSignalGroup::create(conn.conn(), risk_group_scope, risk_group_kind)?;
+    ) -> FpResult<Vec<Self>>
+    where
+        T: Into<NewRiskSignalArgs> + Clone + Eq + PartialEq + std::hash::Hash,
+    {
+        let rsg = RiskSignalGroup::get_or_create(conn.conn(), risk_group_scope, risk_group_kind)?;
         Self::bulk_add(conn, signals, hidden, rsg.id)
     }
 
     #[tracing::instrument("RiskSignal::bulk_add", skip_all)]
     /// Add the provided risk signals to an existing RiskSignalGroup
-    pub fn bulk_add<T>(
+    fn bulk_add<T>(
         conn: &mut TxnPgConn,
         signals: Vec<T>,
         hidden: bool,
