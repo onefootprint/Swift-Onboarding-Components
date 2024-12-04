@@ -384,7 +384,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
                 .map(|frc| (frc, vendor_api, vres_id.clone()))
                 .collect();
 
-            let rsg = RiskSignalGroup::get_or_create(
+            let rsg = RiskSignalGroup::create(
                 conn,
                 risk_signal_group_scope.clone(),
                 RiskSignalGroupKind::Behavior,
