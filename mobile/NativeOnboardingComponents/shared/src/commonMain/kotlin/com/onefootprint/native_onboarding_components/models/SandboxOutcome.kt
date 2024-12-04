@@ -1,45 +1,50 @@
 package com.onefootprint.native_onboarding_components.models
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
 enum class OverallOutcome{
-    PASS {
+    @SerialName("pass") PASS {
         override fun toString(): String {
             return "pass"
         }
     },
-    FAIL {
+    @SerialName("fail") FAIL {
         override fun toString(): String {
             return "fail"
         }
     },
-    MANUAL_REVIEW {
+    @SerialName("manual_review") MANUAL_REVIEW {
         override fun toString(): String {
             return "manual_review"
         }
     },
-    USE_RULES_OUTCOME {
+    @SerialName("use_rules_outcome") USE_RULES_OUTCOME {
         override fun toString(): String {
             return "use_rules_outcome"
         }
     },
-    STEP_UP {
+    @SerialName("step_up") STEP_UP {
         override fun toString(): String {
             return "step_up"
         }
     }
 }
 
+@Serializable
 enum class DocumentOutcome {
-    PASS {
+    @SerialName("pass") PASS {
         override fun toString(): String {
             return "pass"
         }
     },
-    FAIL {
+    @SerialName("fail") FAIL {
         override fun toString(): String {
             return "fail"
         }
     },
-    REAL {
+    @SerialName("real") REAL {
         override fun toString(): String {
             return "real"
         }

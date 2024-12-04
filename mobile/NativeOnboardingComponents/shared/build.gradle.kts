@@ -40,6 +40,9 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.ktor.client.jvm)
+            implementation(libs.androidx.activity.compose)
+            implementation(libs.androidx.browser)
+            implementation(libs.okhttp)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -78,4 +81,9 @@ android {
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
     }
+}
+dependencies {
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.material)
+    implementation(libs.androidx.activity)
 }

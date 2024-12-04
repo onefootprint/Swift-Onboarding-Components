@@ -5,6 +5,9 @@ import com.onefootprint.native_onboarding_components.models.DocumentOutcome
 import com.onefootprint.native_onboarding_components.models.FootprintAuthMethods
 import com.onefootprint.native_onboarding_components.models.FootprintAuthRequirement
 import com.onefootprint.native_onboarding_components.models.FootprintException
+import com.onefootprint.native_onboarding_components.models.FootprintL10n
+import com.onefootprint.native_onboarding_components.models.FootprintSupportedLanguage
+import com.onefootprint.native_onboarding_components.models.FootprintSupportedLocale
 import com.onefootprint.native_onboarding_components.models.OverallOutcome
 import com.onefootprint.native_onboarding_components.models.SandboxOutcome
 import com.onefootprint.native_onboarding_components.models.VerificationResponse
@@ -17,26 +20,27 @@ import org.openapitools.client.models.ObConfigurationKind
 import org.openapitools.client.models.PublicOnboardingConfiguration
 
 object Footprint {
-    private var publicKey: String? = null
-    private var authToken: String? = null
-    private var verifiedAuthToken: String? = null
-    private var vaultingToken: String? = null
+    internal var publicKey: String? = null
+    internal var authToken: String? = null
+    internal var verifiedAuthToken: String? = null
+    internal var vaultingToken: String? = null
     private var authTokenStatus: AuthTokenStatus? = null
-    private var authValidationToken: String? = null
+    internal var authValidationToken: String? = null
     private var vaultData: String? = null // TODO: update the type here
-    private var onboardingConfig: PublicOnboardingConfiguration? = null
+    internal var onboardingConfig: PublicOnboardingConfiguration? = null
     private var challenge: IdentifyChallengeResponse? = null
 
-    // TODO: add requirements field (check we actually need requirements field)
-    private var sandboxId: String? = null
-    private var sandboxOutcome: SandboxOutcome? = null
+    internal var sandboxId: String? = null
+    internal var sandboxOutcome: SandboxOutcome? = null
     private var isReady: Boolean = false
-    // TODO: add l10n
-    // TODO: add appearance
+    internal var l10n: FootprintL10n = FootprintL10n(
+        locale = FootprintSupportedLocale.EN_US,
+        language = FootprintSupportedLanguage.ENGLISH
+    )
 
     // To ensure that only one coroutine can modify the state of the Footprint object at any given time
     // private functions won't have to use the mutex
-    private val mutex = Mutex()
+    internal val mutex = Mutex()
 
     private fun reset() {
         publicKey = null
@@ -51,6 +55,10 @@ object Footprint {
         sandboxId = null
         sandboxOutcome = null
         isReady = false
+        l10n = FootprintL10n(
+            locale = FootprintSupportedLocale.EN_US,
+            language = FootprintSupportedLanguage.ENGLISH
+        )
     }
 
     suspend fun initialize(
@@ -162,7 +170,7 @@ object Footprint {
 
     suspend fun verify(
         verificationCode: String
-    ): VerificationResponse{
+    ): VerificationResponse {
         mutex.withLock {
             val verificationResponseInternal = AuthUtils.verify(
                 challenge = challenge,
