@@ -1618,7 +1618,10 @@ def test_playbook_versions(sandbox_tenant, tenant):
     get_obc_v2 = get(
         f"/org/onboarding_configs/{obc_v2_id}", None, *sandbox_tenant.db_auths
     )
-    assert get_obc_v2 == obc_v2_resp
+    assert get_obc_v2 == obc_v2_resp | {
+        # Author name may be changed dynamically.
+        "author": get_obc_v2["author"],
+    }
 
     versions = get(
         f"/org/playbooks/{playbook_id}/versions", None, *sandbox_tenant.db_auths
