@@ -1224,6 +1224,12 @@ footprint_reason_code_enum! {
         #[scope = SignalScope::Name, additional_scopes = vec![SignalScope::Dob, SignalScope::Ssn, SignalScope::Document], match_level = None]
         #[note = "User has medium connection to a labeled fraud user", severity = SignalSeverity::High,  description = "Medium strength connection to a labeled fraud user. The user shares the Name+Dob, SSN4, etc with another user that was labeled as `Offboard(fraud)` by your organization."]
         MediumConnectionToLabeledFraud,
+        #[scope = SignalScope::Name, additional_scopes = vec![SignalScope::Dob, SignalScope::Ssn, SignalScope::Device, SignalScope::Document], match_level = None]
+        #[note = "User has strong connection to a labeled active user", severity = SignalSeverity::Medium,  description = "Strong connection to a labeled active user. The user shares the Name+Dob, SSN, Identity Document Number, Device ID/Cookie ID etc with another user that was labeled as `Active` by your organization."]
+        StrongConnectionToLabeledActive,
+        #[scope = SignalScope::Name, additional_scopes = vec![SignalScope::Dob, SignalScope::Ssn, SignalScope::Document], match_level = None]
+        #[note = "User has medium connection to a labeled active user", severity = SignalSeverity::Medium,  description = "Medium strength connection to a labeled active user. The user shares the Name+Dob, SSN4, etc with another user that was labeled as `Active` by your organization."]
+        MediumConnectionToLabeledActive,
         // ~~~~~~~ Misc ~~~~~~~~
         #[scope = SignalScope::Name, additional_scopes = vec![], match_level = None]
         #[note = "User is labeled fraud", severity = SignalSeverity::High,  description = "The user has been labeled Offboard(fraud) by your organization"]

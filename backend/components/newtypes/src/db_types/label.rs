@@ -26,7 +26,6 @@ use strum_macros::EnumString;
     EnumString,
     AsRefStr,
     macros::SerdeAttr,
-    derive_more::IsVariant,
 )]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
@@ -47,6 +46,14 @@ impl LabelKind {
         match self {
             Self::OffboardFraud => true,
             Self::Active | Self::OffboardOther => false,
+        }
+    }
+
+    // Enumerating cases because we want to not forget other variants in the future
+    pub fn is_active(&self) -> bool {
+        match self {
+            Self::Active => true,
+            Self::OffboardFraud | Self::OffboardOther => false,
         }
     }
 }
