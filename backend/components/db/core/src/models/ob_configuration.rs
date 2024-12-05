@@ -57,16 +57,16 @@ pub type IsLive = bool;
 pub struct ObConfiguration {
     pub id: ObConfigurationId,
     #[deprecated(note = "Use playbook(key) instead")]
-    pub key: PublishablePlaybookKey,
+    pub key: Option<PublishablePlaybookKey>,
     pub name: String,
     #[deprecated(note = "Use playbook(tenant_id) instead")]
-    pub tenant_id: TenantId,
+    pub tenant_id: Option<TenantId>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     #[deprecated(note = "Use playbook(is_live) instead")]
-    pub is_live: IsLive,
+    pub is_live: Option<IsLive>,
     #[deprecated(note = "Use playbook(status) instead")]
-    pub status: ApiKeyStatus,
+    pub status: Option<ApiKeyStatus>,
     pub created_at: DateTime<Utc>,
     #[diesel(deserialize_as = NonNullVec<CDO>)]
     pub must_collect_data: Vec<CDO>,
@@ -328,12 +328,12 @@ impl ObConfiguration {
             deactivated_at: None,
             appearance_id: None,
 
-            key,
+            key: Some(key),
             created_at,
-            status,
+            status: Some(status),
             name,
-            tenant_id,
-            is_live,
+            tenant_id: Some(tenant_id),
+            is_live: Some(is_live),
             must_collect_data,
             can_access_data,
             cip_kind,

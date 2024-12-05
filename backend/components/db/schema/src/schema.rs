@@ -764,13 +764,13 @@ diesel::table! {
 
     ob_configuration (id) {
         id -> Text,
-        key -> Text,
+        key -> Nullable<Text>,
         name -> Varchar,
-        tenant_id -> Text,
+        tenant_id -> Nullable<Text>,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
-        is_live -> Bool,
-        status -> Text,
+        is_live -> Nullable<Bool>,
+        status -> Nullable<Text>,
         created_at -> Timestamptz,
         must_collect_data -> Array<Nullable<Text>>,
         can_access_data -> Array<Nullable<Text>>,
