@@ -5,9 +5,8 @@ import { createFontStyles } from '@onefootprint/ui';
 import { forwardRef, useImperativeHandle, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import ConfirmationDialog from 'src/components/confirmation-dialog';
+import useUpdatePlaybook from 'src/components/playbooks/create-playbook/hooks/use-update-playbook';
 import styled from 'styled-components';
-
-import useUpdatePlaybook from '@/playbooks/hooks/use-update-playbook';
 
 export type StatusHandler = {
   toggle: () => void;
@@ -17,7 +16,7 @@ export type StatusProps = {
   playbook: OnboardingConfiguration;
 };
 
-const Status = forwardRef<StatusHandler, StatusProps>(({ playbook }, ref) => {
+const Status = forwardRef<StatusHandler, StatusProps>(({ playbook: obc }, ref) => {
   const { t } = useTranslation('playbooks', {
     keyPrefix: 'table.actions.status',
   });
@@ -32,8 +31,12 @@ const Status = forwardRef<StatusHandler, StatusProps>(({ playbook }, ref) => {
   const disable = () => {
     mutation.mutate(
       {
-        id: playbook.id,
-        status: playbook.status === 'enabled' ? OnboardingConfigStatus.disabled : OnboardingConfigStatus.enabled,
+        body: {
+          status: obc.status === 'enabled' ? OnboardingConfigStatus.disabled : OnboardingConfigStatus.enabled,
+        },
+        path: {
+          id: obc.playbookId,
+        },
       },
       {
         onSuccess: hideConfirmation,
@@ -45,7 +48,7 @@ const Status = forwardRef<StatusHandler, StatusProps>(({ playbook }, ref) => {
   };
 
   const handleToggle = () => {
-    if (playbook.status === 'enabled') {
+    if (obc.status === 'enabled') {
       setOpen(true);
     } else {
       disable();
@@ -67,19 +70,19 @@ const Status = forwardRef<StatusHandler, StatusProps>(({ playbook }, ref) => {
       onClose={hideConfirmation}
       onConfirm={disable}
       open={open}
-      title={playbook.status === 'enabled' ? t('disable.confirmation.title') : t('enable.confirmation.title')}
+      title={obc.status === 'enabled' ? t('disable.confirmation.title') : t('enable.confirmation.title')}
     >
       <Trans
         ns="playbooks"
         i18nKey={
-          playbook.status === 'enabled'
+          obc.status === 'enabled'
             ? 'table.actions.status.disable.confirmation.description'
             : 'table.actions.status.enable.confirmation.description'
         }
         components={{
           b: <Bold />,
         }}
-        values={{ name: playbook.name }}
+        values={{ name: obc.name }}
       />
     </ConfirmationDialog>
   );

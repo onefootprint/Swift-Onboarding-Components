@@ -1,9 +1,9 @@
-import useUpdatePlaybook from '@/playbooks/hooks/use-update-playbook';
 import { IcoArrowUpRight16 } from '@onefootprint/icons';
 import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
 import { LinkButton, Stack, Text, Toggle } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import useUpdateOnboardingConfig from 'src/pages/playbooks/hooks/use-update-onboarding-config';
 import styled, { css } from 'styled-components';
 
 export type PasskeysProps = {
@@ -21,7 +21,7 @@ const Settings = ({ playbook }: PasskeysProps) => {
     promptForPasskey: playbook.promptForPasskey,
     skipConfirm: Boolean(playbook.skipConfirm),
   });
-  const mutation = useUpdatePlaybook();
+  const mutation = useUpdateOnboardingConfig();
 
   const handleToggle = (property: keyof LocalState) => () => {
     const nextState = !localState[property];

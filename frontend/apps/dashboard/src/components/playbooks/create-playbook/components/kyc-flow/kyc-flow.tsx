@@ -6,8 +6,8 @@ import isEqual from 'lodash/isEqual';
 import { useMemo, useReducer } from 'react';
 import { useTranslation } from 'react-i18next';
 import useCreatePlaybook from '../../hooks/use-create-playbook';
+import useCreatePlaybookVersion from '../../hooks/use-create-playbook-version';
 import { useDialogButtons } from '../../hooks/use-dialog-buttons';
-import useUpdatePlaybook from '../../hooks/use-update-playbook';
 import NameStep from '../name-step';
 import RequiredAuthMethodsStep from '../required-auth-methods-step';
 import ResidencyStep from '../residency-step';
@@ -32,7 +32,7 @@ const KycFlow = ({ onBack, onDone, playbook }: KycFlowProps) => {
   const initialState = useMemo(() => getInitialValues(playbook), [playbook]);
   const [state, dispatch] = useReducer(reducer, initialState);
   const createMutation = useCreatePlaybook();
-  const updateMutation = useUpdatePlaybook();
+  const createVersionMutation = useCreatePlaybookVersion();
   const orgQuery = useQuery(getOrgOptions());
   const options = useOptions(playbook);
   const { showBackButton, hideBackButton, setPrimaryButton, reset, resetWithBackButton } = useDialogButtons();
@@ -194,7 +194,7 @@ const KycFlow = ({ onBack, onDone, playbook }: KycFlowProps) => {
             resetWithBackButton();
           }}
           onSubmit={() => {
-            updateMutation.mutate(
+            createVersionMutation.mutate(
               {
                 body: {
                   expectedLatestObcId: playbook.id,
