@@ -1,18 +1,9 @@
-import { Stack, Text } from '@onefootprint/ui';
-
-type HeaderProps = {
-  title: string;
-  subtitle: string;
-};
-
-const Header = ({ title, subtitle }: HeaderProps) => {
+const Header = ({ title, subtitle }) => {
   return (
-    <Stack direction="column" gap={3}>
-      <Text variant="heading-3">{title}</Text>
-      <Text variant="body-2" color="secondary">
-        {subtitle}
-      </Text>
-    </Stack>
+    <header className="header">
+      <h1 className="title">{title}</h1>
+      <h2 className="subtitle">{subtitle}</h2>
+    </header>
   );
 };
 

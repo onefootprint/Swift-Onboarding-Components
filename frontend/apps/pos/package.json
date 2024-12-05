@@ -1,46 +1,35 @@
 {
-  "name": "pos",
-  "version": "0.0.1",
+  "name": "@onefootprint/pos-avis",
+  "version": "0.1.2",
   "private": true,
-  "scripts": {
-    "build:analyze": "ANALYZE=true pnpm build",
-    "build": "next build",
-    "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules",
-    "dev": "next dev -p 3013",
-    "lint:ci": "biome ci src",
-    "lint": "biome check src --fix --unsafe",
-    "set:dot-env": "sh ../../scripts/set-dot-env.sh",
-    "start": "next start -p 3013",
-    "typecheck": "pnpm tsc --noEmit"
-  },
   "dependencies": {
-    "@onefootprint/core": "workspace:*",
-    "@onefootprint/design-tokens": "workspace:*",
-    "@onefootprint/footprint-js": "workspace:*",
-    "@onefootprint/footprint-react": "workspace:*",
-    "@onefootprint/icons": "workspace:*",
-    "@onefootprint/request": "workspace:*",
-    "@onefootprint/types": "workspace:*",
-    "@onefootprint/ui": "workspace:*",
-    "i18next": "^23.16.0",
+    "@tanstack/react-query": "^5.56.2",
+    "axios": "^1.7.7",
     "lodash": "^4.17.21",
-    "next": "^14.2.12",
-    "react": "^18",
+    "react-app-polyfill": "^3.0.0",
     "react-dom": "^18",
-    "react-hook-form": "^7.52.2",
-    "react-i18next": "^15.0.3",
-    "styled-components": "^6",
-    "twilio": "^4.1.0"
+    "react-hook-form": "^7.53.0",
+    "react-scripts": "5.0.1",
+    "react": "^18",
+    "typescript": "^5.6.2"
   },
   "devDependencies": {
-    "@tanstack/react-query": "^4.35.7",
-    "@types/google.maps": "^3.55.11",
-    "@types/lodash": "^4.14.194",
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "bun-types": "^1",
-    "tsconfig": "workspace:*",
-    "typescript": "^5.6.3"
+    "@types/node": "^22.7.4",
+    "@types/react-dom": "^18.3.0",
+    "@types/react": "^18.3.10"
+  },
+  "scripts": {
+    "dev": "react-scripts start",
+    "build": "react-scripts build",
+    "eject": "react-scripts eject",
+    "lint:ci": "biome ci src",
+    "lint": "biome check src --fix --unsafe"
+  },
+  "eslintConfig": {
+    "extends": ["react-app", "react-app/jest"]
+  },
+  "browserslist": {
+    "development": ["last 1 chrome version", "last 1 firefox version", "last 1 safari version", "ie 11"],
+    "production": ["last 1 chrome version", "last 1 firefox version", "last 1 safari version", "ie 11"]
   }
 }

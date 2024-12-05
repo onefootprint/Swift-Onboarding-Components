@@ -1,2 +1,25 @@
-export const DEPLOYMENT_URL = process.env.NEXT_PUBLIC_VERCEL_URL;
-export const COMMIT_SHA = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA;
+export const obConfig = {
+  name: 'SimpleKYC',
+  key: 'pb_test_uStuJNEaq6dS16QYu3CDOK',
+  orgId: 'org_5kllpJJHldcAB4yvW8bfyb',
+  orgName: 'Avis (POS)',
+  logoUrl: 'https://i.onefp.net/ol/In8PgvSWDE_1rfj3mn1rrU4Cnpdv2pvj6JLPG5U2mxo/gqibhZjAlOCrKyj4tYUioP.jpg',
+  privacyPolicyUrl: null,
+  isLive: false,
+  status: 'enabled',
+  isAppClipEnabled: true,
+  isInstantAppEnabled: false,
+  appClipExperienceId: 'app_exp_RrbtCH69M099UrGeMuhjDA',
+  isNoPhoneFlow: false,
+  requiresIdDoc: false,
+  canMakeRealDocScanCallsInSandbox: false,
+  isKyb: false,
+  allowInternationalResidents: false,
+  supportedCountries: ['US'],
+  isStepupEnabled: false,
+  kind: 'kyc',
+  supportEmail: '',
+  supportPhone: '',
+  supportWebsite: '',
+  requiredAuthMethods: ['phone'],
+};
