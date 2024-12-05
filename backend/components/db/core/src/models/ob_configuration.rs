@@ -1,5 +1,4 @@
 use super::playbook::Playbook;
-use super::playbook::PlaybookUpdate;
 use super::rule_set::RuleSet;
 use super::workflow::Workflow;
 use crate::actor;
@@ -496,7 +495,6 @@ pub enum ObConfigIdentifier<'a> {
 #[diesel(table_name = ob_configuration)]
 pub struct ObConfigurationUpdate {
     pub name: Option<String>,
-    pub status: Option<ApiKeyStatus>,
     pub verification_checks: Option<Vec<VerificationCheck>>,
     pub prompt_for_passkey: Option<bool>,
     pub skip_confirm: Option<bool>,
@@ -757,20 +755,13 @@ impl ObConfiguration {
     #[tracing::instrument("ObConfiguration::update", skip_all)]
     pub fn update(
         conn: &mut TxnPgConn,
-        // Consume since Playbook may become outdated.
-        playbook: Locked<Playbook>,
+        playbook: &Locked<Playbook>,
         id: &ObConfigurationId,
         update: ObConfigurationUpdate,
     ) -> FpResult<Self> {
-        let playbook_id = playbook.id.clone();
-        if let Some(status) = update.status {
-            let pb_update = PlaybookUpdate { status: Some(status) };
-            Playbook::update(conn, playbook, pb_update)?;
-        }
-
         let results: Vec<Self> = diesel::update(ob_configuration::table)
             .filter(ob_configuration::id.eq(id))
-            .filter(ob_configuration::playbook_id.eq(&playbook_id))
+            .filter(ob_configuration::playbook_id.eq(&playbook.id))
             .filter(ob_configuration::deactivated_at.is_null())
             .set(update)
             .load(conn.conn())?;

@@ -1,9 +1,9 @@
 use crate::diesel::RunQueryDsl;
 use crate::models::ob_configuration::NewObConfigurationArgs;
 use crate::models::ob_configuration::ObConfiguration;
-use crate::models::ob_configuration::ObConfigurationUpdate;
 use crate::models::ob_configuration::VerificationChecks;
 use crate::models::playbook::Playbook;
+use crate::models::playbook::PlaybookUpdate;
 use crate::test_helpers::assert_have_same_elements;
 use crate::tests::fixtures;
 use crate::tests::fixtures::ob_configuration::ObConfigurationOpts;
@@ -30,23 +30,23 @@ use std::str::FromStr;
 use strum::IntoEnumIterator;
 
 #[db_test]
-fn test_ob_config(conn: &mut TestPgConn) {
-    // Create an ob config
+fn test_playbook_status(conn: &mut TestPgConn) {
+    // Create a playbook
     let tenant = fixtures::tenant::create(conn);
     let (playbook, ob_config) = fixtures::ob_configuration::create(conn, &tenant.id, true);
 
     // Enforce it exists
     let (_, fetched_ob_config) = ObConfiguration::get_enabled(conn, &ob_config.id).expect("Could not fetch");
+    assert_eq!(ob_config.id, fetched_ob_config.id);
     assert_eq!(ob_config.name, fetched_ob_config.name);
 
     // Mark as inactive
-    let update = ObConfigurationUpdate {
+    let update = PlaybookUpdate {
         status: Some(ApiKeyStatus::Disabled),
-        ..Default::default()
     };
-    ObConfiguration::update(conn, playbook, &ob_config.id, update).expect("Couldn't update");
+    Playbook::update(conn, playbook, update).expect("Couldn't update");
 
-    // Enforce it does not exist
+    // Check that it's disabled
     ObConfiguration::get_enabled(conn, &ob_config.id).expect_err("Shouldn't find disabled ob config");
 }
 

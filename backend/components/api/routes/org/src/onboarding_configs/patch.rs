@@ -8,7 +8,6 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::ob_configuration::ObConfigurationUpdate;
 use db::models::playbook::Playbook;
 use db::models::rule_set::RuleSet;
-use newtypes::ApiKeyStatus;
 use newtypes::ObConfigurationId;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::patch;
@@ -23,7 +22,6 @@ struct UpdateObConfigPath {
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 struct UpdateObConfigRequest {
     name: Option<String>,
-    status: Option<ApiKeyStatus>,
     prompt_for_passkey: Option<bool>,
     skip_confirm: Option<bool>,
 }
@@ -48,7 +46,6 @@ async fn patch(
     let UpdateObConfigPath { id: obc_id } = path.into_inner();
     let UpdateObConfigRequest {
         name,
-        status,
         prompt_for_passkey,
         skip_confirm,
     } = request.into_inner();
@@ -56,21 +53,16 @@ async fn patch(
         .db_transaction(move |conn| {
             let update = ObConfigurationUpdate {
                 name,
-                status,
                 prompt_for_passkey,
                 skip_confirm,
                 ..Default::default()
             };
             let playbook = Playbook::lock(conn, (&obc_id, &tenant_id, is_live))?;
-            let playbook_id = playbook.id.clone();
-            let obc = ObConfiguration::update(conn, playbook, &obc_id, update)?;
+            let obc = ObConfiguration::update(conn, &playbook, &obc_id, update)?;
             let (obc, actor) = db::actor::saturate_actor_nullable(conn, obc)?;
             let rs = RuleSet::get_active(conn, &obc.id)?;
 
-            // Temp workaround during the status refactor:
-            let playbook = Playbook::get(conn, &playbook_id)?;
-
-            Ok((playbook, obc, actor, rs))
+            Ok((playbook.into_inner(), obc, actor, rs))
         })
         .await?;
 
