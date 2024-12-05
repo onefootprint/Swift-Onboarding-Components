@@ -32,7 +32,6 @@ use newtypes::CountArgs;
 use newtypes::DataIdentifier;
 use newtypes::FilterFunction;
 use newtypes::IdentityDataKind as IDK;
-use newtypes::ScopedVaultCursorKind;
 use newtypes::ScopedVaultId;
 use newtypes::TenantScope;
 use newtypes::TimestampCursor;
@@ -75,7 +74,6 @@ pub async fn post(
             SearchEntitiesRequest::default(),
         )
     };
-    let page_size = pagination.page_size(&state);
     let SearchEntitiesRequest {
         kind,
         statuses,
@@ -91,7 +89,6 @@ pub async fn post(
         tags,
         external_id,
     } = filters;
-    let cursor = pagination.cursor.as_ref().map(|c| c.into());
 
     let (search, fp_id) = parse_search(&state, search, &tenant.id).await?;
 
@@ -115,27 +112,20 @@ pub async fn post(
         labels,
         tags,
     };
-    let (scoped_vaults, mut entities, vws, count) = state
+    let pagination = pagination.db_pagination(&state);
+    let (scoped_vaults, next_cursor, mut entities, vws, count) = state
         .db_query(move |conn| {
-            let page_size = (page_size + 1) as i64;
-            let order_by = ScopedVaultCursorKind::LastActivityAt;
-            let (svs, count) = db::scoped_vault::list_and_count_authorized_for_tenant(
-                conn, params, cursor, order_by, page_size,
-            )?;
+            let ((svs, next_cursor), count) =
+                db::scoped_vault::list_and_count_authorized_for_tenant(conn, params, pagination)?;
             let vws = VaultWrapper::<Any>::multi_get_for_tenant(conn, svs.clone(), None)?;
             let scoped_vault_ids: Vec<_> = svs.iter().map(|su| su.0.id.clone()).collect();
             let entities = ScopedVault::bulk_get_serializable_info(conn, scoped_vault_ids)?;
-            Ok((svs, entities, vws, count))
+            Ok((svs, next_cursor, entities, vws, count))
         })
         .await?;
 
     // Always decrypt name and first letter of last name
     let mut decrypted_results = decrypt_visible_attrs(&state, &scopes, vws.values().collect()).await?;
-
-    // If there are more than page_size results, we should tell the client there's another page
-    let cursor = pagination
-        .cursor_item(&state, &scoped_vaults)
-        .map(|(sv, _)| TimestampCursor(sv.last_activity_at));
 
     // Serialize results
     let entities = scoped_vaults
@@ -153,7 +143,7 @@ pub async fn post(
         .into_iter()
         .map(|(vw, entity, d)| api_wire_types::Entity::from_db((entity, vw, &auth, d)))
         .collect();
-    CursorPaginatedResponseInner::ok(entities, page_size, cursor, Some(count))
+    CursorPaginatedResponseInner::ok(entities, next_cursor, Some(count))
 }
 
 /// Decrypt all of the data for the VWs that is visible by default without an explicit request

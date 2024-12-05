@@ -15,6 +15,9 @@ use crate::models::tenant::Tenant;
 use crate::models::tenant_api_key::TenantApiKey;
 use crate::models::tenant_role::TenantRole;
 use crate::models::tenant_user::TenantUser;
+use crate::ComputeCursor;
+use crate::CursorPaginatedResult;
+use crate::CursorPagination;
 use crate::PgConn;
 use crate::TxnPgConn;
 use api_errors::FpResult;
@@ -140,7 +143,6 @@ pub struct NewAuditEvent {
 
 #[derive(Debug, Default)]
 pub struct FilterQueryParams {
-    pub cursor: Option<(DateTime<Utc>, AuditEventId)>,
     pub tenant_id: TenantId,
     pub search: Option<String>,
     pub timestamp_lte: Option<DateTime<Utc>>,
@@ -244,8 +246,11 @@ impl AuditEvent {
     pub fn filter(
         conn: &mut PgConn,
         params: FilterQueryParams,
-        page_size: i64,
-    ) -> FpResult<(Vec<JoinedAuditEvent>, AuditEventBulkSecondaryData)> {
+        pagination: CursorPagination<AuditEventCursor>,
+    ) -> FpResult<(
+        CursorPaginatedResult<JoinedAuditEvent, AuditEventCursor>,
+        AuditEventBulkSecondaryData,
+    )> {
         let mut results = audit_event::table
             .inner_join(tenant::table)
             .inner_join(insight_event::table)
@@ -266,10 +271,10 @@ impl AuditEvent {
                     .eq(params.is_live)
                     .or(audit_event::is_live.is_null()),
             )
-            .limit(page_size)
+            .limit(pagination.limit())
             .into_boxed();
 
-        if let Some((cursor_ts, cursor_id)) = params.cursor {
+        if let Some((cursor_ts, cursor_id)) = &pagination.cursor {
             // Filter on (row_ts, row_id) <= (cursor_ts, cursor_id)
             results = results.filter(
                 audit_event::timestamp.lt(cursor_ts).or(audit_event::timestamp
@@ -359,6 +364,7 @@ impl AuditEvent {
             .collect_vec();
 
         let secondary_data = AuditEventBulkSecondaryData::load(conn, &events)?;
+        let events = pagination.results(events);
         Ok((events, secondary_data))
     }
 
@@ -489,6 +495,13 @@ impl AuditEventBulkSecondaryData {
     }
 }
 
+pub type AuditEventCursor = (DateTime<Utc>, AuditEventId);
+
+impl ComputeCursor<AuditEventCursor> for JoinedAuditEvent {
+    fn compute_cursor(&self) -> AuditEventCursor {
+        (self.audit_event.timestamp, self.audit_event.id.clone())
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -553,22 +566,18 @@ mod tests {
 
         let insight_event = tests::fixtures::insight_event::create(conn);
 
-        let (events, _) = AuditEvent::filter(
-            conn,
-            FilterQueryParams {
-                cursor: None,
-                tenant_id: tenant.id.clone(),
-                search: None,
-                timestamp_lte: None,
-                timestamp_gte: None,
-                names: vec![],
-                targets: vec![],
-                is_live: Some(true),
-                list_id: None,
-            },
-            100,
-        )
-        .unwrap();
+        let pagination = CursorPagination::page(100);
+        let filters = FilterQueryParams {
+            tenant_id: tenant.id.clone(),
+            search: None,
+            timestamp_lte: None,
+            timestamp_gte: None,
+            names: vec![],
+            targets: vec![],
+            is_live: Some(true),
+            list_id: None,
+        };
+        let ((events, _), _) = AuditEvent::filter(conn, filters, pagination).unwrap();
         assert_eq!(events.len(), 0);
 
         let event1 = NewAuditEvent {
@@ -635,10 +644,21 @@ mod tests {
         };
         let id4 = AuditEvent::create(conn, event4).unwrap();
 
-        let (events, _) = AuditEvent::filter(
-            conn,
-            FilterQueryParams {
-                cursor: None,
+        let filters = FilterQueryParams {
+            tenant_id: tenant.id.clone(),
+            search: None,
+            timestamp_lte: None,
+            timestamp_gte: None,
+            names: vec![],
+            targets: vec![],
+            is_live: Some(true),
+            list_id: None,
+        };
+        let ((events, _), _) = AuditEvent::filter(conn, filters, CursorPagination::page(100)).unwrap();
+        assert_eq!(events.len(), 3);
+
+        for page_size in 0..=events.len() {
+            let filters = FilterQueryParams {
                 tenant_id: tenant.id.clone(),
                 search: None,
                 timestamp_lte: None,
@@ -647,29 +667,9 @@ mod tests {
                 targets: vec![],
                 is_live: Some(true),
                 list_id: None,
-            },
-            100,
-        )
-        .unwrap();
-        assert_eq!(events.len(), 3);
-
-        for page_size in 0..=events.len() {
-            let (partial_events, _) = AuditEvent::filter(
-                conn,
-                FilterQueryParams {
-                    cursor: None,
-                    tenant_id: tenant.id.clone(),
-                    search: None,
-                    timestamp_lte: None,
-                    timestamp_gte: None,
-                    names: vec![],
-                    targets: vec![],
-                    is_live: Some(true),
-                    list_id: None,
-                },
-                page_size as i64,
-            )
-            .unwrap();
+            };
+            let pagination = CursorPagination::page(page_size);
+            let ((partial_events, _), _) = AuditEvent::filter(conn, filters, pagination).unwrap();
             assert_eq!(partial_events.len(), page_size);
         }
 
@@ -687,7 +687,6 @@ mod tests {
             (
                 "filter by cursor bound, three results",
                 FilterQueryParams {
-                    cursor: Some(first_cursor.clone()),
                     tenant_id: tenant.id.clone(),
                     search: None,
                     timestamp_lte: None,
@@ -697,12 +696,12 @@ mod tests {
                     is_live: Some(true),
                     list_id: None,
                 },
+                Some(first_cursor.clone()),
                 vec![first_id.clone(), second_id.clone(), third_id.clone()],
             ),
             (
                 "filter by id cursor bound, two result",
                 FilterQueryParams {
-                    cursor: Some(second_cursor.clone()),
                     tenant_id: tenant.id.clone(),
                     search: None,
                     timestamp_lte: None,
@@ -712,15 +711,12 @@ mod tests {
                     is_live: Some(true),
                     list_id: None,
                 },
+                Some(second_cursor.clone()),
                 vec![second_id.clone(), third_id.clone()],
             ),
             (
                 "filter by id cursor bound, no results",
                 FilterQueryParams {
-                    cursor: Some((
-                        DateTime::<Utc>::from_timestamp(0, 0).unwrap(),
-                        AuditEventId::from("ae_00000".to_owned()),
-                    )),
                     tenant_id: tenant.id.clone(),
                     search: None,
                     timestamp_lte: None,
@@ -730,12 +726,15 @@ mod tests {
                     is_live: Some(true),
                     list_id: None,
                 },
+                Some((
+                    DateTime::<Utc>::from_timestamp(0, 0).unwrap(),
+                    AuditEventId::from("ae_00000".to_owned()),
+                )),
                 vec![],
             ),
             (
                 "search by fp_id",
                 FilterQueryParams {
-                    cursor: None,
                     tenant_id: tenant.id.clone(),
                     search: Some(scoped_vault_1.fp_id.to_string()),
                     timestamp_lte: None,
@@ -745,12 +744,12 @@ mod tests {
                     is_live: Some(true),
                     list_id: None,
                 },
+                None,
                 vec![id1.clone()],
             ),
             (
                 "timestamp <= 0",
                 FilterQueryParams {
-                    cursor: None,
                     tenant_id: tenant.id.clone(),
                     search: None,
                     timestamp_lte: Some(DateTime::<Utc>::from_timestamp(0, 0).unwrap()),
@@ -760,12 +759,12 @@ mod tests {
                     is_live: Some(true),
                     list_id: None,
                 },
+                None,
                 vec![],
             ),
             (
                 "timestamp <= far future",
                 FilterQueryParams {
-                    cursor: None,
                     tenant_id: tenant.id.clone(),
                     search: None,
                     timestamp_lte: Some(DateTime::<Utc>::from_timestamp(9000000000, 0).unwrap()),
@@ -775,12 +774,12 @@ mod tests {
                     is_live: Some(true),
                     list_id: None,
                 },
+                None,
                 vec![id1.clone(), id2.clone(), id4.clone()],
             ),
             (
                 "timestamp >= 0",
                 FilterQueryParams {
-                    cursor: None,
                     tenant_id: tenant.id.clone(),
                     search: None,
                     timestamp_lte: None,
@@ -790,12 +789,12 @@ mod tests {
                     is_live: Some(true),
                     list_id: None,
                 },
+                None,
                 vec![id1.clone(), id2.clone(), id4.clone()],
             ),
             (
                 "timestamp >= far future",
                 FilterQueryParams {
-                    cursor: None,
                     tenant_id: tenant.id.clone(),
                     search: None,
                     timestamp_lte: None,
@@ -805,12 +804,12 @@ mod tests {
                     is_live: Some(true),
                     list_id: None,
                 },
+                None,
                 vec![],
             ),
             (
                 "name = CreateUser",
                 FilterQueryParams {
-                    cursor: None,
                     tenant_id: tenant.id.clone(),
                     search: None,
                     timestamp_lte: None,
@@ -820,12 +819,12 @@ mod tests {
                     is_live: Some(true),
                     list_id: None,
                 },
+                None,
                 vec![id1.clone()],
             ),
             (
                 "name = CreateUser or DecryptUserData",
                 FilterQueryParams {
-                    cursor: None,
                     tenant_id: tenant.id.clone(),
                     search: None,
                     timestamp_lte: None,
@@ -835,12 +834,12 @@ mod tests {
                     is_live: Some(true),
                     list_id: None,
                 },
+                None,
                 vec![id1.clone(), id2.clone()],
             ),
             (
                 "target fields overlap",
                 FilterQueryParams {
-                    cursor: None,
                     tenant_id: tenant.id.clone(),
                     search: None,
                     timestamp_lte: None,
@@ -853,12 +852,12 @@ mod tests {
                     is_live: Some(false),
                     list_id: None,
                 },
+                None,
                 vec![id3.clone()],
             ),
             (
                 "target fields don't overlap",
                 FilterQueryParams {
-                    cursor: None,
                     tenant_id: tenant.id.clone(),
                     search: None,
                     timestamp_lte: None,
@@ -868,12 +867,12 @@ mod tests {
                     is_live: Some(false),
                     list_id: None,
                 },
+                None,
                 vec![],
             ),
             (
                 "live = true",
                 FilterQueryParams {
-                    cursor: None,
                     tenant_id: tenant.id.clone(),
                     search: None,
                     timestamp_lte: None,
@@ -883,12 +882,12 @@ mod tests {
                     is_live: Some(true),
                     list_id: None,
                 },
+                None,
                 vec![id1.clone(), id2.clone(), id4.clone()],
             ),
             (
                 "live = true, tenant with no events",
                 FilterQueryParams {
-                    cursor: None,
                     tenant_id: other_tenant.id.clone(),
                     search: None,
                     timestamp_lte: None,
@@ -898,12 +897,12 @@ mod tests {
                     is_live: Some(true),
                     list_id: None,
                 },
+                None,
                 vec![],
             ),
             (
                 "live = false",
                 FilterQueryParams {
-                    cursor: None,
                     tenant_id: tenant.id.clone(),
                     search: None,
                     timestamp_lte: None,
@@ -913,12 +912,14 @@ mod tests {
                     is_live: Some(false),
                     list_id: None,
                 },
+                None,
                 vec![id3.clone(), id4.clone()],
             ),
         ];
 
-        for (test_case, params, expect_ids) in tests {
-            let (events, _) = AuditEvent::filter(conn, params, 100).unwrap();
+        for (test_case, params, cursor, expect_ids) in tests {
+            let pagination = CursorPagination::new(cursor, 100);
+            let ((events, _), _) = AuditEvent::filter(conn, params, pagination).unwrap();
             assert_eq!(
                 sorted(events.into_iter().map(|j| j.audit_event.id)).collect_vec(),
                 sorted(expect_ids).collect_vec(),
@@ -927,22 +928,17 @@ mod tests {
             );
         }
 
-        let (events, _) = AuditEvent::filter(
-            conn,
-            FilterQueryParams {
-                cursor: None,
-                tenant_id: other_tenant.id,
-                search: None,
-                timestamp_lte: None,
-                timestamp_gte: None,
-                names: vec![],
-                targets: vec![],
-                is_live: Some(true),
-                list_id: None,
-            },
-            100,
-        )
-        .unwrap();
+        let filters = FilterQueryParams {
+            tenant_id: other_tenant.id,
+            search: None,
+            timestamp_lte: None,
+            timestamp_gte: None,
+            names: vec![],
+            targets: vec![],
+            is_live: Some(true),
+            list_id: None,
+        };
+        let ((events, _), _) = AuditEvent::filter(conn, filters, CursorPagination::page(100)).unwrap();
         assert_eq!(events.len(), 0);
     }
 }

@@ -1,4 +1,3 @@
-use crate::audit_events::AuditEventCursor;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
@@ -17,6 +16,7 @@ use api_wire_types::ListEventDetail;
 use crypto::aead::AeadSealedBytes;
 use crypto::aead::SealingKey;
 use db::models::audit_event::AuditEvent;
+use db::models::audit_event::AuditEventCursor;
 use db::models::audit_event::FilterQueryParams;
 use db::models::audit_event::JoinedAuditEvent;
 use db::models::list::List;
@@ -54,10 +54,7 @@ async fn timeline(
     let is_live = auth.is_live()?;
     let list_id = list_id.into_inner();
 
-    let page_size = pagination.page_size(&state);
-    let cursor = pagination.cursor.as_ref().map(|co| co.inner());
     let params = FilterQueryParams {
-        cursor: cursor.map(|c| (c.timestamp, c.id.clone())),
         tenant_id: tenant_id.clone(),
         names: LIST_AUDIT_EVENT_NAMES.to_vec(),
         is_live: Some(is_live),
@@ -65,10 +62,12 @@ async fn timeline(
         ..Default::default()
     };
 
-    let (events, list, list_entry_creations, list_entries) = state
+    let pagination = pagination.into_inner().map_cursor(|c| c.into_inner());
+    let pagination = pagination.db_pagination(&state);
+    let (events, next_cursor, list, list_entry_creations, list_entries) = state
         .db_transaction(move |conn| {
             let list = List::get(conn, &tenant_id, is_live, &list_id)?;
-            let (events, _) = AuditEvent::filter(conn, params, (page_size + 1) as i64)?;
+            let ((events, next_cursor), _) = AuditEvent::filter(conn, params, pagination)?;
 
             let lec_ids = events
                 .iter()
@@ -82,16 +81,11 @@ async fn timeline(
                 .collect_vec();
             let list_entries = ListEntry::bulk_get(conn, &le_ids)?;
 
-            Ok((events, list, list_entry_creations, list_entries))
+            Ok((events, next_cursor, list, list_entry_creations, list_entries))
         })
         .await?;
 
-    let next_cursor = pagination.cursor_item(&state, &events).map(|j| {
-        Base64Cursor::new(AuditEventCursor {
-            timestamp: j.audit_event.timestamp,
-            id: j.audit_event.id.clone(),
-        })
-    });
+    let next_cursor = next_cursor.map(Base64Cursor::new);
 
     let saturated_events = saturate_events(
         &state,
@@ -107,7 +101,7 @@ async fn timeline(
         .into_iter()
         .map(api_wire_types::ListEvent::from_db)
         .collect();
-    CursorPaginatedResponseInner::ok(results, page_size, next_cursor, None)
+    CursorPaginatedResponseInner::ok(results, next_cursor, None)
 }
 
 async fn saturate_events(

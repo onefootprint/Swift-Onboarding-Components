@@ -37,3 +37,42 @@ impl OffsetPagination {
         (results, next_page)
     }
 }
+
+
+pub struct CursorPagination<TCursor> {
+    pub cursor: Option<TCursor>,
+    page_size: usize,
+}
+
+pub type CursorPaginatedResult<T, TCursor> = (Vec<T>, Option<TCursor>);
+
+impl<TCursor> CursorPagination<TCursor> {
+    pub fn new(cursor: Option<TCursor>, page_size: usize) -> Self {
+        Self { cursor, page_size }
+    }
+
+    pub fn page(page_size: usize) -> Self {
+        Self::new(None, page_size)
+    }
+
+    /// Constructs the value to pass to the SQL limit clause.
+    /// Always fetch one more than the page size in order to determine if there is an extra page
+    pub fn limit(&self) -> i64 {
+        (self.page_size + 1) as i64
+    }
+
+    /// Truncate the results to the requested page size and return the cursor for the next page, if
+    /// any
+    pub fn results<T>(&self, results: Vec<T>) -> CursorPaginatedResult<T, TCursor>
+    where
+        T: ComputeCursor<TCursor>,
+    {
+        let next_cursor = results.get(self.page_size).map(|item| item.compute_cursor());
+        let results = results.into_iter().take(self.page_size).collect();
+        (results, next_cursor)
+    }
+}
+
+pub trait ComputeCursor<T> {
+    fn compute_cursor(&self) -> T;
+}

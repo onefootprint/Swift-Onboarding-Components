@@ -92,6 +92,7 @@ macro_rules! define_err_type {
             where
                 E: From<FpError>,
             {
+                #[track_caller]
                 fn from(value: [< $name Internal >]) -> Self {
                     Err(E::from(FpError::from(value)))
                 }

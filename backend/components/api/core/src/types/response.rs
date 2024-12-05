@@ -171,16 +171,9 @@ pub struct CursorPaginatedResponseInner<T, C> {
 }
 
 impl<T, C> CursorPaginatedResponseInner<T, C> {
-    pub fn ok(
-        data: Vec<T>,
-        page_size: usize,
-        next: Option<C>,
-        count: Option<i64>,
-    ) -> ApiResponse<Json<Self>> {
+    pub fn ok(data: Vec<T>, next: Option<C>, count: Option<i64>) -> ApiResponse<Json<Self>> {
         Ok(Json(Self {
-            // Since cursor-paginated DB utils fetch N+1 results to see if there's a next page, we have to
-            // drop the last element
-            data: data.into_iter().take(page_size).collect(),
+            data,
             meta: CursorPaginatedResponseMeta { next, count },
         }))
     }
@@ -304,19 +297,20 @@ impl<T> OffsetPaginatedResponse<T, OffsetPaginatedResponseMetaNoCount> {
 
 /// Wraps a rich cursor type so it's serialized as an base64 string.
 /// Facilitates multi-field cursors.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Base64Cursor<T>(T);
 
-impl<T> Base64Cursor<T>
-where
-    T: Serialize + for<'de> Deserialize<'de>,
-{
+impl<T> Base64Cursor<T> {
     pub fn new(t: T) -> Base64Cursor<T> {
         Base64Cursor(t)
     }
 
     pub fn inner(&self) -> &T {
         &self.0
+    }
+
+    pub fn into_inner(self) -> T {
+        self.0
     }
 }
 

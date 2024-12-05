@@ -42,8 +42,7 @@ async fn get(
         .await?;
 
     let count = orgs.len();
-    let page = pagination.page;
-    let page_size = pagination.page_size(&state);
+    let pagination = pagination.db_pagination(&state);
 
     let results = orgs
         .into_iter()
@@ -51,10 +50,9 @@ async fn get(
         .map(api_wire_types::PrivateTenant::from_db)
         .sorted_by_key(|org| (org.is_live, org.num_live_vaults, org.created_at))
         .rev()
-        .skip(page_size * page.unwrap_or_default())
+        .skip(pagination.offset().unwrap_or_default() as usize)
         .collect_vec();
 
-    let pagination = pagination.db_pagination(&state);
     let (results, next_page) = pagination.results(results);
 
     let result = OffsetPaginatedResponse::ok(results, next_page, count as i64);

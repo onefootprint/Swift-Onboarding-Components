@@ -9,18 +9,14 @@ use api_core::utils::db2api::TryDbToApi;
 use api_core::FpResult;
 use api_core::State;
 use api_wire_types::AuditEventRequest;
-use chrono::DateTime;
-use chrono::Utc;
 use db::models::audit_event::AuditEvent;
+use db::models::audit_event::AuditEventCursor;
 use db::models::audit_event::FilterQueryParams;
-use newtypes::AuditEventId;
 use newtypes::AuditEventName;
 use newtypes::DataIdentifier;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
 use paperclip::actix::web;
-use serde::Deserialize;
-use serde::Serialize;
 
 #[api_v2_operation(
     description = "Query audit events, in descending order of timestamp.",
@@ -35,9 +31,6 @@ async fn get(
 ) -> CursorPaginatedResponse<api_wire_types::AuditEvent, Base64Cursor<AuditEventCursor>> {
     let auth = auth.check_guard(TenantGuard::Read)?;
 
-    let page_size = pagination.page_size(&state);
-    let cursor = pagination.cursor.as_ref().map(|co| co.inner());
-
     let AuditEventRequest {
         names,
         targets,
@@ -49,7 +42,6 @@ async fn get(
     let tenant = auth.tenant();
 
     let params = FilterQueryParams {
-        cursor: cursor.map(|c| (c.timestamp, c.id.clone())),
         tenant_id: tenant.id.clone(),
         search,
         timestamp_lte,
@@ -60,27 +52,18 @@ async fn get(
         list_id,
     };
 
-    let (results, secondary_data) = state
-        .db_query(move |conn| AuditEvent::filter(conn, params, (page_size + 1) as i64))
+    let pagination = pagination.into_inner().map_cursor(|c| c.into_inner());
+    let pagination = pagination.db_pagination(&state);
+    let ((results, next_cursor), secondary_data) = state
+        .db_query(move |conn| AuditEvent::filter(conn, params, pagination))
         .await?;
 
     // If there are more than page_size results, we should tell the client there's another page.
-    let next_cursor = pagination.cursor_item(&state, &results).map(|j| {
-        Base64Cursor::new(AuditEventCursor {
-            timestamp: j.audit_event.timestamp,
-            id: j.audit_event.id.clone(),
-        })
-    });
+    let next_cursor = next_cursor.map(Base64Cursor::new);
     let response = results
         .into_iter()
         .map(|e| (e, &secondary_data))
         .map(api_wire_types::AuditEvent::try_from_db)
         .collect::<FpResult<Vec<api_wire_types::AuditEvent>>>()?;
-    CursorPaginatedResponseInner::ok(response, page_size, next_cursor, None)
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct AuditEventCursor {
-    pub timestamp: DateTime<Utc>,
-    pub id: AuditEventId,
+    CursorPaginatedResponseInner::ok(response, next_cursor, None)
 }

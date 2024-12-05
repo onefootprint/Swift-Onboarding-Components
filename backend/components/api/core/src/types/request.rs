@@ -1,4 +1,5 @@
 use crate::State;
+use db::CursorPagination;
 use db::OffsetPagination;
 use paperclip::actix::web;
 use paperclip::actix::Apiv2Schema;
@@ -6,7 +7,7 @@ use paperclip::actix::Apiv2Schema;
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 pub struct EmptyRequest {}
 
-#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 #[openapi(inline)]
 // Don't want this to be a docstring or it will be visible in Apiv2Schema docs...
@@ -36,20 +37,23 @@ impl<C> Default for CursorPaginationRequest<C> {
 }
 
 impl<C> CursorPaginationRequest<C> {
-    pub fn page_size(&self, state: &web::Data<State>) -> usize {
-        if let Some(page_size) = self.page_size {
-            std::cmp::min(page_size, MAX_PAGE_SIZE)
-        } else {
-            state.config.default_page_size
+    pub fn map_cursor<F, U>(self, f: F) -> CursorPaginationRequest<U>
+    where
+        F: FnOnce(C) -> U,
+    {
+        CursorPaginationRequest {
+            cursor: self.cursor.map(f),
+            page_size: self.page_size,
         }
     }
 
-    pub fn cursor_item<'a, U>(&self, state: &web::Data<State>, values: &'a [U]) -> Option<&'a U> {
-        if values.len() > self.page_size(state) {
-            values.last()
+    pub fn db_pagination(self, state: &web::Data<State>) -> CursorPagination<C> {
+        let page_size = if let Some(page_size) = self.page_size {
+            std::cmp::min(page_size, MAX_PAGE_SIZE)
         } else {
-            None
-        }
+            state.config.default_page_size
+        };
+        CursorPagination::new(self.cursor, page_size)
     }
 }
 
@@ -69,17 +73,13 @@ pub struct OffsetPaginationRequest {
 }
 
 impl OffsetPaginationRequest {
-    pub fn page_size(&self, state: &web::Data<State>) -> usize {
-        if let Some(page_size) = self.page_size {
+    pub fn db_pagination(&self, state: &web::Data<State>) -> OffsetPagination {
+        let page = self.page;
+        let page_size = if let Some(page_size) = self.page_size {
             std::cmp::min(page_size, MAX_PAGE_SIZE)
         } else {
             state.config.default_page_size
-        }
-    }
-
-    pub fn db_pagination(&self, state: &web::Data<State>) -> OffsetPagination {
-        let page = self.page;
-        let page_size = self.page_size(state);
+        };
         OffsetPagination::new(page, page_size)
     }
 }

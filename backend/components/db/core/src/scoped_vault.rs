@@ -1,15 +1,17 @@
 use crate::models::scoped_vault::ScopedVault;
 use crate::models::scoped_vault::ScopedVaultIdentifier;
 use crate::models::vault::Vault;
+use crate::ComputeCursor;
+use crate::CursorPaginatedResult;
+use crate::CursorPagination;
 use crate::PgConn;
 use api_errors::FpDbOptionalExtension;
 use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
+use db_schema::schema;
+use db_schema::schema::scoped_vault;
 use db_schema::schema::vault;
-use db_schema::schema::{
-    self,
-};
 use diesel::dsl::exists;
 use diesel::dsl::not;
 use diesel::prelude::*;
@@ -25,8 +27,10 @@ use newtypes::PiiString;
 use newtypes::ScopedVaultCursor;
 use newtypes::ScopedVaultCursorKind;
 use newtypes::ScopedVaultId;
+use newtypes::ScopedVaultOrderingId;
 use newtypes::TagKind;
 use newtypes::TenantId;
+use newtypes::TimestampCursor;
 use newtypes::VaultKind;
 use newtypes::WatchlistCheckStatusKind;
 use newtypes::WorkflowKind;
@@ -340,42 +344,46 @@ fn vaults_matching_search(
     Ok(all_ids)
 }
 
+type SvListResult<TCursor> = CursorPaginatedResult<(ScopedVault, Vault), TCursor>;
+
 #[instrument("ScopedVault::list", skip_all)]
-fn list(
+fn list<TCursor>(
     conn: &mut PgConn,
     params: &ScopedVaultListQueryParams<Vec<ScopedVaultId>>,
-    cursor: Option<ScopedVaultCursor>,
-    order_by: ScopedVaultCursorKind,
-    page_size: i64,
-) -> FpResult<Vec<(ScopedVault, Vault)>> {
+    pagination: CursorPagination<TCursor>,
+) -> FpResult<SvListResult<TCursor>>
+where
+    TCursor: ScopedVaultCursorTrait,
+    (ScopedVault, Vault): ComputeCursor<TCursor>,
+{
     let query = list_query!(params);
 
-    let mut scoped_vaults = query.inner_join(vault::table).limit(page_size);
+    let mut scoped_vaults = query.inner_join(vault::table).limit(pagination.limit());
 
-    if let Some(cursor) = cursor {
-        match cursor {
+    if let Some(cursor) = pagination.cursor.clone() {
+        match cursor.into() {
             ScopedVaultCursor::OrderingId(c) => {
-                scoped_vaults = scoped_vaults.filter(schema::scoped_vault::ordering_id.le(c))
+                scoped_vaults = scoped_vaults.filter(scoped_vault::ordering_id.le(c));
             }
             ScopedVaultCursor::LastActivityAt(c) => {
-                scoped_vaults = scoped_vaults.filter(schema::scoped_vault::last_activity_at.le(c))
+                scoped_vaults = scoped_vaults.filter(scoped_vault::last_activity_at.le(c.0));
             }
         }
     }
 
-    match order_by {
+    match TCursor::cursor_kind() {
         ScopedVaultCursorKind::OrderingId => {
-            scoped_vaults = scoped_vaults.order_by(schema::scoped_vault::ordering_id.desc())
+            scoped_vaults = scoped_vaults.order_by(scoped_vault::ordering_id.desc());
         }
         ScopedVaultCursorKind::LastActivityAt => {
-            scoped_vaults = scoped_vaults.order_by(schema::scoped_vault::last_activity_at.desc())
+            scoped_vaults = scoped_vaults.order_by(scoped_vault::last_activity_at.desc());
         }
     }
 
     let results = scoped_vaults
         .select((schema::scoped_vault::all_columns, schema::vault::all_columns))
         .get_results(conn)?;
-    Ok(results)
+    Ok(pagination.results(results))
 }
 
 #[instrument("ScopedVault::count_for_tenant", skip_all)]
@@ -389,16 +397,48 @@ pub fn count_for_tenant(conn: &mut PgConn, params: ScopedVaultListQueryParams) -
 /// count of results and the results themselves - this util saves and reuses some intermediate
 /// computation
 #[instrument("ScopedVault::list_and_count_authorized_for_tenant", skip_all)]
-pub fn list_and_count_authorized_for_tenant(
+pub fn list_and_count_authorized_for_tenant<TCursor>(
     conn: &mut PgConn,
     params: ScopedVaultListQueryParams,
-    cursor: Option<ScopedVaultCursor>,
-    order_by: ScopedVaultCursorKind,
-    page_size: i64,
-) -> FpResult<(Vec<(ScopedVault, Vault)>, i64)> {
+    pagination: CursorPagination<TCursor>,
+) -> FpResult<(SvListResult<TCursor>, i64)>
+where
+    TCursor: ScopedVaultCursorTrait,
+    (ScopedVault, Vault): ComputeCursor<TCursor>,
+{
     let params = &params.map_search(conn)?;
 
-    let results = list(conn, params, cursor, order_by, page_size)?;
+    let results = list(conn, params, pagination)?;
     let count = list_query!(params).count().get_result(conn)?;
     Ok((results, count))
+}
+
+impl ComputeCursor<ScopedVaultOrderingId> for (ScopedVault, Vault) {
+    fn compute_cursor(&self) -> ScopedVaultOrderingId {
+        self.0.ordering_id
+    }
+}
+
+impl ComputeCursor<TimestampCursor> for (ScopedVault, Vault) {
+    fn compute_cursor(&self) -> TimestampCursor {
+        TimestampCursor(self.0.last_activity_at)
+    }
+}
+
+// Some fluff to support cursor pagination utils when there are multiple possible cursor types
+
+trait ScopedVaultCursorTrait: Into<ScopedVaultCursor> + Clone {
+    fn cursor_kind() -> ScopedVaultCursorKind;
+}
+
+impl ScopedVaultCursorTrait for ScopedVaultOrderingId {
+    fn cursor_kind() -> ScopedVaultCursorKind {
+        ScopedVaultCursorKind::OrderingId
+    }
+}
+
+impl ScopedVaultCursorTrait for TimestampCursor {
+    fn cursor_kind() -> ScopedVaultCursorKind {
+        ScopedVaultCursorKind::LastActivityAt
+    }
 }

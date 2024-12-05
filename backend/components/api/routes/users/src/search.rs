@@ -13,8 +13,6 @@ use api_wire_types::SearchUsersRequest;
 use db::scoped_vault::ScopedVaultListQueryParams;
 use newtypes::preview_api;
 use newtypes::PiiString;
-use newtypes::ScopedVaultCursor;
-use newtypes::ScopedVaultCursorKind;
 use newtypes::ScopedVaultOrderingId;
 use newtypes::TimestampCursor;
 use newtypes::VaultKind;
@@ -37,6 +35,7 @@ pub async fn get(
 ) -> CursorPaginatedResponse<api_wire_types::LiteUser, ScopedVaultOrderingId> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
+    let pagination = pagination.into_inner();
     let SearchUsersRequest { search, external_id } = request.into_inner();
     let has_search = search.is_some();
 
@@ -51,14 +50,12 @@ pub async fn get(
         external_id,
         ..ScopedVaultListQueryParams::default()
     };
-    let cursor = pagination.cursor;
-    let page_size = pagination.page_size(&state);
 
     // We're changing the kind of pagination we're using in `GET /entities`. But it's hard to
     // change for `GET /users` if anyone is using pagination since this API is tenant-facing.
     // Going to start logging to see if anyone is using it
     // Also changing whether we accept the search querystring, so jam that into the meta as well
-    let meta = match (&cursor, has_search) {
+    let meta = match (pagination.cursor.as_ref(), has_search) {
         (Some(_), true) => "with_cursor,with_search",
         (Some(_), false) => "with_cursor,without_search",
         (None, true) => "without_cursor,with_search",
@@ -68,22 +65,15 @@ pub async fn get(
     tracing::info!(%meta, "GET /users meta");
     root_span.record("meta", meta);
 
-    let (svs, count) = state
+    let pagination = pagination.db_pagination(&state);
+    let ((svs, next_cursor), count) = state
         .db_query(move |conn| {
-            let page_size = (page_size + 1) as i64;
-            let cursor = cursor.map(ScopedVaultCursor::OrderingId);
-            let order_by = ScopedVaultCursorKind::OrderingId;
-            let (svs, count) = db::scoped_vault::list_and_count_authorized_for_tenant(
-                conn, params, cursor, order_by, page_size,
-            )?;
-            Ok((svs, count))
+            db::scoped_vault::list_and_count_authorized_for_tenant(conn, params, pagination)
         })
         .await?;
 
-    let cursor = pagination.cursor_item(&state, &svs).map(|(sv, _)| sv.ordering_id);
-
     let results = svs.into_iter().map(api_wire_types::LiteUser::from_db).collect();
-    CursorPaginatedResponseInner::ok(results, page_size, cursor, Some(count))
+    CursorPaginatedResponseInner::ok(results, next_cursor, Some(count))
 }
 
 #[derive(serde::Deserialize, paperclip::actix::Apiv2Schema)]
@@ -117,24 +107,14 @@ pub async fn post_search(
         external_id: None,
         ..ScopedVaultListQueryParams::default()
     };
-    let cursor = pagination.cursor.as_ref().map(|c| c.into());
-    let page_size = pagination.page_size(&state);
+    let pagination = pagination.db_pagination(&state);
 
-    let (svs, count) = state
+    let ((svs, next_cursor), count) = state
         .db_query(move |conn| {
-            let page_size = (page_size + 1) as i64;
-            let order_by = ScopedVaultCursorKind::LastActivityAt;
-            let (svs, count) = db::scoped_vault::list_and_count_authorized_for_tenant(
-                conn, params, cursor, order_by, page_size,
-            )?;
-            Ok((svs, count))
+            db::scoped_vault::list_and_count_authorized_for_tenant(conn, params, pagination)
         })
         .await?;
 
-    let cursor = pagination
-        .cursor_item(&state, &svs)
-        .map(|(sv, _)| TimestampCursor(sv.last_activity_at));
-
     let results = svs.into_iter().map(api_wire_types::LiteUser::from_db).collect();
-    CursorPaginatedResponseInner::ok(results, page_size, cursor, Some(count))
+    CursorPaginatedResponseInner::ok(results, next_cursor, Some(count))
 }

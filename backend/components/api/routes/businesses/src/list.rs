@@ -9,8 +9,6 @@ use api_core::utils::db2api::DbToApi;
 use api_wire_types::ModernSearchRequest;
 use db::scoped_vault::ScopedVaultListQueryParams;
 use newtypes::preview_api;
-use newtypes::ScopedVaultCursor;
-use newtypes::ScopedVaultCursorKind;
 use newtypes::ScopedVaultOrderingId;
 use newtypes::VaultKind;
 use paperclip::actix::api_v2_operation;
@@ -42,22 +40,14 @@ pub async fn get(
         external_id,
         ..ScopedVaultListQueryParams::default()
     };
-    let cursor = pagination.cursor;
-    let page_size = pagination.page_size(&state);
 
-    let (svs, count) = state
+    let pagination = pagination.into_inner().db_pagination(&state);
+    let ((svs, next_cursor), count) = state
         .db_query(move |conn| {
-            let page_size = (page_size + 1) as i64;
-            let cursor = cursor.map(ScopedVaultCursor::OrderingId);
-            let order_by = ScopedVaultCursorKind::OrderingId;
-            let (svs, count) = db::scoped_vault::list_and_count_authorized_for_tenant(
-                conn, params, cursor, order_by, page_size,
-            )?;
-            Ok((svs, count))
+            db::scoped_vault::list_and_count_authorized_for_tenant(conn, params, pagination)
         })
         .await?;
 
-    let cursor = pagination.cursor_item(&state, &svs).map(|(sv, _)| sv.ordering_id);
     let results = svs.into_iter().map(api_wire_types::LiteUser::from_db).collect();
-    CursorPaginatedResponseInner::ok(results, page_size, cursor, Some(count))
+    CursorPaginatedResponseInner::ok(results, next_cursor, Some(count))
 }
