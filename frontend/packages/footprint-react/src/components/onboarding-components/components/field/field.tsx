@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import cx from 'classnames';
+import { cx } from 'class-variance-authority';
 import type { HTMLAttributes } from 'react';
 import type React from 'react';
 import { useId, useMemo } from 'react';

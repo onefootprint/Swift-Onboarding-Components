@@ -10,9 +10,7 @@
   "style": "./dist/footprint-react.css",
   "sideEffects": false,
   "license": "MIT",
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "scripts": {
     "build": "tsup",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
@@ -36,7 +34,6 @@
     "@onefootprint/types": "workspace:*",
     "@testing-library/react": "^14.2.1",
     "@testing-library/user-event": "^14.5.2",
-    "@types/classnames": "^2.3.1",
     "@types/cleave.js": "^1.4.6",
     "@types/lodash": "^4.14.202",
     "@types/react": "^18",
@@ -53,7 +50,6 @@
     "typescript": "^5.6.3"
   },
   "dependencies": {
-    "classnames": "^2.5.1",
     "cleave.js": "https://github.com/3runo/cleave.js.git#8b5392cd87f19d200da68143f0ce81676b1733f9",
     "csstype": "^3.1.2",
     "i18next": "^23.16.0",

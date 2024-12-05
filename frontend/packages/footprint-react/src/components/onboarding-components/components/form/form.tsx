@@ -1,5 +1,5 @@
 /* eslint-FormValuessable react/jsx-props-no-spreading */
-import cx from 'classnames';
+import { cx } from 'class-variance-authority';
 import type { FormHTMLAttributes } from 'react';
 import type React from 'react';
 import { type FieldErrors, FormProvider, type UseFormSetFocus, type UseFormSetValue, useForm } from 'react-hook-form';

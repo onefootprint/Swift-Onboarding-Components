@@ -1933,9 +1933,6 @@ importers:
       class-variance-authority:
         specifier: ^0.7.0
         version: 0.7.0
-      classnames:
-        specifier: ^2.5.1
-        version: 2.5.1
       cleave.js:
         specifier: https://github.com/3runo/cleave.js.git#8b5392cd87f19d200da68143f0ce81676b1733f9
         version: github.com/3runo/cleave.js/8b5392cd87f19d200da68143f0ce81676b1733f9
@@ -1994,9 +1991,6 @@ importers:
       '@testing-library/user-event':
         specifier: ^14.5.2
         version: 14.5.2(@testing-library/dom@8.20.0)
-      '@types/classnames':
-        specifier: ^2.3.1
-        version: 2.3.1
       '@types/cleave.js':
         specifier: ^1.4.6
         version: 1.4.7
@@ -11643,13 +11637,6 @@ packages:
     resolution: {integrity: sha512-hWtVTC2q7hc7xZ/RLbxapMvDMgUnDvKvMOpKal4DrMyfGBUfB1oKaZlIRr6mJL+If3bAP6sV/QneGzF6tJjZDg==}
     dev: true
 
-  /@types/classnames@2.3.1:
-    resolution: {integrity: sha512-zeOWb0JGBoVmlQoznvqXbE0tEC/HONsnoUNH19Hc96NFsTAwTXbTqb8FMYkru1F/iqp7a18Ws3nWJvtA1sHD1A==}
-    deprecated: This is a stub types definition. classnames provides its own type definitions, so you do not need this installed.
-    dependencies:
-      classnames: 2.5.1
-    dev: true
-
   /@types/cleave.js@1.4.7:
     resolution: {integrity: sha512-0MatQhFMEsOWOjfY06z7Ez+84dWJFXWsqGRsZn+dxcZ8FqZbHftP4g4NIdpZmPm5I7RWmjDmrF5wtg99TVCgQA==}
     dependencies:
@@ -13387,9 +13374,6 @@ packages:
     dependencies:
       clsx: 2.0.0
     dev: false
-
-  /classnames@2.5.1:
-    resolution: {integrity: sha512-saHYOzhIQs6wy2sVxTM6bUDsQO4F50V9RQ22qBpEdCW+I+/Wmke2HOl6lS6dTpdxVhb88/I6+Hs+438c3lfUow==}
 
   /clean-css@5.3.2:
     resolution: {integrity: sha512-JVJbM+f3d3Q704rF4bqQ5UUyTtuJ0JRKNbTKVEeujCCBoMdkEi+V+e8oktO9qGQNSvHrFTM6JZRXrUvGR1czww==}

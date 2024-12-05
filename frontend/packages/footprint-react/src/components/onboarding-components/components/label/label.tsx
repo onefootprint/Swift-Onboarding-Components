@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import cx from 'classnames';
+import { cx } from 'class-variance-authority';
 import type { LabelHTMLAttributes } from 'react';
 import { useContext } from 'react';
 

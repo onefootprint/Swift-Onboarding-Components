@@ -1,4 +1,4 @@
-import cx from 'classnames';
+import { cx } from 'class-variance-authority';
 import type { InputHTMLAttributes } from 'react';
 import { forwardRef, useId } from 'react';
 
