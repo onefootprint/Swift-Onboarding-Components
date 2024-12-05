@@ -14,8 +14,8 @@ import getStepperValue from './utils/get-stepper-value';
 import { getInitialValues, reducer } from './utils/reducer';
 
 import useCreatePlaybook from '../../hooks/use-create-playbook';
+import useCreatePlaybookVersion from '../../hooks/use-create-playbook-version';
 import { useDialogButtons } from '../../hooks/use-dialog-buttons';
-import useUpdatePlaybook from '../../hooks/use-update-playbook';
 import NameStep from '../name-step';
 import RequiredAuthMethodsStep from '../required-auth-methods-step';
 import StepperContainer from '../stepper-container';
@@ -31,7 +31,7 @@ const KybFlow = ({ onBack, onDone, playbook }: KybFlowProps) => {
   const initialState = useMemo(() => getInitialValues(playbook), [playbook]);
   const [state, dispatch] = useReducer(reducer, initialState);
   const createMutation = useCreatePlaybook();
-  const updateMutation = useUpdatePlaybook();
+  const createVersionMutation = useCreatePlaybookVersion();
   const dialogButtons = useDialogButtons();
   const isEditing = !!playbook;
   const options = useOptions(playbook);
@@ -160,7 +160,7 @@ const KybFlow = ({ onBack, onDone, playbook }: KybFlowProps) => {
             dialogButtons.resetWithBackButton();
           }}
           onSubmit={() => {
-            updateMutation.mutate(
+            createVersionMutation.mutate(
               {
                 body: {
                   expectedLatestObcId: playbook.id,
