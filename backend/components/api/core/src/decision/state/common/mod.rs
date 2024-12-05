@@ -334,6 +334,7 @@ pub async fn run_samba_if_needed(
     };
 
     tokio::spawn(async move {
+        let wf_id = wf.id.clone();
         match create_order::run_samba_create_order(
             &s2,
             create_order::CreateOrderContext::Workflow { di, wf_id: wf.id },
@@ -343,7 +344,7 @@ pub async fn run_samba_if_needed(
         .await
         {
             Ok(_) => (),
-            Err(e) => tracing::error!(?e, "error running samba create order"),
+            Err(e) => tracing::error!(?e, ?wf_id, "error running samba create order"),
         }
     });
 
