@@ -37,6 +37,7 @@ use newtypes::IdempotencyId;
 use newtypes::Locked;
 use newtypes::OnboardingStatus;
 use newtypes::ScopedVaultId;
+use newtypes::ScopedVaultOrderingId;
 use newtypes::TenantId;
 use newtypes::UserSpecificWebhookKind;
 use newtypes::UserSpecificWebhookPayload;
@@ -49,7 +50,7 @@ use std::collections::HashMap;
 /// Creates a unique identifier specific to each onboarding configuration.
 /// This allows one user to onboard onto multiple onboarding configurations at the same tenant
 /// while keeping information for each onboarding separate.
-#[derive(Debug, Clone, Queryable, Insertable, Eq, PartialEq)]
+#[derive(Debug, Clone, Queryable, Eq, PartialEq)]
 #[diesel(table_name = scoped_vault)]
 pub struct ScopedVault {
     pub id: ScopedVaultId,
@@ -58,7 +59,7 @@ pub struct ScopedVault {
     pub tenant_id: TenantId,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    pub ordering_id: i64,
+    pub ordering_id: ScopedVaultOrderingId,
     pub start_timestamp: DateTime<Utc>,
     /// Denormalized from the user vault just to make querying easier
     pub is_live: bool,

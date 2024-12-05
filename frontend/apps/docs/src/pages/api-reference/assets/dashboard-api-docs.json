@@ -12768,7 +12768,8 @@
                     "name_ssn4",
                     "dob_ssn4",
                     "bank_routing_account",
-                    "card_number_cvc"
+                    "card_number_cvc",
+                    "identity_document_number"
                 ]
             },
             "Dupes": {
@@ -13619,6 +13620,9 @@
                     "affiliated_with_broker_or_finra",
                     "visa_is_other",
                     "visa_expired_or_expiring_soon",
+                    "strong_connection_to_labeled_fraud",
+                    "medium_connection_to_labeled_fraud",
+                    "user_is_labeled_fraud",
                     "business_name_match",
                     "business_name_similar_match",
                     "business_name_alternate_match",
@@ -18316,7 +18320,9 @@
                     "aml",
                     "behavior",
                     "phone",
-                    "synthetic"
+                    "synthetic",
+                    "duplicates",
+                    "user"
                 ]
             },
             "Rule": {

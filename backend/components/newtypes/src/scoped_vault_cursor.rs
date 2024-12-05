@@ -1,3 +1,4 @@
+use crate::ScopedVaultOrderingId;
 use chrono::serde::ts_nanoseconds;
 use chrono::DateTime;
 use chrono::Utc;
@@ -14,7 +15,7 @@ use strum_macros::EnumString;
 #[strum_discriminants(vis(pub))]
 pub enum ScopedVaultCursor {
     #[strum_discriminants(default)]
-    OrderingId(i64),
+    OrderingId(ScopedVaultOrderingId),
     /// Note: we're cutting a little corner here - when using cursor pagination, the cursors must
     /// be unique or you could see duplicate results in the pages.
     /// Sadly, these timestamps are not unique. But it's difficult to have a last_activity_at

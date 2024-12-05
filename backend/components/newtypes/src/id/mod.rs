@@ -1,6 +1,5 @@
 mod alias;
 mod basic;
-mod data_lifetime;
 mod external_id;
 mod prefix;
 mod sandbox_id;
@@ -8,7 +7,6 @@ mod scoped_vault_version_number;
 mod tenant_utils;
 pub use self::alias::*;
 pub use self::basic::*;
-pub use self::data_lifetime::*;
 pub use self::external_id::*;
 pub use self::sandbox_id::*;
 pub use self::scoped_vault_version_number::*;
@@ -91,6 +89,69 @@ macro_rules! define_newtype_id {
 }
 
 use define_newtype_id;
+
+macro_rules! define_newtype_int {
+    ($name: ident, $type: ty) => {
+        #[derive(
+            Debug,
+            Clone,
+            Copy,
+            Hash,
+            PartialEq,
+            Eq,
+            Ord,
+            PartialOrd,
+            derive_more::Display,
+            derive_more::From,
+            derive_more::Into,
+            derive_more::FromStr,
+            serde::Serialize,
+            serde::Deserialize,
+            Default,
+            diesel::expression::AsExpression,
+            diesel::deserialize::FromSqlRow,
+        )]
+        #[serde(transparent)]
+        #[diesel(sql_type = diesel::sql_types::BigInt)]
+        pub struct $name(pub(in crate::id) $type);
+
+        impl<DB> diesel::serialize::ToSql<diesel::sql_types::BigInt, DB> for $name
+        where
+            DB: diesel::backend::Backend,
+            i64: diesel::serialize::ToSql<diesel::sql_types::BigInt, DB>,
+        {
+            fn to_sql<'b>(
+                &'b self,
+                out: &mut diesel::serialize::Output<'b, '_, DB>,
+            ) -> diesel::serialize::Result {
+                self.0.to_sql(out)
+            }
+        }
+
+        impl<DB> diesel::deserialize::FromSql<diesel::sql_types::BigInt, DB> for $name
+        where
+            DB: diesel::backend::Backend,
+            i64: diesel::deserialize::FromSql<diesel::sql_types::BigInt, DB>,
+        {
+            fn from_sql(bytes: DB::RawValue<'_>) -> diesel::deserialize::Result<Self> {
+                Ok(Self::from(i64::from_sql(bytes)?))
+            }
+        }
+
+        impl paperclip::v2::schema::TypedData for $name {
+            fn data_type() -> paperclip::v2::models::DataType {
+                paperclip::v2::models::DataType::Integer
+            }
+
+            fn format() -> Option<paperclip::v2::models::DataTypeFormat> {
+                Some(paperclip::v2::models::DataTypeFormat::Int64)
+            }
+        }
+    };
+}
+
+use define_newtype_int;
+
 
 /// A trait that enables an id to verify its prefix
 pub trait PrefixId: From<String> {

@@ -378,19 +378,6 @@ fn list(
     Ok(results)
 }
 
-/// lists all scoped_vaults across all configurations
-#[instrument("ScopedVault::list_authorized_for_tenant", skip_all)]
-pub fn list_authorized_for_tenant(
-    conn: &mut PgConn,
-    params: ScopedVaultListQueryParams,
-    cursor: Option<i64>,
-    page_size: i64,
-) -> FpResult<Vec<(ScopedVault, Vault)>> {
-    let params = &params.map_search(conn)?;
-    let cursor = cursor.map(ScopedVaultCursor::OrderingId);
-    list(conn, params, cursor, ScopedVaultCursorKind::OrderingId, page_size)
-}
-
 #[instrument("ScopedVault::count_for_tenant", skip_all)]
 pub fn count_for_tenant(conn: &mut PgConn, params: ScopedVaultListQueryParams) -> FpResult<i64> {
     let params = &params.map_search(conn)?;

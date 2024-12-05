@@ -15,6 +15,7 @@ use newtypes::OnboardingStatus;
 use newtypes::PiiString;
 use newtypes::SandboxId;
 use newtypes::ScopedVaultId;
+use newtypes::ScopedVaultOrderingId;
 use newtypes::TenantId;
 use newtypes::VaultId;
 use newtypes::VaultKind;
@@ -42,7 +43,7 @@ pub struct Entity {
     pub kind: VaultKind,
     pub start_timestamp: DateTime<Utc>,
     pub watchlist_check: Option<WatchlistCheck>,
-    pub ordering_id: i64,
+    pub ordering_id: ScopedVaultOrderingId,
     // These are a representation of the associated workflows
     pub status: EntityStatus,
     pub requires_manual_review: bool,

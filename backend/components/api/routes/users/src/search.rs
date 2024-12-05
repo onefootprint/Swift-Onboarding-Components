@@ -15,6 +15,7 @@ use newtypes::preview_api;
 use newtypes::PiiString;
 use newtypes::ScopedVaultCursor;
 use newtypes::ScopedVaultCursorKind;
+use newtypes::ScopedVaultOrderingId;
 use newtypes::TimestampCursor;
 use newtypes::VaultKind;
 use paperclip::actix::api_v2_operation;
@@ -29,11 +30,11 @@ use paperclip::actix::web;
 #[get("/users")]
 pub async fn get(
     state: web::Data<State>,
-    pagination: web::Query<CursorPaginationRequest<i64>>,
+    pagination: web::Query<CursorPaginationRequest<ScopedVaultOrderingId>>,
     request: web::Query<SearchUsersRequest>,
     auth: TenantApiKeyGated<preview_api::LegacyListUsersBusinesses>,
     root_span: RootSpan,
-) -> CursorPaginatedResponse<api_wire_types::LiteUser, i64> {
+) -> CursorPaginatedResponse<api_wire_types::LiteUser, ScopedVaultOrderingId> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
     let SearchUsersRequest { search, external_id } = request.into_inner();

@@ -11,6 +11,7 @@ use db::scoped_vault::ScopedVaultListQueryParams;
 use newtypes::preview_api;
 use newtypes::ScopedVaultCursor;
 use newtypes::ScopedVaultCursorKind;
+use newtypes::ScopedVaultOrderingId;
 use newtypes::VaultKind;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
@@ -23,10 +24,10 @@ use paperclip::actix::web;
 #[get("/businesses")]
 pub async fn get(
     state: web::Data<State>,
-    pagination: web::Query<CursorPaginationRequest<i64>>,
+    pagination: web::Query<CursorPaginationRequest<ScopedVaultOrderingId>>,
     request: web::Query<ModernSearchRequest>,
     auth: TenantApiKeyGated<preview_api::LegacyListUsersBusinesses>,
-) -> CursorPaginatedResponse<api_wire_types::LiteUser, i64> {
+) -> CursorPaginatedResponse<api_wire_types::LiteUser, ScopedVaultOrderingId> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
     let ModernSearchRequest { external_id } = request.into_inner();
