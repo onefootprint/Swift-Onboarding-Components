@@ -19,12 +19,11 @@ def test_historical_data(sandbox_tenant):
 
     # Then, look at data at the earliest timeline event where phone and email were added
     timeline = get(f"entities/{user.fp_id}/timeline", None, *sandbox_tenant.db_auths)
-    timeline.reverse()
 
     # Iterate through the timeline in time asc and keep track of all seen identifiers.
     # At the seqno of a given timeline event, we should see all data added up to that point.
     all_seen_dis = set()
-    for te in timeline:
+    for te in reversed(timeline["data"]):
         if te["event"]["kind"] != "data_collected":
             continue
         all_seen_dis.update(te["event"]["data"]["targets"])
@@ -45,7 +44,7 @@ def test_historical_data(sandbox_tenant):
     }
 
     # Then, look at earliest seqno, should be missing phone and email
-    data = dict(seqno=timeline[0]["seqno"] - 100)
+    data = dict(seqno=timeline["data"][0]["seqno"] - 100)
     body = get(f"entities/{user.fp_id}/data", data, *sandbox_tenant.db_auths)
     dis = set(i["identifier"] for i in body)
     assert not dis, "Should no longer have any data"
@@ -78,7 +77,8 @@ def test_historical_documents(sandbox_tenant, must_collect_data):
         files=open_multipart_file("drivers_license.front.jpg", "image/jpg")(),
     )
 
-    timeline = get(f"entities/{user.fp_id}/timeline", None, *sandbox_tenant.db_auths)
+    body = get(f"entities/{user.fp_id}/timeline", None, *sandbox_tenant.db_auths)
+    timeline = body["data"]
 
     dl_uploaded_event = next(
         te
@@ -143,14 +143,14 @@ def test_historical_risk_signals(sandbox_tenant):
     timeline = get(f"entities/{user.fp_id}/timeline", None, *sandbox_tenant.db_auths)
 
     # First even should have no risk signals
-    first_event = timeline[-1]
+    first_event = timeline["data"][-1]
     data = dict(seqno=first_event["seqno"])
     body = get(f"entities/{user.fp_id}/risk_signals", data, *sandbox_tenant.db_auths)
     assert not body, "Should not have risk signals at first timeline event"
 
     # Event with decision should have risk signals
     decision_event = next(
-        te for te in timeline if te["event"]["kind"] == "onboarding_decision"
+        te for te in timeline["data"] if te["event"]["kind"] == "onboarding_decision"
     )
     data = dict(seqno=decision_event["seqno"])
     body = get(f"entities/{user.fp_id}/risk_signals", data, *sandbox_tenant.db_auths)

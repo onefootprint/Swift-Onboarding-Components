@@ -82,12 +82,14 @@ def test_prefill_timeline_events(
     foo_fp_id = dual_onboarded_user.foo_fp_id
 
     body = get(f"entities/{fp_id}/timeline", None, *sandbox_tenant.db_auths)
-    assert body
+    assert body["data"]
 
     # There should be two timeline events showing data was prefilled into the new tenant.
     # The first event shows the contact info being prefilled, and the second shows the data
     body = get(f"entities/{foo_fp_id}/timeline", None, *foo_sandbox_tenant.db_auths)
-    collect_data_events = [i for i in body if i["event"]["kind"] == "data_collected"]
+    collect_data_events = [
+        i for i in body["data"] if i["event"]["kind"] == "data_collected"
+    ]
     assert len(collect_data_events) == 2
     assert all(e["event"]["data"]["is_prefill"] for e in collect_data_events)
     assert set(collect_data_events[1]["event"]["data"]["attributes"]) == {

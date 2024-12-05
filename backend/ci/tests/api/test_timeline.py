@@ -14,11 +14,11 @@ def test_timeline_data_added(sandbox_tenant):
 
     body = get(f"entities/{fp_id}/timeline", None, *sandbox_tenant.db_auths)
     vault_created_event = next(
-        i["event"] for i in body if i["event"]["kind"] == "vault_created"
+        i["event"] for i in body["data"] if i["event"]["kind"] == "vault_created"
     )
     assert vault_created_event["data"]["actor"]["id"] == sandbox_tenant.sk.id
     data_collected_events = [
-        i["event"] for i in body if i["event"]["kind"] == "data_collected"
+        i["event"] for i in body["data"] if i["event"]["kind"] == "data_collected"
     ]
     assert len(data_collected_events) == 2
     assert set(data_collected_events[1]["data"]["attributes"]) == {"ssn9", "us_tax_id"}

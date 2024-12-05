@@ -22,7 +22,7 @@ def send_trigger(fp_id, sandbox_tenant, trigger, **kwargs):
     # Grab the trigger ID from the timeline
     body = get(f"entities/{fp_id}/timeline", None, *sandbox_tenant.db_auths)
     trigger_event = next(
-        i["event"] for i in body if i["event"]["kind"] == "workflow_triggered"
+        i["event"] for i in body["data"] if i["event"]["kind"] == "workflow_triggered"
     )
     assert trigger_event["data"]["request_is_active"]
     assert trigger_event["data"]["actor"]["kind"] == "organization"
@@ -58,7 +58,7 @@ def complete_redo_flow_user(user, auth_token, pre_run=None):
 def complete_redo_flow(auth_token, fp_id, obc, sandbox_id, pre_run=None):
     tenant = obc.tenant
     timeline = get(f"entities/{fp_id}/timeline", None, *tenant.db_auths)
-    obds = [i for i in timeline if i["event"]["kind"] == "onboarding_decision"]
+    obds = [i for i in timeline["data"] if i["event"]["kind"] == "onboarding_decision"]
     initial_num_obds = len(obds)
 
     # Re-run Bifrost with the token, optionally with any pre_run assertion checks
@@ -82,10 +82,10 @@ def complete_redo_flow(auth_token, fp_id, obc, sandbox_id, pre_run=None):
     # Verify the timeline events are updated
     body = get(f"entities/{fp_id}/timeline", None, *tenant.db_auths)
     trigger_event = next(
-        i["event"] for i in body if i["event"]["kind"] == "workflow_triggered"
+        i["event"] for i in body["data"] if i["event"]["kind"] == "workflow_triggered"
     )
     assert not trigger_event["data"]["request_is_active"]
-    obds = [i for i in body if i["event"]["kind"] == "onboarding_decision"]
+    obds = [i for i in body["data"] if i["event"]["kind"] == "onboarding_decision"]
     assert len(obds) == initial_num_obds + 1
     return user
 
@@ -129,7 +129,7 @@ def test_onboard_non_portable_document(sandbox_tenant, doc_first_obc):
     complete_redo_flow(initial_auth_token, fp_id, obc, sandbox_id, pre_run)
 
     body = get(f"entities/{fp_id}/timeline", None, *sandbox_tenant.db_auths)
-    docs = [i for i in body if i["event"]["kind"] == "document_uploaded"]
+    docs = [i for i in body["data"] if i["event"]["kind"] == "document_uploaded"]
     assert len(docs) == 1
 
     users_docs = get(f"users/{fp_id}/documents", None, sandbox_tenant.sk.key)
@@ -169,11 +169,11 @@ def test_retrigger_onboard(sandbox_tenant):
     # Verify we made a new timeline event
     body = get(f"entities/{fp_id}/timeline", None, *sandbox_tenant.db_auths)
     trigger_event = next(
-        i["event"] for i in body if i["event"]["kind"] == "workflow_triggered"
+        i["event"] for i in body["data"] if i["event"]["kind"] == "workflow_triggered"
     )
     assert not trigger_event["data"]["request_is_active"]
     assert trigger_event["data"]["config"]["data"]["playbook_id"] == obc.id
-    obds = [i for i in body if i["event"]["kind"] == "onboarding_decision"]
+    obds = [i for i in body["data"] if i["event"]["kind"] == "onboarding_decision"]
     assert len(obds) == 2
     obd = obds[0]
     assert obd["event"]["data"]["decision"]["ob_configuration"]["id"] == obc.id

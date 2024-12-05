@@ -45,7 +45,7 @@ def test_no_bos(obc, sandbox_tenant, sandbox_outcome):
 
     # confirm OBD timeline event created
     timeline = get(f"entities/{fp_bid}/timeline", None, *sandbox_tenant.db_auths)
-    obds = [i for i in timeline if i["event"]["kind"] == "onboarding_decision"]
+    obds = [i for i in timeline["data"] if i["event"]["kind"] == "onboarding_decision"]
     assert len(obds) == 1
 
     # Confirm status

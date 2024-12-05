@@ -19,7 +19,7 @@ def test_onboarding_timeline(sandbox_tenant):
     # Check timeline event in dashboard API
     body = get(f"entities/{user.fp_id}/timeline", None, *sandbox_tenant.db_auths)
     event = next(
-        i["event"] for i in body if i["event"]["kind"] == "onboarding_timeline"
+        i["event"] for i in body["data"] if i["event"]["kind"] == "onboarding_timeline"
     )
     assert event["data"]["event"] == "collect-kyc-data.basic-info"
     assert event["data"]["session_id"] == session_id

@@ -120,7 +120,9 @@ def test_custom_document_playbook(sandbox_tenant, must_collect_data):
     # Check the timeline event from uploading the doc
     body = get(f"entities/{user.fp_id}/timeline", None, *sandbox_tenant.db_auths)
     event = next(
-        i["event"]["data"] for i in body if i["event"]["kind"] == "document_uploaded"
+        i["event"]["data"]
+        for i in body["data"]
+        if i["event"]["kind"] == "document_uploaded"
     )
     assert event["config"]["data"]["identifier"] == "document.custom.utility_bill"
     assert event["config"]["data"]["name"] == "Utility bill"

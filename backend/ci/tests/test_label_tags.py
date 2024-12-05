@@ -52,7 +52,9 @@ def test_create_label(sandbox_tenant, is_api):
     # Make sure we have a timeline event for updating the labels
     body = get(f"entities/{user.fp_id}/timeline", None, *sandbox_tenant.db_auths)
     label_events = [
-        i["event"]["data"]["kind"] for i in body if i["event"]["kind"] == "label_added"
+        i["event"]["data"]["kind"]
+        for i in body["data"]
+        if i["event"]["kind"] == "label_added"
     ]
     assert label_events == ["offboard_fraud", "active"]
 

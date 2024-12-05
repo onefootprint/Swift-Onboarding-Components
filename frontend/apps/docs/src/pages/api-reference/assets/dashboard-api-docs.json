@@ -2577,6 +2577,23 @@
                             }
                         },
                         "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "cursor",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page_size",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
                     }
                 ],
                 "responses": {
@@ -2585,10 +2602,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/UserTimeline"
-                                    }
+                                    "$ref": "#/components/schemas/CursorPaginatedUserTimeline"
                                 }
                             }
                         }
@@ -11676,6 +11690,38 @@
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/ListEvent"
+                        }
+                    },
+                    "meta": {
+                        "type": "object",
+                        "properties": {
+                            "count": {
+                                "example": 10000,
+                                "description": "The total number of results.",
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "next": {
+                                "example": 1234,
+                                "description": "The `cursor` parameter to provide in order to request the next page of results.",
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "required": [
+                    "data",
+                    "meta"
+                ]
+            },
+            "CursorPaginatedUserTimeline": {
+                "description": "",
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/UserTimeline"
                         }
                     },
                     "meta": {

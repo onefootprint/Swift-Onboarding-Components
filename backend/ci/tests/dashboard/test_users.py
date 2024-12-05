@@ -177,14 +177,14 @@ def test_timeline(sandbox_user):
         None,
         *sandbox_user.tenant.db_auths,
     )
-    assert any(i["event"]["kind"] == "data_collected" for i in body)
+    assert any(i["event"]["kind"] == "data_collected" for i in body["data"])
     decision_event = next(
-        i for i in body if i["event"]["kind"] == "onboarding_decision"
+        i for i in body["data"] if i["event"]["kind"] == "onboarding_decision"
     )
     assert decision_event["event"]["data"]["decision"]["status"] == "pass"
     assert decision_event["event"]["data"]["decision"]["source"]["kind"] == "footprint"
     workflow_started_event = next(
-        i for i in body if i["event"]["kind"] == "workflow_started"
+        i for i in body["data"] if i["event"]["kind"] == "workflow_started"
     )
     assert (
         workflow_started_event["event"]["data"]["playbook"]["id"]
@@ -197,8 +197,8 @@ def test_timeline(sandbox_user):
         dict(kinds="onboarding_decision"),
         *sandbox_user.tenant.db_auths,
     )
-    assert len(body) == 1
-    assert body[0] == decision_event
+    assert len(body["data"]) == 1
+    assert body["data"][0] == decision_event
 
 
 def test_audit_events_list(sandbox_user):
@@ -282,7 +282,7 @@ def test_override_onboarding_decision(sandbox_user):
     events = get(
         f"entities/{sandbox_user.fp_id}/timeline", event_kinds, *tenant.db_auths
     )
-    event = events[0]["event"]
+    event = events["data"][0]["event"]
     assert event["data"]["decision"]["source"]["kind"] == "footprint"
 
     test_note = "This is a test note. Flerp derp"
@@ -300,7 +300,7 @@ def test_override_onboarding_decision(sandbox_user):
     events = get(
         f"entities/{sandbox_user.fp_id}/timeline", event_kinds, *tenant.db_auths
     )
-    event = events[0]["event"]
+    event = events["data"][0]["event"]
     assert event["data"]["decision"]["source"]["kind"] == "organization"
     assert "@onefootprint.com" in event["data"]["decision"]["source"]["member"]
 
@@ -377,12 +377,12 @@ def test_update_data(sandbox_tenant):
     patch(f"users/{fp_id}/vault", data, *sandbox_tenant.db_auths)
 
     body = get(f"entities/{fp_id}/timeline", None, *sandbox_tenant.db_auths)
-    event = body[0]["event"]
+    event = body["data"][0]["event"]
     assert event["kind"] == "data_collected"
     assert event["data"]["attributes"] == ["name"]
     assert event["data"]["actor"]["kind"] == "organization"
     # And the initial event that added the name
-    event = body[1]["event"]
+    event = body["data"][1]["event"]
     assert event["kind"] == "data_collected"
     assert event["data"]["attributes"] == ["name"]
     assert event["data"]["actor"]["kind"] == "api_key"

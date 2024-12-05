@@ -17,6 +17,9 @@ use crate::actor::SaturatedActor;
 use crate::models::annotation::Annotation;
 use crate::models::liveness_event::LivenessEvent;
 use crate::models::scoped_vault::ScopedVault;
+use crate::ComputeCursor;
+use crate::CursorPaginatedResult;
+use crate::CursorPagination;
 use crate::DbError;
 use crate::PgConn;
 use crate::TxnPgConn;
@@ -141,7 +144,8 @@ impl UserTimeline {
         conn: &mut PgConn,
         scoped_vault_id: T,
         kinds: Vec<DbUserTimelineEventKind>,
-    ) -> FpResult<Vec<UserTimelineInfo>>
+        pagination: CursorPagination<UserTimelineCursor>,
+    ) -> FpResult<CursorPaginatedResult<UserTimelineInfo, UserTimelineCursor>>
     where
         T: Into<ScopedVaultIdentifier<'a>>,
     {
@@ -150,15 +154,20 @@ impl UserTimeline {
         // that belong to an onboarding for this tenant
         let mut query = user_timeline::table
             .filter(user_timeline::scoped_vault_id.eq(&su.id))
+            .order_by((user_timeline::timestamp.desc(), user_timeline::id.desc()))
+            .limit(pagination.limit())
             .into_boxed();
 
         if !kinds.is_empty() {
             query = query.filter(user_timeline::event_kind.eq_any(kinds));
         }
+        if let Some((timestamp, id)) = &pagination.cursor {
+            query = query
+                .filter(user_timeline::timestamp.lt(timestamp))
+                .filter(user_timeline::id.lt(id));
+        }
 
-        let results: Vec<Self> = query
-            .order_by(user_timeline::timestamp.desc())
-            .get_results(conn)?;
+        let results: Vec<Self> = query.get_results(conn)?;
 
         // Batch fetch any related metadata from the source-of-truth business objects
         let decision_ids = results.iter().flat_map(|ut| match ut.event {
@@ -372,7 +381,7 @@ impl UserTimeline {
             })
             .collect::<FpResult<Vec<_>>>()?;
 
-        Ok(results)
+        Ok(pagination.results(results))
     }
 
     #[tracing::instrument("UserTimeline::get_by_event_data_id", skip_all)]
@@ -395,11 +404,20 @@ impl UserTimeline {
     }
 }
 
+pub type UserTimelineCursor = (DateTime<Utc>, UserTimelineId);
+
+impl ComputeCursor<UserTimelineCursor> for UserTimelineInfo {
+    fn compute_cursor(&self) -> UserTimelineCursor {
+        (self.0.timestamp, self.0.id.clone())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::actor::SaturatedActor;
     use crate::tests::prelude::*;
+    use crate::CursorPagination;
     // TODO modernize utils
     use crate::{
         models::tenant_role::{
@@ -478,8 +496,9 @@ mod tests {
         )
         .0;
 
-        let user_timeline_infos =
-            UserTimeline::list(conn, (&scoped_vault.fp_id, &tenant.id, is_live), vec![]).unwrap();
+        let id = (&scoped_vault.fp_id, &tenant.id, is_live);
+        let (user_timeline_infos, _) =
+            UserTimeline::list(conn, id, vec![], CursorPagination::page(10)).unwrap();
 
         assert_eq!(3, user_timeline_infos.len());
 

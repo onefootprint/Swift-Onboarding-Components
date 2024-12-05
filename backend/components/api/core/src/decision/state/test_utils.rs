@@ -1,13 +1,9 @@
 use crate::decision::document::route_handler::complete_non_identity_document;
 use crate::decision::document::route_handler::handle_document_create;
+use crate::decision::tests::test_helpers;
 use crate::decision::tests::test_helpers::FixtureData;
-use crate::decision::tests::test_helpers::{
-    self,
-};
+use crate::decision::vendor;
 use crate::decision::vendor::vendor_trait::MockVendorAPICall;
-use crate::decision::vendor::{
-    self,
-};
 use crate::FpResult;
 use crate::State;
 use api_errors::FpError;
@@ -44,6 +40,7 @@ use db::models::workflow::Workflow;
 use db::models::workflow_event::WorkflowEvent;
 use db::tests::fixtures;
 use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
+use db::CursorPagination;
 use db::TxnPgConn;
 use db_schema::schema::document_request;
 use diesel::prelude::*;
@@ -300,10 +297,11 @@ pub async fn query_timeline_events(
     kinds: Vec<DbUserTimelineEventKind>,
 ) -> Vec<UserTimelineInfo> {
     let svid = sv_id.clone();
-    state
-        .db_query(move |conn| UserTimeline::list(conn, &svid, kinds))
+    let (results, _) = state
+        .db_query(move |conn| UserTimeline::list(conn, &svid, kinds, CursorPagination::page(10)))
         .await
-        .unwrap()
+        .unwrap();
+    results
 }
 
 pub struct WithHit(pub Vec<AmlKind>);

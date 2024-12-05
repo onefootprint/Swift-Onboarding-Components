@@ -330,7 +330,7 @@ def test_get_rule_set_result(sandbox_tenant, must_collect_data):
 
     timeline = get(f"entities/{user.fp_id}/timeline", None, *sandbox_tenant.db_auths)
     stepup_event = [
-        i for i in timeline if i["event"]["kind"] == "onboarding_decision"
+        i for i in timeline["data"] if i["event"]["kind"] == "onboarding_decision"
     ].pop()
 
     # We currently have 2 API's for retrieving rule_set_results. The latter will be deprecated in favor of the former but in the meantime we'll test both
@@ -467,7 +467,7 @@ def test_vault_data_rules(sandbox_tenant, must_collect_data):
         # Fetch the rule set results.
         timeline = get(f"entities/{fp_id}/timeline", None, *sandbox_tenant.db_auths)
         stepup_event = [
-            i for i in timeline if i["event"]["kind"] == "onboarding_decision"
+            i for i in timeline["data"] if i["event"]["kind"] == "onboarding_decision"
         ].pop()
         rule_set_result_id = stepup_event["event"]["data"]["decision"][
             "rule_set_result_id"
@@ -627,7 +627,7 @@ def test_ip_address_rules(sandbox_tenant, must_collect_data):
 
     timeline = get(f"entities/{fp_id}/timeline", None, *sandbox_tenant.db_auths)
     stepup_event = [
-        i for i in timeline if i["event"]["kind"] == "onboarding_decision"
+        i for i in timeline["data"] if i["event"]["kind"] == "onboarding_decision"
     ].pop()
     rule_set_result_id = stepup_event["event"]["data"]["decision"]["rule_set_result_id"]
 

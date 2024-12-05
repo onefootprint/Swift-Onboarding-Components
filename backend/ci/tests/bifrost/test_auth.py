@@ -181,7 +181,7 @@ def test_multi_tenant_auth(sandbox_user, foo_sandbox_tenant, must_collect_data):
     body = get(f"entities/{fp_id}/timeline", None, *foo_sandbox_tenant.db_auths)
     prefill_events = [
         i["event"]["data"]
-        for i in body
+        for i in body["data"]
         if i["event"]["kind"] == "data_collected" and i["event"]["data"]["is_prefill"]
     ]
     assert set(prefill_events[0]["attributes"]) == {

@@ -294,8 +294,10 @@ def test_reonboard(ob_config, sandbox_tenant, operation_kind):
     }
     assert [i["kind"] for i in bifrost2.handled_requirements] == ["process"]
 
-    timeline = get(f"entities/{user.fp_id}/timeline", None, *sandbox_tenant.db_auths)
-    obds = [i["event"] for i in timeline if i["event"]["kind"] == "onboarding_decision"]
+    body = get(f"entities/{user.fp_id}/timeline", None, *sandbox_tenant.db_auths)
+    obds = [
+        i["event"] for i in body["data"] if i["event"]["kind"] == "onboarding_decision"
+    ]
     assert len(obds) == 2
     assert all(
         i["data"]["decision"]["ob_configuration"]["id"] == ob_config.id for i in obds

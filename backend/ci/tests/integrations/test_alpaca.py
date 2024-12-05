@@ -169,7 +169,7 @@ def test_alpaca_cip(
             expected_review_reasons = None
         if expected_review_reasons:
             assert (
-                timeline[0]["event"]["data"]["decision"]["manual_review"][
+                timeline["data"][0]["event"]["data"]["decision"]["manual_review"][
                     "review_reasons"
                 ]
                 == expected_review_reasons
@@ -285,7 +285,7 @@ def test_alpaca_cip(
         body = get(f"entities/{user.fp_id}/timeline", None, *sandbox_tenant.db_auths)
         cip_api_events = [
             i["event"]["data"]["kind"]
-            for i in body
+            for i in body["data"]
             if i["event"]["kind"] == "external_integration_called"
         ]
         assert cip_api_events == ["alpaca_cip"]

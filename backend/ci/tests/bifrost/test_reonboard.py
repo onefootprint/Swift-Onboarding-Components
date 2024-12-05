@@ -8,7 +8,7 @@ from tests.utils import create_ob_config
 
 def num_onboarding_decisions(fp_id, tenant):
     timeline = get(f"entities/{fp_id}/timeline", None, *tenant.db_auths)
-    obds = [i for i in timeline if i["event"]["kind"] == "onboarding_decision"]
+    obds = [i for i in timeline["data"] if i["event"]["kind"] == "onboarding_decision"]
     return len(obds)
 
 

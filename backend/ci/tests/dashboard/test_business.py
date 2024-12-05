@@ -156,7 +156,9 @@ def test_bo_timeline_events(sandbox_tenant, kyb_sandbox_ob_config):
     # Should have made an event on the business's timeline for the primary BO's onboarding
     body = get(f"entities/{fp_bid}/timeline", None, *sandbox_tenant.db_auths)
     event = next(
-        i["event"] for i in body if i["event"]["kind"] == "business_owner_completed_kyc"
+        i["event"]
+        for i in body["data"]
+        if i["event"]["kind"] == "business_owner_completed_kyc"
     )
     assert event["data"]["fp_id"] == primary_bo.fp_id
     assert event["data"]["decision"]["status"] == "fail"
@@ -164,7 +166,9 @@ def test_bo_timeline_events(sandbox_tenant, kyb_sandbox_ob_config):
 
     # Make sure we can't see this event on the user timeline
     body = get(f"entities/{primary_bo.fp_id}/timeline", None, *sandbox_tenant.db_auths)
-    assert not any(i["event"]["kind"] == "business_owner_completed_kyc" for i in body)
+    assert not any(
+        i["event"]["kind"] == "business_owner_completed_kyc" for i in body["data"]
+    )
 
     # Onboard the secondary BO
     bifrost = BifrostClient.new_user(
@@ -179,7 +183,9 @@ def test_bo_timeline_events(sandbox_tenant, kyb_sandbox_ob_config):
     # This should make another event
     body = get(f"entities/{fp_bid}/timeline", None, *sandbox_tenant.db_auths)
     event = next(
-        i["event"] for i in body if i["event"]["kind"] == "business_owner_completed_kyc"
+        i["event"]
+        for i in body["data"]
+        if i["event"]["kind"] == "business_owner_completed_kyc"
     )
     assert event["data"]["fp_id"] == secondary_bo.fp_id
     assert event["data"]["decision"]["status"] == "pass"
@@ -194,7 +200,9 @@ def test_bo_timeline_events(sandbox_tenant, kyb_sandbox_ob_config):
     # This should make another event
     body = get(f"entities/{fp_bid}/timeline", None, *sandbox_tenant.db_auths)
     event = next(
-        i["event"] for i in body if i["event"]["kind"] == "business_owner_completed_kyc"
+        i["event"]
+        for i in body["data"]
+        if i["event"]["kind"] == "business_owner_completed_kyc"
     )
     assert event["data"]["fp_id"] == primary_bo.fp_id
     assert event["data"]["decision"]["status"] == "pass"

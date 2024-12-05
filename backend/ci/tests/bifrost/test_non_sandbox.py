@@ -163,7 +163,7 @@ def test_onboarding_init(twilio, tenant, live_phone_number, sandbox_tenant):
 
     # Make sure the fp_id works
     body = get(f"entities/{fp_id}/timeline", None, *tenant.db_auths)
-    assert len(body) > 0
+    assert len(body["data"]) > 0
 
     # Should be idempotent if we authorize again
     num_already_handled_reqs = len(bifrost.handled_requirements)

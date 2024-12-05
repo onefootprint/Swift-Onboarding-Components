@@ -194,7 +194,7 @@ def test_kyc(sandbox_tenant, obc):
 
     # confirm OBD timeline event created
     timeline = get(f"entities/{fp_id}/timeline", None, *sandbox_tenant.db_auths)
-    obds = [i for i in timeline if i["event"]["kind"] == "onboarding_decision"]
+    obds = [i for i in timeline["data"] if i["event"]["kind"] == "onboarding_decision"]
     assert len(obds) == 1
 
     # confirm we can still decrypt all fields
@@ -318,7 +318,7 @@ def test_force_redo_kyc(sandbox_tenant, obc):
     assert body["status"] == "pass"
 
     timeline = get(f"entities/{fp_id}/timeline", None, *sandbox_tenant.db_auths)
-    obds = [i for i in timeline if i["event"]["kind"] == "onboarding_decision"]
+    obds = [i for i in timeline["data"] if i["event"]["kind"] == "onboarding_decision"]
     assert len(obds) == 2
 
     # Will error when trying to re-onboard to playbook if already onboarded onto

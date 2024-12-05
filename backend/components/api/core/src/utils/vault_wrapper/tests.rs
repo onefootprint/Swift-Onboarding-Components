@@ -11,6 +11,7 @@ use db::models::vault_data::NewVaultData;
 use db::models::vault_data::VaultData;
 use db::tests::fixtures;
 use db::tests::prelude::*;
+use db::CursorPagination;
 use itertools::Itertools;
 use macros::db_test;
 use newtypes::BusinessDataKind as BDK;
@@ -355,7 +356,8 @@ fn test_user_vault_wrapper_add_fields(conn: &mut TestPgConn) {
     assert!(!uvw.has_field(&IDK::LastName.into()));
     assert!(!uvw.has_field(&IDK::Email.into()));
 
-    let timeline_events = UserTimeline::list(conn, &su.id, vec![]).unwrap();
+    let pagination = CursorPagination::page(10);
+    let (timeline_events, _) = UserTimeline::list(conn, &su.id, vec![], pagination).unwrap();
     assert!(!timeline_events.is_empty());
 
     // Commit
@@ -372,7 +374,8 @@ fn test_user_vault_wrapper_add_fields(conn: &mut TestPgConn) {
     assert!(uvw.has_field(&IDK::Email.into()));
 
     // Should have added user timeline events
-    let timeline_events = UserTimeline::list(conn, &su.id, vec![]).unwrap();
+    let pagination = CursorPagination::page(10);
+    let (timeline_events, _) = UserTimeline::list(conn, &su.id, vec![], pagination).unwrap();
     assert!(!timeline_events.is_empty());
 }
 
@@ -402,7 +405,8 @@ fn test_business_vault_wrapper_add_fields(conn: &mut TestPgConn) {
     assert!(!uvw.has_field(&BDK::Name.into()));
     assert!(!uvw.has_field(&BDK::PhoneNumber.into()));
 
-    let timeline_events = UserTimeline::list(conn, &sb.id, vec![]).unwrap();
+    let pagination = CursorPagination::page(10);
+    let (timeline_events, _) = UserTimeline::list(conn, &sb.id, vec![], pagination).unwrap();
     assert!(!timeline_events.is_empty());
 
     // We never portablize business data, yet

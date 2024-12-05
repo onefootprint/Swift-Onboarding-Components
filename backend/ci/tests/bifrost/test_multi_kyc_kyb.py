@@ -578,7 +578,9 @@ def test_kyb_step_up(kyb_sandbox_ob_config, sandbox_tenant):
     timeline = get(
         f"entities/{primary_bo.fp_bid}/timeline", None, *sandbox_tenant.db_auths
     )
-    stepup_event = [i for i in timeline if i["event"]["kind"] == "step_up"].pop()
+    stepup_event = [
+        i for i in timeline["data"] if i["event"]["kind"] == "step_up"
+    ].pop()
     rsr = get(
         f"entities/{primary_bo.fp_bid}/rule_set_result/{stepup_event['event']['data'][0]['rule_set_result_id']}",
         None,
@@ -594,7 +596,9 @@ def test_kyb_step_up(kyb_sandbox_ob_config, sandbox_tenant):
     )
 
     # We uploaded a doc
-    doc_uploaded = [i for i in timeline if i["event"]["kind"] == "document_uploaded"]
+    doc_uploaded = [
+        i for i in timeline["data"] if i["event"]["kind"] == "document_uploaded"
+    ]
     assert len(doc_uploaded) == 1
 
     secondary_bo_token = extract_bo_token(primary_bo)
