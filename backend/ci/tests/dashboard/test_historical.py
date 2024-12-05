@@ -44,7 +44,8 @@ def test_historical_data(sandbox_tenant):
     }
 
     # Then, look at earliest seqno, should be missing phone and email
-    data = dict(seqno=timeline["data"][0]["seqno"] - 100)
+    min_seqno = min(event["seqno"] for event in timeline["data"])
+    data = dict(seqno=min_seqno - 1)
     body = get(f"entities/{user.fp_id}/data", data, *sandbox_tenant.db_auths)
     dis = set(i["identifier"] for i in body)
     assert not dis, "Should no longer have any data"
@@ -128,7 +129,8 @@ def test_historical_documents(sandbox_tenant, must_collect_data):
         assert visible_sides == uploaded_sides
 
     # If we look at the earliest seqno, we should see no documents
-    data = dict(seqno=timeline[0]["seqno"] - 100)
+    min_seqno = min(event["seqno"] for event in timeline)
+    data = dict(seqno=min_seqno - 1)
     body = get(f"entities/{user.fp_id}/documents", data, *sandbox_tenant.db_auths)
     assert not body
 
