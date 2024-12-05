@@ -31,6 +31,7 @@ class ObConfiguration(NamedTuple):
     is_live: bool
     required_auth_methods: List[str]
     is_no_phone_flow: bool
+    skip_confirm: bool
 
     def from_response(resp, tenant):
         return ObConfiguration(
@@ -45,6 +46,7 @@ class ObConfiguration(NamedTuple):
             resp["is_live"],
             resp["required_auth_methods"],
             resp["is_no_phone_flow"],
+            resp["skip_confirm"],
         )
 
 

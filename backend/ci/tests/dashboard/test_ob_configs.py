@@ -36,7 +36,7 @@ def inactive_ob_configuration(sandbox_tenant, must_collect_data):
     )
     data = dict(status="disabled")
     body = patch(
-        f"org/onboarding_configs/{ob_config.id}",
+        f"org/playbooks/{ob_config.playbook_id}",
         data,
         *sandbox_tenant.db_auths,
     )
@@ -1210,10 +1210,12 @@ def test_business_aml_with_verification_checks(
 
 
 def test_config_update(sandbox_tenant, ob_configuration):
+    assert ob_configuration.skip_confirm is False
+
     # Test failing to update
     new_name = "Updated ob config name"
-    new_status = "disabled"
-    data = dict(name=new_name, status=new_status)
+    new_skip_confirm = True
+    data = dict(name=new_name, skip_confirm=new_skip_confirm)
     patch(
         f"org/onboarding_configs/flerpderp",
         data,
@@ -1221,7 +1223,7 @@ def test_config_update(sandbox_tenant, ob_configuration):
         status_code=404,
     )
 
-    # Update the name and status
+    # Update the name and skip_confirm
     body = patch(
         f"org/onboarding_configs/{ob_configuration.id}",
         data,
@@ -1229,14 +1231,32 @@ def test_config_update(sandbox_tenant, ob_configuration):
     )
     ob_config = body
     assert ob_config["name"] == new_name
-    assert ob_config["status"] == new_status
+    assert ob_config["skip_confirm"] == new_skip_confirm
 
     # Verify the update
     body = get(f"org/playbooks?page_size=100", None, *sandbox_tenant.db_auths)
     configs = body["data"]
     ob_config = next(i for i in configs if i["id"] == ob_configuration.id)
     assert ob_config["name"] == new_name
-    assert ob_config["status"] == new_status
+    assert ob_config["skip_confirm"] == new_skip_confirm
+
+
+def test_playbook_update_status(sandbox_tenant, ob_configuration):
+    obc = get(
+        f"org/onboarding_configs/{ob_configuration.id}", None, *sandbox_tenant.db_auths
+    )
+    assert obc["status"] == "enabled"
+
+    obc = patch(
+        f"org/playbooks/{ob_configuration.playbook_id}",
+        dict(status="disabled"),
+        *sandbox_tenant.db_auths,
+    )
+
+    obc = get(
+        f"org/onboarding_configs/{ob_configuration.id}", None, *sandbox_tenant.db_auths
+    )
+    assert obc["status"] == "disabled"
 
     # Verify we can't use the disabled ob config for anything anymore
     get("hosted/onboarding/config", None, ob_configuration.key, status_code=401)
