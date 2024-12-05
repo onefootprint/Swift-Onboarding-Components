@@ -21,7 +21,7 @@ const ButtonLink = ({ children, className, size, variant, ...props }: ButtonLink
 const buttonLink = cva(
   [
     'flex items-center justify-center select-none cursor-pointer outline-offset-4 box-border w-auto',
-    'rounded border border-solid',
+    'rounded border border-solid w-full md:w-auto',
   ],
   {
     variants: {

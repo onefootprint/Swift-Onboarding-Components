@@ -36,7 +36,7 @@ const Ctas = ({ labels, direction = { desktop: 'row', mobile: 'column' }, align 
         <Button variant="primary" size="large" onClick={handleBookCall}>
           {labels?.primary || t('book-a-call')}
         </Button>
-        <MarketingLink app="dashboard" href="authentication/sign-up" target="_blank">
+        <MarketingLink app="dashboard" href="authentication/sign-up" target="_blank" asChild>
           <ButtonLink variant="secondary" size="large">
             {labels?.secondary || t('sign-up-for-free')}
           </ButtonLink>
