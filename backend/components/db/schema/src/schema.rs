@@ -764,13 +764,9 @@ diesel::table! {
 
     ob_configuration (id) {
         id -> Text,
-        key -> Nullable<Text>,
         name -> Varchar,
-        tenant_id -> Nullable<Text>,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
-        is_live -> Nullable<Bool>,
-        status -> Nullable<Text>,
         created_at -> Timestamptz,
         must_collect_data -> Array<Nullable<Text>>,
         can_access_data -> Array<Nullable<Text>>,
@@ -1952,7 +1948,6 @@ diesel::joinable!(neuro_id_analytics_event -> verification_result (verification_
 diesel::joinable!(neuro_id_analytics_event -> workflow (workflow_id));
 diesel::joinable!(ob_configuration -> appearance (appearance_id));
 diesel::joinable!(ob_configuration -> playbook (playbook_id));
-diesel::joinable!(ob_configuration -> tenant (tenant_id));
 diesel::joinable!(onboarding_decision -> rule_set_result (rule_set_result_id));
 diesel::joinable!(onboarding_decision -> workflow (workflow_id));
 diesel::joinable!(onboarding_decision_verification_result_junction -> onboarding_decision (onboarding_decision_id));

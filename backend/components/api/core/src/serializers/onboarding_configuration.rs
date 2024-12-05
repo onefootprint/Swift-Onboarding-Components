@@ -65,7 +65,7 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
         // we only need to tell FE about this if we're in the skip ssn step up flow
         let is_app_clip_enabled = ff_client.flag(BoolFlag::IsAppClipEnabled(&tenant_id));
         let is_instant_app_enabled = ff_client.flag(BoolFlag::IsInstantAppEnabled(&tenant_id));
-        let can_make_real_doc_scan_calls_in_sandbox = (!playbook.is_live)
+        let can_make_real_doc_scan_calls_in_sandbox = (!is_live)
             .then(|| ff_client.flag(BoolFlag::CanMakeDemoIncodeRequestsInSandbox(&tenant_id)))
             .unwrap_or(false);
         let is_kyb = must_collect_data.iter().any(|cdo| cdo.matches(DID::Business));

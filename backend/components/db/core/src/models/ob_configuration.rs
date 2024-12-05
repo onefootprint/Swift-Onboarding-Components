@@ -38,7 +38,6 @@ use newtypes::Locked;
 use newtypes::ObConfigurationId;
 use newtypes::ObConfigurationKind;
 use newtypes::PlaybookId;
-use newtypes::PublishablePlaybookKey;
 use newtypes::ScopedVaultId;
 use newtypes::SupportedDocumentAndCountryMappingForBifrost;
 use newtypes::TenantId;
@@ -56,17 +55,9 @@ pub type IsLive = bool;
 #[diesel(table_name = ob_configuration)]
 pub struct ObConfiguration {
     pub id: ObConfigurationId,
-    #[deprecated(note = "Use playbook(key) instead")]
-    pub key: Option<PublishablePlaybookKey>,
     pub name: String,
-    #[deprecated(note = "Use playbook(tenant_id) instead")]
-    pub tenant_id: Option<TenantId>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    #[deprecated(note = "Use playbook(is_live) instead")]
-    pub is_live: Option<IsLive>,
-    #[deprecated(note = "Use playbook(status) instead")]
-    pub status: Option<ApiKeyStatus>,
     pub created_at: DateTime<Utc>,
     #[diesel(deserialize_as = NonNullVec<CDO>)]
     pub must_collect_data: Vec<CDO>,
@@ -291,12 +282,8 @@ impl ObConfiguration {
         let new_obc = NewObConfiguration::new(playbook, args, Utc::now());
 
         let NewObConfiguration {
-            key,
             created_at,
-            status,
             name,
-            tenant_id,
-            is_live,
             must_collect_data,
             can_access_data,
             cip_kind,
@@ -320,7 +307,6 @@ impl ObConfiguration {
             playbook_id,
         } = new_obc;
 
-        #[allow(deprecated)]
         Self {
             id: ObConfigurationId::test_data("preview".to_owned()),
             _created_at: Utc::now(),
@@ -328,12 +314,8 @@ impl ObConfiguration {
             deactivated_at: None,
             appearance_id: None,
 
-            key: Some(key),
             created_at,
-            status: Some(status),
             name,
-            tenant_id: Some(tenant_id),
-            is_live: Some(is_live),
             must_collect_data,
             can_access_data,
             cip_kind,
@@ -426,13 +408,9 @@ impl SupportedCountriesForDocType for Default {
 #[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = ob_configuration)]
 struct NewObConfiguration {
-    key: PublishablePlaybookKey,
     created_at: DateTime<Utc>,
-    status: ApiKeyStatus,
 
     name: String,
-    tenant_id: TenantId,
-    is_live: bool,
     must_collect_data: Vec<CDO>,
     can_access_data: Vec<CDO>,
     cip_kind: Option<CipKind>,
@@ -684,7 +662,6 @@ impl ObConfiguration {
     pub fn into_copy_args(self, author: DbActor) -> NewObConfigurationArgs {
         let verification_checks = VerificationChecks::from_existing(&self);
 
-        #[allow(deprecated)]
         let ObConfiguration {
             must_collect_data,
             can_access_data,
@@ -708,16 +685,10 @@ impl ObConfiguration {
             // Don't copy these fields. Explicitly enumerate them so the compiler complains when a new
             // field is added
             id: _,
-            key: _,
-            tenant_id: _,
             _created_at: _,
             _updated_at: _,
-            is_live: _,
             created_at: _,
             author: _,
-
-            // Deprecated in favor of playbook(status).
-            status: _,
 
             // Maybe we should copy appearance one day. But it's not really used today.
             appearance_id: _,
@@ -823,15 +794,7 @@ impl NewObConfiguration {
         args: NewObConfigurationArgs,
         created_at: DateTime<Utc>,
     ) -> NewObConfiguration {
-        let Playbook {
-            id: playbook_id,
-            _created_at: _,
-            _updated_at: _,
-            key,
-            tenant_id,
-            is_live,
-            status: _,
-        } = playbook.clone();
+        let playbook_id = playbook.id.clone();
 
         let enhanced_aml = args.verification_checks.enhanced_aml();
         let NewObConfigurationArgs {
@@ -858,14 +821,10 @@ impl NewObConfiguration {
         } = args;
 
         NewObConfiguration {
-            key,
-            status: ApiKeyStatus::Enabled,
             created_at,
             name,
-            tenant_id,
             must_collect_data,
             can_access_data,
-            is_live,
             cip_kind,
             optional_data,
             is_no_phone_flow,
