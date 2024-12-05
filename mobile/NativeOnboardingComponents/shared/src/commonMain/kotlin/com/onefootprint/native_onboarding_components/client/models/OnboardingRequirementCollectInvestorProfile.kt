@@ -41,7 +41,7 @@ data class OnboardingRequirementCollectInvestorProfile (
 
     @SerialName(value = "populated_attributes") @Required val populatedAttributes: kotlin.collections.List<CollectedDataOption>
 
-) {
+): OnboardingRequirement() {
 
     /**
      * 

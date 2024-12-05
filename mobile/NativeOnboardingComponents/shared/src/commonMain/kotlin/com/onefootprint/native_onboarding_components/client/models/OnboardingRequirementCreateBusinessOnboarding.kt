@@ -35,7 +35,7 @@ data class OnboardingRequirementCreateBusinessOnboarding (
     /* When true, requires either selecting an existing business, or will create a new one upon  `POST /hosted/business/onboarding`.  When false, there's already a business associated with this session, so we can  immediately call `POST /hosted/business/onboarding`. */
     @SerialName(value = "requires_business_selection") @Required val requiresBusinessSelection: kotlin.Boolean
 
-) {
+): OnboardingRequirement() {
 
     /**
      * 

@@ -25,7 +25,7 @@ import kotlinx.serialization.encoding.*
 /**
  * A document needs to be collected
  *
- * @param config 
+ // * @param config
  * @param documentRequestId 
  * @param kind 
  * @param uploadSettings 
@@ -34,15 +34,15 @@ import kotlinx.serialization.encoding.*
 
 data class OnboardingRequirementCollectDocument (
 
-    @SerialName(value = "config") @Required val config: CollectDocumentConfig,
+    // @SerialName(value = "config") @Required val config: CollectDocumentConfig,
 
     @SerialName(value = "document_request_id") @Required val documentRequestId: kotlin.String,
 
     @SerialName(value = "kind") @Required val kind: OnboardingRequirementCollectDocument.Kind,
 
-    @SerialName(value = "upload_settings") @Required val uploadSettings: DocumentUploadSettings
+    // @SerialName(value = "upload_settings") @Required val uploadSettings: DocumentUploadSettings
 
-) {
+): OnboardingRequirement() {
 
     /**
      * 

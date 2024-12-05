@@ -35,7 +35,7 @@ data class OnboardingRequirementRegisterAuthMethod (
 
     @SerialName(value = "kind") @Required val kind: OnboardingRequirementRegisterAuthMethod.Kind
 
-) {
+): OnboardingRequirement() {
 
     /**
      * 

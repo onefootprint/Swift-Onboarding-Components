@@ -38,7 +38,7 @@ data class OnboardingRequirementAuthorize (
 
     @SerialName(value = "authorized_at") val authorizedAt: kotlinx.datetime.Instant? = null
 
-) {
+): OnboardingRequirement() {
 
     /**
      * 

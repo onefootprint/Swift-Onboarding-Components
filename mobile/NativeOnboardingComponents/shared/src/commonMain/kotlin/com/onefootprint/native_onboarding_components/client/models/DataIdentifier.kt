@@ -21,922 +21,922 @@ import kotlinx.serialization.*
 /**
  * 
  *
- * Values: idPeriodFirst_name,idPeriodMiddle_name,idPeriodLast_name,idPeriodDob,idPeriodSsn4,idPeriodSsn9,idPeriodAddress_line1,idPeriodAddress_line2,idPeriodCity,idPeriodState,idPeriodZip,idPeriodCountry,idPeriodEmail,idPeriodPhone_number,idPeriodUs_legal_status,idPeriodVisa_kind,idPeriodVisa_expiration_date,idPeriodNationality,idPeriodCitizenships,idPeriodDrivers_license_number,idPeriodDrivers_license_state,idPeriodItin,idPeriodUs_tax_id,businessPeriodName,businessPeriodDba,businessPeriodWebsite,businessPeriodPhone_number,businessPeriodTin,businessPeriodAddress_line1,businessPeriodAddress_line2,businessPeriodCity,businessPeriodState,businessPeriodZip,businessPeriodCountry,businessPeriodCorporation_type,businessPeriodFormation_state,businessPeriodFormation_date,customPeriodStar,investor_profilePeriodEmployment_status,investor_profilePeriodOccupation,investor_profilePeriodEmployer,investor_profilePeriodAnnual_income,investor_profilePeriodNet_worth,investor_profilePeriodInvestment_goals,investor_profilePeriodRisk_tolerance,investor_profilePeriodDeclarations,investor_profilePeriodBrokerage_firm_employer,investor_profilePeriodSenior_executive_symbols,investor_profilePeriodFamily_member_names,investor_profilePeriodPolitical_organization,investor_profilePeriodFunding_sources,documentPeriodId_cardPeriodFrontPeriodImage,documentPeriodId_cardPeriodFrontPeriodMime_type,documentPeriodId_cardPeriodBackPeriodImage,documentPeriodId_cardPeriodBackPeriodMime_type,documentPeriodId_cardPeriodSelfiePeriodImage,documentPeriodId_cardPeriodSelfiePeriodMime_type,documentPeriodId_cardPeriodFull_name,documentPeriodId_cardPeriodFirst_name,documentPeriodId_cardPeriodLast_name,documentPeriodId_cardPeriodDob,documentPeriodId_cardPeriodGender,documentPeriodId_cardPeriodFull_address,documentPeriodId_cardPeriodAddress_line1,documentPeriodId_cardPeriodCity,documentPeriodId_cardPeriodState,documentPeriodId_cardPeriodPostal_code,documentPeriodId_cardPeriodDocument_number,documentPeriodId_cardPeriodExpires_at,documentPeriodId_cardPeriodIssued_at,documentPeriodId_cardPeriodIssuing_state,documentPeriodId_cardPeriodIssuing_country,documentPeriodId_cardPeriodRef_number,documentPeriodId_cardPeriodNationality,documentPeriodId_cardPeriodCurp,documentPeriodId_cardPeriodClave_de_elector,documentPeriodId_cardPeriodClassified_document_type,documentPeriodId_cardPeriodCurp_validation_response,documentPeriodId_cardPeriodSamba_activity_history_response,documentPeriodId_cardPeriodUs_issuing_state,documentPeriodDrivers_licensePeriodFrontPeriodImage,documentPeriodDrivers_licensePeriodFrontPeriodMime_type,documentPeriodDrivers_licensePeriodBackPeriodImage,documentPeriodDrivers_licensePeriodBackPeriodMime_type,documentPeriodDrivers_licensePeriodSelfiePeriodImage,documentPeriodDrivers_licensePeriodSelfiePeriodMime_type,documentPeriodDrivers_licensePeriodFull_name,documentPeriodDrivers_licensePeriodFirst_name,documentPeriodDrivers_licensePeriodLast_name,documentPeriodDrivers_licensePeriodDob,documentPeriodDrivers_licensePeriodGender,documentPeriodDrivers_licensePeriodFull_address,documentPeriodDrivers_licensePeriodAddress_line1,documentPeriodDrivers_licensePeriodCity,documentPeriodDrivers_licensePeriodState,documentPeriodDrivers_licensePeriodPostal_code,documentPeriodDrivers_licensePeriodDocument_number,documentPeriodDrivers_licensePeriodExpires_at,documentPeriodDrivers_licensePeriodIssued_at,documentPeriodDrivers_licensePeriodIssuing_state,documentPeriodDrivers_licensePeriodIssuing_country,documentPeriodDrivers_licensePeriodRef_number,documentPeriodDrivers_licensePeriodNationality,documentPeriodDrivers_licensePeriodCurp,documentPeriodDrivers_licensePeriodClave_de_elector,documentPeriodDrivers_licensePeriodClassified_document_type,documentPeriodDrivers_licensePeriodCurp_validation_response,documentPeriodDrivers_licensePeriodSamba_activity_history_response,documentPeriodDrivers_licensePeriodUs_issuing_state,documentPeriodPassportPeriodFrontPeriodImage,documentPeriodPassportPeriodFrontPeriodMime_type,documentPeriodPassportPeriodBackPeriodImage,documentPeriodPassportPeriodBackPeriodMime_type,documentPeriodPassportPeriodSelfiePeriodImage,documentPeriodPassportPeriodSelfiePeriodMime_type,documentPeriodPassportPeriodFull_name,documentPeriodPassportPeriodFirst_name,documentPeriodPassportPeriodLast_name,documentPeriodPassportPeriodDob,documentPeriodPassportPeriodGender,documentPeriodPassportPeriodFull_address,documentPeriodPassportPeriodAddress_line1,documentPeriodPassportPeriodCity,documentPeriodPassportPeriodState,documentPeriodPassportPeriodPostal_code,documentPeriodPassportPeriodDocument_number,documentPeriodPassportPeriodExpires_at,documentPeriodPassportPeriodIssued_at,documentPeriodPassportPeriodIssuing_state,documentPeriodPassportPeriodIssuing_country,documentPeriodPassportPeriodRef_number,documentPeriodPassportPeriodNationality,documentPeriodPassportPeriodCurp,documentPeriodPassportPeriodClave_de_elector,documentPeriodPassportPeriodClassified_document_type,documentPeriodPassportPeriodCurp_validation_response,documentPeriodPassportPeriodSamba_activity_history_response,documentPeriodPassportPeriodUs_issuing_state,documentPeriodPassport_cardPeriodFrontPeriodImage,documentPeriodPassport_cardPeriodFrontPeriodMime_type,documentPeriodPassport_cardPeriodBackPeriodImage,documentPeriodPassport_cardPeriodBackPeriodMime_type,documentPeriodPassport_cardPeriodSelfiePeriodImage,documentPeriodPassport_cardPeriodSelfiePeriodMime_type,documentPeriodPassport_cardPeriodFull_name,documentPeriodPassport_cardPeriodFirst_name,documentPeriodPassport_cardPeriodLast_name,documentPeriodPassport_cardPeriodDob,documentPeriodPassport_cardPeriodGender,documentPeriodPassport_cardPeriodFull_address,documentPeriodPassport_cardPeriodAddress_line1,documentPeriodPassport_cardPeriodCity,documentPeriodPassport_cardPeriodState,documentPeriodPassport_cardPeriodPostal_code,documentPeriodPassport_cardPeriodDocument_number,documentPeriodPassport_cardPeriodExpires_at,documentPeriodPassport_cardPeriodIssued_at,documentPeriodPassport_cardPeriodIssuing_state,documentPeriodPassport_cardPeriodIssuing_country,documentPeriodPassport_cardPeriodRef_number,documentPeriodPassport_cardPeriodNationality,documentPeriodPassport_cardPeriodCurp,documentPeriodPassport_cardPeriodClave_de_elector,documentPeriodPassport_cardPeriodClassified_document_type,documentPeriodPassport_cardPeriodCurp_validation_response,documentPeriodPassport_cardPeriodSamba_activity_history_response,documentPeriodPassport_cardPeriodUs_issuing_state,documentPeriodPermitPeriodFrontPeriodImage,documentPeriodPermitPeriodFrontPeriodMime_type,documentPeriodPermitPeriodBackPeriodImage,documentPeriodPermitPeriodBackPeriodMime_type,documentPeriodPermitPeriodSelfiePeriodImage,documentPeriodPermitPeriodSelfiePeriodMime_type,documentPeriodPermitPeriodFull_name,documentPeriodPermitPeriodFirst_name,documentPeriodPermitPeriodLast_name,documentPeriodPermitPeriodDob,documentPeriodPermitPeriodGender,documentPeriodPermitPeriodFull_address,documentPeriodPermitPeriodAddress_line1,documentPeriodPermitPeriodCity,documentPeriodPermitPeriodState,documentPeriodPermitPeriodPostal_code,documentPeriodPermitPeriodDocument_number,documentPeriodPermitPeriodExpires_at,documentPeriodPermitPeriodIssued_at,documentPeriodPermitPeriodIssuing_state,documentPeriodPermitPeriodIssuing_country,documentPeriodPermitPeriodRef_number,documentPeriodPermitPeriodNationality,documentPeriodPermitPeriodCurp,documentPeriodPermitPeriodClave_de_elector,documentPeriodPermitPeriodClassified_document_type,documentPeriodPermitPeriodCurp_validation_response,documentPeriodPermitPeriodSamba_activity_history_response,documentPeriodPermitPeriodUs_issuing_state,documentPeriodVisaPeriodFrontPeriodImage,documentPeriodVisaPeriodFrontPeriodMime_type,documentPeriodVisaPeriodBackPeriodImage,documentPeriodVisaPeriodBackPeriodMime_type,documentPeriodVisaPeriodSelfiePeriodImage,documentPeriodVisaPeriodSelfiePeriodMime_type,documentPeriodVisaPeriodFull_name,documentPeriodVisaPeriodFirst_name,documentPeriodVisaPeriodLast_name,documentPeriodVisaPeriodDob,documentPeriodVisaPeriodGender,documentPeriodVisaPeriodFull_address,documentPeriodVisaPeriodAddress_line1,documentPeriodVisaPeriodCity,documentPeriodVisaPeriodState,documentPeriodVisaPeriodPostal_code,documentPeriodVisaPeriodDocument_number,documentPeriodVisaPeriodExpires_at,documentPeriodVisaPeriodIssued_at,documentPeriodVisaPeriodIssuing_state,documentPeriodVisaPeriodIssuing_country,documentPeriodVisaPeriodRef_number,documentPeriodVisaPeriodNationality,documentPeriodVisaPeriodCurp,documentPeriodVisaPeriodClave_de_elector,documentPeriodVisaPeriodClassified_document_type,documentPeriodVisaPeriodCurp_validation_response,documentPeriodVisaPeriodSamba_activity_history_response,documentPeriodVisaPeriodUs_issuing_state,documentPeriodResidence_documentPeriodFrontPeriodImage,documentPeriodResidence_documentPeriodFrontPeriodMime_type,documentPeriodResidence_documentPeriodBackPeriodImage,documentPeriodResidence_documentPeriodBackPeriodMime_type,documentPeriodResidence_documentPeriodSelfiePeriodImage,documentPeriodResidence_documentPeriodSelfiePeriodMime_type,documentPeriodResidence_documentPeriodFull_name,documentPeriodResidence_documentPeriodFirst_name,documentPeriodResidence_documentPeriodLast_name,documentPeriodResidence_documentPeriodDob,documentPeriodResidence_documentPeriodGender,documentPeriodResidence_documentPeriodFull_address,documentPeriodResidence_documentPeriodAddress_line1,documentPeriodResidence_documentPeriodCity,documentPeriodResidence_documentPeriodState,documentPeriodResidence_documentPeriodPostal_code,documentPeriodResidence_documentPeriodDocument_number,documentPeriodResidence_documentPeriodExpires_at,documentPeriodResidence_documentPeriodIssued_at,documentPeriodResidence_documentPeriodIssuing_state,documentPeriodResidence_documentPeriodIssuing_country,documentPeriodResidence_documentPeriodRef_number,documentPeriodResidence_documentPeriodNationality,documentPeriodResidence_documentPeriodCurp,documentPeriodResidence_documentPeriodClave_de_elector,documentPeriodResidence_documentPeriodClassified_document_type,documentPeriodResidence_documentPeriodCurp_validation_response,documentPeriodResidence_documentPeriodSamba_activity_history_response,documentPeriodResidence_documentPeriodUs_issuing_state,documentPeriodVoter_identificationPeriodFrontPeriodImage,documentPeriodVoter_identificationPeriodFrontPeriodMime_type,documentPeriodVoter_identificationPeriodBackPeriodImage,documentPeriodVoter_identificationPeriodBackPeriodMime_type,documentPeriodVoter_identificationPeriodSelfiePeriodImage,documentPeriodVoter_identificationPeriodSelfiePeriodMime_type,documentPeriodVoter_identificationPeriodFull_name,documentPeriodVoter_identificationPeriodFirst_name,documentPeriodVoter_identificationPeriodLast_name,documentPeriodVoter_identificationPeriodDob,documentPeriodVoter_identificationPeriodGender,documentPeriodVoter_identificationPeriodFull_address,documentPeriodVoter_identificationPeriodAddress_line1,documentPeriodVoter_identificationPeriodCity,documentPeriodVoter_identificationPeriodState,documentPeriodVoter_identificationPeriodPostal_code,documentPeriodVoter_identificationPeriodDocument_number,documentPeriodVoter_identificationPeriodExpires_at,documentPeriodVoter_identificationPeriodIssued_at,documentPeriodVoter_identificationPeriodIssuing_state,documentPeriodVoter_identificationPeriodIssuing_country,documentPeriodVoter_identificationPeriodRef_number,documentPeriodVoter_identificationPeriodNationality,documentPeriodVoter_identificationPeriodCurp,documentPeriodVoter_identificationPeriodClave_de_elector,documentPeriodVoter_identificationPeriodClassified_document_type,documentPeriodVoter_identificationPeriodCurp_validation_response,documentPeriodVoter_identificationPeriodSamba_activity_history_response,documentPeriodVoter_identificationPeriodUs_issuing_state,documentPeriodFinra_compliance_letter,documentPeriodProof_of_addressPeriodImage,documentPeriodSsn_cardPeriodImage,documentPeriodCustomPeriodStar,cardPeriodStarPeriodNumber,cardPeriodStarPeriodExpiration,cardPeriodStarPeriodCvc,cardPeriodStarPeriodName,cardPeriodStarPeriodBilling_addressPeriodZip,cardPeriodStarPeriodBilling_addressPeriodCountry,cardPeriodStarPeriodExpiration_month,cardPeriodStarPeriodExpiration_year,cardPeriodStarPeriodNumber_last4,cardPeriodStarPeriodIssuer,cardPeriodStarPeriodFingerprint,bankPeriodStarPeriodName,bankPeriodStarPeriodAch_routing_number,bankPeriodStarPeriodAch_account_number,bankPeriodStarPeriodAch_account_id,bankPeriodStarPeriodAccount_type,bankPeriodStarPeriodFingerprint
+ * Values: idFirstName,idMiddleName,idLastName,idDob,idSsn4,idSsn9,idAddressLine1,idAddressLine2,idCity,idState,idZip,idCountry,idEmail,idPhoneNumber,idUsLegalStatus,idVisaKind,idVisaExpirationDate,idNationality,idCitizenships,idDriversLicenseNumber,idDriversLicenseState,idItin,idUsTaxId,businessName,businessDba,businessWebsite,businessPhoneNumber,businessTin,businessAddressLine1,businessAddressLine2,businessCity,businessState,businessZip,businessCountry,businessCorporationType,businessFormationState,businessFormationDate,custom,investorProfileEmploymentStatus,investorProfileOccupation,investorProfileEmployer,investorProfileAnnualIncome,investorProfileNetWorth,investorProfileInvestmentGoals,investorProfileRiskTolerance,investorProfileDeclarations,investorProfileBrokerageFirmEmployer,investorProfileSeniorExecutiveSymbols,investorProfileFamilyMemberNames,investorProfilePoliticalOrganization,investorProfileFundingSources,documentIdCardFrontImage,documentIdCardFrontMimeType,documentIdCardBackImage,documentIdCardBackMimeType,documentIdCardSelfieImage,documentIdCardSelfieMimeType,documentIdCardFullName,documentIdCardFirstName,documentIdCardLastName,documentIdCardDob,documentIdCardGender,documentIdCardFullAddress,documentIdCardAddressLine1,documentIdCardCity,documentIdCardState,documentIdCardPostalCode,documentIdCardDocumentNumber,documentIdCardExpiresAt,documentIdCardIssuedAt,documentIdCardIssuingState,documentIdCardIssuingCountry,documentIdCardRefNumber,documentIdCardNationality,documentIdCardCurp,documentIdCardClaveDeElector,documentIdCardClassifiedDocumentType,documentIdCardCurpValidationResponse,documentIdCardSambaActivityHistoryResponse,documentIdCardUsIssuingState,documentDriversLicenseFrontImage,documentDriversLicenseFrontMimeType,documentDriversLicenseBackImage,documentDriversLicenseBackMimeType,documentDriversLicenseSelfieImage,documentDriversLicenseSelfieMimeType,documentDriversLicenseFullName,documentDriversLicenseFirstName,documentDriversLicenseLastName,documentDriversLicenseDob,documentDriversLicenseGender,documentDriversLicenseFullAddress,documentDriversLicenseAddressLine1,documentDriversLicenseCity,documentDriversLicenseState,documentDriversLicensePostalCode,documentDriversLicenseDocumentNumber,documentDriversLicenseExpiresAt,documentDriversLicenseIssuedAt,documentDriversLicenseIssuingState,documentDriversLicenseIssuingCountry,documentDriversLicenseRefNumber,documentDriversLicenseNationality,documentDriversLicenseCurp,documentDriversLicenseClaveDeElector,documentDriversLicenseClassifiedDocumentType,documentDriversLicenseCurpValidationResponse,documentDriversLicenseSambaActivityHistoryResponse,documentDriversLicenseUsIssuingState,documentPassportFrontImage,documentPassportFrontMimeType,documentPassportBackImage,documentPassportBackMimeType,documentPassportSelfieImage,documentPassportSelfieMimeType,documentPassportFullName,documentPassportFirstName,documentPassportLastName,documentPassportDob,documentPassportGender,documentPassportFullAddress,documentPassportAddressLine1,documentPassportCity,documentPassportState,documentPassportPostalCode,documentPassportDocumentNumber,documentPassportExpiresAt,documentPassportIssuedAt,documentPassportIssuingState,documentPassportIssuingCountry,documentPassportRefNumber,documentPassportNationality,documentPassportCurp,documentPassportClaveDeElector,documentPassportClassifiedDocumentType,documentPassportCurpValidationResponse,documentPassportSambaActivityHistoryResponse,documentPassportUsIssuingState,documentPassportCardFrontImage,documentPassportCardFrontMimeType,documentPassportCardBackImage,documentPassportCardBackMimeType,documentPassportCardSelfieImage,documentPassportCardSelfieMimeType,documentPassportCardFullName,documentPassportCardFirstName,documentPassportCardLastName,documentPassportCardDob,documentPassportCardGender,documentPassportCardFullAddress,documentPassportCardAddressLine1,documentPassportCardCity,documentPassportCardState,documentPassportCardPostalCode,documentPassportCardDocumentNumber,documentPassportCardExpiresAt,documentPassportCardIssuedAt,documentPassportCardIssuingState,documentPassportCardIssuingCountry,documentPassportCardRefNumber,documentPassportCardNationality,documentPassportCardCurp,documentPassportCardClaveDeElector,documentPassportCardClassifiedDocumentType,documentPassportCardCurpValidationResponse,documentPassportCardSambaActivityHistoryResponse,documentPassportCardUsIssuingState,documentPermitFrontImage,documentPermitFrontMimeType,documentPermitBackImage,documentPermitBackMimeType,documentPermitSelfieImage,documentPermitSelfieMimeType,documentPermitFullName,documentPermitFirstName,documentPermitLastName,documentPermitDob,documentPermitGender,documentPermitFullAddress,documentPermitAddressLine1,documentPermitCity,documentPermitState,documentPermitPostalCode,documentPermitDocumentNumber,documentPermitExpiresAt,documentPermitIssuedAt,documentPermitIssuingState,documentPermitIssuingCountry,documentPermitRefNumber,documentPermitNationality,documentPermitCurp,documentPermitClaveDeElector,documentPermitClassifiedDocumentType,documentPermitCurpValidationResponse,documentPermitSambaActivityHistoryResponse,documentPermitUsIssuingState,documentVisaFrontImage,documentVisaFrontMimeType,documentVisaBackImage,documentVisaBackMimeType,documentVisaSelfieImage,documentVisaSelfieMimeType,documentVisaFullName,documentVisaFirstName,documentVisaLastName,documentVisaDob,documentVisaGender,documentVisaFullAddress,documentVisaAddressLine1,documentVisaCity,documentVisaState,documentVisaPostalCode,documentVisaDocumentNumber,documentVisaExpiresAt,documentVisaIssuedAt,documentVisaIssuingState,documentVisaIssuingCountry,documentVisaRefNumber,documentVisaNationality,documentVisaCurp,documentVisaClaveDeElector,documentVisaClassifiedDocumentType,documentVisaCurpValidationResponse,documentVisaSambaActivityHistoryResponse,documentVisaUsIssuingState,documentResidenceDocumentFrontImage,documentResidenceDocumentFrontMimeType,documentResidenceDocumentBackImage,documentResidenceDocumentBackMimeType,documentResidenceDocumentSelfieImage,documentResidenceDocumentSelfieMimeType,documentResidenceDocumentFullName,documentResidenceDocumentFirstName,documentResidenceDocumentLastName,documentResidenceDocumentDob,documentResidenceDocumentGender,documentResidenceDocumentFullAddress,documentResidenceDocumentAddressLine1,documentResidenceDocumentCity,documentResidenceDocumentState,documentResidenceDocumentPostalCode,documentResidenceDocumentDocumentNumber,documentResidenceDocumentExpiresAt,documentResidenceDocumentIssuedAt,documentResidenceDocumentIssuingState,documentResidenceDocumentIssuingCountry,documentResidenceDocumentRefNumber,documentResidenceDocumentNationality,documentResidenceDocumentCurp,documentResidenceDocumentClaveDeElector,documentResidenceDocumentClassifiedDocumentType,documentResidenceDocumentCurpValidationResponse,documentResidenceDocumentSambaActivityHistoryResponse,documentResidenceDocumentUsIssuingState,documentVoterIdentificationFrontImage,documentVoterIdentificationFrontMimeType,documentVoterIdentificationBackImage,documentVoterIdentificationBackMimeType,documentVoterIdentificationSelfieImage,documentVoterIdentificationSelfieMimeType,documentVoterIdentificationFullName,documentVoterIdentificationFirstName,documentVoterIdentificationLastName,documentVoterIdentificationDob,documentVoterIdentificationGender,documentVoterIdentificationFullAddress,documentVoterIdentificationAddressLine1,documentVoterIdentificationCity,documentVoterIdentificationState,documentVoterIdentificationPostalCode,documentVoterIdentificationDocumentNumber,documentVoterIdentificationExpiresAt,documentVoterIdentificationIssuedAt,documentVoterIdentificationIssuingState,documentVoterIdentificationIssuingCountry,documentVoterIdentificationRefNumber,documentVoterIdentificationNationality,documentVoterIdentificationCurp,documentVoterIdentificationClaveDeElector,documentVoterIdentificationClassifiedDocumentType,documentVoterIdentificationCurpValidationResponse,documentVoterIdentificationSambaActivityHistoryResponse,documentVoterIdentificationUsIssuingState,documentFinraComplianceLetter,documentProofOfAddressImage,documentSsnCardImage,documentCustom,cardNumber,cardExpiration,cardCvc,cardName,cardBillingAddressZip,cardBillingAddressCountry,cardExpirationMonth,cardExpirationYear,cardNumberLast4,cardIssuer,cardFingerprint,bankName,bankAchRoutingNumber,bankAchAccountNumber,bankAchAccountId,bankAccountType,bankFingerprint
  */
 @Serializable
 enum class DataIdentifier(val value: kotlin.String) {
 
     @SerialName(value = "id.first_name")
-    idPeriodFirst_name("id.first_name"),
+    idFirstName("id.first_name"),
 
     @SerialName(value = "id.middle_name")
-    idPeriodMiddle_name("id.middle_name"),
+    idMiddleName("id.middle_name"),
 
     @SerialName(value = "id.last_name")
-    idPeriodLast_name("id.last_name"),
+    idLastName("id.last_name"),
 
     @SerialName(value = "id.dob")
-    idPeriodDob("id.dob"),
+    idDob("id.dob"),
 
     @SerialName(value = "id.ssn4")
-    idPeriodSsn4("id.ssn4"),
+    idSsn4("id.ssn4"),
 
     @SerialName(value = "id.ssn9")
-    idPeriodSsn9("id.ssn9"),
+    idSsn9("id.ssn9"),
 
     @SerialName(value = "id.address_line1")
-    idPeriodAddress_line1("id.address_line1"),
+    idAddressLine1("id.address_line1"),
 
     @SerialName(value = "id.address_line2")
-    idPeriodAddress_line2("id.address_line2"),
+    idAddressLine2("id.address_line2"),
 
     @SerialName(value = "id.city")
-    idPeriodCity("id.city"),
+    idCity("id.city"),
 
     @SerialName(value = "id.state")
-    idPeriodState("id.state"),
+    idState("id.state"),
 
     @SerialName(value = "id.zip")
-    idPeriodZip("id.zip"),
+    idZip("id.zip"),
 
     @SerialName(value = "id.country")
-    idPeriodCountry("id.country"),
+    idCountry("id.country"),
 
     @SerialName(value = "id.email")
-    idPeriodEmail("id.email"),
+    idEmail("id.email"),
 
     @SerialName(value = "id.phone_number")
-    idPeriodPhone_number("id.phone_number"),
+    idPhoneNumber("id.phone_number"),
 
     @SerialName(value = "id.us_legal_status")
-    idPeriodUs_legal_status("id.us_legal_status"),
+    idUsLegalStatus("id.us_legal_status"),
 
     @SerialName(value = "id.visa_kind")
-    idPeriodVisa_kind("id.visa_kind"),
+    idVisaKind("id.visa_kind"),
 
     @SerialName(value = "id.visa_expiration_date")
-    idPeriodVisa_expiration_date("id.visa_expiration_date"),
+    idVisaExpirationDate("id.visa_expiration_date"),
 
     @SerialName(value = "id.nationality")
-    idPeriodNationality("id.nationality"),
+    idNationality("id.nationality"),
 
     @SerialName(value = "id.citizenships")
-    idPeriodCitizenships("id.citizenships"),
+    idCitizenships("id.citizenships"),
 
     @SerialName(value = "id.drivers_license_number")
-    idPeriodDrivers_license_number("id.drivers_license_number"),
+    idDriversLicenseNumber("id.drivers_license_number"),
 
     @SerialName(value = "id.drivers_license_state")
-    idPeriodDrivers_license_state("id.drivers_license_state"),
+    idDriversLicenseState("id.drivers_license_state"),
 
     @SerialName(value = "id.itin")
-    idPeriodItin("id.itin"),
+    idItin("id.itin"),
 
     @SerialName(value = "id.us_tax_id")
-    idPeriodUs_tax_id("id.us_tax_id"),
+    idUsTaxId("id.us_tax_id"),
 
     @SerialName(value = "business.name")
-    businessPeriodName("business.name"),
+    businessName("business.name"),
 
     @SerialName(value = "business.dba")
-    businessPeriodDba("business.dba"),
+    businessDba("business.dba"),
 
     @SerialName(value = "business.website")
-    businessPeriodWebsite("business.website"),
+    businessWebsite("business.website"),
 
     @SerialName(value = "business.phone_number")
-    businessPeriodPhone_number("business.phone_number"),
+    businessPhoneNumber("business.phone_number"),
 
     @SerialName(value = "business.tin")
-    businessPeriodTin("business.tin"),
+    businessTin("business.tin"),
 
     @SerialName(value = "business.address_line1")
-    businessPeriodAddress_line1("business.address_line1"),
+    businessAddressLine1("business.address_line1"),
 
     @SerialName(value = "business.address_line2")
-    businessPeriodAddress_line2("business.address_line2"),
+    businessAddressLine2("business.address_line2"),
 
     @SerialName(value = "business.city")
-    businessPeriodCity("business.city"),
+    businessCity("business.city"),
 
     @SerialName(value = "business.state")
-    businessPeriodState("business.state"),
+    businessState("business.state"),
 
     @SerialName(value = "business.zip")
-    businessPeriodZip("business.zip"),
+    businessZip("business.zip"),
 
     @SerialName(value = "business.country")
-    businessPeriodCountry("business.country"),
+    businessCountry("business.country"),
 
     @SerialName(value = "business.corporation_type")
-    businessPeriodCorporation_type("business.corporation_type"),
+    businessCorporationType("business.corporation_type"),
 
     @SerialName(value = "business.formation_state")
-    businessPeriodFormation_state("business.formation_state"),
+    businessFormationState("business.formation_state"),
 
     @SerialName(value = "business.formation_date")
-    businessPeriodFormation_date("business.formation_date"),
+    businessFormationDate("business.formation_date"),
 
     @SerialName(value = "custom.*")
-    customPeriodStar("custom.*"),
+    custom("custom.*"),
 
     @SerialName(value = "investor_profile.employment_status")
-    investor_profilePeriodEmployment_status("investor_profile.employment_status"),
+    investorProfileEmploymentStatus("investor_profile.employment_status"),
 
     @SerialName(value = "investor_profile.occupation")
-    investor_profilePeriodOccupation("investor_profile.occupation"),
+    investorProfileOccupation("investor_profile.occupation"),
 
     @SerialName(value = "investor_profile.employer")
-    investor_profilePeriodEmployer("investor_profile.employer"),
+    investorProfileEmployer("investor_profile.employer"),
 
     @SerialName(value = "investor_profile.annual_income")
-    investor_profilePeriodAnnual_income("investor_profile.annual_income"),
+    investorProfileAnnualIncome("investor_profile.annual_income"),
 
     @SerialName(value = "investor_profile.net_worth")
-    investor_profilePeriodNet_worth("investor_profile.net_worth"),
+    investorProfileNetWorth("investor_profile.net_worth"),
 
     @SerialName(value = "investor_profile.investment_goals")
-    investor_profilePeriodInvestment_goals("investor_profile.investment_goals"),
+    investorProfileInvestmentGoals("investor_profile.investment_goals"),
 
     @SerialName(value = "investor_profile.risk_tolerance")
-    investor_profilePeriodRisk_tolerance("investor_profile.risk_tolerance"),
+    investorProfileRiskTolerance("investor_profile.risk_tolerance"),
 
     @SerialName(value = "investor_profile.declarations")
-    investor_profilePeriodDeclarations("investor_profile.declarations"),
+    investorProfileDeclarations("investor_profile.declarations"),
 
     @SerialName(value = "investor_profile.brokerage_firm_employer")
-    investor_profilePeriodBrokerage_firm_employer("investor_profile.brokerage_firm_employer"),
+    investorProfileBrokerageFirmEmployer("investor_profile.brokerage_firm_employer"),
 
     @SerialName(value = "investor_profile.senior_executive_symbols")
-    investor_profilePeriodSenior_executive_symbols("investor_profile.senior_executive_symbols"),
+    investorProfileSeniorExecutiveSymbols("investor_profile.senior_executive_symbols"),
 
     @SerialName(value = "investor_profile.family_member_names")
-    investor_profilePeriodFamily_member_names("investor_profile.family_member_names"),
+    investorProfileFamilyMemberNames("investor_profile.family_member_names"),
 
     @SerialName(value = "investor_profile.political_organization")
-    investor_profilePeriodPolitical_organization("investor_profile.political_organization"),
+    investorProfilePoliticalOrganization("investor_profile.political_organization"),
 
     @SerialName(value = "investor_profile.funding_sources")
-    investor_profilePeriodFunding_sources("investor_profile.funding_sources"),
+    investorProfileFundingSources("investor_profile.funding_sources"),
 
     @SerialName(value = "document.id_card.front.image")
-    documentPeriodId_cardPeriodFrontPeriodImage("document.id_card.front.image"),
+    documentIdCardFrontImage("document.id_card.front.image"),
 
     @SerialName(value = "document.id_card.front.mime_type")
-    documentPeriodId_cardPeriodFrontPeriodMime_type("document.id_card.front.mime_type"),
+    documentIdCardFrontMimeType("document.id_card.front.mime_type"),
 
     @SerialName(value = "document.id_card.back.image")
-    documentPeriodId_cardPeriodBackPeriodImage("document.id_card.back.image"),
+    documentIdCardBackImage("document.id_card.back.image"),
 
     @SerialName(value = "document.id_card.back.mime_type")
-    documentPeriodId_cardPeriodBackPeriodMime_type("document.id_card.back.mime_type"),
+    documentIdCardBackMimeType("document.id_card.back.mime_type"),
 
     @SerialName(value = "document.id_card.selfie.image")
-    documentPeriodId_cardPeriodSelfiePeriodImage("document.id_card.selfie.image"),
+    documentIdCardSelfieImage("document.id_card.selfie.image"),
 
     @SerialName(value = "document.id_card.selfie.mime_type")
-    documentPeriodId_cardPeriodSelfiePeriodMime_type("document.id_card.selfie.mime_type"),
+    documentIdCardSelfieMimeType("document.id_card.selfie.mime_type"),
 
     @SerialName(value = "document.id_card.full_name")
-    documentPeriodId_cardPeriodFull_name("document.id_card.full_name"),
+    documentIdCardFullName("document.id_card.full_name"),
 
     @SerialName(value = "document.id_card.first_name")
-    documentPeriodId_cardPeriodFirst_name("document.id_card.first_name"),
+    documentIdCardFirstName("document.id_card.first_name"),
 
     @SerialName(value = "document.id_card.last_name")
-    documentPeriodId_cardPeriodLast_name("document.id_card.last_name"),
+    documentIdCardLastName("document.id_card.last_name"),
 
     @SerialName(value = "document.id_card.dob")
-    documentPeriodId_cardPeriodDob("document.id_card.dob"),
+    documentIdCardDob("document.id_card.dob"),
 
     @SerialName(value = "document.id_card.gender")
-    documentPeriodId_cardPeriodGender("document.id_card.gender"),
+    documentIdCardGender("document.id_card.gender"),
 
     @SerialName(value = "document.id_card.full_address")
-    documentPeriodId_cardPeriodFull_address("document.id_card.full_address"),
+    documentIdCardFullAddress("document.id_card.full_address"),
 
     @SerialName(value = "document.id_card.address_line1")
-    documentPeriodId_cardPeriodAddress_line1("document.id_card.address_line1"),
+    documentIdCardAddressLine1("document.id_card.address_line1"),
 
     @SerialName(value = "document.id_card.city")
-    documentPeriodId_cardPeriodCity("document.id_card.city"),
+    documentIdCardCity("document.id_card.city"),
 
     @SerialName(value = "document.id_card.state")
-    documentPeriodId_cardPeriodState("document.id_card.state"),
+    documentIdCardState("document.id_card.state"),
 
     @SerialName(value = "document.id_card.postal_code")
-    documentPeriodId_cardPeriodPostal_code("document.id_card.postal_code"),
+    documentIdCardPostalCode("document.id_card.postal_code"),
 
     @SerialName(value = "document.id_card.document_number")
-    documentPeriodId_cardPeriodDocument_number("document.id_card.document_number"),
+    documentIdCardDocumentNumber("document.id_card.document_number"),
 
     @SerialName(value = "document.id_card.expires_at")
-    documentPeriodId_cardPeriodExpires_at("document.id_card.expires_at"),
+    documentIdCardExpiresAt("document.id_card.expires_at"),
 
     @SerialName(value = "document.id_card.issued_at")
-    documentPeriodId_cardPeriodIssued_at("document.id_card.issued_at"),
+    documentIdCardIssuedAt("document.id_card.issued_at"),
 
     @SerialName(value = "document.id_card.issuing_state")
-    documentPeriodId_cardPeriodIssuing_state("document.id_card.issuing_state"),
+    documentIdCardIssuingState("document.id_card.issuing_state"),
 
     @SerialName(value = "document.id_card.issuing_country")
-    documentPeriodId_cardPeriodIssuing_country("document.id_card.issuing_country"),
+    documentIdCardIssuingCountry("document.id_card.issuing_country"),
 
     @SerialName(value = "document.id_card.ref_number")
-    documentPeriodId_cardPeriodRef_number("document.id_card.ref_number"),
+    documentIdCardRefNumber("document.id_card.ref_number"),
 
     @SerialName(value = "document.id_card.nationality")
-    documentPeriodId_cardPeriodNationality("document.id_card.nationality"),
+    documentIdCardNationality("document.id_card.nationality"),
 
     @SerialName(value = "document.id_card.curp")
-    documentPeriodId_cardPeriodCurp("document.id_card.curp"),
+    documentIdCardCurp("document.id_card.curp"),
 
     @SerialName(value = "document.id_card.clave_de_elector")
-    documentPeriodId_cardPeriodClave_de_elector("document.id_card.clave_de_elector"),
+    documentIdCardClaveDeElector("document.id_card.clave_de_elector"),
 
     @SerialName(value = "document.id_card.classified_document_type")
-    documentPeriodId_cardPeriodClassified_document_type("document.id_card.classified_document_type"),
+    documentIdCardClassifiedDocumentType("document.id_card.classified_document_type"),
 
     @SerialName(value = "document.id_card.curp_validation_response")
-    documentPeriodId_cardPeriodCurp_validation_response("document.id_card.curp_validation_response"),
+    documentIdCardCurpValidationResponse("document.id_card.curp_validation_response"),
 
     @SerialName(value = "document.id_card.samba_activity_history_response")
-    documentPeriodId_cardPeriodSamba_activity_history_response("document.id_card.samba_activity_history_response"),
+    documentIdCardSambaActivityHistoryResponse("document.id_card.samba_activity_history_response"),
 
     @SerialName(value = "document.id_card.us_issuing_state")
-    documentPeriodId_cardPeriodUs_issuing_state("document.id_card.us_issuing_state"),
+    documentIdCardUsIssuingState("document.id_card.us_issuing_state"),
 
     @SerialName(value = "document.drivers_license.front.image")
-    documentPeriodDrivers_licensePeriodFrontPeriodImage("document.drivers_license.front.image"),
+    documentDriversLicenseFrontImage("document.drivers_license.front.image"),
 
     @SerialName(value = "document.drivers_license.front.mime_type")
-    documentPeriodDrivers_licensePeriodFrontPeriodMime_type("document.drivers_license.front.mime_type"),
+    documentDriversLicenseFrontMimeType("document.drivers_license.front.mime_type"),
 
     @SerialName(value = "document.drivers_license.back.image")
-    documentPeriodDrivers_licensePeriodBackPeriodImage("document.drivers_license.back.image"),
+    documentDriversLicenseBackImage("document.drivers_license.back.image"),
 
     @SerialName(value = "document.drivers_license.back.mime_type")
-    documentPeriodDrivers_licensePeriodBackPeriodMime_type("document.drivers_license.back.mime_type"),
+    documentDriversLicenseBackMimeType("document.drivers_license.back.mime_type"),
 
     @SerialName(value = "document.drivers_license.selfie.image")
-    documentPeriodDrivers_licensePeriodSelfiePeriodImage("document.drivers_license.selfie.image"),
+    documentDriversLicenseSelfieImage("document.drivers_license.selfie.image"),
 
     @SerialName(value = "document.drivers_license.selfie.mime_type")
-    documentPeriodDrivers_licensePeriodSelfiePeriodMime_type("document.drivers_license.selfie.mime_type"),
+    documentDriversLicenseSelfieMimeType("document.drivers_license.selfie.mime_type"),
 
     @SerialName(value = "document.drivers_license.full_name")
-    documentPeriodDrivers_licensePeriodFull_name("document.drivers_license.full_name"),
+    documentDriversLicenseFullName("document.drivers_license.full_name"),
 
     @SerialName(value = "document.drivers_license.first_name")
-    documentPeriodDrivers_licensePeriodFirst_name("document.drivers_license.first_name"),
+    documentDriversLicenseFirstName("document.drivers_license.first_name"),
 
     @SerialName(value = "document.drivers_license.last_name")
-    documentPeriodDrivers_licensePeriodLast_name("document.drivers_license.last_name"),
+    documentDriversLicenseLastName("document.drivers_license.last_name"),
 
     @SerialName(value = "document.drivers_license.dob")
-    documentPeriodDrivers_licensePeriodDob("document.drivers_license.dob"),
+    documentDriversLicenseDob("document.drivers_license.dob"),
 
     @SerialName(value = "document.drivers_license.gender")
-    documentPeriodDrivers_licensePeriodGender("document.drivers_license.gender"),
+    documentDriversLicenseGender("document.drivers_license.gender"),
 
     @SerialName(value = "document.drivers_license.full_address")
-    documentPeriodDrivers_licensePeriodFull_address("document.drivers_license.full_address"),
+    documentDriversLicenseFullAddress("document.drivers_license.full_address"),
 
     @SerialName(value = "document.drivers_license.address_line1")
-    documentPeriodDrivers_licensePeriodAddress_line1("document.drivers_license.address_line1"),
+    documentDriversLicenseAddressLine1("document.drivers_license.address_line1"),
 
     @SerialName(value = "document.drivers_license.city")
-    documentPeriodDrivers_licensePeriodCity("document.drivers_license.city"),
+    documentDriversLicenseCity("document.drivers_license.city"),
 
     @SerialName(value = "document.drivers_license.state")
-    documentPeriodDrivers_licensePeriodState("document.drivers_license.state"),
+    documentDriversLicenseState("document.drivers_license.state"),
 
     @SerialName(value = "document.drivers_license.postal_code")
-    documentPeriodDrivers_licensePeriodPostal_code("document.drivers_license.postal_code"),
+    documentDriversLicensePostalCode("document.drivers_license.postal_code"),
 
     @SerialName(value = "document.drivers_license.document_number")
-    documentPeriodDrivers_licensePeriodDocument_number("document.drivers_license.document_number"),
+    documentDriversLicenseDocumentNumber("document.drivers_license.document_number"),
 
     @SerialName(value = "document.drivers_license.expires_at")
-    documentPeriodDrivers_licensePeriodExpires_at("document.drivers_license.expires_at"),
+    documentDriversLicenseExpiresAt("document.drivers_license.expires_at"),
 
     @SerialName(value = "document.drivers_license.issued_at")
-    documentPeriodDrivers_licensePeriodIssued_at("document.drivers_license.issued_at"),
+    documentDriversLicenseIssuedAt("document.drivers_license.issued_at"),
 
     @SerialName(value = "document.drivers_license.issuing_state")
-    documentPeriodDrivers_licensePeriodIssuing_state("document.drivers_license.issuing_state"),
+    documentDriversLicenseIssuingState("document.drivers_license.issuing_state"),
 
     @SerialName(value = "document.drivers_license.issuing_country")
-    documentPeriodDrivers_licensePeriodIssuing_country("document.drivers_license.issuing_country"),
+    documentDriversLicenseIssuingCountry("document.drivers_license.issuing_country"),
 
     @SerialName(value = "document.drivers_license.ref_number")
-    documentPeriodDrivers_licensePeriodRef_number("document.drivers_license.ref_number"),
+    documentDriversLicenseRefNumber("document.drivers_license.ref_number"),
 
     @SerialName(value = "document.drivers_license.nationality")
-    documentPeriodDrivers_licensePeriodNationality("document.drivers_license.nationality"),
+    documentDriversLicenseNationality("document.drivers_license.nationality"),
 
     @SerialName(value = "document.drivers_license.curp")
-    documentPeriodDrivers_licensePeriodCurp("document.drivers_license.curp"),
+    documentDriversLicenseCurp("document.drivers_license.curp"),
 
     @SerialName(value = "document.drivers_license.clave_de_elector")
-    documentPeriodDrivers_licensePeriodClave_de_elector("document.drivers_license.clave_de_elector"),
+    documentDriversLicenseClaveDeElector("document.drivers_license.clave_de_elector"),
 
     @SerialName(value = "document.drivers_license.classified_document_type")
-    documentPeriodDrivers_licensePeriodClassified_document_type("document.drivers_license.classified_document_type"),
+    documentDriversLicenseClassifiedDocumentType("document.drivers_license.classified_document_type"),
 
     @SerialName(value = "document.drivers_license.curp_validation_response")
-    documentPeriodDrivers_licensePeriodCurp_validation_response("document.drivers_license.curp_validation_response"),
+    documentDriversLicenseCurpValidationResponse("document.drivers_license.curp_validation_response"),
 
     @SerialName(value = "document.drivers_license.samba_activity_history_response")
-    documentPeriodDrivers_licensePeriodSamba_activity_history_response("document.drivers_license.samba_activity_history_response"),
+    documentDriversLicenseSambaActivityHistoryResponse("document.drivers_license.samba_activity_history_response"),
 
     @SerialName(value = "document.drivers_license.us_issuing_state")
-    documentPeriodDrivers_licensePeriodUs_issuing_state("document.drivers_license.us_issuing_state"),
+    documentDriversLicenseUsIssuingState("document.drivers_license.us_issuing_state"),
 
     @SerialName(value = "document.passport.front.image")
-    documentPeriodPassportPeriodFrontPeriodImage("document.passport.front.image"),
+    documentPassportFrontImage("document.passport.front.image"),
 
     @SerialName(value = "document.passport.front.mime_type")
-    documentPeriodPassportPeriodFrontPeriodMime_type("document.passport.front.mime_type"),
+    documentPassportFrontMimeType("document.passport.front.mime_type"),
 
     @SerialName(value = "document.passport.back.image")
-    documentPeriodPassportPeriodBackPeriodImage("document.passport.back.image"),
+    documentPassportBackImage("document.passport.back.image"),
 
     @SerialName(value = "document.passport.back.mime_type")
-    documentPeriodPassportPeriodBackPeriodMime_type("document.passport.back.mime_type"),
+    documentPassportBackMimeType("document.passport.back.mime_type"),
 
     @SerialName(value = "document.passport.selfie.image")
-    documentPeriodPassportPeriodSelfiePeriodImage("document.passport.selfie.image"),
+    documentPassportSelfieImage("document.passport.selfie.image"),
 
     @SerialName(value = "document.passport.selfie.mime_type")
-    documentPeriodPassportPeriodSelfiePeriodMime_type("document.passport.selfie.mime_type"),
+    documentPassportSelfieMimeType("document.passport.selfie.mime_type"),
 
     @SerialName(value = "document.passport.full_name")
-    documentPeriodPassportPeriodFull_name("document.passport.full_name"),
+    documentPassportFullName("document.passport.full_name"),
 
     @SerialName(value = "document.passport.first_name")
-    documentPeriodPassportPeriodFirst_name("document.passport.first_name"),
+    documentPassportFirstName("document.passport.first_name"),
 
     @SerialName(value = "document.passport.last_name")
-    documentPeriodPassportPeriodLast_name("document.passport.last_name"),
+    documentPassportLastName("document.passport.last_name"),
 
     @SerialName(value = "document.passport.dob")
-    documentPeriodPassportPeriodDob("document.passport.dob"),
+    documentPassportDob("document.passport.dob"),
 
     @SerialName(value = "document.passport.gender")
-    documentPeriodPassportPeriodGender("document.passport.gender"),
+    documentPassportGender("document.passport.gender"),
 
     @SerialName(value = "document.passport.full_address")
-    documentPeriodPassportPeriodFull_address("document.passport.full_address"),
+    documentPassportFullAddress("document.passport.full_address"),
 
     @SerialName(value = "document.passport.address_line1")
-    documentPeriodPassportPeriodAddress_line1("document.passport.address_line1"),
+    documentPassportAddressLine1("document.passport.address_line1"),
 
     @SerialName(value = "document.passport.city")
-    documentPeriodPassportPeriodCity("document.passport.city"),
+    documentPassportCity("document.passport.city"),
 
     @SerialName(value = "document.passport.state")
-    documentPeriodPassportPeriodState("document.passport.state"),
+    documentPassportState("document.passport.state"),
 
     @SerialName(value = "document.passport.postal_code")
-    documentPeriodPassportPeriodPostal_code("document.passport.postal_code"),
+    documentPassportPostalCode("document.passport.postal_code"),
 
     @SerialName(value = "document.passport.document_number")
-    documentPeriodPassportPeriodDocument_number("document.passport.document_number"),
+    documentPassportDocumentNumber("document.passport.document_number"),
 
     @SerialName(value = "document.passport.expires_at")
-    documentPeriodPassportPeriodExpires_at("document.passport.expires_at"),
+    documentPassportExpiresAt("document.passport.expires_at"),
 
     @SerialName(value = "document.passport.issued_at")
-    documentPeriodPassportPeriodIssued_at("document.passport.issued_at"),
+    documentPassportIssuedAt("document.passport.issued_at"),
 
     @SerialName(value = "document.passport.issuing_state")
-    documentPeriodPassportPeriodIssuing_state("document.passport.issuing_state"),
+    documentPassportIssuingState("document.passport.issuing_state"),
 
     @SerialName(value = "document.passport.issuing_country")
-    documentPeriodPassportPeriodIssuing_country("document.passport.issuing_country"),
+    documentPassportIssuingCountry("document.passport.issuing_country"),
 
     @SerialName(value = "document.passport.ref_number")
-    documentPeriodPassportPeriodRef_number("document.passport.ref_number"),
+    documentPassportRefNumber("document.passport.ref_number"),
 
     @SerialName(value = "document.passport.nationality")
-    documentPeriodPassportPeriodNationality("document.passport.nationality"),
+    documentPassportNationality("document.passport.nationality"),
 
     @SerialName(value = "document.passport.curp")
-    documentPeriodPassportPeriodCurp("document.passport.curp"),
+    documentPassportCurp("document.passport.curp"),
 
     @SerialName(value = "document.passport.clave_de_elector")
-    documentPeriodPassportPeriodClave_de_elector("document.passport.clave_de_elector"),
+    documentPassportClaveDeElector("document.passport.clave_de_elector"),
 
     @SerialName(value = "document.passport.classified_document_type")
-    documentPeriodPassportPeriodClassified_document_type("document.passport.classified_document_type"),
+    documentPassportClassifiedDocumentType("document.passport.classified_document_type"),
 
     @SerialName(value = "document.passport.curp_validation_response")
-    documentPeriodPassportPeriodCurp_validation_response("document.passport.curp_validation_response"),
+    documentPassportCurpValidationResponse("document.passport.curp_validation_response"),
 
     @SerialName(value = "document.passport.samba_activity_history_response")
-    documentPeriodPassportPeriodSamba_activity_history_response("document.passport.samba_activity_history_response"),
+    documentPassportSambaActivityHistoryResponse("document.passport.samba_activity_history_response"),
 
     @SerialName(value = "document.passport.us_issuing_state")
-    documentPeriodPassportPeriodUs_issuing_state("document.passport.us_issuing_state"),
+    documentPassportUsIssuingState("document.passport.us_issuing_state"),
 
     @SerialName(value = "document.passport_card.front.image")
-    documentPeriodPassport_cardPeriodFrontPeriodImage("document.passport_card.front.image"),
+    documentPassportCardFrontImage("document.passport_card.front.image"),
 
     @SerialName(value = "document.passport_card.front.mime_type")
-    documentPeriodPassport_cardPeriodFrontPeriodMime_type("document.passport_card.front.mime_type"),
+    documentPassportCardFrontMimeType("document.passport_card.front.mime_type"),
 
     @SerialName(value = "document.passport_card.back.image")
-    documentPeriodPassport_cardPeriodBackPeriodImage("document.passport_card.back.image"),
+    documentPassportCardBackImage("document.passport_card.back.image"),
 
     @SerialName(value = "document.passport_card.back.mime_type")
-    documentPeriodPassport_cardPeriodBackPeriodMime_type("document.passport_card.back.mime_type"),
+    documentPassportCardBackMimeType("document.passport_card.back.mime_type"),
 
     @SerialName(value = "document.passport_card.selfie.image")
-    documentPeriodPassport_cardPeriodSelfiePeriodImage("document.passport_card.selfie.image"),
+    documentPassportCardSelfieImage("document.passport_card.selfie.image"),
 
     @SerialName(value = "document.passport_card.selfie.mime_type")
-    documentPeriodPassport_cardPeriodSelfiePeriodMime_type("document.passport_card.selfie.mime_type"),
+    documentPassportCardSelfieMimeType("document.passport_card.selfie.mime_type"),
 
     @SerialName(value = "document.passport_card.full_name")
-    documentPeriodPassport_cardPeriodFull_name("document.passport_card.full_name"),
+    documentPassportCardFullName("document.passport_card.full_name"),
 
     @SerialName(value = "document.passport_card.first_name")
-    documentPeriodPassport_cardPeriodFirst_name("document.passport_card.first_name"),
+    documentPassportCardFirstName("document.passport_card.first_name"),
 
     @SerialName(value = "document.passport_card.last_name")
-    documentPeriodPassport_cardPeriodLast_name("document.passport_card.last_name"),
+    documentPassportCardLastName("document.passport_card.last_name"),
 
     @SerialName(value = "document.passport_card.dob")
-    documentPeriodPassport_cardPeriodDob("document.passport_card.dob"),
+    documentPassportCardDob("document.passport_card.dob"),
 
     @SerialName(value = "document.passport_card.gender")
-    documentPeriodPassport_cardPeriodGender("document.passport_card.gender"),
+    documentPassportCardGender("document.passport_card.gender"),
 
     @SerialName(value = "document.passport_card.full_address")
-    documentPeriodPassport_cardPeriodFull_address("document.passport_card.full_address"),
+    documentPassportCardFullAddress("document.passport_card.full_address"),
 
     @SerialName(value = "document.passport_card.address_line1")
-    documentPeriodPassport_cardPeriodAddress_line1("document.passport_card.address_line1"),
+    documentPassportCardAddressLine1("document.passport_card.address_line1"),
 
     @SerialName(value = "document.passport_card.city")
-    documentPeriodPassport_cardPeriodCity("document.passport_card.city"),
+    documentPassportCardCity("document.passport_card.city"),
 
     @SerialName(value = "document.passport_card.state")
-    documentPeriodPassport_cardPeriodState("document.passport_card.state"),
+    documentPassportCardState("document.passport_card.state"),
 
     @SerialName(value = "document.passport_card.postal_code")
-    documentPeriodPassport_cardPeriodPostal_code("document.passport_card.postal_code"),
+    documentPassportCardPostalCode("document.passport_card.postal_code"),
 
     @SerialName(value = "document.passport_card.document_number")
-    documentPeriodPassport_cardPeriodDocument_number("document.passport_card.document_number"),
+    documentPassportCardDocumentNumber("document.passport_card.document_number"),
 
     @SerialName(value = "document.passport_card.expires_at")
-    documentPeriodPassport_cardPeriodExpires_at("document.passport_card.expires_at"),
+    documentPassportCardExpiresAt("document.passport_card.expires_at"),
 
     @SerialName(value = "document.passport_card.issued_at")
-    documentPeriodPassport_cardPeriodIssued_at("document.passport_card.issued_at"),
+    documentPassportCardIssuedAt("document.passport_card.issued_at"),
 
     @SerialName(value = "document.passport_card.issuing_state")
-    documentPeriodPassport_cardPeriodIssuing_state("document.passport_card.issuing_state"),
+    documentPassportCardIssuingState("document.passport_card.issuing_state"),
 
     @SerialName(value = "document.passport_card.issuing_country")
-    documentPeriodPassport_cardPeriodIssuing_country("document.passport_card.issuing_country"),
+    documentPassportCardIssuingCountry("document.passport_card.issuing_country"),
 
     @SerialName(value = "document.passport_card.ref_number")
-    documentPeriodPassport_cardPeriodRef_number("document.passport_card.ref_number"),
+    documentPassportCardRefNumber("document.passport_card.ref_number"),
 
     @SerialName(value = "document.passport_card.nationality")
-    documentPeriodPassport_cardPeriodNationality("document.passport_card.nationality"),
+    documentPassportCardNationality("document.passport_card.nationality"),
 
     @SerialName(value = "document.passport_card.curp")
-    documentPeriodPassport_cardPeriodCurp("document.passport_card.curp"),
+    documentPassportCardCurp("document.passport_card.curp"),
 
     @SerialName(value = "document.passport_card.clave_de_elector")
-    documentPeriodPassport_cardPeriodClave_de_elector("document.passport_card.clave_de_elector"),
+    documentPassportCardClaveDeElector("document.passport_card.clave_de_elector"),
 
     @SerialName(value = "document.passport_card.classified_document_type")
-    documentPeriodPassport_cardPeriodClassified_document_type("document.passport_card.classified_document_type"),
+    documentPassportCardClassifiedDocumentType("document.passport_card.classified_document_type"),
 
     @SerialName(value = "document.passport_card.curp_validation_response")
-    documentPeriodPassport_cardPeriodCurp_validation_response("document.passport_card.curp_validation_response"),
+    documentPassportCardCurpValidationResponse("document.passport_card.curp_validation_response"),
 
     @SerialName(value = "document.passport_card.samba_activity_history_response")
-    documentPeriodPassport_cardPeriodSamba_activity_history_response("document.passport_card.samba_activity_history_response"),
+    documentPassportCardSambaActivityHistoryResponse("document.passport_card.samba_activity_history_response"),
 
     @SerialName(value = "document.passport_card.us_issuing_state")
-    documentPeriodPassport_cardPeriodUs_issuing_state("document.passport_card.us_issuing_state"),
+    documentPassportCardUsIssuingState("document.passport_card.us_issuing_state"),
 
     @SerialName(value = "document.permit.front.image")
-    documentPeriodPermitPeriodFrontPeriodImage("document.permit.front.image"),
+    documentPermitFrontImage("document.permit.front.image"),
 
     @SerialName(value = "document.permit.front.mime_type")
-    documentPeriodPermitPeriodFrontPeriodMime_type("document.permit.front.mime_type"),
+    documentPermitFrontMimeType("document.permit.front.mime_type"),
 
     @SerialName(value = "document.permit.back.image")
-    documentPeriodPermitPeriodBackPeriodImage("document.permit.back.image"),
+    documentPermitBackImage("document.permit.back.image"),
 
     @SerialName(value = "document.permit.back.mime_type")
-    documentPeriodPermitPeriodBackPeriodMime_type("document.permit.back.mime_type"),
+    documentPermitBackMimeType("document.permit.back.mime_type"),
 
     @SerialName(value = "document.permit.selfie.image")
-    documentPeriodPermitPeriodSelfiePeriodImage("document.permit.selfie.image"),
+    documentPermitSelfieImage("document.permit.selfie.image"),
 
     @SerialName(value = "document.permit.selfie.mime_type")
-    documentPeriodPermitPeriodSelfiePeriodMime_type("document.permit.selfie.mime_type"),
+    documentPermitSelfieMimeType("document.permit.selfie.mime_type"),
 
     @SerialName(value = "document.permit.full_name")
-    documentPeriodPermitPeriodFull_name("document.permit.full_name"),
+    documentPermitFullName("document.permit.full_name"),
 
     @SerialName(value = "document.permit.first_name")
-    documentPeriodPermitPeriodFirst_name("document.permit.first_name"),
+    documentPermitFirstName("document.permit.first_name"),
 
     @SerialName(value = "document.permit.last_name")
-    documentPeriodPermitPeriodLast_name("document.permit.last_name"),
+    documentPermitLastName("document.permit.last_name"),
 
     @SerialName(value = "document.permit.dob")
-    documentPeriodPermitPeriodDob("document.permit.dob"),
+    documentPermitDob("document.permit.dob"),
 
     @SerialName(value = "document.permit.gender")
-    documentPeriodPermitPeriodGender("document.permit.gender"),
+    documentPermitGender("document.permit.gender"),
 
     @SerialName(value = "document.permit.full_address")
-    documentPeriodPermitPeriodFull_address("document.permit.full_address"),
+    documentPermitFullAddress("document.permit.full_address"),
 
     @SerialName(value = "document.permit.address_line1")
-    documentPeriodPermitPeriodAddress_line1("document.permit.address_line1"),
+    documentPermitAddressLine1("document.permit.address_line1"),
 
     @SerialName(value = "document.permit.city")
-    documentPeriodPermitPeriodCity("document.permit.city"),
+    documentPermitCity("document.permit.city"),
 
     @SerialName(value = "document.permit.state")
-    documentPeriodPermitPeriodState("document.permit.state"),
+    documentPermitState("document.permit.state"),
 
     @SerialName(value = "document.permit.postal_code")
-    documentPeriodPermitPeriodPostal_code("document.permit.postal_code"),
+    documentPermitPostalCode("document.permit.postal_code"),
 
     @SerialName(value = "document.permit.document_number")
-    documentPeriodPermitPeriodDocument_number("document.permit.document_number"),
+    documentPermitDocumentNumber("document.permit.document_number"),
 
     @SerialName(value = "document.permit.expires_at")
-    documentPeriodPermitPeriodExpires_at("document.permit.expires_at"),
+    documentPermitExpiresAt("document.permit.expires_at"),
 
     @SerialName(value = "document.permit.issued_at")
-    documentPeriodPermitPeriodIssued_at("document.permit.issued_at"),
+    documentPermitIssuedAt("document.permit.issued_at"),
 
     @SerialName(value = "document.permit.issuing_state")
-    documentPeriodPermitPeriodIssuing_state("document.permit.issuing_state"),
+    documentPermitIssuingState("document.permit.issuing_state"),
 
     @SerialName(value = "document.permit.issuing_country")
-    documentPeriodPermitPeriodIssuing_country("document.permit.issuing_country"),
+    documentPermitIssuingCountry("document.permit.issuing_country"),
 
     @SerialName(value = "document.permit.ref_number")
-    documentPeriodPermitPeriodRef_number("document.permit.ref_number"),
+    documentPermitRefNumber("document.permit.ref_number"),
 
     @SerialName(value = "document.permit.nationality")
-    documentPeriodPermitPeriodNationality("document.permit.nationality"),
+    documentPermitNationality("document.permit.nationality"),
 
     @SerialName(value = "document.permit.curp")
-    documentPeriodPermitPeriodCurp("document.permit.curp"),
+    documentPermitCurp("document.permit.curp"),
 
     @SerialName(value = "document.permit.clave_de_elector")
-    documentPeriodPermitPeriodClave_de_elector("document.permit.clave_de_elector"),
+    documentPermitClaveDeElector("document.permit.clave_de_elector"),
 
     @SerialName(value = "document.permit.classified_document_type")
-    documentPeriodPermitPeriodClassified_document_type("document.permit.classified_document_type"),
+    documentPermitClassifiedDocumentType("document.permit.classified_document_type"),
 
     @SerialName(value = "document.permit.curp_validation_response")
-    documentPeriodPermitPeriodCurp_validation_response("document.permit.curp_validation_response"),
+    documentPermitCurpValidationResponse("document.permit.curp_validation_response"),
 
     @SerialName(value = "document.permit.samba_activity_history_response")
-    documentPeriodPermitPeriodSamba_activity_history_response("document.permit.samba_activity_history_response"),
+    documentPermitSambaActivityHistoryResponse("document.permit.samba_activity_history_response"),
 
     @SerialName(value = "document.permit.us_issuing_state")
-    documentPeriodPermitPeriodUs_issuing_state("document.permit.us_issuing_state"),
+    documentPermitUsIssuingState("document.permit.us_issuing_state"),
 
     @SerialName(value = "document.visa.front.image")
-    documentPeriodVisaPeriodFrontPeriodImage("document.visa.front.image"),
+    documentVisaFrontImage("document.visa.front.image"),
 
     @SerialName(value = "document.visa.front.mime_type")
-    documentPeriodVisaPeriodFrontPeriodMime_type("document.visa.front.mime_type"),
+    documentVisaFrontMimeType("document.visa.front.mime_type"),
 
     @SerialName(value = "document.visa.back.image")
-    documentPeriodVisaPeriodBackPeriodImage("document.visa.back.image"),
+    documentVisaBackImage("document.visa.back.image"),
 
     @SerialName(value = "document.visa.back.mime_type")
-    documentPeriodVisaPeriodBackPeriodMime_type("document.visa.back.mime_type"),
+    documentVisaBackMimeType("document.visa.back.mime_type"),
 
     @SerialName(value = "document.visa.selfie.image")
-    documentPeriodVisaPeriodSelfiePeriodImage("document.visa.selfie.image"),
+    documentVisaSelfieImage("document.visa.selfie.image"),
 
     @SerialName(value = "document.visa.selfie.mime_type")
-    documentPeriodVisaPeriodSelfiePeriodMime_type("document.visa.selfie.mime_type"),
+    documentVisaSelfieMimeType("document.visa.selfie.mime_type"),
 
     @SerialName(value = "document.visa.full_name")
-    documentPeriodVisaPeriodFull_name("document.visa.full_name"),
+    documentVisaFullName("document.visa.full_name"),
 
     @SerialName(value = "document.visa.first_name")
-    documentPeriodVisaPeriodFirst_name("document.visa.first_name"),
+    documentVisaFirstName("document.visa.first_name"),
 
     @SerialName(value = "document.visa.last_name")
-    documentPeriodVisaPeriodLast_name("document.visa.last_name"),
+    documentVisaLastName("document.visa.last_name"),
 
     @SerialName(value = "document.visa.dob")
-    documentPeriodVisaPeriodDob("document.visa.dob"),
+    documentVisaDob("document.visa.dob"),
 
     @SerialName(value = "document.visa.gender")
-    documentPeriodVisaPeriodGender("document.visa.gender"),
+    documentVisaGender("document.visa.gender"),
 
     @SerialName(value = "document.visa.full_address")
-    documentPeriodVisaPeriodFull_address("document.visa.full_address"),
+    documentVisaFullAddress("document.visa.full_address"),
 
     @SerialName(value = "document.visa.address_line1")
-    documentPeriodVisaPeriodAddress_line1("document.visa.address_line1"),
+    documentVisaAddressLine1("document.visa.address_line1"),
 
     @SerialName(value = "document.visa.city")
-    documentPeriodVisaPeriodCity("document.visa.city"),
+    documentVisaCity("document.visa.city"),
 
     @SerialName(value = "document.visa.state")
-    documentPeriodVisaPeriodState("document.visa.state"),
+    documentVisaState("document.visa.state"),
 
     @SerialName(value = "document.visa.postal_code")
-    documentPeriodVisaPeriodPostal_code("document.visa.postal_code"),
+    documentVisaPostalCode("document.visa.postal_code"),
 
     @SerialName(value = "document.visa.document_number")
-    documentPeriodVisaPeriodDocument_number("document.visa.document_number"),
+    documentVisaDocumentNumber("document.visa.document_number"),
 
     @SerialName(value = "document.visa.expires_at")
-    documentPeriodVisaPeriodExpires_at("document.visa.expires_at"),
+    documentVisaExpiresAt("document.visa.expires_at"),
 
     @SerialName(value = "document.visa.issued_at")
-    documentPeriodVisaPeriodIssued_at("document.visa.issued_at"),
+    documentVisaIssuedAt("document.visa.issued_at"),
 
     @SerialName(value = "document.visa.issuing_state")
-    documentPeriodVisaPeriodIssuing_state("document.visa.issuing_state"),
+    documentVisaIssuingState("document.visa.issuing_state"),
 
     @SerialName(value = "document.visa.issuing_country")
-    documentPeriodVisaPeriodIssuing_country("document.visa.issuing_country"),
+    documentVisaIssuingCountry("document.visa.issuing_country"),
 
     @SerialName(value = "document.visa.ref_number")
-    documentPeriodVisaPeriodRef_number("document.visa.ref_number"),
+    documentVisaRefNumber("document.visa.ref_number"),
 
     @SerialName(value = "document.visa.nationality")
-    documentPeriodVisaPeriodNationality("document.visa.nationality"),
+    documentVisaNationality("document.visa.nationality"),
 
     @SerialName(value = "document.visa.curp")
-    documentPeriodVisaPeriodCurp("document.visa.curp"),
+    documentVisaCurp("document.visa.curp"),
 
     @SerialName(value = "document.visa.clave_de_elector")
-    documentPeriodVisaPeriodClave_de_elector("document.visa.clave_de_elector"),
+    documentVisaClaveDeElector("document.visa.clave_de_elector"),
 
     @SerialName(value = "document.visa.classified_document_type")
-    documentPeriodVisaPeriodClassified_document_type("document.visa.classified_document_type"),
+    documentVisaClassifiedDocumentType("document.visa.classified_document_type"),
 
     @SerialName(value = "document.visa.curp_validation_response")
-    documentPeriodVisaPeriodCurp_validation_response("document.visa.curp_validation_response"),
+    documentVisaCurpValidationResponse("document.visa.curp_validation_response"),
 
     @SerialName(value = "document.visa.samba_activity_history_response")
-    documentPeriodVisaPeriodSamba_activity_history_response("document.visa.samba_activity_history_response"),
+    documentVisaSambaActivityHistoryResponse("document.visa.samba_activity_history_response"),
 
     @SerialName(value = "document.visa.us_issuing_state")
-    documentPeriodVisaPeriodUs_issuing_state("document.visa.us_issuing_state"),
+    documentVisaUsIssuingState("document.visa.us_issuing_state"),
 
     @SerialName(value = "document.residence_document.front.image")
-    documentPeriodResidence_documentPeriodFrontPeriodImage("document.residence_document.front.image"),
+    documentResidenceDocumentFrontImage("document.residence_document.front.image"),
 
     @SerialName(value = "document.residence_document.front.mime_type")
-    documentPeriodResidence_documentPeriodFrontPeriodMime_type("document.residence_document.front.mime_type"),
+    documentResidenceDocumentFrontMimeType("document.residence_document.front.mime_type"),
 
     @SerialName(value = "document.residence_document.back.image")
-    documentPeriodResidence_documentPeriodBackPeriodImage("document.residence_document.back.image"),
+    documentResidenceDocumentBackImage("document.residence_document.back.image"),
 
     @SerialName(value = "document.residence_document.back.mime_type")
-    documentPeriodResidence_documentPeriodBackPeriodMime_type("document.residence_document.back.mime_type"),
+    documentResidenceDocumentBackMimeType("document.residence_document.back.mime_type"),
 
     @SerialName(value = "document.residence_document.selfie.image")
-    documentPeriodResidence_documentPeriodSelfiePeriodImage("document.residence_document.selfie.image"),
+    documentResidenceDocumentSelfieImage("document.residence_document.selfie.image"),
 
     @SerialName(value = "document.residence_document.selfie.mime_type")
-    documentPeriodResidence_documentPeriodSelfiePeriodMime_type("document.residence_document.selfie.mime_type"),
+    documentResidenceDocumentSelfieMimeType("document.residence_document.selfie.mime_type"),
 
     @SerialName(value = "document.residence_document.full_name")
-    documentPeriodResidence_documentPeriodFull_name("document.residence_document.full_name"),
+    documentResidenceDocumentFullName("document.residence_document.full_name"),
 
     @SerialName(value = "document.residence_document.first_name")
-    documentPeriodResidence_documentPeriodFirst_name("document.residence_document.first_name"),
+    documentResidenceDocumentFirstName("document.residence_document.first_name"),
 
     @SerialName(value = "document.residence_document.last_name")
-    documentPeriodResidence_documentPeriodLast_name("document.residence_document.last_name"),
+    documentResidenceDocumentLastName("document.residence_document.last_name"),
 
     @SerialName(value = "document.residence_document.dob")
-    documentPeriodResidence_documentPeriodDob("document.residence_document.dob"),
+    documentResidenceDocumentDob("document.residence_document.dob"),
 
     @SerialName(value = "document.residence_document.gender")
-    documentPeriodResidence_documentPeriodGender("document.residence_document.gender"),
+    documentResidenceDocumentGender("document.residence_document.gender"),
 
     @SerialName(value = "document.residence_document.full_address")
-    documentPeriodResidence_documentPeriodFull_address("document.residence_document.full_address"),
+    documentResidenceDocumentFullAddress("document.residence_document.full_address"),
 
     @SerialName(value = "document.residence_document.address_line1")
-    documentPeriodResidence_documentPeriodAddress_line1("document.residence_document.address_line1"),
+    documentResidenceDocumentAddressLine1("document.residence_document.address_line1"),
 
     @SerialName(value = "document.residence_document.city")
-    documentPeriodResidence_documentPeriodCity("document.residence_document.city"),
+    documentResidenceDocumentCity("document.residence_document.city"),
 
     @SerialName(value = "document.residence_document.state")
-    documentPeriodResidence_documentPeriodState("document.residence_document.state"),
+    documentResidenceDocumentState("document.residence_document.state"),
 
     @SerialName(value = "document.residence_document.postal_code")
-    documentPeriodResidence_documentPeriodPostal_code("document.residence_document.postal_code"),
+    documentResidenceDocumentPostalCode("document.residence_document.postal_code"),
 
     @SerialName(value = "document.residence_document.document_number")
-    documentPeriodResidence_documentPeriodDocument_number("document.residence_document.document_number"),
+    documentResidenceDocumentDocumentNumber("document.residence_document.document_number"),
 
     @SerialName(value = "document.residence_document.expires_at")
-    documentPeriodResidence_documentPeriodExpires_at("document.residence_document.expires_at"),
+    documentResidenceDocumentExpiresAt("document.residence_document.expires_at"),
 
     @SerialName(value = "document.residence_document.issued_at")
-    documentPeriodResidence_documentPeriodIssued_at("document.residence_document.issued_at"),
+    documentResidenceDocumentIssuedAt("document.residence_document.issued_at"),
 
     @SerialName(value = "document.residence_document.issuing_state")
-    documentPeriodResidence_documentPeriodIssuing_state("document.residence_document.issuing_state"),
+    documentResidenceDocumentIssuingState("document.residence_document.issuing_state"),
 
     @SerialName(value = "document.residence_document.issuing_country")
-    documentPeriodResidence_documentPeriodIssuing_country("document.residence_document.issuing_country"),
+    documentResidenceDocumentIssuingCountry("document.residence_document.issuing_country"),
 
     @SerialName(value = "document.residence_document.ref_number")
-    documentPeriodResidence_documentPeriodRef_number("document.residence_document.ref_number"),
+    documentResidenceDocumentRefNumber("document.residence_document.ref_number"),
 
     @SerialName(value = "document.residence_document.nationality")
-    documentPeriodResidence_documentPeriodNationality("document.residence_document.nationality"),
+    documentResidenceDocumentNationality("document.residence_document.nationality"),
 
     @SerialName(value = "document.residence_document.curp")
-    documentPeriodResidence_documentPeriodCurp("document.residence_document.curp"),
+    documentResidenceDocumentCurp("document.residence_document.curp"),
 
     @SerialName(value = "document.residence_document.clave_de_elector")
-    documentPeriodResidence_documentPeriodClave_de_elector("document.residence_document.clave_de_elector"),
+    documentResidenceDocumentClaveDeElector("document.residence_document.clave_de_elector"),
 
     @SerialName(value = "document.residence_document.classified_document_type")
-    documentPeriodResidence_documentPeriodClassified_document_type("document.residence_document.classified_document_type"),
+    documentResidenceDocumentClassifiedDocumentType("document.residence_document.classified_document_type"),
 
     @SerialName(value = "document.residence_document.curp_validation_response")
-    documentPeriodResidence_documentPeriodCurp_validation_response("document.residence_document.curp_validation_response"),
+    documentResidenceDocumentCurpValidationResponse("document.residence_document.curp_validation_response"),
 
     @SerialName(value = "document.residence_document.samba_activity_history_response")
-    documentPeriodResidence_documentPeriodSamba_activity_history_response("document.residence_document.samba_activity_history_response"),
+    documentResidenceDocumentSambaActivityHistoryResponse("document.residence_document.samba_activity_history_response"),
 
     @SerialName(value = "document.residence_document.us_issuing_state")
-    documentPeriodResidence_documentPeriodUs_issuing_state("document.residence_document.us_issuing_state"),
+    documentResidenceDocumentUsIssuingState("document.residence_document.us_issuing_state"),
 
     @SerialName(value = "document.voter_identification.front.image")
-    documentPeriodVoter_identificationPeriodFrontPeriodImage("document.voter_identification.front.image"),
+    documentVoterIdentificationFrontImage("document.voter_identification.front.image"),
 
     @SerialName(value = "document.voter_identification.front.mime_type")
-    documentPeriodVoter_identificationPeriodFrontPeriodMime_type("document.voter_identification.front.mime_type"),
+    documentVoterIdentificationFrontMimeType("document.voter_identification.front.mime_type"),
 
     @SerialName(value = "document.voter_identification.back.image")
-    documentPeriodVoter_identificationPeriodBackPeriodImage("document.voter_identification.back.image"),
+    documentVoterIdentificationBackImage("document.voter_identification.back.image"),
 
     @SerialName(value = "document.voter_identification.back.mime_type")
-    documentPeriodVoter_identificationPeriodBackPeriodMime_type("document.voter_identification.back.mime_type"),
+    documentVoterIdentificationBackMimeType("document.voter_identification.back.mime_type"),
 
     @SerialName(value = "document.voter_identification.selfie.image")
-    documentPeriodVoter_identificationPeriodSelfiePeriodImage("document.voter_identification.selfie.image"),
+    documentVoterIdentificationSelfieImage("document.voter_identification.selfie.image"),
 
     @SerialName(value = "document.voter_identification.selfie.mime_type")
-    documentPeriodVoter_identificationPeriodSelfiePeriodMime_type("document.voter_identification.selfie.mime_type"),
+    documentVoterIdentificationSelfieMimeType("document.voter_identification.selfie.mime_type"),
 
     @SerialName(value = "document.voter_identification.full_name")
-    documentPeriodVoter_identificationPeriodFull_name("document.voter_identification.full_name"),
+    documentVoterIdentificationFullName("document.voter_identification.full_name"),
 
     @SerialName(value = "document.voter_identification.first_name")
-    documentPeriodVoter_identificationPeriodFirst_name("document.voter_identification.first_name"),
+    documentVoterIdentificationFirstName("document.voter_identification.first_name"),
 
     @SerialName(value = "document.voter_identification.last_name")
-    documentPeriodVoter_identificationPeriodLast_name("document.voter_identification.last_name"),
+    documentVoterIdentificationLastName("document.voter_identification.last_name"),
 
     @SerialName(value = "document.voter_identification.dob")
-    documentPeriodVoter_identificationPeriodDob("document.voter_identification.dob"),
+    documentVoterIdentificationDob("document.voter_identification.dob"),
 
     @SerialName(value = "document.voter_identification.gender")
-    documentPeriodVoter_identificationPeriodGender("document.voter_identification.gender"),
+    documentVoterIdentificationGender("document.voter_identification.gender"),
 
     @SerialName(value = "document.voter_identification.full_address")
-    documentPeriodVoter_identificationPeriodFull_address("document.voter_identification.full_address"),
+    documentVoterIdentificationFullAddress("document.voter_identification.full_address"),
 
     @SerialName(value = "document.voter_identification.address_line1")
-    documentPeriodVoter_identificationPeriodAddress_line1("document.voter_identification.address_line1"),
+    documentVoterIdentificationAddressLine1("document.voter_identification.address_line1"),
 
     @SerialName(value = "document.voter_identification.city")
-    documentPeriodVoter_identificationPeriodCity("document.voter_identification.city"),
+    documentVoterIdentificationCity("document.voter_identification.city"),
 
     @SerialName(value = "document.voter_identification.state")
-    documentPeriodVoter_identificationPeriodState("document.voter_identification.state"),
+    documentVoterIdentificationState("document.voter_identification.state"),
 
     @SerialName(value = "document.voter_identification.postal_code")
-    documentPeriodVoter_identificationPeriodPostal_code("document.voter_identification.postal_code"),
+    documentVoterIdentificationPostalCode("document.voter_identification.postal_code"),
 
     @SerialName(value = "document.voter_identification.document_number")
-    documentPeriodVoter_identificationPeriodDocument_number("document.voter_identification.document_number"),
+    documentVoterIdentificationDocumentNumber("document.voter_identification.document_number"),
 
     @SerialName(value = "document.voter_identification.expires_at")
-    documentPeriodVoter_identificationPeriodExpires_at("document.voter_identification.expires_at"),
+    documentVoterIdentificationExpiresAt("document.voter_identification.expires_at"),
 
     @SerialName(value = "document.voter_identification.issued_at")
-    documentPeriodVoter_identificationPeriodIssued_at("document.voter_identification.issued_at"),
+    documentVoterIdentificationIssuedAt("document.voter_identification.issued_at"),
 
     @SerialName(value = "document.voter_identification.issuing_state")
-    documentPeriodVoter_identificationPeriodIssuing_state("document.voter_identification.issuing_state"),
+    documentVoterIdentificationIssuingState("document.voter_identification.issuing_state"),
 
     @SerialName(value = "document.voter_identification.issuing_country")
-    documentPeriodVoter_identificationPeriodIssuing_country("document.voter_identification.issuing_country"),
+    documentVoterIdentificationIssuingCountry("document.voter_identification.issuing_country"),
 
     @SerialName(value = "document.voter_identification.ref_number")
-    documentPeriodVoter_identificationPeriodRef_number("document.voter_identification.ref_number"),
+    documentVoterIdentificationRefNumber("document.voter_identification.ref_number"),
 
     @SerialName(value = "document.voter_identification.nationality")
-    documentPeriodVoter_identificationPeriodNationality("document.voter_identification.nationality"),
+    documentVoterIdentificationNationality("document.voter_identification.nationality"),
 
     @SerialName(value = "document.voter_identification.curp")
-    documentPeriodVoter_identificationPeriodCurp("document.voter_identification.curp"),
+    documentVoterIdentificationCurp("document.voter_identification.curp"),
 
     @SerialName(value = "document.voter_identification.clave_de_elector")
-    documentPeriodVoter_identificationPeriodClave_de_elector("document.voter_identification.clave_de_elector"),
+    documentVoterIdentificationClaveDeElector("document.voter_identification.clave_de_elector"),
 
     @SerialName(value = "document.voter_identification.classified_document_type")
-    documentPeriodVoter_identificationPeriodClassified_document_type("document.voter_identification.classified_document_type"),
+    documentVoterIdentificationClassifiedDocumentType("document.voter_identification.classified_document_type"),
 
     @SerialName(value = "document.voter_identification.curp_validation_response")
-    documentPeriodVoter_identificationPeriodCurp_validation_response("document.voter_identification.curp_validation_response"),
+    documentVoterIdentificationCurpValidationResponse("document.voter_identification.curp_validation_response"),
 
     @SerialName(value = "document.voter_identification.samba_activity_history_response")
-    documentPeriodVoter_identificationPeriodSamba_activity_history_response("document.voter_identification.samba_activity_history_response"),
+    documentVoterIdentificationSambaActivityHistoryResponse("document.voter_identification.samba_activity_history_response"),
 
     @SerialName(value = "document.voter_identification.us_issuing_state")
-    documentPeriodVoter_identificationPeriodUs_issuing_state("document.voter_identification.us_issuing_state"),
+    documentVoterIdentificationUsIssuingState("document.voter_identification.us_issuing_state"),
 
     @SerialName(value = "document.finra_compliance_letter")
-    documentPeriodFinra_compliance_letter("document.finra_compliance_letter"),
+    documentFinraComplianceLetter("document.finra_compliance_letter"),
 
     @SerialName(value = "document.proof_of_address.image")
-    documentPeriodProof_of_addressPeriodImage("document.proof_of_address.image"),
+    documentProofOfAddressImage("document.proof_of_address.image"),
 
     @SerialName(value = "document.ssn_card.image")
-    documentPeriodSsn_cardPeriodImage("document.ssn_card.image"),
+    documentSsnCardImage("document.ssn_card.image"),
 
     @SerialName(value = "document.custom.*")
-    documentPeriodCustomPeriodStar("document.custom.*"),
+    documentCustom("document.custom.*"),
 
     @SerialName(value = "card.*.number")
-    cardPeriodStarPeriodNumber("card.*.number"),
+    cardNumber("card.*.number"),
 
     @SerialName(value = "card.*.expiration")
-    cardPeriodStarPeriodExpiration("card.*.expiration"),
+    cardExpiration("card.*.expiration"),
 
     @SerialName(value = "card.*.cvc")
-    cardPeriodStarPeriodCvc("card.*.cvc"),
+    cardCvc("card.*.cvc"),
 
     @SerialName(value = "card.*.name")
-    cardPeriodStarPeriodName("card.*.name"),
+    cardName("card.*.name"),
 
     @SerialName(value = "card.*.billing_address.zip")
-    cardPeriodStarPeriodBilling_addressPeriodZip("card.*.billing_address.zip"),
+    cardBillingAddressZip("card.*.billing_address.zip"),
 
     @SerialName(value = "card.*.billing_address.country")
-    cardPeriodStarPeriodBilling_addressPeriodCountry("card.*.billing_address.country"),
+    cardBillingAddressCountry("card.*.billing_address.country"),
 
     @SerialName(value = "card.*.expiration_month")
-    cardPeriodStarPeriodExpiration_month("card.*.expiration_month"),
+    cardExpirationMonth("card.*.expiration_month"),
 
     @SerialName(value = "card.*.expiration_year")
-    cardPeriodStarPeriodExpiration_year("card.*.expiration_year"),
+    cardExpirationYear("card.*.expiration_year"),
 
     @SerialName(value = "card.*.number_last4")
-    cardPeriodStarPeriodNumber_last4("card.*.number_last4"),
+    cardNumberLast4("card.*.number_last4"),
 
     @SerialName(value = "card.*.issuer")
-    cardPeriodStarPeriodIssuer("card.*.issuer"),
+    cardIssuer("card.*.issuer"),
 
     @SerialName(value = "card.*.fingerprint")
-    cardPeriodStarPeriodFingerprint("card.*.fingerprint"),
+    cardFingerprint("card.*.fingerprint"),
 
     @SerialName(value = "bank.*.name")
-    bankPeriodStarPeriodName("bank.*.name"),
+    bankName("bank.*.name"),
 
     @SerialName(value = "bank.*.ach_routing_number")
-    bankPeriodStarPeriodAch_routing_number("bank.*.ach_routing_number"),
+    bankAchRoutingNumber("bank.*.ach_routing_number"),
 
     @SerialName(value = "bank.*.ach_account_number")
-    bankPeriodStarPeriodAch_account_number("bank.*.ach_account_number"),
+    bankAchAccountNumber("bank.*.ach_account_number"),
 
     @SerialName(value = "bank.*.ach_account_id")
-    bankPeriodStarPeriodAch_account_id("bank.*.ach_account_id"),
+    bankAchAccountId("bank.*.ach_account_id"),
 
     @SerialName(value = "bank.*.account_type")
-    bankPeriodStarPeriodAccount_type("bank.*.account_type"),
+    bankAccountType("bank.*.account_type"),
 
     @SerialName(value = "bank.*.fingerprint")
-    bankPeriodStarPeriodFingerprint("bank.*.fingerprint");
+    bankFingerprint("bank.*.fingerprint");
 
     /**
      * Override [toString()] to avoid using the enum variable name as the value, and instead use

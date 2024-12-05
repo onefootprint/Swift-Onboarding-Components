@@ -33,7 +33,9 @@ data class ApiOnboardingRequirement (
 
     @SerialName(value = "is_met") @Required val isMet: kotlin.Boolean,
 
-    @SerialName(value = "requirement") @Required val requirement: OnboardingRequirement
+    @SerialName(value = "requirement") 
+    @Serializable(with = OnboardingRequirementSerializer::class)
+    @Required val requirement: OnboardingRequirement
 
 ) {
 

@@ -19,6 +19,7 @@ import org.openapitools.client.models.IdentifyVerifyRequest
 import org.openapitools.client.models.IdentifyVerifyResponse
 import org.openapitools.client.models.LoginChallengeRequest
 import org.openapitools.client.models.OnboardingResponse
+import org.openapitools.client.models.OnboardingStatusResponse
 import org.openapitools.client.models.PostOnboardingRequest
 import org.openapitools.client.models.PublicOnboardingConfiguration
 import org.openapitools.client.models.RequestedTokenScope
@@ -253,5 +254,19 @@ internal object FootprintQueries {
         }
 
         return  response.body()
+    }
+
+    suspend fun getOnboardingStatus(authToken: String): OnboardingStatusResponse {
+        val api = OnboardingApi()
+        val response = api.hostedOnboardingStatusGet(xFpAuthorization = authToken)
+        if (!response.success) {
+            val error = response.response.body<HttpError>()
+            throw FootprintException(
+                kind = FootprintException.ErrorKind.ONBOARDING_ERROR,
+                message = error.message
+            )
+        }
+
+        return response.body()
     }
 }

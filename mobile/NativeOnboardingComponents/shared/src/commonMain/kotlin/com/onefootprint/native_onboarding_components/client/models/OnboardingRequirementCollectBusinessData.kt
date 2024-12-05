@@ -41,7 +41,7 @@ data class OnboardingRequirementCollectBusinessData (
 
     @SerialName(value = "recollect_attributes") @Required val recollectAttributes: kotlin.collections.List<CollectedDataOption>
 
-) {
+): OnboardingRequirement() {
 
     /**
      * 

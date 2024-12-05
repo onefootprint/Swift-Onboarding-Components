@@ -9,9 +9,11 @@ import com.onefootprint.native_onboarding_components.models.FootprintL10n
 import com.onefootprint.native_onboarding_components.models.FootprintSupportedLanguage
 import com.onefootprint.native_onboarding_components.models.FootprintSupportedLocale
 import com.onefootprint.native_onboarding_components.models.OverallOutcome
+import com.onefootprint.native_onboarding_components.models.Requirements
 import com.onefootprint.native_onboarding_components.models.SandboxOutcome
 import com.onefootprint.native_onboarding_components.models.VerificationResponse
 import com.onefootprint.native_onboarding_components.utils.AuthUtils
+import com.onefootprint.native_onboarding_components.utils.RequirementUtil
 import com.onefootprint.native_onboarding_components.utils.generateRandomString
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -65,7 +67,8 @@ object Footprint {
         publicKey: String? = null,
         authToken: String? = null,
         sandboxId: String? = null,
-        sandboxOutcome: SandboxOutcome? = null
+        sandboxOutcome: SandboxOutcome? = null,
+        l10n: FootprintL10n? = null
     ): FootprintAuthRequirement {
         mutex.withLock {
             reset()
@@ -74,6 +77,10 @@ object Footprint {
                     kind = FootprintException.ErrorKind.INITIALIZATION_ERROR,
                     message = "Must provide public key or auth token"
                 )
+            }
+
+            if (l10n != null){
+                this.l10n = l10n
             }
 
             try {
@@ -186,5 +193,9 @@ object Footprint {
                 validationToken = verificationResponseInternal.validationToken
             )
         }
+    }
+
+    suspend fun getRequirements(): Requirements {
+        return RequirementUtil.getRequirements(authToken = verifiedAuthToken)
     }
 }

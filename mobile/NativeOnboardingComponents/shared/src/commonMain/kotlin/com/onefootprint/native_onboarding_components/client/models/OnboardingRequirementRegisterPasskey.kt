@@ -31,7 +31,7 @@ data class OnboardingRequirementRegisterPasskey (
 
     @SerialName(value = "kind") @Required val kind: OnboardingRequirementRegisterPasskey.Kind
 
-) {
+): OnboardingRequirement() {
 
     /**
      * 

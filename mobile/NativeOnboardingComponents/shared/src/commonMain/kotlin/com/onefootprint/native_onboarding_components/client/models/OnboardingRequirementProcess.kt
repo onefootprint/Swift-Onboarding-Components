@@ -31,7 +31,7 @@ data class OnboardingRequirementProcess (
 
     @SerialName(value = "kind") @Required val kind: OnboardingRequirementProcess.Kind
 
-) {
+): OnboardingRequirement() {
 
     /**
      * 
