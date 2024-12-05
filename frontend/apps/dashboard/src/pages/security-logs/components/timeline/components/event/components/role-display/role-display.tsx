@@ -1,8 +1,7 @@
+import { IcoUser16 } from '@onefootprint/icons';
 import type { TenantScope } from '@onefootprint/request-types/dashboard';
-import { Stack, Text } from '@onefootprint/ui';
-import * as HoverCard from '@radix-ui/react-hover-card';
 import { useTranslation } from 'react-i18next';
-import styled, { keyframes } from 'styled-components';
+import BaseHoverCard from '../base-hover-card';
 import RolePermissions from './components/role-permissions';
 
 type RoleDisplayProps = {
@@ -15,39 +14,14 @@ const RoleDisplay = ({ isNew, name, scopes }: RoleDisplayProps) => {
   const { t } = useTranslation('security-logs', { keyPrefix: 'events.roles' });
 
   return (
-    <HoverCard.Root openDelay={0} closeDelay={0}>
-      <Stack gap={2} cursor="default">
-        <HoverCard.Trigger asChild>
-          <Text variant="label-3" textDecoration="underline">
-            {isNew ? `${t('role')} (${name})` : `${name}`}
-          </Text>
-        </HoverCard.Trigger>
-      </Stack>
-
-      <HoverCard.Portal>
-        <HoverCardContent side="bottom" sideOffset={5} align="start">
-          <RolePermissions scopes={scopes} name={name} />
-        </HoverCardContent>
-      </HoverCard.Portal>
-    </HoverCard.Root>
+    <BaseHoverCard
+      textTrigger={isNew ? `${t('role')} (${name})` : `${name}`}
+      titleText={`"${name}" ${t('role-perms-lower')}`}
+      titleIcon={IcoUser16}
+    >
+      <RolePermissions scopes={scopes} name={name} />
+    </BaseHoverCard>
   );
 };
-
-const scaleIn = keyframes`
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-`;
-
-const HoverCardContent = styled(HoverCard.Content)`
-  will-change: opacity;
-  transform-origin: var(--radix-hover-card-content-transform-origin);
-  animation: ${scaleIn} 0.1s ease-out;
-`;
 
 export default RoleDisplay;

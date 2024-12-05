@@ -6,8 +6,6 @@ describe('<InsightEvent />', () => {
   it('renders all labels', () => {
     customRender(<InsightEventDisplay insightEvent={insightEventFixture} />);
 
-    const userInsights = screen.getByText('User insights');
-    expect(userInsights).toBeInTheDocument();
     const region = screen.getByText('Region');
     expect(region).toBeInTheDocument();
     const country = screen.getByText('Country');

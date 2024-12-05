@@ -146,7 +146,7 @@ describe('UserData with financial data', () => {
     expect(financialData).toBeInTheDocument();
 
     const elements = screen.getAllByRole('paragraph');
-    expect(elements.map(el => el.textContent).join('')).toBe('Financial data,Date of birth,First name,and Last name');
+    expect(elements.map(el => el.textContent).join('')).toBe('Date of birth,First name,and Last name');
 
     await userEvent.hover(financialData);
     await waitFor(() => {
@@ -168,7 +168,7 @@ describe('UserData with financial data', () => {
     expect(financialData).toBeInTheDocument();
 
     const elements = screen.getAllByRole('paragraph');
-    expect(elements.map(el => el.textContent).join('')).toBe('Financial data,Date of birth,Email,First name,and');
+    expect(elements.map(el => el.textContent).join('')).toBe('Date of birth,Email,First name,and');
 
     const otherText = screen.getByText('3 other attributes');
     expect(otherText).toBeInTheDocument();

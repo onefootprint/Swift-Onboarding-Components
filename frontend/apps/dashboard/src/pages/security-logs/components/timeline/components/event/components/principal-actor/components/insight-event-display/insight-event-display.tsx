@@ -1,91 +1,38 @@
-import { IcoSparkles16 } from '@onefootprint/icons';
 import type { InsightEvent } from '@onefootprint/request-types/dashboard';
-import { Stack, Text } from '@onefootprint/ui';
+import { cx } from 'class-variance-authority';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
 
 type InsightEventDisplayProps = {
   insightEvent?: InsightEvent;
 };
+
+const eventItems = [
+  { label: 'labels.region', key: 'region' },
+  { label: 'labels.country', key: 'country' },
+  { label: 'labels.postal-code', key: 'postalCode' },
+  { label: 'labels.ip-address', key: 'ipAddress' },
+  { label: 'labels.user-agent', key: 'userAgent', fullWidth: true },
+];
 
 const InsightEventDisplay = ({ insightEvent }: InsightEventDisplayProps) => {
   const { t } = useTranslation('security-logs', {
     keyPrefix: 'principal-actor.insight-event',
   });
 
+  const renderEventItem = (label: string, value: string | number, fullWidth: boolean = false) => (
+    <div className={cx('flex flex-col gap-2 min-w-[190px]', { 'col-span-2': fullWidth })}>
+      <p className="text-body-3 text-tertiary">{label}</p>
+      <p className="overflow-hidden text-body-3 max-h-24 text-ellipsis line-clamp-4">{value}</p>
+    </div>
+  );
+
   return (
-    <ShadowStack
-      direction="column"
-      paddingInline={5}
-      paddingBlock={4}
-      gap={5}
-      backgroundColor="primary"
-      aria-label={t('aria-label')}
-      borderColor="tertiary"
-      borderStyle="solid"
-      borderWidth={1}
-      borderRadius="default"
-    >
-      <Stack gap={1}>
-        <IcoSparkles16 />
-        <Text variant="label-3">{t('title')}</Text>
-      </Stack>
-      <Stack justifyContent="space-between" width="420px">
-        <Stack direction="column" gap={5}>
-          <Stack direction="column" gap={2}>
-            <Text variant="body-3" color="tertiary">
-              {t('labels.region')}
-            </Text>
-            <Text variant="body-3">{insightEvent?.region || '-'}</Text>
-          </Stack>
-
-          <Stack direction="column" gap={2}>
-            <Text variant="body-3" color="tertiary">
-              {t('labels.country')}
-            </Text>
-            <Text variant="body-3">{insightEvent?.country || '-'}</Text>
-          </Stack>
-
-          <Stack direction="column" gap={2}>
-            <Text variant="body-3" color="tertiary">
-              {t('labels.postal-code')}
-            </Text>
-            <Text variant="body-3">{insightEvent?.postalCode || '-'}</Text>
-          </Stack>
-        </Stack>
-        <Stack direction="column" gap={5} width="221px">
-          <Stack direction="column" gap={2}>
-            <Text variant="body-3" color="tertiary">
-              {t('labels.ip-address')}
-            </Text>
-            <Text variant="body-3">{insightEvent?.ipAddress || '-'}</Text>
-          </Stack>
-
-          <Stack direction="column" gap={2}>
-            <Text variant="body-3" color="tertiary">
-              {t('labels.user-agent')}
-            </Text>
-            <Text
-              variant="body-3"
-              maxHeight="6em"
-              overflow="hidden"
-              textOverflow="ellipsis"
-              // note - easiest way to get multi-line truncation with an ellipsis at the end
-              // otherwise, we truncate with ellipsis after one line (or don't show an ellipsis at all)
-              display="-webkit-box"
-              style={{ WebkitLineClamp: 4, WebkitBoxOrient: 'vertical' }}
-            >
-              {insightEvent?.userAgent || '-'}
-            </Text>
-          </Stack>
-        </Stack>
-      </Stack>
-    </ShadowStack>
+    <div className="grid grid-cols-2 gap-9 gap-y-4">
+      {eventItems.map(item =>
+        renderEventItem(t(item.label), insightEvent?.[item.key as keyof InsightEvent] ?? '-', item.fullWidth),
+      )}
+    </div>
   );
 };
-
-const ShadowStack = styled(Stack)`
-    box-shadow: 0px 1px 8px 0px #00000024;
-`;
 
 export default InsightEventDisplay;

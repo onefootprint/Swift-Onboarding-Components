@@ -1,5 +1,4 @@
 import type { DataIdentifier } from '@onefootprint/request-types/dashboard';
-import { Box, Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
 type FinancialPermissionsProps = {
@@ -10,21 +9,16 @@ type FinancialPermissionsProps = {
 const FinancialPermissions = ({ title, permissions }: FinancialPermissionsProps) => {
   const { t } = useTranslation('security-logs', { keyPrefix: 'events.user-data.financial' });
   return (
-    <Stack
-      backgroundColor="secondary"
-      paddingInline={4}
-      paddingBlock={3}
-      gap={5}
-      direction="column"
-      borderRadius="default"
-    >
-      <Text variant="label-3">{title}</Text>
-      <Box display="grid" gridTemplateColumns="repeat(2, minmax(0, 190px))" gap={9} rowGap={4}>
+    <div className="flex flex-col gap-3 p-3 px-4 rounded bg-secondary">
+      <h3 className="text-label-3">{title}</h3>
+      <div className="grid grid-cols-2 gap-x-3 gap-y-3">
         {permissions.map(permission => (
-          <Text variant="body-3">{t(permission)}</Text>
+          <div key={permission} className="text-body-3">
+            {t(permission)}
+          </div>
         ))}
-      </Box>
-    </Stack>
+      </div>
+    </div>
   );
 };
 

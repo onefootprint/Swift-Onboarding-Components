@@ -1,9 +1,5 @@
-import { IcoUser16 } from '@onefootprint/icons';
 import type { TenantScope } from '@onefootprint/request-types/dashboard';
 import type { CollectedDataOption } from '@onefootprint/request-types/dashboard';
-import { Box, Stack, Text } from '@onefootprint/ui';
-import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
 import useGetRoleText from './hooks/use-get-role-text';
 
 type RolePermissionsProps = {
@@ -11,9 +7,8 @@ type RolePermissionsProps = {
   name: string;
 };
 
-const RolePermissions = ({ scopes, name }: RolePermissionsProps) => {
+const RolePermissions = ({ scopes }: RolePermissionsProps) => {
   const getRoleText = useGetRoleText();
-  const { t } = useTranslation('security-logs', { keyPrefix: 'events.roles' });
   // In its current state, we have many scopes that represent a decryption, typically one for each DI.
   // For example: [{kind: "decrypt", data: "name"}, {kind: "decrypt", data: "email"}, {kind: "decrypt", data: "phone_number"}]
   // In our case, we just want to display "Decrypt data" for now, possibly later we'll add this functionality
@@ -26,38 +21,16 @@ const RolePermissions = ({ scopes, name }: RolePermissionsProps) => {
     : scopesTextWithoutDecrypt;
 
   return (
-    <ShadowStack
-      direction="column"
-      gap={6}
-      borderColor="tertiary"
-      padding={5}
-      borderWidth={1}
-      borderStyle="solid"
-      borderRadius="default"
-      backgroundColor="primary"
-      width={scopesTextWithDecrypt.length > 1 ? '413px' : '212px'}
-    >
-      <Stack gap={2} align="center">
-        <IcoUser16 />
-        <Text variant="label-3">{`"${name}" ${t('role-permissions')}`}</Text>
-      </Stack>
-      <Box
-        display="grid"
-        gridTemplateColumns={scopesTextWithDecrypt.length > 2 ? 'repeat(2, minmax(0, 190px))' : '190px'}
-        justifyContent="space-between"
-        gap={9}
-        rowGap={4}
-      >
+    <div className="flex flex-col items-start gap-3">
+      <div className="grid justify-between grid-cols-2 gap-5 gap-y-3">
         {scopesTextWithDecrypt.map(scopeText => (
-          <Text variant="body-3">{scopeText}</Text>
+          <div key={scopeText} className="text-body-3">
+            {scopeText}
+          </div>
         ))}
-      </Box>
-    </ShadowStack>
+      </div>
+    </div>
   );
 };
-
-const ShadowStack = styled(Stack)`
-    box-shadow: 0px 1px 8px 0px #00000024;
-`;
 
 export default RolePermissions;

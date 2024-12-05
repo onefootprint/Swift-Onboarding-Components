@@ -26,8 +26,8 @@ describe('<RoleDisplay />', () => {
       await userEvent.hover(trigger);
       // RolePermissions component should be rendered
       await waitFor(() => {
-        const rolePermissions = screen.getByText('"Admin" role permissions');
-        expect(rolePermissions).toBeInTheDocument();
+        const titleText = screen.getByText('"Admin" role permissions');
+        expect(titleText).toBeInTheDocument();
       });
     });
   });

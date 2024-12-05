@@ -147,7 +147,8 @@
       "created-a-new": "created a new",
       "edited-the": "edited the",
       "role": "role",
-      "role-permissions": "role permissions",
+      "role-permissions": "Role permissions",
+      "role-perms-lower": "role permissions",
       "deleted-the": "deleted the",
       "new-permissions": "New permissions",
       "old-permissions": "Old permissions"
