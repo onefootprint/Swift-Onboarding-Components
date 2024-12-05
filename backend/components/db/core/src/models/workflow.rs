@@ -430,10 +430,11 @@ impl Workflow {
         only_completed: bool,
     ) -> FpResult<Option<(Self, ObConfiguration)>> {
         let mut query = workflow::table
-            .inner_join(ob_configuration::table)
+            .inner_join(ob_configuration::table.inner_join(playbook::table))
             .filter(workflow::scoped_vault_id.eq(sv_id))
             .filter(ob_configuration::kind.eq_any(ObConfigurationKind::reonboardable()))
-            .filter(ob_configuration::status.eq(ApiKeyStatus::Enabled))
+            .filter(playbook::status.eq(ApiKeyStatus::Enabled))
+            .select((workflow::all_columns, ob_configuration::all_columns))
             .into_boxed();
 
         if only_completed {

@@ -160,7 +160,7 @@ pub(super) fn apply_trigger_request(
                 };
 
                 let (obcs, _) = ObConfiguration::list(conn, &query, OffsetPagination::page(1))?;
-                let (obc, _, _) = obcs.into_iter().next().ok_or(UserError::NoPlaybooksExist)?;
+                let (_, obc, _, _) = obcs.into_iter().next().ok_or(UserError::NoPlaybooksExist)?;
                 obc
             }
             // Both of these methods choose a pretty arbitrary playbook. This will have minor

@@ -52,7 +52,7 @@ async fn patch(
         prompt_for_passkey,
         skip_confirm,
     } = request.into_inner();
-    let (obc, actor, rs) = state
+    let (playbook, obc, actor, rs) = state
         .db_transaction(move |conn| {
             let update = ObConfigurationUpdate {
                 name,
@@ -62,14 +62,20 @@ async fn patch(
                 ..Default::default()
             };
             let playbook = Playbook::lock(conn, (&obc_id, &tenant_id, is_live))?;
+            let playbook_id = playbook.id.clone();
             let obc = ObConfiguration::update(conn, playbook, &obc_id, update)?;
             let (obc, actor) = db::actor::saturate_actor_nullable(conn, obc)?;
             let rs = RuleSet::get_active(conn, &obc.id)?;
-            Ok((obc, actor, rs))
+
+            // Temp workaround during the status refactor:
+            let playbook = Playbook::get(conn, &playbook_id)?;
+
+            Ok((playbook, obc, actor, rs))
         })
         .await?;
 
     Ok(api_wire_types::OnboardingConfiguration::from_db((
+        playbook,
         obc,
         actor,
         rs,

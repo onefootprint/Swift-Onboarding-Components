@@ -2,6 +2,7 @@ use crate::models::annotation::Annotation;
 use crate::models::audit_event::AuditEvent;
 use crate::models::ob_configuration::ObConfiguration;
 use crate::models::onboarding_decision::OnboardingDecision;
+use crate::models::playbook::Playbook;
 use crate::models::scoped_vault::ScopedVault;
 use crate::models::tenant_api_key::TenantApiKey;
 use crate::models::tenant_user::TenantUser;
@@ -59,6 +60,12 @@ impl HasActor for AuditEvent {
 impl HasActor for DbActor {
     fn actor(&self) -> Option<DbActor> {
         Some(self.clone())
+    }
+}
+
+impl HasActor for (Playbook, ObConfiguration) {
+    fn actor(&self) -> Option<DbActor> {
+        self.1.actor()
     }
 }
 

@@ -26,15 +26,16 @@ async fn get_detail(
     let is_live = auth.is_live()?;
     let ob_config_id = ob_config_id.into_inner();
 
-    let (obc, actor, rs) = state
+    let (playbook, obc, actor, rs) = state
         .db_query(move |conn| {
-            let (_, obc) = ObConfiguration::get(conn, (&ob_config_id, &tenant_id, is_live))?;
+            let (playbook, obc) = ObConfiguration::get(conn, (&ob_config_id, &tenant_id, is_live))?;
             let (obc, actor) = db::actor::saturate_actor_nullable(conn, obc)?;
             let rs = RuleSet::get_active(conn, &obc.id)?;
-            Ok((obc, actor, rs))
+            Ok((playbook, obc, actor, rs))
         })
         .await?;
 
-    let result = api_wire_types::OnboardingConfiguration::from_db((obc, actor, rs, state.ff_client.clone()));
+    let result =
+        api_wire_types::OnboardingConfiguration::from_db((playbook, obc, actor, rs, state.ff_client.clone()));
     Ok(result)
 }

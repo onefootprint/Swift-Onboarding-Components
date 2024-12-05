@@ -55,8 +55,14 @@ pub async fn get_playbooks(
 
     let results = results
         .into_iter()
-        .map(|(obc, actor, rs)| {
-            api_wire_types::OnboardingConfiguration::from_db((obc, actor, rs, state.ff_client.clone()))
+        .map(|(playbook, obc, actor, rs)| {
+            api_wire_types::OnboardingConfiguration::from_db((
+                playbook,
+                obc,
+                actor,
+                rs,
+                state.ff_client.clone(),
+            ))
         })
         .collect::<Vec<_>>();
     Ok(Json(OffsetPaginatedResponse::ok(results, next_page, count)))
@@ -96,8 +102,14 @@ async fn get_versions(
 
     let results = results
         .into_iter()
-        .map(|(obc, actor, rs)| {
-            api_wire_types::OnboardingConfiguration::from_db((obc, actor, rs, state.ff_client.clone()))
+        .map(|(playbook, obc, actor, rs)| {
+            api_wire_types::OnboardingConfiguration::from_db((
+                playbook,
+                obc,
+                actor,
+                rs,
+                state.ff_client.clone(),
+            ))
         })
         .collect::<Vec<_>>();
 

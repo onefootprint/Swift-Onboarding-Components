@@ -62,7 +62,7 @@ pub async fn put_create_version(
         prepare_onboarding_configuration_request(&state, obc_request, &tenant, is_live, actor.clone().into())
             .await?;
 
-    let (obc, actor, rs) = state
+    let (playbook, obc, actor, rs) = state
         .db_transaction(move |conn| -> FpResult<_> {
             let playbook = Playbook::lock(conn, (&playbook_id, &tenant.id, is_live))?;
 
@@ -92,7 +92,7 @@ pub async fn put_create_version(
                     ob_configuration_id: new_obc.id.clone(),
                     actor: auth_actor.into(),
                 };
-                return Ok((new_obc, actor, Some(rs)));
+                return Ok((playbook.into_inner(), new_obc, actor, Some(rs)));
             }
 
             let new_obc = ObConfiguration::create(conn, &playbook, obc_args)?;
@@ -116,11 +116,12 @@ pub async fn put_create_version(
 
             let (new_obc, actor) = db::actor::saturate_actor_nullable(conn, new_obc)?;
             let new_rs = RuleSet::get_active(conn, &new_obc.id)?;
-            Ok((new_obc, actor, new_rs))
+            Ok((playbook.into_inner(), new_obc, actor, new_rs))
         })
         .await?;
 
     Ok(api_wire_types::OnboardingConfiguration::from_db((
+        playbook,
         obc,
         actor,
         rs,

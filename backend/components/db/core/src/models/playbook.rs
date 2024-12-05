@@ -31,8 +31,6 @@ pub struct Playbook {
     pub key: PublishablePlaybookKey,
     pub tenant_id: TenantId,
     pub is_live: IsLive,
-    /// Currently unused.
-    /// TODO: implement playbook-wide immediate deactivation.
     pub status: ApiKeyStatus,
 }
 
@@ -198,8 +196,8 @@ impl Playbook {
         Ok(result)
     }
 
-    /// Gets the latest version (active) OBC for a given playbook, but returns an error if it that
-    /// latest version is disabled.
+    /// Gets the latest version (active) OBC for a given playbook, but returns an error if the
+    /// playbook is disabled.
     #[tracing::instrument("Playbook::get_latest_version_if_enabled", skip_all)]
     pub fn get_latest_version_if_enabled<'a, T>(
         conn: &mut PgConn,
@@ -209,8 +207,7 @@ impl Playbook {
         T: Into<PlaybookIdentifier<'a>>,
     {
         let (playbook, obc, tenant) = Self::get_latest_version(conn, id)?;
-        // n.b. playbook-wide (all version) disabled status is not implemented yet.
-        if obc.status == ApiKeyStatus::Disabled {
+        if playbook.status == ApiKeyStatus::Disabled {
             return Err(DbError::PlaybookDisabled.into());
         }
         Ok((playbook, obc, tenant))

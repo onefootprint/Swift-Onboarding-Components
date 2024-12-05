@@ -106,7 +106,7 @@ async fn post(
     let rules = rules.into_iter().map(copy_rule).collect_vec();
 
     let source_actor = source_auth.actor().clone();
-    let (obc, actor, rs) = state
+    let (playbook, obc, actor, rs) = state
         .db_transaction(move |conn| {
             // Create the copied playbook
             let (playbook, new_obc) = Playbook::create(conn, &target_tenant_id, target_is_live, args)?;
@@ -155,9 +155,10 @@ async fn post(
 
             let (obc, actor) = db::actor::saturate_actor_nullable(conn, new_obc)?;
             let rs = RuleSet::get_active(conn, &obc.id)?;
-            Ok((obc, actor, rs))
+            Ok((playbook.into_inner(), obc, actor, rs))
         })
         .await?;
-    let result = api_wire_types::OnboardingConfiguration::from_db((obc, actor, rs, state.ff_client.clone()));
+    let result =
+        api_wire_types::OnboardingConfiguration::from_db((playbook, obc, actor, rs, state.ff_client.clone()));
     Ok(result)
 }

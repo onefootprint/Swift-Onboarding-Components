@@ -52,7 +52,7 @@ pub async fn post_create_playbook(
         prepare_onboarding_configuration_request(&state, obc_request, tenant, is_live, actor).await?;
 
     let principal_actor = auth.actor();
-    let (obc, actor, rs) = state
+    let (playbook, obc, actor, rs) = state
         .db_transaction(move |conn| {
             let (playbook, obc) = Playbook::create(conn, &tenant_id, is_live, obc_args)?;
             rule_engine::default_rules::save_default_rules_for_obc(conn, &playbook, &obc.id)?;
@@ -63,11 +63,12 @@ pub async fn post_create_playbook(
                 is_live,
             };
             AuditEvent::create_with_insight(conn, &tenant_id, principal_actor, insight.clone(), detail)?;
-            Ok((obc, actor, rs))
+            Ok((playbook.into_inner(), obc, actor, rs))
         })
         .await?;
 
     Ok(api_wire_types::OnboardingConfiguration::from_db((
+        playbook,
         obc,
         actor,
         rs,
@@ -134,7 +135,7 @@ pub async fn post_restore(
 
     let restore_rules = restore_rules.into_iter().map(copy_rule).collect_vec();
 
-    let (obc, actor, rs) = state
+    let (playbook, obc, actor, rs) = state
         .db_transaction(move |conn| {
             let playbook = Playbook::lock(conn, (&playbook_id, &tenant_id, is_live))?;
             let obc = ObConfiguration::create(conn, &playbook, obc_args)?;
@@ -152,10 +153,11 @@ pub async fn post_restore(
 
             let (obc, actor) = db::actor::saturate_actor_nullable(conn, obc)?;
             let rs = RuleSet::get_active(conn, &obc.id)?;
-            Ok((obc, actor, rs))
+            Ok((playbook.into_inner(), obc, actor, rs))
         })
         .await?;
 
-    let result = api_wire_types::OnboardingConfiguration::from_db((obc, actor, rs, state.ff_client.clone()));
+    let result =
+        api_wire_types::OnboardingConfiguration::from_db((playbook, obc, actor, rs, state.ff_client.clone()));
     Ok(result)
 }

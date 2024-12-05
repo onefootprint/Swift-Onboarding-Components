@@ -66,6 +66,7 @@ pub struct ObConfiguration {
     pub _updated_at: DateTime<Utc>,
     #[deprecated(note = "Use playbook(is_live) instead")]
     pub is_live: IsLive,
+    #[deprecated(note = "Use playbook(status) instead")]
     pub status: ApiKeyStatus,
     pub created_at: DateTime<Utc>,
     #[diesel(deserialize_as = NonNullVec<CDO>)]
@@ -512,7 +513,7 @@ pub struct ObConfigurationQuery {
     pub include_deactivated_versions: bool,
 }
 
-pub type ObConfigInfo = (ObConfiguration, Option<SaturatedActor>, Option<RuleSet>);
+pub type ObConfigInfo = (Playbook, ObConfiguration, Option<SaturatedActor>, Option<RuleSet>);
 
 pub type TenantObConfigCounts = HashMap<TenantId, i64>;
 
@@ -523,7 +524,7 @@ macro_rules! list_query {
             .inner_join(playbook::table)
             .filter(playbook::tenant_id.eq(&$filters.tenant_id))
             .filter(playbook::is_live.eq($filters.is_live))
-            .select(ObConfiguration::as_select())
+            .select((playbook::all_columns, ob_configuration::all_columns))
             .into_boxed();
 
         if let Some(playbook_id) = $filters.playbook_id.as_ref() {
@@ -535,7 +536,7 @@ macro_rules! list_query {
         }
 
         if let Some(status) = $filters.status.as_ref() {
-            query = query.filter(ob_configuration::status.eq(status))
+            query = query.filter(playbook::status.eq(status))
         }
         if let Some(search) = $filters.search.as_ref() {
             query = query.filter(ob_configuration::name.ilike(format!("%{}%", search)));
@@ -561,15 +562,15 @@ impl ObConfiguration {
         if let Some(offset) = pagination.offset() {
             query = query.offset(offset)
         }
-        let results = query.load::<Self>(conn)?;
-        let obc_ids = results.iter().map(|obc| &obc.id).collect();
+        let results: Vec<(Playbook, ObConfiguration)> = query.load(conn)?;
+        let obc_ids = results.iter().map(|(_, obc)| &obc.id).collect();
         let mut rule_sets = RuleSet::bulk_get_active(conn, obc_ids)?;
         let results = actor::saturate_actors_nullable(conn, results)?;
         let results = results
             .into_iter()
-            .map(|(obc, actor)| {
+            .map(|((playbook, obc), actor)| {
                 let rs = rule_sets.remove(&obc.id);
-                (obc, actor, rs)
+                (playbook, obc, actor, rs)
             })
             .collect();
 
@@ -652,14 +653,13 @@ impl ObConfiguration {
     }
 
     /// Gets the OBC, if it's enabled.
-    /// The OBC may be deactivated (i.e. not the latest version of the playbook).
     #[tracing::instrument("ObConfiguration::get_enabled", skip_all)]
     pub fn get_enabled<'a, T>(conn: &mut PgConn, id: T) -> FpResult<(Playbook, Self)>
     where
         T: Into<ObConfigIdentifier<'a>>,
     {
         let (playbook, obc) = Self::get(conn, id)?;
-        if obc.status != ApiKeyStatus::Enabled {
+        if playbook.status != ApiKeyStatus::Enabled {
             return Err(DbError::PlaybookDisabled.into());
         }
         Ok((playbook, obc))
@@ -716,9 +716,11 @@ impl ObConfiguration {
             _created_at: _,
             _updated_at: _,
             is_live: _,
-            status: _,
             created_at: _,
             author: _,
+
+            // Deprecated in favor of playbook(status).
+            status: _,
 
             // Maybe we should copy appearance one day. But it's not really used today.
             appearance_id: _,

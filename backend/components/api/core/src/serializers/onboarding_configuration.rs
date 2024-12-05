@@ -42,13 +42,14 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
         let ObConfiguration {
             name,
             key,
-            status,
             is_live,
             is_no_phone_flow,
             skip_confirm,
             must_collect_data,
             allow_international_residents,
             kind,
+            // Status is read from the playbook.
+            status: _,
             ..
         } = ob_config;
         let Tenant {
@@ -81,7 +82,7 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
             logo_url,
             privacy_policy_url,
             is_live,
-            status,
+            status: playbook.status,
             appearance,
             is_app_clip_enabled,
             is_instant_app_enabled,
@@ -117,6 +118,7 @@ impl DbToApi<WorkflowRequest> for HostedWorkflowRequest {
 
 impl
     DbToApi<(
+        Playbook,
         ObConfiguration,
         Option<SaturatedActor>,
         Option<RuleSet>,
@@ -124,7 +126,8 @@ impl
     )> for api_wire_types::OnboardingConfiguration
 {
     fn from_db(
-        (ob_config, author, rule_set, _ff_client): (
+        (playbook, ob_config, author, rule_set, _ff_client): (
+            Playbook,
             ObConfiguration,
             Option<SaturatedActor>,
             Option<RuleSet>,
@@ -144,7 +147,6 @@ impl
             name,
             created_at,
             must_collect_data,
-            status,
             can_access_data,
             is_live,
             optional_data,
@@ -172,6 +174,8 @@ impl
             _updated_at: _,
             appearance_id: _,
             author: _,
+            // Status is read from the playbook.
+            status: _,
             // TODO: only thing hidden here is enhanced_aml and skip_kyb which will be removed shortly
             ..
         } = ob_config;
@@ -185,7 +189,7 @@ impl
             can_access_data,
             is_live,
             created_at,
-            status,
+            status: playbook.status,
             is_no_phone_flow,
             is_doc_first_flow: is_doc_first,
             allow_international_residents,

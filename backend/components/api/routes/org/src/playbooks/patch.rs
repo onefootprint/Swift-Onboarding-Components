@@ -33,7 +33,7 @@ async fn patch(
     let playbook_id = path.into_inner();
     let UpdatePlaybookRequest { status } = request.into_inner();
 
-    let (obc, actor, rs) = state
+    let (playbook, obc, actor, rs) = state
         .db_transaction(move |conn| {
             let playbook = Playbook::lock(conn, (&playbook_id, &tenant_id, is_live))?;
 
@@ -47,11 +47,16 @@ async fn patch(
 
             let (obc, actor) = db::actor::saturate_actor_nullable(conn, obc)?;
             let rs = RuleSet::get_active(conn, &obc.id)?;
-            Ok((obc, actor, rs))
+
+            // Temp workaround during the status refactor:
+            let playbook = Playbook::get(conn, &playbook_id)?;
+
+            Ok((playbook, obc, actor, rs))
         })
         .await?;
 
     Ok(api_wire_types::OnboardingConfiguration::from_db((
+        playbook,
         obc,
         actor,
         rs,
