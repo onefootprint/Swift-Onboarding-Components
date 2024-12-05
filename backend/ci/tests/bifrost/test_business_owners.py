@@ -31,9 +31,8 @@ def _assert_decrypt_bo_data(link_id, fp_bid, tenant, expected_data):
 def test_onboard(kyb_sandbox_ob_config, sandbox_tenant):
     primary_bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
     primary_bifrost.data.update(BUSINESS_SECONDARY_BOS)
-    primary_bo = primary_bifrost.run()
     primary_ownership_stake = primary_bifrost.data["business.primary_owner_stake"]
-    fp_bid = primary_bo.fp_bid
+    primary_bifrost.handle_one_requirement("collect_business_data")
 
     # Check the new business owners APIs
     body = get("hosted/business/owners", None, primary_bifrost.auth_token)
@@ -41,6 +40,7 @@ def test_onboard(kyb_sandbox_ob_config, sandbox_tenant):
     # First BO is self
     assert primary_bo_data["has_linked_user"]
     assert primary_bo_data["is_authed_user"]
+    assert primary_bo_data["is_mutable"]
     assert primary_bo_data["ownership_stake"] == primary_ownership_stake
     _assert_bo_data(
         primary_bo_data, USER_BO_FIELDS, USER_BO_FIELDS, primary_bifrost.data
@@ -49,10 +49,15 @@ def test_onboard(kyb_sandbox_ob_config, sandbox_tenant):
     # Secondary BO is incomplete, but has all data (from the business vault)
     assert not secondary_bo_data["has_linked_user"]
     assert not secondary_bo_data["is_authed_user"]
+    assert secondary_bo_data["is_mutable"]
     assert secondary_bo_data["ownership_stake"] == SECONDARY_BO_DATA["ownership_stake"]
     _assert_bo_data(
         secondary_bo_data, USER_BO_FIELDS, USER_BO_FIELDS, SECONDARY_BO_DATA
     )
+
+    # Finish onboarding
+    primary_bo = primary_bifrost.run()
+    fp_bid = primary_bo.fp_bid
 
     # Test decrypting the new business owner DIs
     secondary_link_id = secondary_bo_data["link_id"]
@@ -67,7 +72,7 @@ def test_onboard(kyb_sandbox_ob_config, sandbox_tenant):
     secondary_bifrost = BifrostClient.new_user(
         kyb_sandbox_ob_config, override_ob_config_auth=secondary_bo_token
     )
-    secondary_bifrost.run()
+    secondary_bifrost.handle_one_requirement("collect_data")
 
     body = get("hosted/business/owners", None, secondary_bifrost.auth_token)
     [primary_bo, secondary_bo] = body
@@ -75,6 +80,7 @@ def test_onboard(kyb_sandbox_ob_config, sandbox_tenant):
     # Can only see primary owner's first name and last name
     assert primary_bo["has_linked_user"]
     assert not primary_bo["is_authed_user"]
+    assert not primary_bo["is_mutable"]
     assert primary_bo["ownership_stake"] == primary_ownership_stake
     decrypted_fields = ["id.first_name", "id.last_name"]
     _assert_bo_data(primary_bo, decrypted_fields, USER_BO_FIELDS, primary_bifrost.data)
@@ -82,10 +88,13 @@ def test_onboard(kyb_sandbox_ob_config, sandbox_tenant):
     # Secondary BO is now the authed user
     assert secondary_bo["has_linked_user"]
     assert secondary_bo["is_authed_user"]
+    assert secondary_bo["is_mutable"]
     assert secondary_bo["ownership_stake"] == SECONDARY_BO_DATA["ownership_stake"]
     _assert_bo_data(
         secondary_bo, USER_BO_FIELDS, USER_BO_FIELDS, secondary_bifrost.data
     )
+
+    secondary_bifrost.run()
 
 
 def test_update_business_owners(kyb_sandbox_ob_config, sandbox_tenant):
@@ -292,3 +301,26 @@ def test_can_edit_tenant_linked_bos(kyb_sandbox_ob_config, sandbox_tenant):
 
     patch("hosted/business/owners", ops, bifrost.auth_token)
     bifrost.run()
+
+
+def test_immutable_bo_on_reonboard(kyb_sandbox_ob_config):
+    """
+    When a user reonboards onto a playbook in order to onboard a second business, their KYC result will be
+    reused. So, verify that we don't allow them to edit their own data when adding the second business.
+    """
+    # Make a user with biz1
+    bifrost1 = BifrostClient.new_user(kyb_sandbox_ob_config)
+    bifrost1.data["business.name"] = "Biz 1"
+    body = get("hosted/business/owners", None, bifrost1.auth_token)
+    assert body[0]["is_authed_user"]
+    assert body[0]["is_mutable"]
+    bifrost1.run()
+
+    # Log into the same user and make biz2
+    bifrost2 = BifrostClient.login_user(kyb_sandbox_ob_config, bifrost1.sandbox_id)
+    assert bifrost2.is_new_business
+    # Primary BO should not be mutable
+    body = get("hosted/business/owners", None, bifrost2.auth_token)
+    assert body[0]["is_authed_user"]
+    assert not body[0]["is_mutable"]
+    bifrost2.run()

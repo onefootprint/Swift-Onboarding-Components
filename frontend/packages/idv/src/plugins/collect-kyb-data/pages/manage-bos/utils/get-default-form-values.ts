@@ -9,6 +9,10 @@ import {
 } from '@onefootprint/types';
 import type { NewBusinessOwner } from '../manage-bos.types';
 
+/** Returns true if the BO is editable and should be rendered by EditBosForm. If the BO is mutable OR if the ownership stake is not yet set, we will render it in EditBosForm. */
+export const isBoEditable = (bo: HostedBusinessOwner) =>
+  bo.isMutable || bo.ownershipStake === undefined || bo.ownershipStake === null;
+
 const getDefaultFormValues = (
   existingBos: HostedBusinessOwner[],
   bootstrapBusinessData: BootstrapBusinessData,
@@ -16,27 +20,25 @@ const getDefaultFormValues = (
 ) => {
   // First, take all "mutable" BOs from the backend and insert them into the list of default form values.
   // This includes the primary BO during a new business onboarding.
-  const defaultBos: NewBusinessOwner[] = existingBos
-    .filter(bo => bo.isMutable)
-    .map(bo => {
-      let bootstrappedPrimaryOwnerFields: Partial<NewBusinessOwner> = {};
-      if (bo.isAuthedUser) {
-        bootstrappedPrimaryOwnerFields = {
-          ownershipStake: bootstrapBusinessData[BootstrapOnlyBusinessPrimaryOwnerStake]?.value,
-          firstName: bootstrapUserData[IdDI.firstName]?.value,
-          lastName: bootstrapUserData[IdDI.lastName]?.value,
-        };
-      }
-      return {
-        uuid: bo.uuid,
-        email: bo.decryptedData[IdDI.email],
-        phoneNumber: bo.decryptedData[IdDI.phoneNumber],
-        // For some fields, overlay bootstrapped data for the primary owner, if available
-        firstName: bootstrappedPrimaryOwnerFields.firstName || bo.decryptedData[IdDI.firstName],
-        lastName: bootstrappedPrimaryOwnerFields.lastName || bo.decryptedData[IdDI.lastName],
-        ownershipStake: bootstrappedPrimaryOwnerFields.ownershipStake || bo.ownershipStake,
+  const defaultBos: NewBusinessOwner[] = existingBos.filter(isBoEditable).map(bo => {
+    let bootstrappedPrimaryOwnerFields: Partial<NewBusinessOwner> = {};
+    if (bo.isAuthedUser) {
+      bootstrappedPrimaryOwnerFields = {
+        ownershipStake: bootstrapBusinessData[BootstrapOnlyBusinessPrimaryOwnerStake]?.value,
+        firstName: bootstrapUserData[IdDI.firstName]?.value,
+        lastName: bootstrapUserData[IdDI.lastName]?.value,
       };
-    });
+    }
+    return {
+      uuid: bo.uuid,
+      email: bo.decryptedData[IdDI.email],
+      phoneNumber: bo.decryptedData[IdDI.phoneNumber],
+      // For some fields, overlay bootstrapped data for the primary owner, if available
+      firstName: bootstrappedPrimaryOwnerFields.firstName || bo.decryptedData[IdDI.firstName],
+      lastName: bootstrappedPrimaryOwnerFields.lastName || bo.decryptedData[IdDI.lastName],
+      ownershipStake: bootstrappedPrimaryOwnerFields.ownershipStake || bo.ownershipStake,
+    };
+  });
 
   const isOnlyAuthedUser = existingBos.every(bo => bo.isAuthedUser);
   if (isOnlyAuthedUser) {

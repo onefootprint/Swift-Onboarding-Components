@@ -8,7 +8,7 @@ import useCollectKybDataMachine from '../../hooks/use-collect-kyb-data-machine';
 import BosList from './components/bos-list';
 import EditBosForm from './components/edit-bos-form';
 import Loading from './components/loading';
-import getDefaultFormValues from './utils/get-default-form-values';
+import getDefaultFormValues, { isBoEditable } from './utils/get-default-form-values';
 
 const ManageBos = () => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.manage-bos' });
@@ -45,7 +45,7 @@ const ManageBos = () => {
     send({ type: 'manageBosCompleted' });
   };
 
-  const immutableBos = bosQuery.data?.filter(bo => !bo.isMutable) || [];
+  const immutableBos = bosQuery.data?.filter(bo => !isBoEditable(bo)) || [];
 
   if (bosQuery.data) {
     return (

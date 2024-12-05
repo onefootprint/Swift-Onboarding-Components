@@ -18,6 +18,7 @@ use newtypes::IdentityDataKind as IDK;
 use newtypes::OnboardingStatus;
 use newtypes::PiiString;
 use newtypes::SessionAuthToken;
+use newtypes::WorkflowGuard;
 
 type BusinessOwnerSerializableInfo<'a> = (
     BusinessOwnerInfo,
@@ -70,7 +71,12 @@ impl<'a> DbToApi<(BusinessOwnerInfo, &'a CheckUserBizWfAuthContext)> for api_wir
             ownership_stake,
         } = bo;
         let is_authed_user = su.is_some_and(|su| su.id == user_auth.scoped_user.id);
-        let is_mutable = !has_linked_user || is_authed_user;
+        let is_mutable = if is_authed_user {
+            // If this is the currently authed user, it is mutable as long as the workflow allows editing data
+            user_auth.check_workflow_guard(WorkflowGuard::AddData).is_ok()
+        } else {
+            !has_linked_user
+        };
         let populated_data = data.keys().cloned().collect();
         let decrypted_data = data
             .into_iter()
@@ -82,7 +88,7 @@ impl<'a> DbToApi<(BusinessOwnerInfo, &'a CheckUserBizWfAuthContext)> for api_wir
                 // For other properties (like phone and email), only render them if they are owned by the biz
                 // OR if the currently logged in user is this beneficial owner.
                 // This minimizes the amount of data that BOs can see about each other
-                is_mutable
+                is_authed_user || !has_linked_user
             })
             .collect();
         Self {

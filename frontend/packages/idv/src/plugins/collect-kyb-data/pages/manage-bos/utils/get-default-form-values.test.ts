@@ -36,6 +36,12 @@ const MOCK_BO_PRIMARY: HostedBusinessOwner = {
   createdAt: '2023-11-28T14:32:18.456Z',
 };
 
+const MOCK_BO_PRIMARY_IMMUTABLE: HostedBusinessOwner = {
+  ...MOCK_BO_PRIMARY,
+  isMutable: false,
+  ownershipStake: undefined,
+};
+
 const MOCK_BO_SECONDARY: HostedBusinessOwner = {
   uuid: 'bo_link_secondary',
   hasLinkedUser: false,
@@ -64,6 +70,20 @@ describe('getDefaultFormValues', () => {
         firstName: MOCK_BO_PRIMARY.decryptedData[IdDI.firstName],
         lastName: MOCK_BO_PRIMARY.decryptedData[IdDI.lastName],
         ownershipStake: MOCK_BO_PRIMARY.ownershipStake,
+      },
+    ]);
+  });
+
+  it('should return authed user even when immutable', () => {
+    const result = getDefaultFormValues([MOCK_BO_PRIMARY_IMMUTABLE], {}, {});
+    expect(result).toEqual([
+      {
+        uuid: MOCK_BO_PRIMARY_IMMUTABLE.uuid,
+        email: MOCK_BO_PRIMARY_IMMUTABLE.decryptedData[IdDI.email],
+        phoneNumber: MOCK_BO_PRIMARY_IMMUTABLE.decryptedData[IdDI.phoneNumber],
+        firstName: MOCK_BO_PRIMARY_IMMUTABLE.decryptedData[IdDI.firstName],
+        lastName: MOCK_BO_PRIMARY_IMMUTABLE.decryptedData[IdDI.lastName],
+        ownershipStake: MOCK_BO_PRIMARY_IMMUTABLE.ownershipStake,
       },
     ]);
   });
