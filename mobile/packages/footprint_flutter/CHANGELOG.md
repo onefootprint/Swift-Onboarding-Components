@@ -40,3 +40,7 @@ Align with requirements and onboarding status API response changes
 ## 2.0.0-beta.3.3
 
 Add additional requirements check before calling process
+
+## 2.0.0-beta.3.4
+
+Add `canUpdateUserData` to requirements result
