@@ -21,6 +21,7 @@ use chrono::DateTime;
 use chrono::Duration;
 use chrono::Utc;
 use db_schema::schema::business_owner;
+use db_schema::schema::playbook;
 use db_schema::schema::scoped_vault;
 use db_schema::schema::vault;
 use diesel::dsl::count_distinct;
@@ -585,11 +586,16 @@ impl ScopedVault {
         use db_schema::schema::workflow;
         let results = workflow::table
             .inner_join(scoped_vault::table)
-            .inner_join(ob_configuration::table)
-            .inner_join(tenant::table.on(tenant::id.eq(ob_configuration::tenant_id)))
+            .inner_join(ob_configuration::table.inner_join(playbook::table.inner_join(tenant::table)))
             .filter(scoped_vault::vault_id.eq(v_id))
             .filter(not(workflow::authorized_at.is_null()))
             .order_by(workflow::created_at.desc())
+            .select((
+                workflow::all_columns,
+                scoped_vault::all_columns,
+                ob_configuration::all_columns,
+                tenant::all_columns,
+            ))
             .get_results(conn)?;
         Ok(results)
     }

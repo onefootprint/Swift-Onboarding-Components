@@ -12,6 +12,7 @@ use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::ob_configuration;
+use db_schema::schema::playbook;
 use db_schema::schema::rule_instance;
 use db_schema::schema::rule_instance_references_list;
 use diesel::prelude::*;
@@ -368,9 +369,9 @@ impl RuleInstance {
         };
 
         let res = rule_instance::table
-            .inner_join(ob_configuration::table)
-            .filter(ob_configuration::tenant_id.eq(tenant_id))
-            .filter(ob_configuration::is_live.eq(is_live))
+            .inner_join(ob_configuration::table.inner_join(playbook::table))
+            .filter(playbook::tenant_id.eq(tenant_id))
+            .filter(playbook::is_live.eq(is_live))
             .filter(ob_configuration::id.eq(ob_config_id))
             .filter(rule_instance::kind.eq_any(kinds))
             .filter(rule_instance::deactivated_at.is_null())

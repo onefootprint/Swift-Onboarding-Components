@@ -603,8 +603,7 @@ impl ObConfiguration {
         T: Into<ObConfigIdentifier<'a>>,
     {
         let mut query = ob_configuration::table
-            .inner_join(playbook::table)
-            .inner_join(tenant::table)
+            .inner_join(playbook::table.inner_join(tenant::table))
             .into_boxed();
 
         match id.into() {

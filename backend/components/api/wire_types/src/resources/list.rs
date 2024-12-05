@@ -6,7 +6,6 @@ use newtypes::ListId;
 use newtypes::ListKind;
 use newtypes::ObConfigurationId;
 use newtypes::PiiString;
-use newtypes::PublishablePlaybookKey;
 
 #[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct List {
@@ -41,7 +40,6 @@ pub struct ListEntry {
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct ListPlaybookUsage {
     pub id: ObConfigurationId,
-    pub key: PublishablePlaybookKey,
     pub name: String,
     pub rules: Vec<Rule>,
 }

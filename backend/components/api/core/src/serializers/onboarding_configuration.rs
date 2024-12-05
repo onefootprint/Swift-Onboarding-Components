@@ -38,18 +38,16 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
             .get(VerificationCheckKind::NeuroId)
             .map(|_| true);
 
-        #[allow(deprecated)]
+        let Playbook {
+            key, is_live, status, ..
+        } = playbook;
         let ObConfiguration {
             name,
-            key,
-            is_live,
             is_no_phone_flow,
             skip_confirm,
             must_collect_data,
             allow_international_residents,
             kind,
-            // Status is read from the playbook.
-            status: _,
             ..
         } = ob_config;
         let Tenant {
@@ -82,7 +80,7 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
             logo_url,
             privacy_policy_url,
             is_live,
-            status: playbook.status,
+            status,
             appearance,
             is_app_clip_enabled,
             is_instant_app_enabled,
@@ -140,15 +138,13 @@ impl
         let skip_kyb = vc.skip_kyc();
         let curp_validation_enabled = vc.is_enabled(VerificationCheckKind::CurpValidation);
 
-        #[allow(deprecated)]
+        let Playbook { key, is_live, .. } = playbook;
         let ObConfiguration {
             id,
-            key,
             name,
             created_at,
             must_collect_data,
             can_access_data,
-            is_live,
             optional_data,
             is_no_phone_flow,
             allow_international_residents,
@@ -169,13 +165,10 @@ impl
             deactivated_at,
 
             // explicitly enumerating unused fields here so we don't forget to expose
-            tenant_id: _,
             _created_at: _,
             _updated_at: _,
             appearance_id: _,
             author: _,
-            // Status is read from the playbook.
-            status: _,
             // TODO: only thing hidden here is enhanced_aml and skip_kyb which will be removed shortly
             ..
         } = ob_config;

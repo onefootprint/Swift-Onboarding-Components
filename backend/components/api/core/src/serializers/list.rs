@@ -49,9 +49,6 @@ impl DbToApi<ListInfo> for api_wire_types::ListDetails {
             .into_iter()
             .map(|(obc, rules)| ListPlaybookUsage {
                 id: obc.id,
-                // We can probably remove this field.
-                #[allow(deprecated)]
-                key: obc.key,
                 name: obc.name,
                 rules: rules.into_iter().map(api_wire_types::Rule::from_db).collect(),
             })

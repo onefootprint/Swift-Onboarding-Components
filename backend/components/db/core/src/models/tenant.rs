@@ -12,6 +12,7 @@ use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::billing_profile;
 use db_schema::schema::ob_configuration;
+use db_schema::schema::playbook;
 use db_schema::schema::scoped_vault;
 use db_schema::schema::tenant::BoxedQuery;
 use db_schema::schema::tenant::{
@@ -176,8 +177,9 @@ impl Tenant {
             }
             TenantIdentifier::ObConfigurationId(ob_configuration_id) => {
                 let tenant_id = ob_configuration::table
+                    .inner_join(playbook::table)
                     .filter(ob_configuration::id.eq(ob_configuration_id))
-                    .select(ob_configuration::tenant_id);
+                    .select(playbook::tenant_id);
                 tenant::table.filter(tenant::id.eq_any(tenant_id)).into_boxed()
             }
         }
