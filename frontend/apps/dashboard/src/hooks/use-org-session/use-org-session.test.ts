@@ -46,6 +46,7 @@ describe('useOrgSession', () => {
       isProdAuthPlaybookRestricted: false,
       isProdNeuroEnabled: false,
       isProdSentilinkEnabled: false,
+      allowedPreviewApis: [],
     });
   });
 

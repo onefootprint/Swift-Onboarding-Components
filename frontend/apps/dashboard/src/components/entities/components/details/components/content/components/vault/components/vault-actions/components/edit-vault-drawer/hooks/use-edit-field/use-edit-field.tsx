@@ -7,12 +7,17 @@ import {
   isVaultDataEmpty,
 } from '@onefootprint/types';
 import { BusinessDI, IdDI } from '@onefootprint/types';
+import { TenantPreviewApi } from '@onefootprint/types/src/api/get-tenants';
 import type { ParseKeys } from 'i18next';
 import { useTranslation } from 'react-i18next';
+import useSession from 'src/hooks/use-session';
 
 const useEditField = (entity: Entity) => {
   const { t } = useTranslation('common', { keyPrefix: 'di' });
   const { data: vaultData } = useEntityVault(entity.id, entity);
+  const {
+    data: { org },
+  } = useSession();
 
   const getLabel = (di: DataIdentifier, _isDecrypted: boolean) => {
     const isInvestorProfileDI = (Object.values(InvestorProfileDI) as DataIdentifier[]).includes(di);
@@ -47,8 +52,6 @@ const useEditField = (entity: Entity) => {
       IdDI.firstName,
       IdDI.middleName,
       IdDI.lastName,
-      IdDI.phoneNumber,
-      IdDI.email,
       IdDI.dob,
       IdDI.ssn9,
       IdDI.addressLine1,
@@ -85,6 +88,10 @@ const useEditField = (entity: Entity) => {
       BusinessDI.formationState,
       BusinessDI.formationDate,
     ];
+    if (org?.allowedPreviewApis.includes(TenantPreviewApi.ManageVerifiedContactInfo)) {
+      editableFields.push(IdDI.phoneNumber, IdDI.email);
+    }
+
     return editableFields.includes(di);
   };
 

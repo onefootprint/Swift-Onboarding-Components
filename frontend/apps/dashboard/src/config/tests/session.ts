@@ -25,6 +25,7 @@ const baseOrg: OrgSession = {
   isProdSentilinkEnabled: false,
   isSandboxRestricted: false,
   logoUrl: null,
+  allowedPreviewApis: [],
 };
 
 const baseMeta = {

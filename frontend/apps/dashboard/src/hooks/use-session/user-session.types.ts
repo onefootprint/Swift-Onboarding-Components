@@ -30,6 +30,7 @@ export type OrgSession = {
   | 'logoUrl'
   | 'id'
   | 'name'
+  | 'allowedPreviewApis'
 >;
 
 export type MetaSession = {
