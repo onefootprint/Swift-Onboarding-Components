@@ -1,22 +1,28 @@
-import type { PreviousWatchlistChecksEventData, WatchlistCheckEventData } from '@onefootprint/types';
 import { Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import Timeline from 'src/components/timeline';
 
+import useEntityId from 'src/components/entities/components/details/hooks/use-entity-id';
+import useEntityTimeline from 'src/components/entities/components/details/hooks/use-entity-timeline';
 import WatchlistCheckEventBody from '../../../../watchlist-check-event-body';
 import WatchlistCheckEventIcon from '../../../../watchlist-check-event-icon';
 
-type WatchlistCheckEventsDrawerContentProp = {
-  data: PreviousWatchlistChecksEventData;
-};
-
-const WatchlistCheckEventsDrawerContent = ({ data }: WatchlistCheckEventsDrawerContentProp) => {
+const WatchlistCheckEventsDrawerContent = () => {
   const { t } = useTranslation('entity-details', {
     keyPrefix: 'audit-trail.timeline.watchlist-check-event',
   });
-  const timelineItems = data.map(event => {
-    const { watchlistEvent, timestamp } = event;
-    const eventData = watchlistEvent.data as WatchlistCheckEventData;
+  const id = useEntityId();
+  // @ts-expect-error: TODO: this type is incorrect, the backend accepts a single comma-separated string
+  const { data } = useEntityTimeline(id, { kinds: 'watchlist_check' }, true);
+
+  const timelineItems = data?.flatMap(event => {
+    const {
+      event: { data: eventData, kind },
+      timestamp,
+    } = event;
+    if (kind !== 'watchlist_check') {
+      return [];
+    }
 
     return {
       headerComponent: (
@@ -46,7 +52,7 @@ const WatchlistCheckEventsDrawerContent = ({ data }: WatchlistCheckEventsDrawerC
     };
   });
 
-  return <Timeline items={timelineItems} />;
+  return <Timeline items={timelineItems || []} />;
 };
 
 export default WatchlistCheckEventsDrawerContent;

@@ -15,8 +15,6 @@ import type { InsightEvent } from './insight-event';
 import type { OnboardingDecision, TimelinePlaybook } from './onboarding-decision';
 
 export enum TimelineEventKind {
-  abandoned = 'abandoned',
-  awaitingBos = 'awaiting-bos',
   labelAdded = 'label_added',
   dataCollected = 'data_collected',
   onboardingDecision = 'onboarding_decision',
@@ -24,7 +22,6 @@ export enum TimelineEventKind {
   documentUploaded = 'document_uploaded',
   watchlistCheck = 'watchlist_check',
   freeFormNote = 'annotation',
-  combinedWatchlistChecks = 'combined_watchlist_checks',
   vaultCreated = 'vault_created',
   workflowTriggered = 'workflow_triggered',
   workflowStarted = 'workflow_started',
@@ -33,16 +30,6 @@ export enum TimelineEventKind {
   stepUp = 'step_up',
   businessOwnerCompletedKyc = 'business_owner_completed_kyc',
 }
-
-export type AbandonedEvent = {
-  kind: TimelineEventKind.abandoned;
-  data: {};
-};
-
-export type AwaitingBosEvent = {
-  kind: TimelineEventKind.awaitingBos;
-  data: {};
-};
 
 export type LabelAddedEvent = {
   kind: TimelineEventKind.labelAdded;
@@ -227,18 +214,6 @@ export type WatchlistCheckEventData = {
   status: WatchlistCheckStatus;
 };
 
-export type CombinedWatchlistChecksEvent = {
-  kind: TimelineEventKind.combinedWatchlistChecks;
-  data: PreviousWatchlistChecksEventData;
-  latestWatchlistEvent: WatchlistCheckEvent | null;
-};
-
-export type PreviousWatchlistChecksEventData = {
-  watchlistEvent: WatchlistCheckEvent;
-  timestamp: string;
-  seqno: number;
-}[];
-
 export type StepUpEvent = {
   kind: TimelineEventKind.stepUp;
   data: StepUpEventData;
@@ -269,8 +244,6 @@ export type BoCompletedKycEventData = {
 
 export type TimelineEvent = {
   event:
-    | AbandonedEvent
-    | AwaitingBosEvent
     | LabelAddedEvent
     | CollectedDataEvent
     | LivenessEvent
@@ -278,7 +251,6 @@ export type TimelineEvent = {
     | OnboardingDecisionEvent
     | WatchlistCheckEvent
     | FreeFormNoteEvent
-    | CombinedWatchlistChecksEvent
     | VaultCreatedEvent
     | WorkflowTriggeredEvent
     | WorkflowStartedEvent

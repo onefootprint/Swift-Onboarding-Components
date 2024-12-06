@@ -265,11 +265,8 @@ export { default as SessionStatus } from './session-status';
 export { SentilinkFraudLevel, SentilinkScoreBand, type SentilinkReasonCode } from './sentilink';
 export type { Tenant } from './tenant';
 export type {
-  AbandonedEvent,
-  AwaitingBosEvent,
   CollectedDataEvent,
   CollectedDataEventData,
-  CombinedWatchlistChecksEvent,
   DocumentUploadedEvent,
   DocumentUploadedEventData,
   ExternalIntegrationCalledData,
@@ -281,7 +278,6 @@ export type {
   LivenessEventData,
   OnboardingDecisionEvent,
   OnboardingDecisionEventData,
-  PreviousWatchlistChecksEventData,
   StepUpDocument,
   StepUpEventData,
   Timeline,

@@ -35,7 +35,7 @@ import {
   WorkflowStartedEventKind,
 } from '@onefootprint/types/src/data/timeline';
 import startCase from 'lodash/startCase';
-import type { AuditTrailTimelineEvent } from 'src/utils/merge-audit-trail-timeline-events';
+import type { AuditTrailTimelineEvent } from 'src/components/entities/components/details/hooks/use-entity-timeline';
 
 import getActorText from '../get-actor-text';
 
@@ -183,7 +183,7 @@ const getTimelineEventText = (event: AuditTrailTimelineEvent): string => {
     return `Manually reviewed and marked as ${statusText} by ${getActorText(source)}`;
   }
 
-  if (kind === TimelineEventKind.combinedWatchlistChecks) {
+  if (kind === TimelineEventKind.watchlistCheck) {
     return 'Watchlist check performed';
   }
 

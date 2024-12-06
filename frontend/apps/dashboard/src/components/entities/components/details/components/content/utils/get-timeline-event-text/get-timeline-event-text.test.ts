@@ -1,7 +1,6 @@
 import getTimelineEventText from './get-timeline-event-text';
 import {
   authMethodUpdatedEventFixture,
-  combinedWatchlistChecksEventFixture,
   dataCollectedEventFixture,
   documentUploadedEventFixture,
   externalIntegrationCalledEventFixture,
@@ -11,6 +10,7 @@ import {
   onboardingDecisionEventFixture,
   stepUpEventFixture,
   vaultCreatedEventFixture,
+  watchlistCheckEventFixture,
   workflowStartedEventFixture,
   workflowTriggeredEventFixture,
 } from './get-timeline-event-text.test.config';
@@ -53,7 +53,7 @@ describe('getTimelineEventText', () => {
 
   describe('when an event with kind TimelineEventKind.combinedWatchlistChecks is passed in', () => {
     it('should return the correct text', () => {
-      const combinedWatchlistChecksText = getTimelineEventText(combinedWatchlistChecksEventFixture);
+      const combinedWatchlistChecksText = getTimelineEventText(watchlistCheckEventFixture);
       expect(combinedWatchlistChecksText).toEqual('Watchlist check performed');
     });
   });

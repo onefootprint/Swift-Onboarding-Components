@@ -3,13 +3,35 @@ import {
   getEntitiesByFpIdBusinessOwnersOptions,
   getEntitiesByFpIdTimelineOptions,
 } from '@onefootprint/axios/dashboard';
-import type { UserTimeline } from '@onefootprint/request-types/dashboard';
+import type { GetEntitiesByFpIdTimelineData } from '@onefootprint/request-types/dashboard';
 import { EntityStatus, type TimelineEvent, TimelineEventKind } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
-import mergeAuditTrailTimelineEvents from 'src/utils/merge-audit-trail-timeline-events';
 
-const useEntityTimeline = (id: string) => {
+export type AbandonedEvent = {
+  kind: 'abandoned';
+  data: {};
+};
+
+export type AwaitingBosEvent = {
+  kind: 'awaiting-bos';
+  data: {};
+};
+
+/** Extra timeline event types that aren't returned by the backend. These are only added by the frontend */
+export type ExtraTimelineEvents = {
+  event: AbandonedEvent | AwaitingBosEvent;
+  timestamp: string;
+  seqno: number;
+};
+
+export type AuditTrailTimelineEvent = TimelineEvent | ExtraTimelineEvents;
+
+const useEntityTimeline = (
+  id: string,
+  query?: GetEntitiesByFpIdTimelineData['query'],
+  showAllWatchlistChecks?: boolean,
+) => {
   const router = useRouter();
   const isBusiness = router.pathname.includes('businesses');
   const entity = useEntity(id);
@@ -22,40 +44,59 @@ const useEntityTimeline = (id: string) => {
   return useQuery({
     ...getEntitiesByFpIdTimelineOptions({
       path: { fpId: id },
-      query: { pageSize: 100 },
+      query: { ...query, pageSize: 100 },
     }),
     // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     select: (response: any) => {
-      let events;
+      let allEvents;
       // TODO: migrate to expect only the modern paginated API repsonse
       if (Array.isArray(response)) {
         // For legacy API response
-        events = response as UserTimeline[];
+        allEvents = response as TimelineEvent[];
       } else {
         // For modern API response
-        events = response.data as UserTimeline[];
+        allEvents = response.data as TimelineEvent[];
       }
-      const mergedEvents = mergeAuditTrailTimelineEvents(events as TimelineEvent[]);
 
-      if (entity.data?.status === EntityStatus.incomplete) {
+      const events = showAllWatchlistChecks ? allEvents : onlyFirstWatchlistCheck(allEvents);
+
+      // Add in incomplete events
+      const extraEvents: ExtraTimelineEvents[] = [];
+      if (entity.data?.status === EntityStatus.incomplete && !showAllWatchlistChecks) {
         const hasPendingBos = bosQuery.data?.some(bo => {
           const isIncomplete =
             bo.boStatus === 'incomplete' || bo.boStatus === 'awaiting_kyc' || bo.boStatus === 'pending';
           return bo.name && isIncomplete;
         });
-        mergedEvents.unshift({
+        extraEvents.push({
           event: {
-            kind: hasPendingBos ? TimelineEventKind.awaitingBos : TimelineEventKind.abandoned,
+            kind: hasPendingBos ? 'awaiting-bos' : 'abandoned',
             data: {},
           },
           seqno: events[0].seqno,
           timestamp: events[0].timestamp,
         });
       }
-      return mergedEvents;
+
+      return [...extraEvents, ...events];
     },
     enabled: (!!id && !isBusiness) || (!!id && isBusiness && !!bosQuery.data),
   });
+};
+
+/** Filter out all except the very first watchlist check event. All others will be rendered in a drawer */
+const onlyFirstWatchlistCheck = (allEvents: TimelineEvent[]) => {
+  const events: TimelineEvent[] = [];
+  allEvents.forEach(event => {
+    const isWatchlistCheck = event.event.kind === TimelineEventKind.watchlistCheck;
+    const alreadyHasWatchlistCheck = events.some(e => e.event.kind === TimelineEventKind.watchlistCheck);
+    if (isWatchlistCheck && alreadyHasWatchlistCheck) {
+      // Skip all but the first watchlist check event
+      return;
+    }
+    events.push(event);
+  });
+  return events;
 };
 
 export default useEntityTimeline;

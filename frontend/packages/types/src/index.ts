@@ -517,8 +517,6 @@ export type { GetOrgRiskSignalsResponse } from './api/get-org-risk-signals';
 
 export type {
   /** @deprecated Use @onefootprint/request-types instead */
-  AbandonedEvent,
-  /** @deprecated Use @onefootprint/request-types instead */
   AccessEvent,
   /** @deprecated Use @onefootprint/request-types instead */
   AccessLog,
@@ -556,8 +554,6 @@ export type {
   AuthEvent,
   /** @deprecated Use @onefootprint/request-types instead */
   AuthTokenIdentifier,
-  /** @deprecated Use @onefootprint/request-types instead */
-  AwaitingBosEvent,
   /** @deprecated Use @onefootprint/request-types instead */
   BacktestedOnboarding,
   /** @deprecated Use @onefootprint/request-types instead */
@@ -614,8 +610,6 @@ export type {
   CollectedDataEventData,
   /** @deprecated Use @onefootprint/request-types instead */
   CollectedDataOption,
-  /** @deprecated Use @onefootprint/request-types instead */
-  CombinedWatchlistChecksEvent,
   /** @deprecated Use @onefootprint/request-types instead */
   CountryCode,
   /** @deprecated Use @onefootprint/request-types instead */
@@ -772,8 +766,6 @@ export type {
   OtherTenantsDuplicateDataSummary,
   /** @deprecated Use @onefootprint/request-types instead */
   PhoneIdentifier,
-  /** @deprecated Use @onefootprint/request-types instead */
-  PreviousWatchlistChecksEventData,
   /** @deprecated Use @onefootprint/request-types instead */
   ProxyConfig,
   /** @deprecated Use @onefootprint/request-types instead */

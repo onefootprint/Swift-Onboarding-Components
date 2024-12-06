@@ -1,15 +1,10 @@
-import type { PreviousWatchlistChecksEventData } from '@onefootprint/types';
 import { Text, createFontStyles } from '@onefootprint/ui';
 import { Trans } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import PreviousWatchlistCheckEvents from './components/previous-watchlist-check-events';
 
-type WatchlistCheckEventHeaderProps = {
-  data: PreviousWatchlistChecksEventData;
-};
-
-const WatchlistCheckEventHeader = ({ data }: WatchlistCheckEventHeaderProps) => (
+const WatchlistCheckEventHeader = () => (
   <>
     <Text variant="body-3" color="tertiary" testID="watchlist-check-event-header">
       <Trans
@@ -20,7 +15,7 @@ const WatchlistCheckEventHeader = ({ data }: WatchlistCheckEventHeaderProps) => 
         }}
       />
     </Text>
-    <PreviousWatchlistCheckEvents data={data} />
+    <PreviousWatchlistCheckEvents />
   </>
 );
 

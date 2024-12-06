@@ -1,8 +1,8 @@
 import { Hint, Radio, Stack, Text, createFontStyles } from '@onefootprint/ui';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import type { AuditTrailTimelineEvent } from 'src/components/entities/components/details/hooks/use-entity-timeline';
 import TimelineItemTime from 'src/components/timeline-item-time';
-import type { AuditTrailTimelineEvent } from 'src/utils/merge-audit-trail-timeline-events';
 import styled, { css } from 'styled-components';
 
 import useEntitySeqno from '@/entity/hooks/use-entity-seqno';

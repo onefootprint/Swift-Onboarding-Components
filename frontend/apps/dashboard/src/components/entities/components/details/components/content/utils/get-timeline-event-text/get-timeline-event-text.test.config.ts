@@ -1,12 +1,12 @@
 import type {
   CollectedDataEvent,
-  CombinedWatchlistChecksEvent,
   DocumentUploadedEvent,
   FreeFormNoteEvent,
   LabelAddedEvent,
   LivenessEvent,
   OnboardingDecisionEvent,
   VaultCreatedEvent,
+  WatchlistCheckEvent,
   WorkflowTriggeredEvent,
 } from '@onefootprint/types';
 import {
@@ -137,24 +137,15 @@ export const onboardingDecisionEventFixture = {
   seqno: 4,
 };
 
-export const combinedWatchlistChecksEventFixture = {
+export const watchlistCheckEventFixture = {
   event: {
-    kind: TimelineEventKind.combinedWatchlistChecks,
-    data: [
-      {
-        watchlistEvent: {
-          kind: TimelineEventKind.watchlistCheck,
-          data: {
-            id: '1',
-            reasonCodes: ['watchlist_hit_ofac'],
-            status: WatchlistCheckStatus.fail,
-          },
-        },
-        timestamp: '2022-11-08T20:21:33.931738Z',
-      },
-    ],
-    latestWatchlistEvent: null,
-  } as CombinedWatchlistChecksEvent,
+    kind: TimelineEventKind.watchlistCheck,
+    data: {
+      id: '1',
+      reasonCodes: ['watchlist_hit_ofac'],
+      status: WatchlistCheckStatus.fail,
+    },
+  } as WatchlistCheckEvent,
   timestamp: '2022-11-08T20:21:33.931738Z',
   seqno: 4,
 };

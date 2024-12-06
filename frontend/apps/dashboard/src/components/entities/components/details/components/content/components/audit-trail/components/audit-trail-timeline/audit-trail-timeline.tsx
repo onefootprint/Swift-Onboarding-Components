@@ -2,13 +2,11 @@ import type { DataCollectedInfo } from '@onefootprint/request-types/dashboard';
 import type {
   ActorApiKey,
   Annotation,
-  CombinedWatchlistChecksEvent,
   DocumentUploadedEventData,
   Entity,
   ExternalIntegrationCalledData,
   LivenessEventData,
   OnboardingDecisionEventData,
-  PreviousWatchlistChecksEventData,
   StepUpEventData,
   VaultCreatedEventData,
   WatchlistCheckEventData,
@@ -23,9 +21,9 @@ import type {
 } from '@onefootprint/types/src/data/timeline';
 import { LinkButton, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
+import type { AuditTrailTimelineEvent } from 'src/components/entities/components/details/hooks/use-entity-timeline';
 import type { TimelineItem } from 'src/components/timeline';
 import Timeline from 'src/components/timeline';
-import type { AuditTrailTimelineEvent } from 'src/utils/merge-audit-trail-timeline-events';
 import { AbandonedEventHeader } from './components/abandoned-event';
 import Actor from './components/actor';
 import AnnotationNote from './components/annotation-note';
@@ -61,13 +59,13 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
       event: { kind, data },
       timestamp,
     } = event;
-    if (kind === TimelineEventKind.abandoned) {
+    if (kind === 'abandoned') {
       items.push({
         timestamp: timeline.length ? timeline[0].timestamp : undefined,
         headerComponent: <AbandonedEventHeader entity={entity} />,
         bodyComponent: undefined,
       });
-    } else if (kind === TimelineEventKind.awaitingBos) {
+    } else if (kind === 'awaiting-bos') {
       items.push({
         timestamp: timeline.length ? timeline[0].timestamp : undefined,
         headerComponent: <AwaitingBosEvent fpId={entity.id} />,
@@ -109,14 +107,12 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
         headerComponent: <OnboardingDecisionEventHeader data={eventData} />,
         bodyComponent: shouldShowBody && <OnboardingDecisionEventBody data={eventData} />,
       });
-    } else if (kind === TimelineEventKind.combinedWatchlistChecks) {
-      const eventData = data as PreviousWatchlistChecksEventData;
-      const combinedWatchlistEvent = event.event as CombinedWatchlistChecksEvent;
-      const latestWatchlistEventData = combinedWatchlistEvent.latestWatchlistEvent?.data as WatchlistCheckEventData;
+    } else if (kind === TimelineEventKind.watchlistCheck) {
+      const eventData = data as WatchlistCheckEventData;
       items.push({
         timestamp,
-        headerComponent: <WatchlistCheckEventHeader data={eventData} />,
-        bodyComponent: <WatchlistCheckEventBody data={latestWatchlistEventData} />,
+        headerComponent: <WatchlistCheckEventHeader />,
+        bodyComponent: <WatchlistCheckEventBody data={eventData} />,
       });
     } else if (kind === TimelineEventKind.freeFormNote) {
       const eventData = data as Annotation;
