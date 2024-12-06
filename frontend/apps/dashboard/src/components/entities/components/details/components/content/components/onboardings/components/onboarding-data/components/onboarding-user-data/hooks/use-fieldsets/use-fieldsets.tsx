@@ -32,7 +32,7 @@ const useFieldsets = (includeNationality?: boolean): Fieldset => {
     },
     identity: {
       title: t('identity.title'),
-      fields: [{ di: IdDI.itin }, { di: IdDI.ssn9 }, { di: IdDI.ssn4 }, { di: IdDI.dob }],
+      fields: [{ di: IdDI.ssn9 }, { di: IdDI.ssn4 }, { di: IdDI.dob }],
     },
     usLegalStatus: {
       title: t('us-legal-status.title'),

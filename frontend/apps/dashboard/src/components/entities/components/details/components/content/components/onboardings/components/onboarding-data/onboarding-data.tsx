@@ -72,7 +72,7 @@ const OnboardingData = ({ onboarding }: OnboardingDataProps) => {
       </TopSection>
       <Box marginTop={8}>
         <Subsection icon={subsections.userData.iconComponent} title={subsections.userData.title}>
-          <OnboardingUserData />
+          <OnboardingUserData seqno={onboarding.seqno} />
         </Subsection>
       </Box>
     </Box>

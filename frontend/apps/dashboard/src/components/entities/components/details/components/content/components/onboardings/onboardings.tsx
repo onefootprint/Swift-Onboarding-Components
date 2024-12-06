@@ -4,19 +4,18 @@ import { useTranslation } from 'react-i18next';
 import ErrorComponent from 'src/components/error';
 import Section from '../section';
 
-import type { WithEntityProps } from '@/entity/components/with-entity';
+import useEntityId from '../../../../hooks/use-entity-id';
 import Content from './components/content';
 import Loading from './components/loading';
 
-export type OnboardingsProps = WithEntityProps;
-
-const Onboardings = ({ entity }: OnboardingsProps) => {
+const Onboardings = () => {
   const { t } = useTranslation('entity-details', {
     keyPrefix: 'onboardings',
   });
+  const entityId = useEntityId();
   const { isPending, data, error } = useQuery(
     getEntitiesByFpIdOnboardingsOptions({
-      path: { fpId: entity.id },
+      path: { fpId: entityId },
     }),
   );
 

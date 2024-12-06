@@ -3,19 +3,26 @@ import { hasEntityNationality, hasEntityUsLegalStatus } from '@onefootprint/type
 import { Box } from '@onefootprint/ui';
 import styled, { css } from 'styled-components';
 import Fieldset from './components/fieldset';
+import useField from './hooks/use-field';
 import useFieldsets from './hooks/use-fieldsets';
 
-const OnboardingUserData = ({ entity }: WithEntityProps) => {
+type OnboardingUserDataProps = WithEntityProps & {
+  seqno?: number;
+};
+
+const OnboardingUserData = ({ entity, seqno }: OnboardingUserDataProps) => {
+  const hasCustomData = entity.data.some(attr => attr.identifier.startsWith('custom'));
   const hasLegalStatus = hasEntityUsLegalStatus(entity);
   const includeNationality = hasEntityNationality(entity) && !hasLegalStatus;
   const { basic, address, identity, custom } = useFieldsets(includeNationality);
+  const getFieldProps = useField(entity, seqno);
 
   return (
     <Container>
-      <Fieldset fields={basic.fields} title={basic.title} />
-      <Fieldset fields={address.fields} title={address.title} />
-      <Fieldset fields={identity.fields} title={identity.title} />
-      <Fieldset fields={custom.fields} title={custom.title} />
+      <Fieldset fields={basic.fields} title={basic.title} useField={getFieldProps} />
+      <Fieldset fields={address.fields} title={address.title} useField={getFieldProps} />
+      <Fieldset fields={identity.fields} title={identity.title} useField={getFieldProps} />
+      {hasCustomData && <Fieldset fields={custom.fields} title={custom.title} useField={getFieldProps} />}
     </Container>
   );
 };
