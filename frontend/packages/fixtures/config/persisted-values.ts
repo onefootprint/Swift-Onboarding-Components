@@ -242,6 +242,7 @@ import type {
   CursorPaginatedAuditEvent,
   CursorPaginatedEntity,
   CursorPaginatedListEvent,
+  CursorPaginatedUserTimeline,
   CustomDocumentConfig,
   DashboardSecretApiKey,
   DataAttributeKind,
@@ -6266,6 +6267,70 @@ export const dashboard_CursorPaginatedListEvent: CursorPaginatedListEvent = {
   meta: {
     count: 44265973,
     next: 'in et id sed minim',
+  },
+};
+export const dashboard_CursorPaginatedUserTimeline: CursorPaginatedUserTimeline = {
+  data: [
+    {
+      event: {
+        data: {
+          actor: {
+            id: '7a1866cc-e1a0-4321-97e7-a6c5138b10f4',
+            kind: 'user',
+          },
+          attributes: ['business_corporation_type', 'nationality', 'phone_number'],
+          isPrefill: true,
+          targets: [
+            'document.passport_card.nationality',
+            'document.visa.clave_de_elector',
+            'document.passport_card.full_address',
+          ],
+        },
+        kind: 'data_collected',
+      },
+      seqno: -21145602,
+      timestamp: '1921-05-12T09:40:31.0Z',
+    },
+    {
+      event: {
+        data: {
+          actor: {
+            id: '7a1866cc-e1a0-4321-97e7-a6c5138b10f4',
+            kind: 'user',
+          },
+          attributes: ['business_tin', 'us_tax_id', 'us_tax_id'],
+          isPrefill: true,
+          targets: ['document.visa.expires_at', 'document.id_card.address_line1', 'document.visa.front.mime_type'],
+        },
+        kind: 'data_collected',
+      },
+      seqno: 85674108,
+      timestamp: '1913-06-28T22:08:22.0Z',
+    },
+    {
+      event: {
+        data: {
+          actor: {
+            id: '7a1866cc-e1a0-4321-97e7-a6c5138b10f4',
+            kind: 'user',
+          },
+          attributes: ['business_website', 'us_tax_id', 'nationality'],
+          isPrefill: false,
+          targets: [
+            'document.passport.document_number',
+            'document.voter_identification.postal_code',
+            'document.residence_document.samba_activity_history_response',
+          ],
+        },
+        kind: 'data_collected',
+      },
+      seqno: 16472375,
+      timestamp: '1930-10-22T14:54:55.0Z',
+    },
+  ],
+  meta: {
+    count: -59783472,
+    next: 'fugiat sed est laboris',
   },
 };
 export const dashboard_CustomDocumentConfig: CustomDocumentConfig = {
