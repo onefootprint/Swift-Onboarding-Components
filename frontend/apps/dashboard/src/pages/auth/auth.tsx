@@ -7,6 +7,9 @@ import { useTranslation } from 'react-i18next';
 import useLoggedOutStorage from 'src/hooks/use-logged-out-storage';
 import useSession from 'src/hooks/use-session';
 
+import { type RequestError, useRequestError } from '@onefootprint/request';
+import { useState } from 'react';
+import DomainInUse, { type ConflictingTenantDomainErrorContext } from './components/domain-in-use';
 import Loading from './components/loading';
 import useLogin from './hooks/use-login';
 import useTrackAnimationDuration from './hooks/use-track-animation-duration';
@@ -20,6 +23,9 @@ const Auth = () => {
   const { logIn } = useSession();
   const { isFinished, getRemainingDuration } = useTrackAnimationDuration();
   const { data, onLoginUrl, reset: resetLoggedOutStorage } = useLoggedOutStorage();
+  const { getErrorCode, getErrorContext } = useRequestError();
+  const [conflictingTenantErrorContext, setConflictingTenantErrorContext] =
+    useState<ConflictingTenantDomainErrorContext | null>(null);
 
   const waitForAnimation = (callback: () => void) => {
     if (isFinished) {
@@ -67,6 +73,12 @@ const Auth = () => {
             resetLoggedOutStorage();
           });
         },
+        onError: (e: RequestError) => {
+          if (getErrorCode(e) === 'E129') {
+            const context = getErrorContext(e) as ConflictingTenantDomainErrorContext;
+            setConflictingTenantErrorContext(context);
+          }
+        },
       });
     },
     onCodeNotFound: () => {
@@ -95,6 +107,9 @@ const Auth = () => {
     },
   });
 
+  if (conflictingTenantErrorContext) {
+    return <DomainInUse errorContext={conflictingTenantErrorContext} />;
+  }
   return (
     <>
       <Head>

@@ -771,6 +771,10 @@
         "title": "Note",
         "description": "You dont have access to the requested organization. Please request access from the admin."
       },
+      "tenant-domain-conflict": {
+        "title": "This domain is already in use",
+        "description": "A Footprint dashboard account already exists for {{domain}}. Please request that an administrator from {{tenantName}} add you to their organization."
+      },
       "invite": {
         "auth-expired": {
           "title": "Welcome!",
