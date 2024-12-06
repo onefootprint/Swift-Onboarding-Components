@@ -142,7 +142,7 @@ export const getInitialValues = (playbook?: OnboardingConfiguration): State => {
           website: playbook.mustCollectData.includes('business_website'),
         },
         docs: {
-          custom: playbook.documentsToCollect
+          custom: playbook.businessDocumentsToCollect
             .map(doc => {
               if (doc.kind === 'custom') {
                 return {
