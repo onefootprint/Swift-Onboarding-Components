@@ -163,7 +163,7 @@ impl UserTimeline {
         }
         if let Some((timestamp, id)) = &pagination.cursor {
             query = query.filter(
-                user_timeline::timestamp.le(timestamp).or(user_timeline::timestamp
+                user_timeline::timestamp.lt(timestamp).or(user_timeline::timestamp
                     .eq(timestamp)
                     .and(user_timeline::id.le(id))),
             );
