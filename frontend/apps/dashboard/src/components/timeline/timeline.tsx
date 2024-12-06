@@ -4,11 +4,10 @@ import type React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import type { TimelineItemTimeData } from '../timeline-item-time';
 import TimelineItemTime from '../timeline-item-time';
 
 export type TimelineItem = {
-  time?: TimelineItemTimeData;
+  timestamp?: string;
   iconComponent?: React.ReactNode; // If icon is not provided, we show a dashed line between prev and next items
   headerComponent: React.ReactNode;
   bodyComponent?: React.ReactNode;
@@ -31,7 +30,7 @@ const Timeline = ({ items, isPending }: TimelineProps) => {
     <>
       <Stack direction="column">
         {items.map((item: TimelineItem, i: number) => {
-          const key = `${getKeyForItemTime(item.time)}-${i}`;
+          const key = `${item.timestamp || 'empty'}-${i}`;
           const { iconComponent, headerComponent, bodyComponent } = item;
           const last = i === items.length - 1;
 
@@ -47,7 +46,7 @@ const Timeline = ({ items, isPending }: TimelineProps) => {
               templateAreas={['time icon content', 'empty line content', 'empty line content']}
             >
               <Grid.Item grid="time" direction="row" gap={2} height={HEADER_HEIGHT}>
-                {item.time && <TimelineItemTime time={item.time} />}
+                {item.timestamp && <TimelineItemTime timestamp={item.timestamp} />}
               </Grid.Item>
               {!last && <Line data-last={last} gridArea="line" />}
               <Grid.Item
@@ -111,15 +110,5 @@ const Line = styled(Grid.Item)`
     background-color: ${theme.borderColor.primary};
   `}
 `;
-
-export const getKeyForItemTime = (time?: TimelineItemTimeData) => {
-  if (!time) {
-    return 'empty';
-  }
-  if ('timestamp' in time) {
-    return time.timestamp;
-  }
-  return `${time.start}-${time.end}`;
-};
 
 export default Timeline;

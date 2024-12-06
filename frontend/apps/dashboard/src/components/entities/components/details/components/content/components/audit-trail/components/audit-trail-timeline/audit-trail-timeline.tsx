@@ -59,31 +59,31 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
   timeline.forEach(event => {
     const {
       event: { kind, data },
-      time,
+      timestamp,
     } = event;
     if (kind === TimelineEventKind.abandoned) {
       items.push({
-        time: timeline.length ? timeline[0].time : undefined,
+        timestamp: timeline.length ? timeline[0].timestamp : undefined,
         headerComponent: <AbandonedEventHeader entity={entity} />,
         bodyComponent: undefined,
       });
     } else if (kind === TimelineEventKind.awaitingBos) {
       items.push({
-        time: timeline.length ? timeline[0].time : undefined,
+        timestamp: timeline.length ? timeline[0].timestamp : undefined,
         headerComponent: <AwaitingBosEvent fpId={entity.id} />,
         bodyComponent: undefined,
       });
     } else if (kind === TimelineEventKind.liveness) {
       const eventData = data as LivenessEventData;
       items.push({
-        time,
+        timestamp,
         headerComponent: <LivenessEventHeader data={eventData} />,
         bodyComponent: <LivenessEventBody data={eventData} />,
       });
     } else if (kind === TimelineEventKind.labelAdded) {
       const eventData = data as LabelAddedEventData;
       items.push({
-        time,
+        timestamp,
         headerComponent: <LabelAddedEventHeader data={eventData} />,
       });
     } else if (kind === TimelineEventKind.dataCollected) {
@@ -91,21 +91,21 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
       const { visibleDis, visibleAttributes } = getVisibleDis(eventData.targets || [], eventData.attributes);
       if (visibleAttributes.length || visibleDis.length) {
         items.push({
-          time,
+          timestamp,
           headerComponent: <DataCollectedEventHeader data={eventData} />,
         });
       }
     } else if (kind === TimelineEventKind.documentUploaded) {
       const eventData = data as DocumentUploadedEventData;
       items.push({
-        time,
+        timestamp,
         headerComponent: <DocumentUploadedEventHeader data={eventData} />,
       });
     } else if (kind === TimelineEventKind.onboardingDecision) {
       const eventData = data as OnboardingDecisionEventData;
       const shouldShowBody = eventData.annotation;
       items.push({
-        time,
+        timestamp,
         headerComponent: <OnboardingDecisionEventHeader data={eventData} />,
         bodyComponent: shouldShowBody && <OnboardingDecisionEventBody data={eventData} />,
       });
@@ -114,14 +114,14 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
       const combinedWatchlistEvent = event.event as CombinedWatchlistChecksEvent;
       const latestWatchlistEventData = combinedWatchlistEvent.latestWatchlistEvent?.data as WatchlistCheckEventData;
       items.push({
-        time,
+        timestamp,
         headerComponent: <WatchlistCheckEventHeader data={eventData} />,
         bodyComponent: <WatchlistCheckEventBody data={latestWatchlistEventData} />,
       });
     } else if (kind === TimelineEventKind.freeFormNote) {
       const eventData = data as Annotation;
       items.push({
-        time,
+        timestamp,
         headerComponent: (
           <>
             <Text variant="body-3" color="tertiary">
@@ -135,7 +135,7 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
     } else if (kind === TimelineEventKind.vaultCreated) {
       const eventData = data as VaultCreatedEventData;
       items.push({
-        time,
+        timestamp,
         headerComponent: (
           <>
             <Text variant="body-3" color="tertiary">
@@ -151,33 +151,33 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
       const eventData = data as WorkflowTriggeredEventData;
       const shouldShowBody = eventData.requestIsActive;
       items.push({
-        time,
+        timestamp,
         headerComponent: <WorkflowTriggeredEventHeader data={eventData} />,
         bodyComponent: shouldShowBody && <WorkflowTriggeredEventBody data={eventData} entityId={entity.id} />,
       });
     } else if (kind === TimelineEventKind.workflowStarted) {
       const eventData = data as WorkflowStartedEventData;
       items.push({
-        time,
+        timestamp,
         headerComponent: <WorkflowStartedEventHeader data={eventData} />,
       });
     } else if (kind === TimelineEventKind.authMethodUpdated) {
       const eventData = data as AuthMethodUpdatedData;
       items.push({
-        time,
+        timestamp,
         headerComponent: <AuthMethodUpdatedEventHeader data={eventData} />,
       });
     } else if (kind === TimelineEventKind.externalIntegrationCalled) {
       const eventData = data as ExternalIntegrationCalledData;
       items.push({
-        time,
+        timestamp,
         headerComponent: <ExternalIntegrationCalledEventHeader data={eventData} />,
         bodyComponent: <ExternalIntegrationCalledEventBody data={eventData} />,
       });
     } else if (kind === TimelineEventKind.stepUp) {
       const eventData = data as StepUpEventData;
       items.push({
-        time,
+        timestamp,
         headerComponent: <StepUpEventHeader data={eventData} />,
         bodyComponent: <StepUpEventBody data={eventData} />,
       });
@@ -185,7 +185,7 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
       const eventData = data as BoCompletedKycEventData;
       if (eventData.decision.workflowKind !== 'document') {
         items.push({
-          time,
+          timestamp,
           headerComponent: <BoCompletedKycHeader data={eventData} />,
         });
       }

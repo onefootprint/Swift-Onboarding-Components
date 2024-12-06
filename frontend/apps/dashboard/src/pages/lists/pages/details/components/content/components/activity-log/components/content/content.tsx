@@ -22,7 +22,7 @@ const Content = ({ timeline }: ContentProps) => {
     // TK - timeline events for createList and updateList
     if (kind === 'create_list_entry' && principal?.kind === 'user') {
       items.push({
-        time: { timestamp },
+        timestamp,
         // TK - possibly come back, not sure if we actually want to pass the ID
         // down as the name / what was supposed to be here
         // still can't see any of this so unclear
@@ -30,7 +30,7 @@ const Content = ({ timeline }: ContentProps) => {
       });
     } else if (kind === 'delete_list_entry' && principal?.kind === 'user') {
       items.push({
-        time: { timestamp },
+        timestamp,
         headerComponent: <ListEntryDeletedEventHeader user={principal.id} event={detail} />,
       });
     }

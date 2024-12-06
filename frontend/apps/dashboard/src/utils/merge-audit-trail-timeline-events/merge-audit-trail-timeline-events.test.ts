@@ -80,7 +80,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
               isPrefill: false,
             },
           },
-          time: { timestamp: '2021-01-02T00:00:00.000Z' },
+          timestamp: '2021-01-02T00:00:00.000Z',
           seqno: 2,
         },
         {
@@ -91,7 +91,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
               isPrefill: false,
             },
           },
-          time: { timestamp: '2021-02-01T00:00:00.000Z' },
+          timestamp: '2021-02-01T00:00:00.000Z',
           seqno: 1,
         },
       ]);
@@ -150,7 +150,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
               },
             },
           },
-          time: { timestamp: '2021-01-02T00:00:00.000Z' },
+          timestamp: '2021-01-02T00:00:00.000Z',
           seqno: 3,
         },
         {
@@ -167,7 +167,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
               },
             },
           },
-          time: { timestamp: '2021-02-01T00:00:00.000Z' },
+          timestamp: '2021-02-01T00:00:00.000Z',
           seqno: 4,
         },
       ]);
@@ -197,7 +197,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             ],
             latestWatchlistEvent: watchlistCheckEvent1,
           },
-          time: { timestamp: '2021-01-01T00:00:00.000Z' },
+          timestamp: '2021-01-01T00:00:00.000Z',
           seqno: 1,
         },
       ]);
@@ -235,7 +235,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             ],
             latestWatchlistEvent: watchlistCheckEvent1,
           },
-          time: { timestamp: '2021-01-02T00:00:00.000Z' },
+          timestamp: '2021-01-02T00:00:00.000Z',
           seqno: 2,
         },
       ]);
@@ -316,7 +316,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             ],
             latestWatchlistEvent: watchlistCheckEvent1,
           },
-          time: { timestamp: '2021-01-06T00:00:00.000Z' },
+          timestamp: '2021-01-06T00:00:00.000Z',
           seqno: 6,
         },
         {
@@ -327,7 +327,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
               isPrefill: false,
             },
           },
-          time: { timestamp: '2021-01-05T00:00:00.000Z' },
+          timestamp: '2021-01-05T00:00:00.000Z',
           seqno: 5,
         },
         {
@@ -338,7 +338,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
               isPrefill: false,
             },
           },
-          time: { timestamp: '2021-01-04T00:00:00.000Z' },
+          timestamp: '2021-01-04T00:00:00.000Z',
           seqno: 4,
         },
         {
@@ -349,7 +349,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
               isPrefill: false,
             },
           },
-          time: { timestamp: '2021-01-01T00:00:00.000Z' },
+          timestamp: '2021-01-01T00:00:00.000Z',
           seqno: 1,
         },
       ]);

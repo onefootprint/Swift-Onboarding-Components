@@ -49,7 +49,7 @@ const useEntityTimeline = (id: string) => {
             data: {},
           },
           seqno: events[0].seqno,
-          time: events[0],
+          timestamp: events[0].timestamp,
         });
       }
       return mergedEvents;

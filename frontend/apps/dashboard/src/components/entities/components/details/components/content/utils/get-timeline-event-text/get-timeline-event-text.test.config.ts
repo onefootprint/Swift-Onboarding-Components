@@ -59,9 +59,7 @@ export const livenessEventFixture = {
       },
     },
   } as LivenessEvent,
-  time: {
-    timestamp: '2022-11-08T20:21:49.979139Z',
-  },
+  timestamp: '2022-11-08T20:21:49.979139Z',
   seqno: 1,
 };
 
@@ -72,9 +70,7 @@ export const labelAddedEventFixture = {
       kind: EntityLabel.active,
     },
   } as LabelAddedEvent,
-  time: {
-    timestamp: '2022-11-08T10:21:33.931738Z',
-  },
+  timestamp: '2022-11-08T10:21:33.931738Z',
   seqno: 2,
 };
 
@@ -93,9 +89,7 @@ export const dataCollectedEventFixture = {
       isPrefill: false,
     },
   } as CollectedDataEvent,
-  time: {
-    timestamp: '2022-11-08T20:21:33.931738Z',
-  },
+  timestamp: '2022-11-08T20:21:33.931738Z',
   seqno: 3,
 };
 
@@ -113,9 +107,7 @@ export const documentUploadedEventFixture = {
       },
     },
   } as DocumentUploadedEvent,
-  time: {
-    timestamp: '2022-11-08T20:21:33.931738Z',
-  },
+  timestamp: '2022-11-08T20:21:33.931738Z',
   seqno: 4,
 };
 
@@ -141,9 +133,7 @@ export const onboardingDecisionEventFixture = {
       annotation: null,
     },
   } as OnboardingDecisionEvent,
-  time: {
-    timestamp: '2022-11-08T20:21:33.931738Z',
-  },
+  timestamp: '2022-11-08T20:21:33.931738Z',
   seqno: 4,
 };
 
@@ -165,9 +155,7 @@ export const combinedWatchlistChecksEventFixture = {
     ],
     latestWatchlistEvent: null,
   } as CombinedWatchlistChecksEvent,
-  time: {
-    timestamp: '2022-11-08T20:21:33.931738Z',
-  },
+  timestamp: '2022-11-08T20:21:33.931738Z',
   seqno: 4,
 };
 
@@ -184,9 +172,7 @@ export const freeFormNoteEventFixture = {
       timestamp: '2022-11-08T20:21:33.931738Z',
     },
   } as FreeFormNoteEvent,
-  time: {
-    timestamp: '2022-11-08T20:21:33.931738Z',
-  },
+  timestamp: '2022-11-08T20:21:33.931738Z',
   seqno: 4,
 };
 
@@ -201,9 +187,7 @@ export const vaultCreatedEventFixture = {
       },
     },
   } as VaultCreatedEvent,
-  time: {
-    timestamp: '2022-11-08T20:21:33.931738Z',
-  },
+  timestamp: '2022-11-08T20:21:33.931738Z',
   seqno: 4,
 };
 
@@ -232,9 +216,7 @@ export const workflowTriggeredEventFixture = {
       note: 'Hello today, please upload your flerpderp',
     },
   } as WorkflowTriggeredEvent,
-  time: {
-    timestamp: '2022-11-08T20:21:33.931738Z',
-  },
+  timestamp: '2022-11-08T20:21:33.931738Z',
   seqno: 4,
 };
 
@@ -252,9 +234,7 @@ export const workflowStartedEventFixture = {
       workflowSource: 'hosted',
     },
   } as WorkflowStartedEvent,
-  time: {
-    timestamp: '2022-11-08T20:21:33.931738Z',
-  },
+  timestamp: '2022-11-08T20:21:33.931738Z',
   seqno: 4,
 };
 
@@ -281,9 +261,7 @@ export const authMethodUpdatedEventFixture = {
       },
     },
   } as AuthMethodUpdatedEvent,
-  time: {
-    timestamp: '2022-11-08T20:21:33.931738Z',
-  },
+  timestamp: '2022-11-08T20:21:33.931738Z',
   seqno: 4,
 };
 
@@ -295,9 +273,7 @@ export const externalIntegrationCalledEventFixture = {
       successful: true,
     },
   } as ExternalIntegrationCalledEvent,
-  time: {
-    timestamp: '2022-11-08T20:21:33.931738Z',
-  },
+  timestamp: '2022-11-08T20:21:33.931738Z',
   seqno: 4,
 };
 
@@ -311,8 +287,6 @@ export const stepUpEventFixture = {
       },
     ],
   } as StepUpEvent,
-  time: {
-    timestamp: '2022-11-08T20:21:33.931738Z',
-  },
+  timestamp: '2022-11-08T20:21:33.931738Z',
   seqno: 4,
 };

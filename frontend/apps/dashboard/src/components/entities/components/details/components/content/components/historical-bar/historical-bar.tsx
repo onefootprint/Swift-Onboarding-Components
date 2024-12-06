@@ -71,7 +71,7 @@ const HistoricalBar = ({ entity, seqno }: HistoricalBarProps) => {
                 {getTimelineEventText(shownHistoricalEvent)}
               </Text>
               <TimeContainer>
-                <TimelineItemTime time={shownHistoricalEvent.time} />
+                <TimelineItemTime timestamp={shownHistoricalEvent.timestamp} />
               </TimeContainer>
             </>
           )}

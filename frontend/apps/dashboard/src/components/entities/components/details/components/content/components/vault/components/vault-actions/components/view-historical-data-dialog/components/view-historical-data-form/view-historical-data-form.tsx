@@ -30,16 +30,14 @@ const ViewHistoricalDataForm = ({ events, onSubmit }: ViewHistoricalDataFormProp
   const errorMessage = errors.seqno?.message;
 
   const renderEvent = (event: AuditTrailTimelineEvent) => {
-    const { time, seqno } = event;
+    const { timestamp, seqno } = event;
     const eventText = getTimelineEventText(event);
     return eventText ? (
-      <Stack direction="column" key={'timestamp' in time ? time.timestamp : time.end}>
+      <Stack direction="column" key={timestamp}>
         <Radio label={eventText} value={`${seqno}`} {...register('seqno', { required: t('required-error') })} />
-        {time && (
-          <TimeContainer>
-            <TimelineItemTime time={time} />
-          </TimeContainer>
-        )}
+        <TimeContainer>
+          <TimelineItemTime timestamp={timestamp} />
+        </TimeContainer>
       </Stack>
     ) : null;
   };

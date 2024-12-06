@@ -1,10 +1,7 @@
 import type { CombinedWatchlistChecksEvent, TimelineEvent, WatchlistCheckEvent } from '@onefootprint/types';
 import { TimelineEventKind } from '@onefootprint/types';
-import type { TimelineItemTimeData } from 'src/components/timeline';
 
-export type AuditTrailTimelineEvent = Omit<TimelineEvent, 'timestamp'> & {
-  time: TimelineItemTimeData;
-};
+export type AuditTrailTimelineEvent = TimelineEvent;
 
 const processWatchlistEvent = (
   combinedWatchlistChecksEvent: CombinedWatchlistChecksEvent,
@@ -34,9 +31,7 @@ const processWatchlistEvent = (
     event: {
       ...newCombinedWatchlistCheckEvent,
     },
-    time: {
-      timestamp: latestWatchlistEventTimestamp,
-    },
+    timestamp: latestWatchlistEventTimestamp,
     seqno: latestWatchlistEventSeqno,
   };
   const newBufferTimeline = [...bufferTimeline];
@@ -75,9 +70,7 @@ const mergeAuditTrailTimelineEvents = (events: TimelineEvent[]): AuditTrailTimel
 
     bufferTimeline.push({
       event: event.event,
-      time: {
-        timestamp: event.timestamp,
-      },
+      timestamp: event.timestamp,
       seqno: event.seqno,
     });
   });
