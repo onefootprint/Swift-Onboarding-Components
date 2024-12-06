@@ -9,8 +9,8 @@ import {
   withEntities,
   withGhostPosts,
   withLogout,
-  withOrg,
   withOrgAuthRoles,
+  withOrgMember,
   withRiskSignals,
 } from './layout.test.config';
 
@@ -24,7 +24,7 @@ describe('<Layout />', () => {
 
   beforeAll(() => {
     withEntities();
-    withOrg();
+    withOrgMember();
     withRiskSignals();
     withGhostPosts();
   });

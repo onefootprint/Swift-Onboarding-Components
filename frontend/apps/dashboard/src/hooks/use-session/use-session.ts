@@ -54,6 +54,12 @@ export const useStore = create<UserSessionState>()(
   ),
 );
 
+type FetchNewPermissionsParams = {
+  newAuthToken: string;
+  newIsLive: boolean;
+  newIsAssumedSessionEditMode?: boolean;
+};
+
 const useSession = () => {
   const toast = useToast();
   const showRequestErrorToast = useRequestErrorToast();
@@ -89,55 +95,55 @@ const useSession = () => {
       update({ meta: session.meta });
     }
     // Then asynchronously fetch user and tenant info from the backend for the new auth
-    await refreshPermissions({
+    await fetchNewPermissionsOrLogout({
       newAuthToken: session.auth,
       newIsLive: session.newIsLive ?? isLive,
     });
   };
 
-  const refreshPermissions = async ({
+  const fetchNewPermissions = async ({
     newAuthToken,
     newIsLive,
     newIsAssumedSessionEditMode,
-  }: {
-    newAuthToken: string;
-    newIsLive: boolean;
-    newIsAssumedSessionEditMode?: boolean;
-  }) => {
-    try {
-      // Fetch the new permissions from the backend
-      const user = await getOrgMemberRequest({
-        auth: newAuthToken,
-        isLive: newIsLive,
+  }: FetchNewPermissionsParams) => {
+    // Fetch the new permissions from the backend
+    const user = await getOrgMemberRequest({
+      auth: newAuthToken,
+      isLive: newIsLive,
+      isAssumedSessionEditMode: !!newIsAssumedSessionEditMode,
+    });
+
+    if (user.tenant.isSandboxRestricted && newIsLive) {
+      // If we requested to login in live mode but the tenant is sandbox restricted, re-login
+      // in sandbox mode
+      toast.show({
+        title: 'Switched to sandbox mode',
+        description: "This organization doesn't have live mode enabled.",
+      });
+      await fetchNewPermissions({
+        newAuthToken,
+        newIsLive: false,
+        newIsAssumedSessionEditMode,
+      });
+      return;
+    }
+
+    update({
+      user: {
+        ...user,
+        isAssumedSession: !!user.isAssumedSession,
         isAssumedSessionEditMode: !!newIsAssumedSessionEditMode,
-      });
+      },
+      org: {
+        ...user.tenant,
+        isLive: newIsLive,
+      },
+    });
+  };
 
-      if (user.tenant.isSandboxRestricted && newIsLive) {
-        // If we requested to login in live mode but the tenant is sandbox restricted, re-login
-        // in sandbox mode
-        toast.show({
-          title: 'Switched to sandbox mode',
-          description: "This organization doesn't have live mode enabled.",
-        });
-        await refreshPermissions({
-          newAuthToken,
-          newIsLive: false,
-          newIsAssumedSessionEditMode,
-        });
-        return;
-      }
-
-      update({
-        user: {
-          ...user,
-          isAssumedSession: !!user.isAssumedSession,
-          isAssumedSessionEditMode: !!newIsAssumedSessionEditMode,
-        },
-        org: {
-          ...user.tenant,
-          isLive: newIsLive,
-        },
-      });
+  const fetchNewPermissionsOrLogout = async (params: FetchNewPermissionsParams) => {
+    try {
+      await fetchNewPermissions(params);
     } catch (error: unknown) {
       // If we can't fetch the user from the backend, just log out and display a toast
       logOut();
@@ -177,7 +183,7 @@ const useSession = () => {
     if (!data?.auth) return;
     // Fetch the permissions from the backend with the newEditMode - the backend will properly
     // render and apply permissions as requested
-    await refreshPermissions({
+    await fetchNewPermissionsOrLogout({
       newAuthToken: data.auth,
       newIsLive: isLive,
       newIsAssumedSessionEditMode: newEditMode,
@@ -186,7 +192,7 @@ const useSession = () => {
 
   const setIsLive = async (newIsLive: boolean) => {
     if (!data.auth) return;
-    await refreshPermissions({
+    await fetchNewPermissionsOrLogout({
       newAuthToken: data.auth,
       newIsLive,
     });
@@ -198,6 +204,15 @@ const useSession = () => {
     });
   };
 
+  /** Reload permissions for the logged-in user. */
+  const refreshPermissions = async () => {
+    if (!data.auth) return;
+    await fetchNewPermissions({
+      newAuthToken: data.auth,
+      newIsLive: isLive,
+    });
+  };
+
   return {
     authHeaders,
     dangerouslyCastedData,
@@ -205,6 +220,7 @@ const useSession = () => {
     isLoggedIn,
     logIn,
     logOut,
+    refreshPermissions,
     setOrg,
     updateUserName,
     isLive,

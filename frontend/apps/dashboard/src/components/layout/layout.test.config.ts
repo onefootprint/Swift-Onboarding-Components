@@ -1,3 +1,4 @@
+import { getAuthOrgMember } from '@onefootprint/fixtures/dashboard';
 import { mockRequest } from '@onefootprint/test-utils';
 import type { Entity, GetAuthRoleResponse } from '@onefootprint/types';
 import { EntityKind, EntityStatus } from '@onefootprint/types';
@@ -91,15 +92,11 @@ export const withLogout = () =>
     response: {},
   });
 
-export const withOrg = () =>
+export const withOrgMember = () =>
   mockRequest({
     method: 'get',
-    path: '/org',
-    response: {
-      data: {
-        id: 'fp_id_wL6XIWe26cRinucZrRK1yn',
-      },
-    },
+    path: '/org/member',
+    response: getAuthOrgMember({}),
   });
 
 export const withGhostPosts = () =>

@@ -86,8 +86,8 @@ const Nav = () => {
       { tenantId, authToken },
       {
         async onSuccess({ token }) {
-          await logIn({ auth: token });
           router.push('/users');
+          await logIn({ auth: token });
         },
         onError: showErrorToast,
       },
