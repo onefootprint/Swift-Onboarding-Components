@@ -1,14 +1,7 @@
 import pytest
 from tests.bifrost.test_triggers import send_trigger
 from tests.identify_client import IdentifyClient
-from tests.utils import (
-    HttpError,
-    get,
-    patch,
-    post,
-    get_requirement_from_requirements,
-    create_ob_config,
-)
+from tests.utils import HttpError, get, patch, post, create_ob_config
 from tests.bifrost_client import BifrostClient
 from tests.constants import (
     BUSINESS_SECONDARY_BOS,
@@ -362,3 +355,25 @@ def test_cannot_select_business_for_redo(kyb_sandbox_ob_config, sandbox_tenant):
     )
     fp_bid = get("hosted/user/private/token", None, bifrost.auth_token)["fp_bid"]
     assert fp_bid == user.fp_bid
+
+
+def test_kyb_no_ein(sandbox_tenant, must_collect_data):
+    """
+    Test a pretty basic KYB playbook that Yieldstreet uses to collect trust information.
+    """
+    biz_cdos = [
+        "business_name",
+        "business_kyced_beneficial_owners",
+    ]
+    cdos = must_collect_data + biz_cdos
+    obc = create_ob_config(
+        sandbox_tenant, "KYB no EIN", cdos, kind="kyb", verification_checks=[]
+    )
+
+    bifrost = BifrostClient.new_user(obc)
+    bifrost.run()
+
+    biz_req = next(
+        r for r in bifrost.handled_requirements if r["kind"] == "collect_business_data"
+    )
+    assert set(biz_req["requirement"]["missing_attributes"]) == set(biz_cdos)

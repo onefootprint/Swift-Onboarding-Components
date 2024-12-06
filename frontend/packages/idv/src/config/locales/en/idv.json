@@ -595,7 +595,7 @@
       },
       "basic-data": {
         "title": "Basic data",
-        "subtitle": "We need your business name and EIN.",
+        "subtitle": "We need basic information about your business.",
         "form": {
           "business-name": {
             "label": "Legal business name",

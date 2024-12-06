@@ -1,9 +1,4 @@
-import {
-  BusinessDI,
-  type BusinessDIData,
-  CollectedKybDataOption,
-  CollectedKybDataOptionToRequiredAttributes,
-} from '@onefootprint/types';
+import { BusinessDI, type BusinessDIData } from '@onefootprint/types';
 import { Stack } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
@@ -57,6 +52,7 @@ const BasicData = ({ ctaLabel, hideHeader, hideInputTin, onCancel, onComplete }:
     kybRequirement,
   } = state.context;
   const { missingAttributes, populatedAttributes } = kybRequirement || {};
+  const allAttributes = [...missingAttributes, ...populatedAttributes];
   const { mutation, syncData } = useSyncData();
   const { t } = useTranslation('idv');
   const defaultValues = getDefaultValues(t, data);
@@ -75,20 +71,6 @@ const BasicData = ({ ctaLabel, hideHeader, hideInputTin, onCancel, onComplete }:
     });
   };
 
-  const optionalFields = missingAttributes
-    .concat(populatedAttributes || [])
-    .filter(
-      attr =>
-        attr === CollectedKybDataOption.corporationType ||
-        attr === CollectedKybDataOption.phoneNumber ||
-        attr === CollectedKybDataOption.website,
-    )
-    .flatMap(attr => CollectedKybDataOptionToRequiredAttributes[attr]) as (
-    | BusinessDI.corporationType
-    | BusinessDI.phoneNumber
-    | BusinessDI.website
-  )[];
-
   return (
     <Stack direction="column" gap={7} width="100%">
       {!hideHeader && (
@@ -105,7 +87,7 @@ const BasicData = ({ ctaLabel, hideHeader, hideInputTin, onCancel, onComplete }:
         isLoading={mutation.isPending}
         onCancel={onCancel}
         onSubmit={handleSubmit}
-        optionalFields={optionalFields}
+        allAttributes={allAttributes}
       />
     </Stack>
   );

@@ -1,5 +1,5 @@
 import { useInputMask } from '@onefootprint/hooks';
-import { BusinessDI, CorporationType, type PublicOnboardingConfig } from '@onefootprint/types';
+import { BusinessDI, CollectedKybDataOption, CorporationType, type PublicOnboardingConfig } from '@onefootprint/types';
 import type { SelectOption } from '@onefootprint/ui';
 import { Grid, PhoneInput, Select, Stack, TextInput } from '@onefootprint/ui';
 import { Controller, useForm } from 'react-hook-form';
@@ -31,7 +31,7 @@ export type BasicDataFormProps = {
   isLoading: boolean;
   onCancel?: () => void;
   onSubmit: (data: BasicData) => void;
-  optionalFields?: (BusinessDI.corporationType | BusinessDI.phoneNumber | BusinessDI.website)[];
+  allAttributes: CollectedKybDataOption[];
 };
 
 const getFormHints = (list: FormProps, errors: FormErrors): FormHints => {
@@ -57,7 +57,7 @@ const BasicDataForm = ({
   isLoading,
   onCancel,
   onSubmit,
-  optionalFields,
+  allAttributes,
 }: BasicDataFormProps) => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.basic-data.form' });
   const l10n = useL10nContext();
@@ -126,7 +126,7 @@ const BasicDataForm = ({
           placeholder={t('doing-business-as.placeholder')}
           {...register('doingBusinessAs', { setValueAs: value => value.trim() || undefined })}
         />
-        {hideInputTin ? null : (
+        {!hideInputTin && allAttributes?.includes(CollectedKybDataOption.tin) && (
           <TextInput
             data-dd-privacy="mask"
             data-dd-action-name="Business Tin"
@@ -148,7 +148,7 @@ const BasicDataForm = ({
             })}
           />
         )}
-        {optionalFields?.includes(BusinessDI.corporationType) && (
+        {allAttributes?.includes(CollectedKybDataOption.corporationType) && (
           <Controller
             data-dd-privacy="mask"
             data-dd-action-name="Business corporation type"
@@ -174,7 +174,7 @@ const BasicDataForm = ({
             )}
           />
         )}
-        {optionalFields?.includes(BusinessDI.website) && (
+        {allAttributes?.includes(CollectedKybDataOption.website) && (
           <TextInput
             data-dd-privacy="mask"
             data-dd-action-name="Business website"
@@ -196,7 +196,7 @@ const BasicDataForm = ({
             })}
           />
         )}
-        {optionalFields?.includes(BusinessDI.phoneNumber) && (
+        {allAttributes?.includes(CollectedKybDataOption.phoneNumber) && (
           <Controller
             control={control}
             name="phoneNumber"

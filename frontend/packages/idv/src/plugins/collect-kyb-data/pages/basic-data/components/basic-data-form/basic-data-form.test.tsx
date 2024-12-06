@@ -1,7 +1,7 @@
 import '../../../../../../config/initializers/i18next-test';
 
 import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
-import { BusinessDI } from '@onefootprint/types';
+import { BusinessDI, CollectedKybDataOption } from '@onefootprint/types';
 
 import type { BasicDataFormProps } from './basic-data-form';
 import BasicDataForm from './basic-data-form';
@@ -9,14 +9,14 @@ import BasicDataForm from './basic-data-form';
 describe('<BasicDataForm />', () => {
   const renderForm = ({
     defaultValues,
-    optionalFields,
+    allAttributes,
     isLoading = false,
     onSubmit = () => undefined,
     ctaLabel,
   }: Partial<BasicDataFormProps>) => {
     customRender(
       <BasicDataForm
-        optionalFields={optionalFields}
+        allAttributes={allAttributes || []}
         defaultValues={defaultValues}
         isLoading={isLoading}
         onSubmit={onSubmit}
@@ -26,7 +26,7 @@ describe('<BasicDataForm />', () => {
   };
 
   it('render a custom cta label', () => {
-    renderForm({ ctaLabel: 'Save' });
+    renderForm({ ctaLabel: 'Save', allAttributes: [CollectedKybDataOption.name, CollectedKybDataOption.tin] });
     const continueButton = screen.getByRole('button', { name: 'Save' });
     expect(continueButton).toBeInTheDocument();
   });
@@ -35,7 +35,12 @@ describe('<BasicDataForm />', () => {
     const onSubmit = jest.fn();
     renderForm({
       onSubmit,
-      optionalFields: [BusinessDI.phoneNumber, BusinessDI.website],
+      allAttributes: [
+        CollectedKybDataOption.name,
+        CollectedKybDataOption.tin,
+        CollectedKybDataOption.phoneNumber,
+        CollectedKybDataOption.website,
+      ],
     });
 
     const name = screen.getByLabelText('Legal business name');
@@ -64,11 +69,12 @@ describe('<BasicDataForm />', () => {
     });
   });
 
-  describe('when phone number and website are not included in the optional fields', () => {
-    it('should hide both', async () => {
+  describe('when phone number, website, and tin are not collected', () => {
+    it('should hide', async () => {
       const onSubmit = jest.fn();
       renderForm({
         onSubmit,
+        allAttributes: [CollectedKybDataOption.name],
       });
 
       const name = screen.getByLabelText('Legal business name');
@@ -77,8 +83,8 @@ describe('<BasicDataForm />', () => {
       const dba = screen.getByLabelText('Doing Business As (optional)');
       await userEvent.type(dba, 'Acme');
 
-      const tin = screen.getByLabelText('Taxpayer Identification Number (TIN)');
-      await userEvent.type(tin, '129876543');
+      const tin = screen.queryByLabelText('Taxpayer Identification Number (TIN)');
+      expect(tin).not.toBeInTheDocument();
 
       const phoneNumber = screen.queryByLabelText('Phone number');
       expect(phoneNumber).not.toBeInTheDocument();
@@ -94,7 +100,6 @@ describe('<BasicDataForm />', () => {
         expect(onSubmit).toHaveBeenCalledWith({
           [BusinessDI.name]: 'Acme Inc.',
           [BusinessDI.doingBusinessAs]: 'Acme',
-          [BusinessDI.tin]: '12-9876543',
         });
       });
     });
@@ -108,6 +113,7 @@ describe('<BasicDataForm />', () => {
           name: 'Acme Inc.',
           tin: '98-7654321',
         },
+        allAttributes: [CollectedKybDataOption.name, CollectedKybDataOption.tin],
         onSubmit,
       });
 
@@ -133,7 +139,9 @@ describe('<BasicDataForm />', () => {
   describe('when the form is submitted incorrectly', () => {
     it('should show an error message', async () => {
       const onSubmit = jest.fn();
-      renderForm({ onSubmit });
+      renderForm({
+        onSubmit,
+      });
 
       const continueButton = screen.getByRole('button', { name: 'Continue' });
       expect(continueButton).toBeInTheDocument();
@@ -145,16 +153,18 @@ describe('<BasicDataForm />', () => {
       await waitFor(() => {
         expect(screen.getByText('Business name cannot be empty or is invalid')).toBeInTheDocument();
       });
-      await waitFor(() => {
-        expect(screen.getByText('TIN cannot be empty or is invalid')).toBeInTheDocument();
-      });
     });
 
-    it('should show an error message for optional fields', async () => {
+    it('should show an error message for fields that arent always collected', async () => {
       const onSubmit = jest.fn();
       renderForm({
         onSubmit,
-        optionalFields: [BusinessDI.phoneNumber, BusinessDI.website],
+        allAttributes: [
+          CollectedKybDataOption.name,
+          CollectedKybDataOption.phoneNumber,
+          CollectedKybDataOption.website,
+          CollectedKybDataOption.tin,
+        ],
       });
 
       const continueButton = screen.getByRole('button', { name: 'Continue' });
@@ -163,16 +173,20 @@ describe('<BasicDataForm />', () => {
       await waitFor(() => {
         expect(screen.getByText('Phone number cannot be empty')).toBeInTheDocument();
       });
-      await waitFor(() => {
-        expect(screen.getByText('Website cannot be empty or is invalid')).toBeInTheDocument();
-      });
+      expect(screen.getByText('Website cannot be empty or is invalid')).toBeInTheDocument();
+      expect(screen.getByText('TIN cannot be empty or is invalid')).toBeInTheDocument();
     });
 
     it('should validate phone on submit function', async () => {
       const onSubmit = jest.fn();
       renderForm({
         onSubmit,
-        optionalFields: [BusinessDI.phoneNumber, BusinessDI.website],
+        allAttributes: [
+          CollectedKybDataOption.phoneNumber,
+          CollectedKybDataOption.website,
+          CollectedKybDataOption.tin,
+          CollectedKybDataOption.name,
+        ],
       });
 
       const name = screen.getByLabelText('Legal business name');

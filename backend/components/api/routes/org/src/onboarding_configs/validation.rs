@@ -513,12 +513,10 @@ impl ObConfigurationArgsToValidate {
                 match c {
                     VerificationCheck::Kyb { .. } => {
                         if !matches!(&self.kind, &ObConfigurationKind::Kyb) {
-                            Err(TenantError::ValidationError(
+                            return Err(TenantError::ValidationError(
                                 "Cannot run KYB for non-KYB Playbooks".to_owned(),
                             )
-                            .into())
-                        } else {
-                            Ok(())
+                            .into());
                         }
                     },
                     VerificationCheck::BusinessAml{ } => {
@@ -535,12 +533,10 @@ impl ObConfigurationArgsToValidate {
                         }
 
                         if !matches!(&self.kind, &ObConfigurationKind::Kyb) {
-                            Err(TenantError::ValidationError(
+                            return Err(TenantError::ValidationError(
                                 "Cannot run Business AML for non-KYB Playbooks".to_owned(),
                             )
-                            .into())
-                        } else {
-                            Ok(())
+                            .into());
                         }
                     },
                     VerificationCheck::Aml {
@@ -552,49 +548,40 @@ impl ObConfigurationArgsToValidate {
                         match_kind: _,
                     } => {
                         if !(*adverse_media || *ofac || *pep) {
-                            Err(TenantError::ValidationError(
+                            return Err(TenantError::ValidationError(
                                 "at least one of adverse_media, ofac, or pep must be set for AML verification check".to_owned(),
                             )
-                            .into())
-                        } else {
-                            Ok(())
+                            .into());
                         }
                     }
                     VerificationCheck::CurpValidation {} => {
                         // TODO: should be identity doc, not any doc
                         if !self.collects_document() {
-                            Err(TenantError::ValidationError(
+                            return Err(TenantError::ValidationError(
                                 "Must collect document if `curp_validation_enabled=true".to_owned(),
                             )
-                            .into())
-                        } else {
-                            Ok(())
+                            .into());
                         }
                     }
                     VerificationCheck::Phone {attributes} => {
                         if attributes.is_empty() {
-                            Err(TenantError::ValidationError(
+                            return Err(TenantError::ValidationError(
                                 "Must provide `attributes` if enabling a phone verification check".to_owned(),
                             )
-                            .into())
-                        } else {
-                            Ok(())
+                            .into());
                         }
                     }
-                    VerificationCheck::Kyc { } => Ok(()),
-                    VerificationCheck::IdentityDocument {  } => Ok(()),
-                    VerificationCheck::StytchDevice {  } => Ok(()),
+                    VerificationCheck::Kyc { } => (),
+                    VerificationCheck::IdentityDocument {  } => (),
+                    VerificationCheck::StytchDevice {  } => (),
                     VerificationCheck::NeuroId {  } => {
                         if !matches!(self.kind, ObConfigurationKind::Kyc) {
                             let err = format!("Cannot create playbook with Neuro ID of kind {}, only KYC", self.kind);
                             return Err(TenantError::ValidationError(err).into())
                         }
                         if !tvc.is_neuro_enabled_for_tenant() && obc_is_live {
-                            return Err(TenantError::ValidationError("Cannot create playbook with Neuro ID. Please reach out to support@onefootprint.com to enable".into()
-                           ).into())
+                            return Err(TenantError::ValidationError("Cannot create playbook with Neuro ID. Please reach out to support@onefootprint.com to enable".into()).into())
                         }
-
-                        Ok(())
                     },
                     VerificationCheck::Sentilink {  } => {
                         let required_idks = SentilinkProduct::iter().flat_map(|p| p.required_identity_data_kinds()).unique();
@@ -618,10 +605,9 @@ impl ObConfigurationArgsToValidate {
                             let err = format!("Cannot create playbook with Sentilink of kind {}. Only KYC and KYB are supported", self.kind);
                             return Err(TenantError::ValidationError(err).into())
                         }
-
-                        Ok(())
                     },
                 }
+                Ok(())
             })?;
 
         // validate against collected data
