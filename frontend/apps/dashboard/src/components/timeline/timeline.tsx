@@ -1,5 +1,5 @@
 import { IcoDotSmall16 } from '@onefootprint/icons';
-import { Box, Grid, LinkButton, LoadingSpinner, Stack, Text } from '@onefootprint/ui';
+import { Box, Grid, LoadingSpinner, Stack, Text } from '@onefootprint/ui';
 import type React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -16,41 +16,23 @@ export type TimelineItem = {
 type TimelineProps = {
   items: TimelineItem[];
   isPending?: boolean;
-  pagination?: {
-    hasNextPage: boolean;
-    fetchNextPage: () => void;
-  };
 };
 
 const HEADER_HEIGHT = '32px';
 
-const Timeline = ({ items, isPending, pagination }: TimelineProps) => {
+const Timeline = ({ items, isPending }: TimelineProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'components.timeline' });
   if (!isPending && !items.length) {
     return <Text variant="body-3">{t('empty')}</Text>;
   }
 
-  const allItems = [...items];
-  if (pagination?.hasNextPage) {
-    allItems.push({
-      headerComponent: (
-        <LinkButton disabled={isPending} onClick={() => pagination.fetchNextPage()}>
-          {t('show-more')}
-        </LinkButton>
-      ),
-      iconComponent: null,
-    });
-  }
-
   return (
     <>
       <Stack direction="column">
-        {allItems.map((item: TimelineItem, i: number) => {
+        {items.map((item: TimelineItem, i: number) => {
           const key = `${item.timestamp || 'empty'}-${i}`;
           const { iconComponent, headerComponent, bodyComponent } = item;
-          const last = i === allItems.length - 1;
-          // True if next item is a pagination button
-          const nextIsPagination = allItems[i + 1]?.iconComponent === null;
+          const last = i === items.length - 1;
 
           return (
             <Grid.Container
@@ -66,17 +48,17 @@ const Timeline = ({ items, isPending, pagination }: TimelineProps) => {
               <Grid.Item grid="time" direction="row" gap={2} height={HEADER_HEIGHT}>
                 {item.timestamp && <TimelineItemTime timestamp={item.timestamp} />}
               </Grid.Item>
-              {!last && <Line gridArea="line" forPagination={nextIsPagination} />}
+              {!last && <Line data-last={last} gridArea="line" />}
               <Grid.Item
                 align="center"
                 justify="center"
                 paddingTop={2}
                 paddingBottom={2}
-                backgroundColor={iconComponent !== null ? 'primary' : 'transparent'}
+                backgroundColor="primary"
                 minHeight={HEADER_HEIGHT}
                 gridArea="icon"
               >
-                {iconComponent === undefined ? <IcoDotSmall16 /> : iconComponent}
+                {iconComponent ?? <IcoDotSmall16 />}
               </Grid.Item>
               <Grid.Container
                 style={{ gridArea: 'content' }}
@@ -117,20 +99,15 @@ const Timeline = ({ items, isPending, pagination }: TimelineProps) => {
   );
 };
 
-const Line = styled(Grid.Item)<{ forPagination?: boolean }>`
-  ${({ theme, forPagination }) => css`
+const Line = styled(Grid.Item)`
+  ${({ theme }) => css`
     position: absolute;
     top: 0;
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
     width: 1px;
-    height: ${forPagination ? `calc(100% + ${HEADER_HEIGHT} / 2)` : '100%'};
-    background: ${
-      forPagination
-        ? `linear-gradient(to bottom, ${theme.borderColor.primary}, ${theme.backgroundColor.primary})`
-        : theme.borderColor.primary
-    };
+    background-color: ${theme.borderColor.primary};
   `}
 `;
 

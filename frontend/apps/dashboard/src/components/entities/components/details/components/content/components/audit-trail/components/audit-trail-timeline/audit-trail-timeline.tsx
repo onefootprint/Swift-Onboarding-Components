@@ -17,12 +17,11 @@ import type {
   AuthMethodUpdatedData,
   BoCompletedKycEventData,
   LabelAddedEventData,
+  TimelineEvent,
   WorkflowStartedEventData,
 } from '@onefootprint/types/src/data/timeline';
 import { LinkButton, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
-import { ErrorComponent } from 'src/components';
-import useCurrentEntityTimeline from 'src/components/entities/components/details/hooks/use-current-entity-timeline';
 import type { TimelineItem } from 'src/components/timeline';
 import Timeline from 'src/components/timeline';
 import useAddIncompleteEvents from '../../hooks/use-add-incomplete-events';
@@ -48,16 +47,12 @@ import WorkflowStartedEventHeader from './components/workflow-started-event';
 import { WorkflowTriggeredEventBody, WorkflowTriggeredEventHeader } from './components/workflow-triggered-event';
 
 export type AuditTrailTimelineProps = {
+  timeline: TimelineEvent[];
   entity: Entity;
 };
 
-const AuditTrailTimeline = ({ entity }: AuditTrailTimelineProps) => {
+const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
   const { t } = useTranslation('entity-details', { keyPrefix: 'audit-trail' });
-  const { data: timeline, error, hasNextPage, fetchNextPage } = useCurrentEntityTimeline();
-
-  if (error) {
-    return <ErrorComponent error={error} />;
-  }
 
   const allTimelineEvents = useAddIncompleteEvents(timeline, entity);
 
@@ -196,11 +191,7 @@ const AuditTrailTimeline = ({ entity }: AuditTrailTimelineProps) => {
     }
   });
 
-  return items.length > 0 ? (
-    <Timeline items={items} pagination={{ hasNextPage, fetchNextPage }} />
-  ) : (
-    <Text variant="body-3">{t('empty')}</Text>
-  );
+  return items.length > 0 ? <Timeline items={items} /> : <Text variant="body-3">{t('empty')}</Text>;
 };
 
 export default AuditTrailTimeline;
