@@ -56,6 +56,14 @@ impl LabelKind {
             Self::OffboardFraud | Self::OffboardOther => false,
         }
     }
+
+    // Enumerating cases because we want to not forget other variants in the future
+    pub fn is_offboard_non_fraud(&self) -> bool {
+        match self {
+            Self::OffboardOther => true,
+            Self::Active | Self::OffboardFraud => false,
+        }
+    }
 }
 
 impl_enum_str_diesel!(LabelKind);

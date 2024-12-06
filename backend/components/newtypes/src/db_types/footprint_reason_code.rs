@@ -1230,6 +1230,12 @@ footprint_reason_code_enum! {
         #[scope = SignalScope::Name, additional_scopes = vec![SignalScope::Dob, SignalScope::Ssn, SignalScope::Document], match_level = None]
         #[note = "User has medium connection to a labeled active user", severity = SignalSeverity::Medium,  description = "Medium strength connection to a labeled active user. The user shares the Name+Dob, SSN4, etc with another user that was labeled as `Active` by your organization."]
         MediumConnectionToLabeledActive,
+        #[scope = SignalScope::Name, additional_scopes = vec![SignalScope::Dob, SignalScope::Ssn, SignalScope::Device, SignalScope::Document], match_level = None]
+        #[note = "User has strong connection to a labeled offboard_other user", severity = SignalSeverity::Medium,  description = "Strong connection to a user labeled `offboard_other`. The user shares the Name+Dob, SSN, Identity Document Number, Device ID/Cookie ID etc with another user that was labeled as `Offboard(other)` by your organization."]
+        StrongConnectionToLabeledOffboardOther,
+        #[scope = SignalScope::Name, additional_scopes = vec![SignalScope::Dob, SignalScope::Ssn, SignalScope::Document], match_level = None]
+        #[note = "User has medium connection to a labeled offboard_other user", severity = SignalSeverity::Medium,  description = "Medium strength connection to a user labeled `offboard_other`. The user shares the Name+Dob, SSN4, etc with another user that was labeled as `Offboard(other)` by your organization."]
+        MediumConnectionToLabeledOffboardOther,
         // ~~~~~~~ Misc ~~~~~~~~
         #[scope = SignalScope::Name, additional_scopes = vec![], match_level = None]
         #[note = "User is labeled fraud", severity = SignalSeverity::High,  description = "The user has been labeled Offboard(fraud) by your organization"]
@@ -1646,6 +1652,10 @@ impl FootprintReasonCode {
                 | Self::StrongConnectionToLabeledFraud
                 | Self::MediumConnectionToLabeledFraud
                 | Self::UserIsLabeledFraud
+                | Self::StrongConnectionToLabeledActive
+                | Self::MediumConnectionToLabeledActive
+                | Self::StrongConnectionToLabeledOffboardOther
+                | Self::MediumConnectionToLabeledOffboardOther
         )
     }
 
