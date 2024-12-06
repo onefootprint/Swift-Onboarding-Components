@@ -2,7 +2,7 @@ import useEntityId from '@/entity/hooks/use-entity-id';
 import useTags from '@/entity/hooks/use-entity-tags';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import { RoleScopeKind } from '@onefootprint/types';
-import { Dropdown, IconButton } from '@onefootprint/ui';
+import { Box, Dropdown, IconButton } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useBusinessOwners from 'src/hooks/use-business-owners';
@@ -42,9 +42,11 @@ const BusinessActions = () => {
     <>
       <Dropdown.Root open={dropdownOpen} onOpenChange={setDropdownOpen}>
         <Dropdown.Trigger asChild>
-          <IconButton variant="outline" aria-label={t('trigger')} size="compact" disabled={isPending}>
-            <IcoDotsHorizontal24 />
-          </IconButton>
+          <Box>
+            <IconButton variant="outline" aria-label={t('trigger')} size="compact" disabled={isPending}>
+              <IcoDotsHorizontal24 />
+            </IconButton>
+          </Box>
         </Dropdown.Trigger>
         <Dropdown.Portal>
           <Dropdown.Content align="end" sideOffset={8} minWidth="200px">
