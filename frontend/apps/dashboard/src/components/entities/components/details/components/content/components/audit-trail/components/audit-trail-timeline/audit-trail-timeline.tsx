@@ -1,3 +1,4 @@
+import type { DataCollectedInfo } from '@onefootprint/request-types/dashboard';
 import type {
   ActorApiKey,
   Annotation,
@@ -24,9 +25,6 @@ import { LinkButton, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import type { TimelineItem } from 'src/components/timeline';
 import Timeline from 'src/components/timeline';
-
-import type { DataCollectedInfo } from '@onefootprint/request-types/dashboard';
-import useSession from 'src/hooks/use-session';
 import type { AuditTrailTimelineEvent } from 'src/utils/merge-audit-trail-timeline-events';
 import { AbandonedEventHeader } from './components/abandoned-event';
 import Actor from './components/actor';
@@ -56,9 +54,6 @@ export type AuditTrailTimelineProps = {
 
 const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
   const { t } = useTranslation('entity-details', { keyPrefix: 'audit-trail' });
-  const {
-    data: { user },
-  } = useSession();
 
   const items: TimelineItem[] = [];
   timeline.forEach(event => {
@@ -186,7 +181,7 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
         headerComponent: <StepUpEventHeader data={eventData} />,
         bodyComponent: <StepUpEventBody data={eventData} />,
       });
-    } else if (kind === TimelineEventKind.businessOwnerCompletedKyc && user?.isFirmEmployee) {
+    } else if (kind === TimelineEventKind.businessOwnerCompletedKyc) {
       const eventData = data as BoCompletedKycEventData;
       if (eventData.decision.workflowKind !== 'document') {
         items.push({
