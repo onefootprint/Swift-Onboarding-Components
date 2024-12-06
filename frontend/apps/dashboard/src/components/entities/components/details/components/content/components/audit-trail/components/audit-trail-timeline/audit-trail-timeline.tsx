@@ -17,13 +17,14 @@ import type {
   AuthMethodUpdatedData,
   BoCompletedKycEventData,
   LabelAddedEventData,
+  TimelineEvent,
   WorkflowStartedEventData,
 } from '@onefootprint/types/src/data/timeline';
 import { LinkButton, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
-import type { AuditTrailTimelineEvent } from 'src/components/entities/components/details/hooks/use-entity-timeline';
 import type { TimelineItem } from 'src/components/timeline';
 import Timeline from 'src/components/timeline';
+import useAddIncompleteEvents from '../../hooks/use-add-incomplete-events';
 import { AbandonedEventHeader } from './components/abandoned-event';
 import Actor from './components/actor';
 import AnnotationNote from './components/annotation-note';
@@ -46,15 +47,17 @@ import WorkflowStartedEventHeader from './components/workflow-started-event';
 import { WorkflowTriggeredEventBody, WorkflowTriggeredEventHeader } from './components/workflow-triggered-event';
 
 export type AuditTrailTimelineProps = {
-  timeline: AuditTrailTimelineEvent[];
+  timeline: TimelineEvent[];
   entity: Entity;
 };
 
 const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
   const { t } = useTranslation('entity-details', { keyPrefix: 'audit-trail' });
 
+  const allTimelineEvents = useAddIncompleteEvents(timeline, entity);
+
   const items: TimelineItem[] = [];
-  timeline.forEach(event => {
+  allTimelineEvents.forEach(event => {
     const {
       event: { kind, data },
       timestamp,

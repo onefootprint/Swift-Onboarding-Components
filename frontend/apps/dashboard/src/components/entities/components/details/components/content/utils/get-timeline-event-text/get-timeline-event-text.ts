@@ -6,6 +6,7 @@ import type {
   ExternalIntegrationCalledData,
   LivenessEventData,
   OnboardingDecisionEventData,
+  TimelineEvent,
   VaultCreatedEventData,
   WorkflowTriggeredEventData,
 } from '@onefootprint/types';
@@ -35,12 +36,11 @@ import {
   WorkflowStartedEventKind,
 } from '@onefootprint/types/src/data/timeline';
 import startCase from 'lodash/startCase';
-import type { AuditTrailTimelineEvent } from 'src/components/entities/components/details/hooks/use-entity-timeline';
 
 import getActorText from '../get-actor-text';
 
 // This is adapted from audit-trail-timeline.tsx
-const getTimelineEventText = (event: AuditTrailTimelineEvent): string => {
+const getTimelineEventText = (event: TimelineEvent): string => {
   // TODO: use translations
   const {
     event: { kind, data },

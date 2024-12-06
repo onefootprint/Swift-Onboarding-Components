@@ -1,17 +1,17 @@
 import { Hint, Radio, Stack, Text, createFontStyles } from '@onefootprint/ui';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import type { AuditTrailTimelineEvent } from 'src/components/entities/components/details/hooks/use-entity-timeline';
 import TimelineItemTime from 'src/components/timeline-item-time';
 import styled, { css } from 'styled-components';
 
 import useEntitySeqno from '@/entity/hooks/use-entity-seqno';
 
 import getTimelineEventText from '@/entities/components/details/components/content/utils/get-timeline-event-text';
+import type { TimelineEvent } from '@onefootprint/types';
 import type { HistoricalFormData } from '../../view-historical-data-dialog.types';
 
 export type ViewHistoricalDataFormProps = {
-  events: AuditTrailTimelineEvent[];
+  events: TimelineEvent[];
   onSubmit: (formData: HistoricalFormData) => void;
 };
 
@@ -29,7 +29,7 @@ const ViewHistoricalDataForm = ({ events, onSubmit }: ViewHistoricalDataFormProp
   });
   const errorMessage = errors.seqno?.message;
 
-  const renderEvent = (event: AuditTrailTimelineEvent) => {
+  const renderEvent = (event: TimelineEvent) => {
     const { timestamp, seqno } = event;
     const eventText = getTimelineEventText(event);
     return eventText ? (
