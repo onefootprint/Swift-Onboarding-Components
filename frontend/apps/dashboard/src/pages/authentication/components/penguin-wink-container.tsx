@@ -1,6 +1,4 @@
 import { ThemedLogoFpCompact } from '@onefootprint/icons';
-import { Box, media } from '@onefootprint/ui';
-import styled from 'styled-components';
 import ContainerBox from './container-box';
 import Layout from './layout';
 import PenguinWink from './penguin-wink';
@@ -11,41 +9,16 @@ type PenguinWinkContainerProps = {
 
 const PenguinWinkContainer = ({ children }: PenguinWinkContainerProps) => (
   <Layout>
-    <Container>
+    <div className="relative w-full sm:w-[410px]">
       <ContainerBox>
         <ThemedLogoFpCompact color="primary" />
         {children}
       </ContainerBox>
-      <PenguinImageContainer>
+      <div className="absolute top-[2px] right-[30px] z-0 w-[140px] h-fit transform -translate-y-full">
         <PenguinWink />
-      </PenguinImageContainer>
-    </Container>
+      </div>
+    </div>
   </Layout>
 );
-
-const Container = styled(Box)`
-  position: relative;
-  width: 100%;
-
-  ${media.greaterThan('sm')`
-    width: 410px;
-  `}
-`;
-
-const PenguinImageContainer = styled(Box)`
-  width: 140px;
-  height: fit-content;
-  position: absolute;
-  transform: translateY(-100%);
-  right: 30px;
-  top: 2px;
-  z-index: 0;
-
-  img {
-    object-fit: contain;
-    width: 100%;
-    height: 100%;
-  }
-`;
 
 export default PenguinWinkContainer;

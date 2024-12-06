@@ -1,4 +1,3 @@
-import { Stack, Text } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useTranslation } from 'react-i18next';
 
@@ -23,15 +22,15 @@ const DomainInUse = ({ errorContext }: DomainInUseProps) => {
         <title>{t('title')}</title>
       </Head>
       <PenguinWinkContainer>
-        <Stack center gap={5} direction="column" align="center">
-          <Text variant="label-2">{t('title')}</Text>
-          <Text variant="body-2" textAlign="center" color="secondary" maxWidth="350px">
+        <div className="flex flex-col items-center gap-5">
+          <div className="text-label-2">{t('title')}</div>
+          <div className="text-body-2 text-center text-secondary max-w-[350px]">
             {t('description', {
               tenantName: errorContext.tenantName,
               domain: errorContext.domain,
             })}
-          </Text>
-        </Stack>
+          </div>
+        </div>
       </PenguinWinkContainer>
     </>
   );
