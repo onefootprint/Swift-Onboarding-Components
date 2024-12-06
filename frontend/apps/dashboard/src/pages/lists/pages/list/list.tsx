@@ -1,4 +1,5 @@
 import { getOrgListsOptions } from '@onefootprint/axios/dashboard';
+import { getErrorMessage } from '@onefootprint/request';
 import { RoleScopeKind } from '@onefootprint/types';
 import { Button } from '@onefootprint/ui';
 import { useQuery } from '@tanstack/react-query';
@@ -14,10 +15,6 @@ const List = () => {
   //   const [dialogOpen, setDialogOpen] = useState(false);
   const listsQuery = useQuery(getOrgListsOptions());
   const { data, error, isPending } = listsQuery;
-  const hasData = data?.data;
-  if (!hasData) {
-    return null;
-  }
 
   //   const handleOpen = () => {
   //     setDialogOpen(true);
@@ -49,7 +46,7 @@ const List = () => {
         </div>
       </div>
       <div className="flex flex-col">
-        <Table data={data?.data} errorMessage={error?.message} isPending={isPending} />
+        <Table data={data?.data} errorMessage={error ? getErrorMessage(error) : undefined} isPending={isPending} />
       </div>
       {/* <CreateDialog open={dialogOpen} onClose={handleClose} /> */}
     </div>

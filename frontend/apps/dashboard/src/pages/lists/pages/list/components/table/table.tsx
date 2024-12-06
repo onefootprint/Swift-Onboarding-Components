@@ -1,8 +1,9 @@
 import type { List } from '@onefootprint/request-types/dashboard';
 import { Table as UITable } from '@onefootprint/ui';
-// import { useRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import { useTranslation } from 'react-i18next';
-// import useSession from 'src/hooks/use-session';
+import useSession from 'src/hooks/use-session';
+import useFilters from '../../hooks/use-filters';
 import Row from './components/row';
 
 type TableProps = {
@@ -13,9 +14,9 @@ type TableProps = {
 
 const Table = ({ data, isPending, errorMessage }: TableProps) => {
   const { t } = useTranslation('lists', { keyPrefix: 'list' });
-  //   const session = useSession();
-  //   const router = useRouter();
-  //   const filters = useFilters();
+  const session = useSession();
+  const router = useRouter();
+  const filters = useFilters();
 
   const columns = [
     { id: 'name', text: t('table.header.name'), width: '20%' },
@@ -29,24 +30,26 @@ const Table = ({ data, isPending, errorMessage }: TableProps) => {
     { id: 'created', text: t('table.header.created'), width: '20%' },
   ];
 
-  //   const handleRowClick = (list: List) => {
-  //     const mode = session.isLive ? 'live' : 'sandbox';
-  //     router.push({
-  //       pathname: `/lists/${list.id}`,
-  //       query: { ...filters.query, mode },
-  //     });
-  //   };
+  const handleRowClick = (list: List) => {
+    const mode = session.isLive ? 'live' : 'sandbox';
+    router.push({
+      pathname: `/lists/${list.id}`,
+      query: { ...filters.query, mode },
+    });
+  };
+
+  const emptyStateText = errorMessage || (!data?.length ? t('empty-description') : '');
 
   return (
     <UITable<List>
       aria-label={t('table.aria-label')}
       columns={columns}
-      emptyStateText={errorMessage || t('empty-description')}
+      emptyStateText={emptyStateText}
       getAriaLabelForRow={list => list.name}
       getKeyForRow={list => list.id}
       isLoading={isPending}
-      items={data}
-      //   onRowClick={handleRowClick}
+      items={errorMessage ? [] : data}
+      onRowClick={handleRowClick}
       renderTr={({ item: list }) => <Row list={list} />}
     />
   );
