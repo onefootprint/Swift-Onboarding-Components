@@ -33,6 +33,10 @@ const Form = ({ onClose }: FormProps) => {
         <Checkbox label={t('address.label')} {...register('data.address')} />
       </Stack>
       <Stack flexDirection="column" gap={4}>
+        <Text variant="label-3">{t('tin.title')}</Text>
+        <Checkbox label={t('tin.label')} {...register('data.tin')} />
+      </Stack>
+      <Stack flexDirection="column" gap={4}>
         <Text variant="label-3">{t('type.title')}</Text>
         <Checkbox label={t('type.label')} {...register('data.type')} />
       </Stack>

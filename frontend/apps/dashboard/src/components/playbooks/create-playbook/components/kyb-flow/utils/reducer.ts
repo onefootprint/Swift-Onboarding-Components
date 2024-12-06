@@ -68,6 +68,7 @@ export const reducer = (state: State, action: Action): State => {
           },
           verificationChecksForm: {
             ...state.data.verificationChecksForm,
+            runKyb: !!action.payload.data?.tin,
             kybKind: action.payload.data?.address ? 'full' : 'ein',
           },
         },

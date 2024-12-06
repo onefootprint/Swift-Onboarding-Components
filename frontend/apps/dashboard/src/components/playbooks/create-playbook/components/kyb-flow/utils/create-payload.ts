@@ -24,7 +24,7 @@ type KycFlowFormData = {
   verificationChecksForm: VerificationChecksFormData;
 };
 
-const requiredKybFields: CollectedDataOption[] = ['business_name', 'business_tin'];
+const requiredKybFields: CollectedDataOption[] = ['business_name'];
 
 const requiredKycFields: CollectedDataOption[] = ['email', 'name', 'dob', 'full_address'];
 
@@ -134,6 +134,9 @@ const createBusinessPayload = (
   const mustCollectData: CollectedDataOption[] = [...requiredKybFields];
   if (meta.collectsBO) {
     mustCollectData.push('business_kyced_beneficial_owners');
+  }
+  if (businessForm.data.tin) {
+    mustCollectData.push('business_tin');
   }
   if (businessForm.data.address) {
     mustCollectData.push('business_address');

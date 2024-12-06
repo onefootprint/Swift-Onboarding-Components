@@ -473,6 +473,7 @@
       },
       "kyb-checks": {
         "title": "Know Your Business (KYB)",
+        "disabled": "You must collect business TIN in order to enable KYB checks.",
         "toggle": {
           "label": "Run KYB",
           "hint": "If not enabled, we'll only collect the data and won't do any verification checks."
@@ -634,19 +635,23 @@
           "title": "Edit business information",
           "address": {
             "title": "Business address",
-            "label": "Request that users provide their business address"
+            "label": "Request users to provide their business's address"
+          },
+          "tin": {
+            "title": "TIN (EIN)",
+            "label": "Request users to provide their business's Tax Identification Number"
           },
           "type": {
             "title": "Legal entity type",
-            "label": "Request users to provide their business legal entity type"
+            "label": "Request users to provide their business's legal entity type"
           },
           "website": {
             "title": "Website",
-            "label": "Request users to provide their business website"
+            "label": "Request users to provide their business's website"
           },
           "phone-number": {
             "title": "Phone number",
-            "label": "Request that users provide their business phone number"
+            "label": "Request users to provide their business's phone number"
           }
         }
       },

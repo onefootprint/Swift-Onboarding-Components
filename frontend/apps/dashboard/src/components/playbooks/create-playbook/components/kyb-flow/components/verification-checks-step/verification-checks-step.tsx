@@ -12,6 +12,7 @@ export type VerificationChecksStepProps = {
   defaultValues: VerificationChecksFormData;
   meta: {
     collectsBO: boolean;
+    collectsTin: boolean;
     collectsBusinessAddress: boolean;
   };
   onBack: () => void;
@@ -20,7 +21,7 @@ export type VerificationChecksStepProps = {
 
 const VerificationChecksStep = ({ defaultValues, meta, onBack, onSubmit }: VerificationChecksStepProps) => {
   const { t } = useTranslation('playbooks', { keyPrefix: 'create.verification-checks' });
-  const { aml, kyc, kybKind } = useMeta(meta);
+  const { aml, kyc, kyb, kybKind } = useMeta(meta);
   const { register, control, handleSubmit } = useForm<VerificationChecksFormData>({ defaultValues });
   const [runKyb] = useWatch({
     control,
@@ -48,14 +49,17 @@ const VerificationChecksStep = ({ defaultValues, meta, onBack, onSubmit }: Verif
               control={control}
               name="runKyb"
               render={({ field }) => (
-                <Toggle
-                  checked={field.value}
-                  hint={t('kyb-checks.toggle.hint')}
-                  label={t('kyb-checks.toggle.label')}
-                  onBlur={field.onBlur}
-                  onChange={field.onChange}
-                  size="compact"
-                />
+                <Tooltip position="bottom" alignment="start" disabled={!kyb.disabled} text={kyb.disabledText}>
+                  <Toggle
+                    checked={field.value}
+                    hint={t('kyb-checks.toggle.hint')}
+                    label={t('kyb-checks.toggle.label')}
+                    onBlur={field.onBlur}
+                    onChange={field.onChange}
+                    disabled={kyb.disabled}
+                    size="compact"
+                  />
+                </Tooltip>
               )}
             />
             {runKyb ? (

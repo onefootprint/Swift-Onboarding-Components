@@ -124,6 +124,7 @@ const KybFlow = ({ onBack, onDone, playbook }: KybFlowProps) => {
           defaultValues={state.data.verificationChecksForm}
           meta={{
             collectsBO: state.data.boForm.data.collect,
+            collectsTin: state.data.businessForm.data.tin,
             collectsBusinessAddress: state.data.businessForm.data.address,
           }}
           onBack={() => {
