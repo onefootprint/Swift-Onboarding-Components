@@ -364,40 +364,27 @@ impl Tenant {
         Ok(res)
     }
 
-    #[tracing::instrument("Tenant::get_opt_by_workos_org_id", skip_all)]
-    pub fn get_opt_by_workos_org_id(conn: &mut PgConn, workos_org_id: &String) -> FpResult<Option<Tenant>> {
-        let res = tenant::table
-            .filter(tenant::workos_id.eq(workos_org_id))
-            .first(conn)
-            .optional()?;
-        Ok(res)
-    }
+    #[tracing::instrument("Tenant::get_by_domain", skip_all)]
+    pub fn get_by_domain(
+        conn: &mut PgConn,
+        domains: &[String],
+        filter: TenantDomainLookupFilter,
+    ) -> FpResult<Option<Tenant>> {
+        let mut query = tenant::table
+            .filter(tenant::domains.overlaps_with(domains))
+            .into_boxed();
 
-    #[tracing::instrument("Tenant::get_tenant_by_domain", skip_all)]
-    pub fn get_tenant_by_domain(conn: &mut PgConn, domain: &str) -> FpResult<Option<Tenant>> {
-        let res = tenant::table
-            .filter(tenant::domains.contains(vec![domain]))
-            .filter(tenant::allow_domain_access.eq(true))
-            .first(conn)
-            .optional()?;
-        Ok(res)
-    }
+        match filter {
+            TenantDomainLookupFilter::OnlyProduction => {
+                query = query.filter(tenant::sandbox_restricted.eq(false));
+            }
+            TenantDomainLookupFilter::OnlyClaimedDomainAccess => {
+                query = query.filter(tenant::allow_domain_access.eq(true));
+            }
+        }
 
-    #[tracing::instrument("Tenant::is_domain_already_claimed", skip_all)]
-    /// Returns true if the domain is already claimed
-    pub fn is_domain_already_claimed(conn: &mut PgConn, domains: &Vec<String>) -> FpResult<bool> {
-        let result = if !domains.is_empty() {
-            let existing: Option<TenantId> = tenant::table
-                .filter(tenant::domains.overlaps_with(domains))
-                .filter(tenant::allow_domain_access.eq(true))
-                .select(tenant::id)
-                .first(conn)
-                .optional()?;
-            existing.is_some()
-        } else {
-            false
-        };
-        Ok(result)
+        let res = query.first(conn).optional()?;
+        Ok(res)
     }
 
     #[tracing::instrument("Tenant::get_with_parent", skip_all)]
@@ -436,6 +423,13 @@ impl Tenant {
     pub fn can_access_preview(&self, api: &PreviewApi) -> bool {
         self.is_demo_tenant || self.allowed_preview_apis.contains(api)
     }
+}
+
+pub enum TenantDomainLookupFilter {
+    /// Only return the tenants that are production-enabled and have one of the domains
+    OnlyProduction,
+    /// Only return the tenants that have claimed one of the domains
+    OnlyClaimedDomainAccess,
 }
 
 impl WorkosAuthIdentity for Tenant {

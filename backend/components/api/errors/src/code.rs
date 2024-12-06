@@ -93,6 +93,8 @@ pub enum FpErrorCode {
     ConflictingPlaybookKey,
     #[strum(serialize = "E128")]
     ContactInfoNotYetVerified,
+    #[strum(serialize = "E129")]
+    ConflictingTenantDomain,
 
     // Tenant-facing errors
     #[strum(serialize = "T120")]
@@ -118,40 +120,7 @@ impl FpErrorCode {
             Self::DbDataNotFound => false,
             Self::DbUniqueConstraintViolation => false,
 
-            // Errors used by our client
-            Self::InvalidStatusTransition => true,
-            Self::IncorrectPin => true,
-            Self::ChallengeExpired => true,
-            Self::RateLimited => true,
-            Self::UnsupportedChallengeKind => true,
-            Self::CannotRegisterPasskey => true,
-            Self::LoginChallengeUserNotFound => true,
-            Self::OnlyOneIdentifier => true,
-            Self::DocumentNotPending => true,
-            Self::InvalidFileUploadMissing => true,
-            Self::MissingMimeType => true,
-            Self::InvalidMimeType => true,
-            Self::MultipartError => true,
-            Self::FileTooLarge => true,
-            Self::InvalidContentLength => true,
-            Self::MissingFilename => true,
-            Self::NoSessionFound => true,
-            Self::SessionExpired => true,
-            Self::CouldNotParseSession => true,
-            Self::ExistingVault => true,
-            Self::FileUploadTimeout => true,
-            Self::FileTooSmall => true,
-            Self::MissingAuthHeader => true,
-            Self::BusinessNotOwnedByUser => true,
-            Self::LinkAlreadyUsed => true,
-            Self::MissingPlaybookKey => true,
-            Self::ConflictingPlaybookKey => true,
-            Self::ContactInfoNotYetVerified => true,
-
-            // Tenant-facing errors
-            Self::VaultDataValidationError => true,
-            Self::PlaybookMissingRequirements => true,
-            Self::AlreadyOnboardedToPlaybook => true,
+            _ => true,
         }
     }
 }

@@ -10,6 +10,7 @@ use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use api_wire_types::UpdateTenantRequest;
 use db::models::tenant::Tenant;
+use db::models::tenant::TenantDomainLookupFilter::OnlyClaimedDomainAccess;
 use db::models::tenant::UpdateTenant;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::patch;
@@ -36,13 +37,11 @@ pub async fn get(
     )
     .await?;
 
-    let domains = tenant.domains.clone();
     let (is_domain_already_claimed, tenant_with_parent) = state
         .db_query(move |conn| {
-            Ok((
-                Tenant::is_domain_already_claimed(conn, &domains)?,
-                tenant.with_parent(conn)?,
-            ))
+            let is_claimed = Tenant::get_by_domain(conn, &tenant.domains, OnlyClaimedDomainAccess)?.is_some();
+            let tenant = tenant.with_parent(conn)?;
+            Ok((is_claimed, tenant))
         })
         .await?;
 
@@ -111,9 +110,10 @@ async fn patch(
 
             // If we're enabling domain access, ensure the tenant's domains aren't already claimed.
             // TODO: Enforce this better with a uniqueness constraint on claimed domains in the DB.
+            let is_claimed = Tenant::get_by_domain(conn, &tenant.domains, OnlyClaimedDomainAccess)?.is_some();
             if !tenant.allow_domain_access
-                && update_tenant.allow_domain_access.is_some_and(|allow| allow)
-                && Tenant::is_domain_already_claimed(conn, &tenant.domains)?
+                && update_tenant.allow_domain_access.unwrap_or_default()
+                && is_claimed
             {
                 return Err(TenantError::ValidationError(
                     "Can not allow domain access: domains are already claimed".to_string(),

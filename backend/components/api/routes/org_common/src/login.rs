@@ -8,6 +8,8 @@ use api_core::utils::headers::InsightHeaders;
 use api_core::utils::session::AuthSession;
 use api_core::FpResult;
 use api_core::State;
+use api_errors::FpErrorCode;
+use api_errors::FpErrorTrait;
 use api_errors::ServerErr;
 use api_wire_types::OrgLoginResponse;
 use api_wire_types::Organization;
@@ -33,6 +35,7 @@ use newtypes::TenantKind;
 use newtypes::TenantScope;
 use newtypes::TenantSessionPurpose;
 use newtypes::WorkosAuthMethod;
+use reqwest::StatusCode;
 use std::str::FromStr;
 use workos::sso::AuthorizationCode;
 use workos::sso::ClientId;
@@ -135,27 +138,25 @@ where
         let user_id = user.id.clone();
         let org_id = t_pt.id().clone_into();
         let rb = state
-            .db_transaction(
-                move |conn| -> FpResult<(TenantRolebinding, TenantOrPartnerTenant)> {
-                    let rb = TenantRolebinding::create_for_login(conn, user_id, &org_id)?;
-                    let insight_event_id = CreateInsightEvent::from(insight).insert_with_conn(conn)?.id;
-                    // Create audit event for both tenant and partner tenant cases
-                    if let OrgIdentifier::TenantId(tenant_id) = org_id {
-                        let detail = AuditEventDetail::OrgMemberJoined {
-                            tenant_role_id: rb.tenant_role_id.clone(),
-                            tenant_user_id: user.id.clone(),
-                        };
-                        let audit_event = NewAuditEvent {
-                            principal_actor: DbActor::TenantUser { id: user.id },
-                            insight_event_id,
-                            tenant_id,
-                            detail,
-                        };
-                        AuditEvent::create(conn, audit_event)?;
-                    }
-                    Ok((rb, t_pt))
-                },
-            )
+            .db_transaction(move |conn| {
+                let rb = TenantRolebinding::create_for_login(conn, user_id, &org_id)?;
+                let insight_event_id = CreateInsightEvent::from(insight).insert_with_conn(conn)?.id;
+                // Create audit event for both tenant and partner tenant cases
+                if let OrgIdentifier::TenantId(tenant_id) = org_id {
+                    let detail = AuditEventDetail::OrgMemberJoined {
+                        tenant_role_id: rb.tenant_role_id.clone(),
+                        tenant_user_id: user.id.clone(),
+                    };
+                    let audit_event = NewAuditEvent {
+                        principal_actor: DbActor::TenantUser { id: user.id },
+                        insight_event_id,
+                        tenant_id,
+                        detail,
+                    };
+                    AuditEvent::create(conn, audit_event)?;
+                }
+                Ok((rb, t_pt))
+            })
             .await?;
         (vec![(rb.0, rb.1)], created_new_tenant)
     } else {
@@ -238,14 +239,28 @@ async fn find_or_create_tenant(state: &State, profile: &Profile) -> FpResult<(Te
     // process domain
     let domain = email_domain::parse_private_email_domain(profile.email.as_str());
 
-    if let Some(domain) = domain.as_ref() {
-        // Check if tenant exists. If so, automatically add new tenant user
-        let domain = domain.clone();
-        let tenant = state
-            .db_query(move |conn| Tenant::get_tenant_by_domain(conn, &domain))
+    if let Some(domain_ref) = domain.as_ref() {
+        use db::models::tenant::TenantDomainLookupFilter::OnlyClaimedDomainAccess;
+        use db::models::tenant::TenantDomainLookupFilter::OnlyProduction;
+        let domain = domain_ref.clone();
+        let (domain_access_tenant, production_tenant) = state
+            .db_query(move |conn| {
+                let domains = &[domain];
+                let domain_access_tenant = Tenant::get_by_domain(conn, domains, OnlyClaimedDomainAccess)?;
+                let production_tenant = Tenant::get_by_domain(conn, domains, OnlyProduction)?;
+                Ok((domain_access_tenant, production_tenant))
+            })
             .await?;
-        if let Some(tenant) = tenant {
+        if let Some(tenant) = domain_access_tenant {
+            // A tenant has enabled domain access for this domain, return this tenant
             return Ok((tenant, false));
+        }
+        if let Some(tenant) = production_tenant {
+            // No tenant has claimed domain access for this domain, but there is a production-enabled
+            // tenant with this domain.
+            // Return an error that asks the user to request access from the admin of this org
+            let domain = domain_ref.clone();
+            return Err(ConflictingTenantDomainError { tenant, domain }.into());
         }
     };
 
@@ -314,4 +329,40 @@ async fn find_or_create_partner_tenant(
         .db_transaction(move |conn| PartnerTenant::create(conn, new_partner_tenant))
         .await?;
     Ok((partner_tenant, true))
+}
+
+#[derive(Debug)]
+pub struct ConflictingTenantDomainError {
+    pub tenant: Tenant,
+    pub domain: String,
+}
+
+impl std::error::Error for ConflictingTenantDomainError {}
+
+impl std::fmt::Display for ConflictingTenantDomainError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "A tenant with this domain already exists. Please contact your administrator in order to be invited to this tenant.")
+    }
+}
+
+impl FpErrorTrait for ConflictingTenantDomainError {
+    fn status_code(&self) -> StatusCode {
+        StatusCode::CONFLICT
+    }
+
+    fn code(&self) -> Option<FpErrorCode> {
+        Some(FpErrorCode::ConflictingTenantDomain)
+    }
+
+    fn message(&self) -> String {
+        self.to_string()
+    }
+
+    fn context(&self) -> Option<serde_json::Value> {
+        Some(serde_json::json!({
+            "tenant_id": self.tenant.id,
+            "tenant_name": self.tenant.name,
+            "domain": self.domain,
+        }))
+    }
 }

@@ -12,6 +12,7 @@ use api_core::utils::session::AuthSession;
 use api_errors::BadRequestInto;
 use db::models::tenant::NewTenant;
 use db::models::tenant::Tenant;
+use db::models::tenant::TenantDomainLookupFilter::OnlyClaimedDomainAccess;
 use newtypes::CompanySize;
 use newtypes::SessionAuthToken;
 use newtypes::TenantId;
@@ -51,7 +52,8 @@ pub async fn post(
     let expires_at = auth.clone().session().expires_at;
     let token = state
         .db_transaction(move |conn| {
-            if Tenant::is_domain_already_claimed(conn, &domains)? {
+            let tenant_with_domain = Tenant::get_by_domain(conn, &domains, OnlyClaimedDomainAccess)?;
+            if tenant_with_domain.is_some() {
                 return BadRequestInto("Tenant for this domain already exists");
             }
             let website_url = domains.first().cloned();
