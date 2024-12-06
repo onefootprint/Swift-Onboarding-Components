@@ -231,6 +231,21 @@ const getBusinessChanges = (old: OnboardingConfiguration, updated: OnboardingCon
     });
   }
 
+  // TIN changes
+  if (old.mustCollectData.includes('business_tin') && !updated.mustCollectData.includes('business_tin')) {
+    businessChanges.push({
+      alias: 'business-tin-required-to-not-collected',
+      old: 'Business TIN required',
+      updated: 'Business TIN is not collected',
+    });
+  } else if (!old.mustCollectData.includes('business_tin') && updated.mustCollectData.includes('business_tin')) {
+    businessChanges.push({
+      alias: 'business-tin-not-collected-to-required',
+      old: 'Business TIN is not collected',
+      updated: 'Business TIN required',
+    });
+  }
+
   // Business phone number changes
   if (
     old.mustCollectData.includes('business_phone_number') &&
@@ -267,21 +282,6 @@ const getBusinessChanges = (old: OnboardingConfiguration, updated: OnboardingCon
       alias: 'business-website-not-collected-to-required',
       old: 'Business website is not collected',
       updated: 'Business website required',
-    });
-  }
-
-  // EIN changes
-  if (old.mustCollectData.includes('business_tin') && !updated.mustCollectData.includes('business_tin')) {
-    businessChanges.push({
-      alias: 'ein-required-to-not-collected',
-      old: 'EIN required',
-      updated: 'EIN is not collected',
-    });
-  } else if (!old.mustCollectData.includes('business_tin') && updated.mustCollectData.includes('business_tin')) {
-    businessChanges.push({
-      alias: 'ein-not-collected-to-required',
-      old: 'EIN is not collected',
-      updated: 'EIN required',
     });
   }
 

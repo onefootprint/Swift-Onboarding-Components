@@ -635,6 +635,52 @@ describe('createDiff', () => {
       );
     });
 
+    it('should show when TIN required is removed', () => {
+      const oldPlaybook = getOnboardingConfiguration({
+        mustCollectData: ['business_tin'],
+      });
+      const updatedPlaybook = getOnboardingConfiguration({
+        mustCollectData: [],
+      });
+      expect(createDiff(oldPlaybook, updatedPlaybook)).toEqual(
+        expect.arrayContaining([
+          {
+            label: 'Business information',
+            changes: [
+              {
+                alias: 'business-tin-required-to-not-collected',
+                old: 'Business TIN required',
+                updated: 'Business TIN is not collected',
+              },
+            ],
+          },
+        ]),
+      );
+    });
+
+    it('should show when TIN is added as required', () => {
+      const oldPlaybook = getOnboardingConfiguration({
+        mustCollectData: [],
+      });
+      const updatedPlaybook = getOnboardingConfiguration({
+        mustCollectData: ['business_tin'],
+      });
+      expect(createDiff(oldPlaybook, updatedPlaybook)).toEqual(
+        expect.arrayContaining([
+          {
+            label: 'Business information',
+            changes: [
+              {
+                alias: 'business-tin-not-collected-to-required',
+                old: 'Business TIN is not collected',
+                updated: 'Business TIN required',
+              },
+            ],
+          },
+        ]),
+      );
+    });
+
     it('should show when business phone number required is removed', () => {
       const oldPlaybook = getOnboardingConfiguration({
         mustCollectData: ['business_phone_number'],
@@ -720,52 +766,6 @@ describe('createDiff', () => {
                 alias: 'business-website-not-collected-to-required',
                 old: 'Business website is not collected',
                 updated: 'Business website required',
-              },
-            ],
-          },
-        ]),
-      );
-    });
-
-    it('should show when EIN required is removed', () => {
-      const oldPlaybook = getOnboardingConfiguration({
-        mustCollectData: ['business_tin'],
-      });
-      const updatedPlaybook = getOnboardingConfiguration({
-        mustCollectData: [],
-      });
-      expect(createDiff(oldPlaybook, updatedPlaybook)).toEqual(
-        expect.arrayContaining([
-          {
-            label: 'Business information',
-            changes: [
-              {
-                alias: 'ein-required-to-not-collected',
-                old: 'EIN required',
-                updated: 'EIN is not collected',
-              },
-            ],
-          },
-        ]),
-      );
-    });
-
-    it('should show when EIN is added as required', () => {
-      const oldPlaybook = getOnboardingConfiguration({
-        mustCollectData: [],
-      });
-      const updatedPlaybook = getOnboardingConfiguration({
-        mustCollectData: ['business_tin'],
-      });
-      expect(createDiff(oldPlaybook, updatedPlaybook)).toEqual(
-        expect.arrayContaining([
-          {
-            label: 'Business information',
-            changes: [
-              {
-                alias: 'ein-not-collected-to-required',
-                old: 'EIN is not collected',
-                updated: 'EIN required',
               },
             ],
           },
