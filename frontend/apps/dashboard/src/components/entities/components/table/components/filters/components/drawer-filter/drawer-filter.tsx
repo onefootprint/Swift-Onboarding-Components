@@ -71,7 +71,7 @@ const DrawerFilter = ({ tags }: DrawerFilterProps) => {
 
   return (
     <>
-      <FilterButton onClick={openDrawer} data-checked={hasFilters}>
+      <FilterButton onClick={openDrawer} hasFilters={hasFilters}>
         {t('trigger')} {hasFilters && `(${filtersCount})`}
       </FilterButton>
       <Drawer

@@ -53,7 +53,7 @@ const DrawerFilter = ({ states }: DrawerFilterProps) => {
 
   return (
     <>
-      <FilterButton onClick={openDrawer} data-checked={hasFilters}>
+      <FilterButton onClick={openDrawer} hasFilters={hasFilters}>
         {t('trigger')}
       </FilterButton>
       <Drawer
