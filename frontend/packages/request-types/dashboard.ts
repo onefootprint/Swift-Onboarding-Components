@@ -946,6 +946,19 @@ export type CursorPaginatedListEvent = {
     next?: string;
   };
 };
+export type CursorPaginatedUserTimeline = {
+  data: Array<UserTimeline>;
+  meta: {
+    /**
+     * The total number of results.
+     */
+    count?: number;
+    /**
+     * The `cursor` parameter to provide in order to request the next page of results.
+     */
+    next?: string;
+  };
+};
 export type CustomDocumentConfig = {
   /**
    * Optional human-readable description of the document that will be displayed to the user
@@ -1510,7 +1523,8 @@ export type DupeKind =
   | 'name_ssn4'
   | 'dob_ssn4'
   | 'bank_routing_account'
-  | 'card_number_cvc';
+  | 'card_number_cvc'
+  | 'identity_document_number';
 export type Dupes = {
   otherTenant?: OtherTenantDupes;
   sameTenant: Array<SameTenantDupe>;
@@ -1971,6 +1985,9 @@ export type FootprintReasonCode =
   | 'affiliated_with_broker_or_finra'
   | 'visa_is_other'
   | 'visa_expired_or_expiring_soon'
+  | 'strong_connection_to_labeled_fraud'
+  | 'medium_connection_to_labeled_fraud'
+  | 'user_is_labeled_fraud'
   | 'business_name_match'
   | 'business_name_similar_match'
   | 'business_name_alternate_match'
@@ -4722,7 +4739,9 @@ export type RiskSignalGroupKind =
   | 'aml'
   | 'behavior'
   | 'phone'
-  | 'synthetic';
+  | 'synthetic'
+  | 'duplicates'
+  | 'user';
 export type Rule = {
   action: RuleAction;
   createdAt: string;
@@ -7770,6 +7789,7 @@ export type GetEntitiesByFpIdTimelineData = {
     fpId: string;
   };
   query?: {
+    cursor?: string;
     kinds?: Array<
       | 'data_collected'
       | 'identity_document_uploaded'
@@ -7787,9 +7807,10 @@ export type GetEntitiesByFpIdTimelineData = {
       | 'onboarding_timeline'
       | 'business_owner_completed_kyc'
     >;
+    pageSize?: number;
   };
 };
-export type GetEntitiesByFpIdTimelineResponse = Array<UserTimeline>;
+export type GetEntitiesByFpIdTimelineResponse = CursorPaginatedUserTimeline;
 export type GetEntitiesByFpIdTimelineError = unknown;
 export type PostEntitiesByFpIdTokenData = {
   body: CreateEntityTokenRequest;
@@ -10330,7 +10351,7 @@ export type $OpenApiTs = {
         /**
          * OK
          */
-        '200': Array<UserTimeline>;
+        '200': CursorPaginatedUserTimeline;
       };
     };
   };

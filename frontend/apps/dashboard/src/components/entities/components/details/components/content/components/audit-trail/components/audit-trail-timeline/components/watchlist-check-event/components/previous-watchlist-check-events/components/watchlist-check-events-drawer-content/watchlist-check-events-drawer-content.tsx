@@ -13,7 +13,7 @@ const WatchlistCheckEventsDrawerContent = () => {
   });
   const id = useEntityId();
   // @ts-expect-error: TODO: this type is incorrect, the backend accepts a single comma-separated string
-  const { data } = useEntityTimeline(id, { kinds: 'watchlist_check' }, true);
+  const { data, hasNextPage, fetchNextPage } = useEntityTimeline(id, { kinds: 'watchlist_check' }, true);
 
   const timelineItems = data?.flatMap(event => {
     const {
@@ -52,7 +52,7 @@ const WatchlistCheckEventsDrawerContent = () => {
     };
   });
 
-  return <Timeline items={timelineItems || []} />;
+  return <Timeline items={timelineItems || []} pagination={{ hasNextPage, fetchNextPage }} />;
 };
 
 export default WatchlistCheckEventsDrawerContent;
