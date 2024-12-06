@@ -162,9 +162,11 @@ impl UserTimeline {
             query = query.filter(user_timeline::event_kind.eq_any(kinds));
         }
         if let Some((timestamp, id)) = &pagination.cursor {
-            query = query
-                .filter(user_timeline::timestamp.lt(timestamp))
-                .filter(user_timeline::id.lt(id));
+            query = query.filter(
+                user_timeline::timestamp.le(timestamp).or(user_timeline::timestamp
+                    .eq(timestamp)
+                    .and(user_timeline::id.le(id))),
+            );
         }
 
         let results: Vec<Self> = query.get_results(conn)?;

@@ -277,7 +277,7 @@ impl AuditEvent {
         if let Some((cursor_ts, cursor_id)) = &pagination.cursor {
             // Filter on (row_ts, row_id) <= (cursor_ts, cursor_id)
             results = results.filter(
-                audit_event::timestamp.lt(cursor_ts).or(audit_event::timestamp
+                audit_event::timestamp.le(cursor_ts).or(audit_event::timestamp
                     .eq(cursor_ts)
                     .and(audit_event::id.le(cursor_id))),
             );
