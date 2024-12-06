@@ -52,7 +52,7 @@ const Content = ({ onboardings }: ContentProps) => {
                   key={onboarding.id}
                   onClick={() => setSelectedOnboarding(onboarding)}
                   checked={selectedOnboarding.id === onboarding.id}
-                  iconRight={IcoCheck16}
+                  iconRight={selectedOnboarding.id === onboarding.id ? IcoCheck16 : undefined}
                 >
                   <Stack direction="column" gap={2} align="flex-start">
                     <Text variant="label-3">{getOnboardingLabel(onboarding.playbookName, onboarding.kind)}</Text>

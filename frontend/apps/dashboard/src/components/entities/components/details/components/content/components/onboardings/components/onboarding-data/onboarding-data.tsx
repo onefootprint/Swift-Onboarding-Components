@@ -4,11 +4,13 @@ import { IcoShuffle16, IcoUserCircle16, IcoWarning16 } from '@onefootprint/icons
 import type { EntityOnboarding } from '@onefootprint/request-types/dashboard';
 import { Box, Text } from '@onefootprint/ui';
 import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import Subsection from '../subsection';
 import OnboardingRiskSignals from './components/onboarding-risk-signals';
 import OnboardingRules from './components/onboarding-rules';
+import RulesDropdown from './components/onboarding-rules/components/rules-dropdown';
 import groupRiskSignals from './utils/group-risk-signals';
 
 type OnboardingDataProps = {
@@ -25,6 +27,7 @@ const OnboardingData = ({ onboarding }: OnboardingDataProps) => {
       path: { fpId: entityId, onboardingId: onboarding.id },
     }),
   );
+  const [showTriggeredRules, setShowTriggeredRules] = useState(true);
 
   const subsections = {
     riskSignals: {
@@ -41,6 +44,10 @@ const OnboardingData = ({ onboarding }: OnboardingDataProps) => {
     },
   };
 
+  const handleRulesDropdownSelect = (isTriggered: boolean) => {
+    setShowTriggeredRules(isTriggered);
+  };
+
   return (
     <Box paddingTop={4} paddingRight={6} paddingBottom={7} paddingLeft={6}>
       <TopSection>
@@ -50,8 +57,15 @@ const OnboardingData = ({ onboarding }: OnboardingDataProps) => {
           </Subsection>
         )}
         {onboarding.ruleSetResults.length > 0 && (
-          <Subsection icon={subsections.rules.iconComponent} title={subsections.rules.title}>
-            <OnboardingRules ruleSetResultId={onboarding.ruleSetResults[0].id} />
+          <Subsection
+            icon={subsections.rules.iconComponent}
+            title={subsections.rules.title}
+            rightComponent={<RulesDropdown onClick={handleRulesDropdownSelect} />}
+          >
+            <OnboardingRules
+              ruleSetResultId={onboarding.ruleSetResults[0].id}
+              showTriggeredRules={showTriggeredRules}
+            />
           </Subsection>
         )}
       </TopSection>

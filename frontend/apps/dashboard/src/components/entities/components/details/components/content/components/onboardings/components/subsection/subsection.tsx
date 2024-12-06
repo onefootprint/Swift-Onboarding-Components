@@ -5,14 +5,18 @@ import type React from 'react';
 type SubsectionProps = {
   icon: Icon;
   title: string;
+  rightComponent?: React.ReactNode;
   children: React.ReactNode;
 };
 
-const Subsection = ({ icon: Icon, title, children }: SubsectionProps) => (
+const Subsection = ({ icon: Icon, title, rightComponent, children }: SubsectionProps) => (
   <Stack direction="column" gap={5}>
-    <Stack gap={3} align="center">
-      <Icon />
-      <Text variant="label-2">{title}</Text>
+    <Stack justify="space-between" align="center">
+      <Stack gap={3} align="center">
+        <Icon />
+        <Text variant="label-2">{title}</Text>
+      </Stack>
+      {rightComponent}
     </Stack>
     <Divider variant="secondary" />
     {children}

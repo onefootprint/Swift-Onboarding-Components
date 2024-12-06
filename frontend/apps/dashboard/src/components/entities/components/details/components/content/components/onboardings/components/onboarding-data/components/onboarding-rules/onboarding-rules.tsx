@@ -9,9 +9,10 @@ import Content from './components/content';
 
 type OnboardingRulesProps = {
   ruleSetResultId: string;
+  showTriggeredRules: boolean;
 };
 
-const OnboardingRules = ({ ruleSetResultId }: OnboardingRulesProps) => {
+const OnboardingRules = ({ ruleSetResultId, showTriggeredRules }: OnboardingRulesProps) => {
   const { t } = useTranslation('entity-details', {
     keyPrefix: 'onboardings.data.rules',
   });
@@ -27,7 +28,10 @@ const OnboardingRules = ({ ruleSetResultId }: OnboardingRulesProps) => {
       {isPending && <Loading />}
       {error && <ErrorComponent error={error} />}
       {data && data.ruleResults.length > 0 && (
-        <Content ruleResults={groupRuleResults(data.ruleResults).notTriggered} showTriggered={false} />
+        <Content
+          ruleResults={groupRuleResults(data.ruleResults)[showTriggeredRules ? 'triggered' : 'notTriggered']}
+          showTriggered={showTriggeredRules}
+        />
       )}
       {data?.ruleResults.length === 0 && <ErrorComponent error={t('no-rule-results')} />}
     </>

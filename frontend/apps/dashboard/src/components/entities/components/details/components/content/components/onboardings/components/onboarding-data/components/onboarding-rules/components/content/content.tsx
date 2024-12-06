@@ -58,16 +58,20 @@ const Content = ({ ruleResults, showTriggered }: ContentProps) => {
     return <Text variant="body-3">{showTriggered ? t('no-triggered-rules') : t('no-not-triggered-rules')}</Text>;
   }
 
-  return Object.entries(ruleResults).map(([action, rules]) => (
-    <Stack direction="column" gap={4}>
-      {renderRuleAction(action as RuleAction)}
-      <Stack direction="column" gap={3}>
-        {rules.map(({ ruleExpression }) => (
-          <RuleRow ruleExpression={ruleExpression} />
-        ))}
-      </Stack>
+  return (
+    <Stack direction="column" gap={7}>
+      {Object.entries(ruleResults).map(([action, rules]) => (
+        <Stack direction="column" gap={4}>
+          {renderRuleAction(action as RuleAction)}
+          <Stack direction="column" gap={3}>
+            {rules.map(({ ruleExpression }) => (
+              <RuleRow ruleExpression={ruleExpression} />
+            ))}
+          </Stack>
+        </Stack>
+      ))}
     </Stack>
-  ));
+  );
 };
 
 export default Content;
