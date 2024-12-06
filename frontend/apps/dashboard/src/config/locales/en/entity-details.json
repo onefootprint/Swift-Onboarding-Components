@@ -1131,6 +1131,7 @@
     },
     "risk-signals": {
       "title": "Risk signals",
+      "no-risk-signals": "No risk signals",
       "group": {
         "kyc": "KYC",
         "kyb": "KYB",
@@ -1185,7 +1186,8 @@
       }
     },
     "user-data": {
-      "title": "User data"
+      "title": "User data",
+      "decrypt-all": "Decrypt all"
     }
   },
   "business-insights": {

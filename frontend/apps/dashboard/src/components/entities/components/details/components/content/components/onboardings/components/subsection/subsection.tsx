@@ -10,7 +10,7 @@ type SubsectionProps = {
 };
 
 const Subsection = ({ icon: Icon, title, rightComponent, children }: SubsectionProps) => (
-  <Stack direction="column" gap={5}>
+  <Stack direction="column">
     <Stack justify="space-between" align="center">
       <Stack gap={3} align="center">
         <Icon />
@@ -18,7 +18,7 @@ const Subsection = ({ icon: Icon, title, rightComponent, children }: SubsectionP
       </Stack>
       {rightComponent}
     </Stack>
-    <Divider variant="secondary" />
+    <Divider variant="secondary" marginTop={3} marginBottom={5} />
     {children}
   </Stack>
 );

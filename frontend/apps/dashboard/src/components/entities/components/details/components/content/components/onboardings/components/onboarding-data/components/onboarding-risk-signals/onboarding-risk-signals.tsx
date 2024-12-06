@@ -1,5 +1,6 @@
 import type { RiskSignal, RiskSignalGroupKind } from '@onefootprint/request-types/dashboard';
 import { Stack, Text } from '@onefootprint/ui';
+import { useTranslation } from 'react-i18next';
 import useRiskSignalGroupText from '../../hooks/use-risk-signal-group-text';
 import RiskSignalItem from './components/risk-signal-item';
 
@@ -8,9 +9,11 @@ type OnboardingRiskSignalsProps = {
 };
 
 const OnboardingRiskSignals = ({ riskSignals }: OnboardingRiskSignalsProps) => {
+  const { t } = useTranslation('entity-details', { keyPrefix: 'onboardings.risk-signals' });
   const riskSignalGroupT = useRiskSignalGroupText();
+  const hasRiskSignals = Object.keys(riskSignals).length > 0;
 
-  return (
+  return hasRiskSignals ? (
     <Stack direction="column" gap={7}>
       {Object.entries(riskSignals).map(([group, signals]) => (
         <Stack direction="column" gap={3}>
@@ -23,6 +26,8 @@ const OnboardingRiskSignals = ({ riskSignals }: OnboardingRiskSignalsProps) => {
         </Stack>
       ))}
     </Stack>
+  ) : (
+    <Text variant="body-3">{t('no-risk-signals')}</Text>
   );
 };
 

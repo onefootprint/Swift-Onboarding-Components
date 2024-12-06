@@ -13,12 +13,14 @@ export type VaultType = {
   dataKinds: Partial<Record<DataIdentifier, DataKind>>;
 };
 
+const getQueryKey = (entityId?: string) => ['entity', entityId, 'vault'];
+
 // This is a custom hook that returns the vault for an entity.
 // The vault is stored in the query cache, so can persist and access from anywhere (e.g list page)
 // The main reason for keeping it separated is is because we should not overwrite it once we make an entity request,
 // any only when we decrypt some data we should update it.
 const getVaultOrCreate = async (queryClient: QueryClient, entity: Entity) => {
-  const getFromCache = () => queryClient.getQueryData<VaultType>(['entity', entity.id, 'vault']);
+  const getFromCache = () => queryClient.getQueryData<VaultType>(getQueryKey(entity.id));
 
   const createInitialData = (): VaultType => {
     const vaultsAndTransforms: VaultType = {
@@ -40,9 +42,10 @@ const getVaultOrCreate = async (queryClient: QueryClient, entity: Entity) => {
 
 const useEntityVault = (entityId?: string, entity?: Entity) => {
   const queryClient = useQueryClient();
+  const queryKey = getQueryKey(entityId);
 
   const update = (newData: VaultType) => {
-    const prevData = queryClient.getQueryData<VaultType>(['entity', entityId, 'vault']);
+    const prevData = queryClient.getQueryData<VaultType>(queryKey);
 
     const newDataConverted = {} as Partial<Record<DataIdentifier, VaultValue>>;
     Object.keys(newData.vault).forEach((di: string) => {
@@ -61,7 +64,7 @@ const useEntityVault = (entityId?: string, entity?: Entity) => {
     const newVault = { ...prevData?.vault, ...newDataConverted };
     const newTransforms = { ...prevData?.transforms, ...newData.transforms };
     const newDataKinds = { ...prevData?.dataKinds, ...newData.dataKinds };
-    queryClient.setQueryData(['entity', entityId, 'vault'], {
+    queryClient.setQueryData(queryKey, {
       vault: newVault,
       transforms: newTransforms,
       dataKinds: newDataKinds,
@@ -84,7 +87,7 @@ const useEntityVault = (entityId?: string, entity?: Entity) => {
         return isJustDecrypted;
       }
     };
-    const prevData = queryClient.getQueryData<VaultType>(['entity', entityId, 'vault']);
+    const prevData = queryClient.getQueryData<VaultType>(queryKey);
     if (shouldSkipUpdate(prevData, newData)) return;
 
     const newDataConverted = {} as Partial<Record<DataIdentifier, VaultValue>>;
@@ -96,7 +99,7 @@ const useEntityVault = (entityId?: string, entity?: Entity) => {
         newDataConverted[IdDI.ssn4] = (newVal as string).slice(-4);
       }
     });
-    queryClient.setQueryData(['entity', entityId, 'vault'], {
+    queryClient.setQueryData(queryKey, {
       ...newData,
       vault: newDataConverted,
     });
@@ -109,7 +112,7 @@ const useEntityVault = (entityId?: string, entity?: Entity) => {
   };
 
   const query = useQuery<VaultType>({
-    queryKey: ['entity', entityId, 'vault'],
+    queryKey,
     queryFn: () => getVaultOrCreate(queryClient, entity as Entity),
     enabled: !!entityId && !!entity,
   });
