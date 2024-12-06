@@ -2,7 +2,7 @@ import useEntityId from '@/entities/components/details/hooks/use-entity-id';
 import { getEntitiesByFpIdOnboardingsByOnboardingIdRiskSignalsOptions } from '@onefootprint/axios/dashboard';
 import { IcoShuffle16, IcoUserCircle16, IcoWarning16 } from '@onefootprint/icons';
 import type { EntityOnboarding } from '@onefootprint/request-types/dashboard';
-import { Box, Text } from '@onefootprint/ui';
+import { Box } from '@onefootprint/ui';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -11,6 +11,7 @@ import Subsection from '../subsection';
 import OnboardingRiskSignals from './components/onboarding-risk-signals';
 import OnboardingRules from './components/onboarding-rules';
 import RulesDropdown from './components/onboarding-rules/components/rules-dropdown';
+import OnboardingUserData from './components/onboarding-user-data';
 import groupRiskSignals from './utils/group-risk-signals';
 
 type OnboardingDataProps = {
@@ -71,7 +72,7 @@ const OnboardingData = ({ onboarding }: OnboardingDataProps) => {
       </TopSection>
       <Box marginTop={8}>
         <Subsection icon={subsections.userData.iconComponent} title={subsections.userData.title}>
-          <Text variant="label-3">Basic data</Text>
+          <OnboardingUserData />
         </Subsection>
       </Box>
     </Box>
