@@ -1,7 +1,8 @@
-import { type DataIdentifier, type DocumentUpload, type EntityVault, IdDocImageTypes } from '@onefootprint/types';
+import type { DataIdentifier, DocumentUpload, EntityVault } from '@onefootprint/types';
 import { Box, useObjectUrl } from '@onefootprint/ui';
 import Image from 'next/image';
 import styled, { css } from 'styled-components';
+import { getSelfieIndex } from '../../../../utils/show-selfie-preview';
 
 type SelfiePreviewProps = {
   uploads: DocumentUpload[];
@@ -9,7 +10,8 @@ type SelfiePreviewProps = {
 };
 
 const SelfiePreview = ({ uploads, vault }: SelfiePreviewProps) => {
-  const selfie = uploads.find(upload => upload.side === IdDocImageTypes.selfie && upload.failureReasons.length === 0);
+  const selfieIndex = getSelfieIndex(uploads);
+  const selfie = uploads[selfieIndex];
   if (!selfie) return null;
 
   const vaultIndex = `${selfie.identifier}:${selfie.version}` as DataIdentifier;

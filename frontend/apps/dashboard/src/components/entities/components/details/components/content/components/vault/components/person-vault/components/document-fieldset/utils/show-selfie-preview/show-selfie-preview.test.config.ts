@@ -32,11 +32,31 @@ const selfieUpload = {
   identifier: DocumentDI.latestIdCardSelfie,
 };
 
-const failedSelfieUpload = {
+const latestFailedSelfieUpload = {
   ...selfieUpload,
+  failureReasons: ['face_not_visible', 'blurry_image'],
+};
+
+const failedSelfieUpload2 = {
+  ...selfieUpload,
+  timestamp: '2010-01-01T00:00:00.000Z',
+  failureReasons: ['face_not_visible', 'blurry_image'],
+};
+
+const failedSelfieUpload3 = {
+  ...selfieUpload,
+  timestamp: '2000-01-01T00:00:00.000Z',
   failureReasons: ['face_not_visible', 'blurry_image'],
 };
 
 export const uploadsWithNoSelfies = [frontUpload, failedFrontUpload, backUpload];
 export const uploadsWithSuccessfulSelfies = [frontUpload, failedFrontUpload, selfieUpload];
-export const uploadsWithFailedSelfie = [frontUpload, backUpload, failedSelfieUpload];
+export const uploadsWithFailedSelfie = [frontUpload, backUpload, latestFailedSelfieUpload];
+export const uploadsWithSuccessfulAndThreeFailedSelfies = [
+  frontUpload,
+  backUpload,
+  selfieUpload,
+  latestFailedSelfieUpload,
+  failedSelfieUpload2,
+  failedSelfieUpload3,
+];
