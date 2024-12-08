@@ -19,9 +19,10 @@ const Banner = ({ children, variant, className, ...props }: BannerProps) => {
 const banner = cva(
   [
     'w-full text-center px-4 py-3 text-label-3',
-    '[&>a:hover]:opacity-70 [&>button:hover]:opacity-70',
-    '[&>a:active]:opacity-85 [&>button:active]:opacity-85',
-    '[&>button]:text-label-3 [&>button]:bg-transparent [&>button]:border-0 [&>button]:cursor-pointer [&>button]:underline',
+    '[&_a:hover]:opacity-70 [&_button:hover]:opacity-70',
+    '[&_a:active]:opacity-85 [&_button:active]:opacity-85',
+    '[&_a]:underline [&_button]:underline',
+    '[&_a]:ml-1 [&_button]:ml-1',
   ],
   {
     variants: {

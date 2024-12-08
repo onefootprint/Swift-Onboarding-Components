@@ -6,9 +6,7 @@ import useSession from 'src/hooks/use-session';
 import styled, { css } from 'styled-components';
 
 const AssumeBanner = () => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'components.private-layout.assume-banner',
-  });
+  const { t } = useTranslation('common', { keyPrefix: 'components.private-layout.assume-banner' });
   const { data, isAssumedSessionEditMode, setAssumedSessionEditMode } = useSession();
   const router = useRouter();
 
