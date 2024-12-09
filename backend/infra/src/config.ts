@@ -70,7 +70,6 @@ export interface Containers {
 }
 
 export interface Workos {
-  defaultOrg: string;
   clientId: string;
 }
 

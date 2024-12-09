@@ -65,10 +65,6 @@ pub struct Config {
 
     #[envconfig(from = "WORKOS_CLIENT_ID")]
     pub workos_client_id: String,
-
-    #[envconfig(from = "WORKOS_DEFAULT_ORG")]
-    pub workos_default_org: String,
-
     #[envconfig(from = "COOKIE_SESSION_KEY")]
     pub cookie_session_key_hex: Option<String>,
 

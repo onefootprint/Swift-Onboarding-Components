@@ -597,11 +597,7 @@ export abstract class ServiceContainers {
               {
                 name: 'WORKOS_CLIENT_ID',
                 value: constants.workos.clientId,
-              },
-              {
-                name: 'WORKOS_DEFAULT_ORG',
-                value: constants.workos.defaultOrg,
-              },
+              },        
               {
                 name: 'SERVICE_ENVIRONMENT',
                 value: serviceEnvironment,

@@ -218,10 +218,9 @@ config:
       memoryMB: 16384
       name: vault-dr
     workos:
-      clientId: client_01G371B7G8Y43RETQKQ0D63F88
-      defaultOrg: org_01G39KR1V1E52JEZV6BYNG590J
+      clientId: client_01G371B7GQS04JDN4JBEAE29PV
       secretKey:
-        secure: v1:qBwY9xkQ5AxOOFFR:nJs8FBGP1lGvhsAUJ/ANgv2PKoIWYJovYxCyLtDBWa24r+sDRpLxD7EC3z6ZWcVOlBb2hoYuR4vJobSyQ/3FBe7jPAFqLDJhrL9m6LEsX0NFg6iP/hYMKnPCqVfE+L2YaE5m
+        secure: v1:TQ9XAFuZAfzrMJy+:DP+fNutNF4xgaKIsh2rzCVX4XHMgrU3/1YCbJKXtxdIwlThaXYolcKoGCTOueYhgTReUKZvtyHWQP+gXHHxomGshxJGLzfMyYqeZGVIadCks5yBm7QVa0bwa5eAY+Q==
   infra:datadogApiKey:
     secure: v1:0BmPOWIqd+L1r3f3:apsMuxb9Qg5/OoIAiAVjtMG3mmTzbwPEKyLCwQ4MJHB+6BHbC9QOcZPqnYD5hoLq
   infra:serverTailscaleKey:
