@@ -13,12 +13,10 @@ from tests.utils import (
 from tests.dashboard.utils import (
     update_rules,
     assert_has_audit_event_with_details,
-    list_audit_events_with_details,
 )
 from tests.headers import (
     DryRun,
     IsLive,
-    PlaybookKey,
     SecondaryDashboardAuth,
 )
 from tests.identify_client import IdentifyClient
@@ -70,42 +68,48 @@ def test_list_playbook_versions(sandbox_tenant, ob_configuration):
 
     assert len(body["data"]) == 1, "Only one version for a playbook without edits"
     assert (
-        len(
-            [
-                obc_version
-                for obc_version in body["data"]
-                if obc_version["id"] == ob_configuration.id
-            ]
-        )
+        len([
+            obc_version
+            for obc_version in body["data"]
+            if obc_version["id"] == ob_configuration.id
+        ])
         == 1
     )
 
 
-@pytest.mark.parametrize(
-    "params,expect_ob_config1,expect_ob_config2",
-    [
-        (dict(status="enabled"), True, False),
-        (dict(status="disabled"), False, True),
-        (dict(search="Test"), True, True),
-        (dict(search="Inactive"), False, True),
-    ],
-)
 def test_config_list_filters(
     sandbox_tenant,
     ob_configuration,
     inactive_ob_configuration,
-    params,
-    expect_ob_config1,
-    expect_ob_config2,
 ):
-    body = get("org/playbooks", params, *sandbox_tenant.db_auths)
-    assert (
-        any(u["id"] == ob_configuration.id for u in body["data"]) == expect_ob_config1
+    params = dict(status="enabled", kinds="kyc,kyb")
+    body = get(
+        "org/playbooks",
+        params,
+        *sandbox_tenant.db_auths,
     )
-    assert (
-        any(u["id"] == inactive_ob_configuration["id"] for u in body["data"])
-        == expect_ob_config2
+    got_statuses = {obc["status"] for obc in body["data"]}
+    assert got_statuses == {"enabled"}
+    got_kinds = {obc["kind"] for obc in body["data"]}
+    assert got_kinds.issubset({"kyc", "kyb"})
+
+    params = dict(status="disabled", search=inactive_ob_configuration["name"])
+    body = get(
+        "org/playbooks",
+        params,
+        *sandbox_tenant.db_auths,
     )
+    got_statuses = {obc["status"] for obc in body["data"]}
+    assert got_statuses == {"disabled"}
+    assert all(inactive_ob_configuration["name"] in obc["name"] for obc in body["data"])
+
+    params = dict(status="enabled", search="nonexistent 0e449f024b10fd")
+    body = get(
+        "org/playbooks",
+        params,
+        *sandbox_tenant.db_auths,
+    )
+    assert len(body["data"]) == 0
 
 
 def test_config_detail(sandbox_tenant, ob_configuration):
@@ -1104,7 +1108,6 @@ def test_enhanced_aml(sandbox_tenant, must_collect_data, enhanced_aml, expected_
 def test_enhanced_aml_with_verification_checks(
     sandbox_tenant, must_collect_data, enhanced_aml, expected_error
 ):
-
     # with verification checks
     aml_check = dict(
         kind="aml",
@@ -1698,23 +1701,19 @@ def test_playbook_versions(sandbox_tenant, tenant):
     )
     # Rule IDs and timestamps are not maintained.
     rules_v2_repr = set(
-        json.dumps(
-            {
-                "name": r["name"],
-                "rule_expression": r["rule_expression"],
-                "action": r["action"],
-            }
-        )
+        json.dumps({
+            "name": r["name"],
+            "rule_expression": r["rule_expression"],
+            "action": r["action"],
+        })
         for r in rules_v2
     )
     rules_v3_repr = set(
-        json.dumps(
-            {
-                "name": r["name"],
-                "rule_expression": r["rule_expression"],
-                "action": r["action"],
-            }
-        )
+        json.dumps({
+            "name": r["name"],
+            "rule_expression": r["rule_expression"],
+            "action": r["action"],
+        })
         for r in rules_v3
     )
     assert rules_v2_repr == rules_v3_repr
