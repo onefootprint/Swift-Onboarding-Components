@@ -1,14 +1,14 @@
-import type { GetEntitySentilinkSignalResponse } from '@onefootprint/types';
+import type { SentilinkDetail } from '@onefootprint/request-types/dashboard';
 import { Stack } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import Score from './components/score';
 
 type ContentProps = {
-  data: GetEntitySentilinkSignalResponse;
+  data: SentilinkDetail;
 };
 
 const Content = ({ data }: ContentProps) => {
-  const { t } = useTranslation('entity-details', { keyPrefix: 'risk-signals.sentilink.details' });
+  const { t } = useTranslation('entity-details', { keyPrefix: 'onboardings.risk-signals.drawer.sentilink.score' });
   const { idTheft, synthetic } = data;
 
   return (
@@ -18,7 +18,7 @@ const Content = ({ data }: ContentProps) => {
           score={synthetic.score}
           scoreBand={synthetic.scoreBand}
           reasonCodes={synthetic.reasonCodes}
-          title={t('score.synthetic-title')}
+          title={t('synthetic-title')}
         />
       ) : null}
       {idTheft ? (
@@ -26,7 +26,7 @@ const Content = ({ data }: ContentProps) => {
           score={idTheft.score}
           scoreBand={idTheft.scoreBand}
           reasonCodes={idTheft.reasonCodes}
-          title={t('score.id-theft-title')}
+          title={t('id-theft-title')}
         />
       ) : null}
     </Stack>

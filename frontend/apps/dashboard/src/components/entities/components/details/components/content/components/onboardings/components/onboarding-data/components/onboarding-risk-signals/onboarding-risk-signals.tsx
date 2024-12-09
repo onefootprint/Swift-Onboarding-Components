@@ -20,9 +20,11 @@ const OnboardingRiskSignals = ({ riskSignals }: OnboardingRiskSignalsProps) => {
           <Text variant="label-3">
             {riskSignalGroupT(group as RiskSignalGroupKind)} ({signals.length})
           </Text>
-          {signals.map(signal => (
-            <RiskSignalItem riskSignal={signal} />
-          ))}
+          <Stack direction="column" gap={1}>
+            {signals.map(signal => (
+              <RiskSignalItem riskSignal={signal} />
+            ))}
+          </Stack>
         </Stack>
       ))}
     </Stack>

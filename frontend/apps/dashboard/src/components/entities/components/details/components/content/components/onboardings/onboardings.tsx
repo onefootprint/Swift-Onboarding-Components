@@ -13,11 +13,12 @@ const Onboardings = () => {
     keyPrefix: 'onboardings',
   });
   const entityId = useEntityId();
-  const { isPending, data, error } = useQuery(
-    getEntitiesByFpIdOnboardingsOptions({
+  const { isPending, data, error } = useQuery({
+    ...getEntitiesByFpIdOnboardingsOptions({
       path: { fpId: entityId },
     }),
-  );
+    enabled: Boolean(entityId),
+  });
 
   return (
     <Section title={t('title')}>

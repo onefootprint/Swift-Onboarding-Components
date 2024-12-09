@@ -27,7 +27,7 @@ const StandardDetails = () => {
     enabled: Boolean(values.riskSignalId),
   });
   const [amlMedia, setAmlMedia] = useState([] as AmlHitMedia[]);
-  const isOpen = !!query.risk_signal_id && !query.is_sentilink;
+  const isOpen = Boolean(query.risk_signal_id) && !query.is_sentilink;
 
   const getDrawerTitle = () => {
     if (data) {

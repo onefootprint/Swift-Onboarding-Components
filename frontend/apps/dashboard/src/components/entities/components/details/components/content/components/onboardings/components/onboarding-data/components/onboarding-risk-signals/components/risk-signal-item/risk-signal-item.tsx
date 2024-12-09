@@ -1,6 +1,7 @@
 import useRiskSignalsFilters from '@/entities/components/details/hooks/use-risk-signals-filters';
 import type { RiskSignal } from '@onefootprint/request-types/dashboard';
 import { Divider, Stack, Text } from '@onefootprint/ui';
+import styled, { css } from 'styled-components';
 import isSentilinkSignal from '../../../../../../../risk-signals/utils/is-sentilink-signal';
 import useRiskSignalSeverityText from '../../../../hooks/use-risk-signal-severity-text';
 
@@ -31,16 +32,24 @@ const RiskSignalItem = ({ riskSignal }: RiskSignalItemProps) => {
   };
 
   return (
-    <Stack gap={3} align="flex-end" paddingTop={2} paddingBottom={2} cursor="pointer" onClick={handleRowClick}>
+    <Container gap={3} align="flex-end" paddingTop={2} paddingBottom={2} cursor="pointer" onClick={handleRowClick}>
       <Text variant="snippet-1" color="secondary">
         {reasonCode}
       </Text>
-      <Divider variant="secondary" />
-      <Text variant="caption-1" color={getSeverityColor()}>
+      <Divider variant="secondary" marginBottom={2} />
+      <Text variant="caption-1" color={getSeverityColor()} marginBottom={1}>
         {riskSignalSeverityT(severity)}
       </Text>
-    </Stack>
+    </Container>
   );
 };
+
+const Container = styled(Stack)`
+  ${({ theme }) => css`
+  &:hover {
+      background-color: ${theme.backgroundColor.secondary};
+    }
+  `};
+`;
 
 export default RiskSignalItem;

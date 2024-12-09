@@ -1,6 +1,5 @@
 import type { UIStates } from '@onefootprint/design-tokens';
-import type { SentilinkReasonCode } from '@onefootprint/types';
-import { SentilinkScoreBand } from '@onefootprint/types';
+import type { ScoreBand, SentilinkReasonCode } from '@onefootprint/request-types/dashboard';
 import { Divider, Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import ReasonCode from './components/reason-code';
@@ -8,19 +7,19 @@ import { sortReasonCodes } from './utils/sort-reason-codes/sort-reason-codes';
 
 type ScoreProps = {
   score: number;
-  scoreBand: SentilinkScoreBand;
+  scoreBand: ScoreBand;
   reasonCodes: SentilinkReasonCode[];
   title: string;
 };
 
-const scoreToColor: Record<SentilinkScoreBand, keyof UIStates> = {
-  [SentilinkScoreBand.low]: 'success',
-  [SentilinkScoreBand.medium]: 'warning',
-  [SentilinkScoreBand.high]: 'error',
+const scoreToColor: Record<ScoreBand, keyof UIStates> = {
+  low: 'success',
+  medium: 'warning',
+  high: 'error',
 };
 
 const Score = ({ score, scoreBand, reasonCodes, title }: ScoreProps) => {
-  const { t } = useTranslation('entity-details', { keyPrefix: 'risk-signals.sentilink.details.score' });
+  const { t } = useTranslation('entity-details', { keyPrefix: 'onboardings.risk-signals.drawer.sentilink.score' });
   const sortedReasonCodes = sortReasonCodes(reasonCodes);
   const scoreColor = scoreToColor[scoreBand];
 

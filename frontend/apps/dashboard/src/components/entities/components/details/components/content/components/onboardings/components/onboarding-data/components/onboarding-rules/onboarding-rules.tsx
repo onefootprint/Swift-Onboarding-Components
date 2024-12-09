@@ -17,11 +17,12 @@ const OnboardingRules = ({ ruleSetResultId, showTriggeredRules }: OnboardingRule
     keyPrefix: 'onboardings.data.rules',
   });
   const entityId = useEntityId();
-  const { data, isPending, error } = useQuery(
-    getEntitiesByFpIdRuleSetResultByRuleSetResultIdOptions({
+  const { data, isPending, error } = useQuery({
+    ...getEntitiesByFpIdRuleSetResultByRuleSetResultIdOptions({
       path: { fpId: entityId, ruleSetResultId },
     }),
-  );
+    enabled: Boolean(entityId) && Boolean(ruleSetResultId),
+  });
 
   return (
     <>

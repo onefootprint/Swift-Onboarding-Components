@@ -1190,6 +1190,22 @@
           "title": "Title",
           "snippet": "Snippet",
           "url": "Go to article"
+        },
+        "sentilink": {
+          "title": "Synthetic and ID Theft scores",
+          "risk-indicator": {
+            "more_fraudy": "More fraudy",
+            "less_fraudy": "Less fraudy",
+            "more-icon-aria-label": "Up arrow",
+            "less-icon-aria-label": "Down arrow"
+          },
+          "score": {
+            "synthetic-title": "Synthetic score",
+            "id-theft-title": "ID theft score",
+            "detected-reason-codes": "Detected reason codes"
+          },
+          "powered-by": "Powered by",
+          "sentilink": "Sentilink"
         }
       }
     },

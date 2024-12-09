@@ -28,17 +28,19 @@ const OnboardingData = ({ onboarding }: OnboardingDataProps) => {
     keyPrefix: 'onboardings',
   });
   const entityId = useEntityId();
-  const { data: riskSignals } = useQuery(
-    getEntitiesByFpIdOnboardingsByOnboardingIdRiskSignalsOptions({
+  const { data: riskSignals } = useQuery({
+    ...getEntitiesByFpIdOnboardingsByOnboardingIdRiskSignalsOptions({
       path: { fpId: entityId, onboardingId: onboarding.id },
     }),
-  );
-  const { data: entityAttributes } = useQuery(
-    getEntitiesByFpIdDataOptions({
+    enabled: Boolean(entityId) && Boolean(onboarding.id),
+  });
+  const { data: entityAttributes } = useQuery({
+    ...getEntitiesByFpIdDataOptions({
       path: { fpId: entityId },
       query: { seqno: onboarding.seqno },
     }),
-  );
+    enabled: Boolean(entityId) && Boolean(onboarding.seqno),
+  });
   const {
     data: vaultData,
     update: updateVault,

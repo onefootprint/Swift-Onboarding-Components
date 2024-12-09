@@ -1,4 +1,4 @@
-import type { SentilinkReasonCode } from '@onefootprint/types';
+import type { SentilinkReasonCode } from '@onefootprint/request-types/dashboard';
 import { Stack, Text } from '@onefootprint/ui';
 import RiskIndicator from './components/risk-indicator';
 

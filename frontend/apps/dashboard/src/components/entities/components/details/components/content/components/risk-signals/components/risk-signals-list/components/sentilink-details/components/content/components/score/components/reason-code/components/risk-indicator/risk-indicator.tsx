@@ -1,28 +1,27 @@
 import { IcoArrowCircleUp16 } from '@onefootprint/icons';
-import { SentilinkFraudLevel } from '@onefootprint/types';
 import { Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 type RiskIndicatorProps = {
-  fraudLevel: SentilinkFraudLevel;
+  fraudLevel: string;
 };
 
 export const RiskIndicator = ({ fraudLevel }: RiskIndicatorProps) => {
   const { t } = useTranslation('entity-details', {
-    keyPrefix: 'risk-signals.sentilink.details.risk-indicator',
+    keyPrefix: 'onboardings.risk-signals.drawer.sentilink.risk-indicator',
   });
 
   return (
     <Stack gap={2} alignItems="center">
       <IconContainer>
-        {fraudLevel === SentilinkFraudLevel.moreFraudy ? (
+        {fraudLevel === 'more_fraudy' ? (
           <IcoArrowCircleUp16 aria-label={t('more-icon-aria-label')} color="error" />
         ) : (
           <IcoArrowCircleDown16 aria-label={t('less-icon-aria-label')} color="success" />
         )}
       </IconContainer>
-      <Text variant="caption-2" color={fraudLevel === SentilinkFraudLevel.moreFraudy ? 'error' : 'success'}>
+      <Text variant="caption-2" color={fraudLevel === 'more_fraudy' ? 'error' : 'success'}>
         {t(fraudLevel)}
       </Text>
     </Stack>
