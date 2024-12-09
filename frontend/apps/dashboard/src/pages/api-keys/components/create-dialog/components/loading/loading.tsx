@@ -1,22 +1,22 @@
-import { Box, Shimmer, Stack } from '@onefootprint/ui';
+import { Shimmer } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
 const Loading = () => {
   const { t } = useTranslation('api-keys', { keyPrefix: 'create' });
 
   return (
-    <Box aria-label={t('form.loading-aria')} width="100%">
-      <Stack gap={4} marginBottom={5}>
-        <Stack direction="column" gap={3}>
+    <div aria-label={t('form.loading-aria')} className="w-full">
+      <div className="flex flex-col gap-3 mb-4">
+        <div className="flex flex-col gap-2">
           <SecretKeyLabel />
           <SecretKeyInput />
-        </Stack>
-        <Stack direction="column" gap={3}>
+        </div>
+        <div className="flex flex-col gap-2">
           <RoleLabel />
           <RoleInput />
-        </Stack>
-      </Stack>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 };
 
