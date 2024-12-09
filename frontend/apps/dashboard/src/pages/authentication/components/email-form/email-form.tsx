@@ -3,6 +3,8 @@ import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { postOrgAuthSamlSsoMutation } from '@onefootprint/axios/dashboard';
+import { useMutation } from '@tanstack/react-query';
 import useEmailLogin from './hooks/use-email-login';
 
 type FormData = {
@@ -13,6 +15,8 @@ const EmailForm = () => {
   const { t } = useTranslation('authentication', { keyPrefix: 'email' });
   const router = useRouter();
   const mutateLoginEmail = useEmailLogin();
+  const mutateSamlSso = useMutation({ ...postOrgAuthSamlSsoMutation() });
+
   const {
     register,
     handleSubmit,
@@ -20,17 +24,28 @@ const EmailForm = () => {
   } = useForm<FormData>();
 
   const onSubmit = ({ email }: FormData) => {
-    mutateLoginEmail.mutate(
+    mutateSamlSso.mutate(
+      { body: { emailAddress: email, redirectUrl: `${window.location.origin}/auth` } },
       {
-        emailAddress: email,
-        redirectUrl: `${window.location.origin}/auth`,
-      },
-      {
-        onSuccess() {
-          router.push({
-            pathname: '/authentication/link-sent',
-            query: { email },
-          });
+        onSuccess(data) {
+          if (data.samlSsoUrl) {
+            window.location.href = data.samlSsoUrl;
+          } else {
+            mutateLoginEmail.mutate(
+              {
+                emailAddress: email,
+                redirectUrl: `${window.location.origin}/auth`,
+              },
+              {
+                onSuccess() {
+                  router.push({
+                    pathname: '/authentication/link-sent',
+                    query: { email },
+                  });
+                },
+              },
+            );
+          }
         },
       },
     );

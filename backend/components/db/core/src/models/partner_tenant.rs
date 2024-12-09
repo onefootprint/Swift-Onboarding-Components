@@ -166,12 +166,19 @@ impl PartnerTenant {
 }
 
 impl WorkosAuthIdentity for PartnerTenant {
-    fn supports_auth_method(&self, auth_method: WorkosAuthMethod) -> bool {
+    fn supports_auth_method(&self, auth_method: WorkosAuthMethod, workos_org_id: Option<&String>) -> bool {
         if let Some(auth_methods) = self.supported_auth_methods.as_ref() {
             if !auth_methods.contains(&auth_method) {
                 return false;
             }
         }
+
+        // ensure the workos org id matches if it is set
+        if workos_org_id.is_some() {
+            log::warn!("Partner tenant login attempted with workos_org_id");
+            return false;
+        }
+
         true
     }
 }

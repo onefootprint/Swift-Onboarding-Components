@@ -63,11 +63,15 @@ impl TryFrom<(Option<Tenant>, Option<PartnerTenant>)> for TenantOrPartnerTenant 
 }
 
 impl WorkosAuthIdentity for TenantOrPartnerTenant {
-    fn supports_auth_method(&self, auth_method: newtypes::WorkosAuthMethod) -> bool {
+    fn supports_auth_method(
+        &self,
+        auth_method: newtypes::WorkosAuthMethod,
+        workos_org_id: Option<&String>,
+    ) -> bool {
         match self {
-            TenantOrPartnerTenant::Tenant(tenant) => tenant.supports_auth_method(auth_method),
+            TenantOrPartnerTenant::Tenant(tenant) => tenant.supports_auth_method(auth_method, workos_org_id),
             TenantOrPartnerTenant::PartnerTenant(partner_tenant) => {
-                partner_tenant.supports_auth_method(auth_method)
+                partner_tenant.supports_auth_method(auth_method, workos_org_id)
             }
         }
     }

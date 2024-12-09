@@ -57,9 +57,8 @@ impl DbToApi<(Tenant, Option<BillingProfile>, Option<TenantVendorControl>)>
             allowed_preview_apis,
             pinned_api_version,
             is_demo_tenant,
-
+            workos_org_id,
             super_tenant_id,
-            workos_id,
             stripe_customer_id,
             app_clip_experience_id,
             ..
@@ -83,7 +82,7 @@ impl DbToApi<(Tenant, Option<BillingProfile>, Option<TenantVendorControl>)>
             is_demo_tenant,
 
             super_tenant_id,
-            workos_id,
+            workos_id: workos_org_id,
             stripe_customer_id,
             app_clip_experience_id,
 

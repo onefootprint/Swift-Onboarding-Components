@@ -61,7 +61,6 @@ pub async fn post(
                 name,
                 e_private_key: e_priv_key,
                 public_key: ec_pk_uncompressed,
-                workos_id: None,
                 logo_url: None,
                 sandbox_restricted: true,
                 is_demo_tenant: false,

@@ -40,7 +40,9 @@ fn post(
     let tu_id = actor.tenant_user_id()?.clone();
 
     let login_result = state
-        .db_transaction(move |conn| TenantRolebinding::login(conn, (&tu_id, &partner_tenant_id), auth_method))
+        .db_transaction(move |conn| {
+            TenantRolebinding::login(conn, (&tu_id, &partner_tenant_id), auth_method, None)
+        })
         .await?;
 
     let session_data = TenantRbSession::create(&login_result, purpose);

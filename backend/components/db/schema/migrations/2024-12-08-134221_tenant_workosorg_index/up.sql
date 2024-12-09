@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX CONCURRENTLY IF NOT EXISTS idx_tenant_workos_org_id ON tenant(workos_org_id);

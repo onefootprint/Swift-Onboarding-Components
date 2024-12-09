@@ -34,6 +34,7 @@ fn post(
     let AssumeRoleRequest { tenant_id } = request.into_inner();
     let purpose = auth.purpose();
     let auth_method = auth.auth_method();
+    let workos_org_id = auth.workos_org_id();
     let expires_at = auth.clone().session().expires_at;
     let auth = auth.check_guard(Any)?;
     let actor = auth.actor();
@@ -42,7 +43,8 @@ fn post(
     let sealing_key = state.session_sealing_key.clone();
     let (login_result, token) = state
         .db_transaction(move |conn| {
-            let login_result = TenantRolebinding::login(conn, (&tu_id, &tenant_id), auth_method)?;
+            let login_result =
+                TenantRolebinding::login(conn, (&tu_id, &tenant_id), auth_method, workos_org_id)?;
             let session_data = TenantRbSession::create(&login_result, purpose);
             // The new token will expire at the same time as the existing token to prevent allowing
             // perpetually re-creating a new token for yourself

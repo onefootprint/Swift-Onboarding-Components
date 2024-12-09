@@ -244,6 +244,9 @@ import type {
   PostOrgAuthMagicLinkData,
   PostOrgAuthMagicLinkError,
   PostOrgAuthMagicLinkResponse,
+  PostOrgAuthSamlSsoData,
+  PostOrgAuthSamlSsoError,
+  PostOrgAuthSamlSsoResponse,
   PostOrgFrequentNotesData,
   PostOrgFrequentNotesError,
   PostOrgFrequentNotesResponse,
@@ -498,6 +501,7 @@ import {
   postOrgAuthLogin,
   postOrgAuthLogout,
   postOrgAuthMagicLink,
+  postOrgAuthSamlSso,
   postOrgFrequentNotes,
   postOrgLists,
   postOrgListsByListIdEntries,
@@ -2623,6 +2627,43 @@ export const getOrgAuthRolesOptions = (options?: Options<GetOrgAuthRolesData>) =
     },
     queryKey: getOrgAuthRolesQueryKey(options),
   });
+};
+
+export const postOrgAuthSamlSsoQueryKey = (options: Options<PostOrgAuthSamlSsoData>) => [
+  createQueryKey('postOrgAuthSamlSso', options),
+];
+
+export const postOrgAuthSamlSsoOptions = (options: Options<PostOrgAuthSamlSsoData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await postOrgAuthSamlSso({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: postOrgAuthSamlSsoQueryKey(options),
+  });
+};
+
+export const postOrgAuthSamlSsoMutation = (options?: Partial<Options<PostOrgAuthSamlSsoData>>) => {
+  const mutationOptions: UseMutationOptions<
+    PostOrgAuthSamlSsoResponse,
+    AxiosError<PostOrgAuthSamlSsoError>,
+    Options<PostOrgAuthSamlSsoData>
+  > = {
+    mutationFn: async localOptions => {
+      const { data } = await postOrgAuthSamlSso({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
 };
 
 export const getOrgClientSecurityConfigQueryKey = (options?: Options<GetOrgClientSecurityConfigData>) => [

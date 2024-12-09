@@ -19,6 +19,8 @@ pub struct TenantRbSession {
     pub tenant_rolebinding_id: TenantRolebindingId,
     /// The auth method used to log in via workos
     pub auth_method: WorkosAuthMethod,
+    /// The workos org id that the tenant rolebinding is bound to (if any)
+    pub workos_org_id: Option<String>,
     #[serde(default = "dashboard")]
     pub purpose: TenantSessionPurpose,
 }
@@ -28,6 +30,7 @@ impl TenantRbSession {
         Self {
             tenant_rolebinding_id: login_info.rb.id.clone(),
             auth_method: login_info.auth_method,
+            workos_org_id: login_info.workos_org_id.clone(),
             purpose,
         }
     }

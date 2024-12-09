@@ -51,7 +51,6 @@ pub struct Tenant {
     pub name: String,
     pub public_key: VaultPublicKey,
     pub e_private_key: EncryptedVaultPrivateKey,
-    pub workos_id: Option<String>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub logo_url: Option<String>,
@@ -96,6 +95,8 @@ pub struct Tenant {
     pub super_tenant_id: Option<TenantId>,
     pub svix_app_id_sandbox: Option<SvixAppId>,
     pub svix_app_id_live: Option<SvixAppId>,
+    /// The organization ID in WorkOS (used only for tenants enabled for SAML SSO)
+    pub workos_org_id: Option<String>,
 }
 
 pub struct PrivateTenantFilters {
@@ -117,8 +118,6 @@ pub struct NewTenant {
     pub name: String,
     pub public_key: VaultPublicKey,
     pub e_private_key: EncryptedVaultPrivateKey,
-    /// DEPRECATED
-    pub workos_id: Option<String>,
     pub logo_url: Option<String>,
     pub sandbox_restricted: bool,
     pub is_demo_tenant: bool,
@@ -364,6 +363,15 @@ impl Tenant {
         Ok(res)
     }
 
+    #[tracing::instrument("Tenant::get_opt_by_workos_org_id", skip_all)]
+    pub fn get_opt_by_workos_org_id(conn: &mut PgConn, workos_org_id: &str) -> FpResult<Option<Tenant>> {
+        let res = tenant::table
+            .filter(tenant::workos_org_id.eq(workos_org_id))
+            .first(conn)
+            .optional()?;
+        Ok(res)
+    }
+
     #[tracing::instrument("Tenant::get_by_domain", skip_all)]
     pub fn get_by_domain(
         conn: &mut PgConn,
@@ -433,13 +441,23 @@ pub enum TenantDomainLookupFilter {
 }
 
 impl WorkosAuthIdentity for Tenant {
-    fn supports_auth_method(&self, auth_method: WorkosAuthMethod) -> bool {
+    fn supports_auth_method(&self, auth_method: WorkosAuthMethod, workos_org_id: Option<&String>) -> bool {
         if let Some(auth_methods) = self.supported_auth_methods.as_ref() {
             if !auth_methods.contains(&auth_method) {
                 return false;
             }
         }
-        true
+
+        // Note: an extra security control: if tenant has workos_org_id set reject the auth method if it is
+        // not SAML SSO currently we require that if we've bound a tenant to a workos org it means
+        // the tenant is using SAML SSO (and it is required) in the future we may relax this if i.e.
+        // tenants want both google oauth & saml sso
+        if self.workos_org_id.is_some() && auth_method != WorkosAuthMethod::SamlSso {
+            return false;
+        }
+
+        // ensure the workos org id matches if it is set
+        self.workos_org_id.as_ref() == workos_org_id
     }
 }
 

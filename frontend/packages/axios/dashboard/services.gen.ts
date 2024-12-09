@@ -374,6 +374,9 @@ import type {
   PostOrgAuthMagicLinkData,
   PostOrgAuthMagicLinkError,
   PostOrgAuthMagicLinkResponse,
+  PostOrgAuthSamlSsoData,
+  PostOrgAuthSamlSsoError,
+  PostOrgAuthSamlSsoResponse,
   PostOrgFrequentNotesData,
   PostOrgFrequentNotesError,
   PostOrgFrequentNotesResponse,
@@ -1589,6 +1592,18 @@ export const getOrgAuthRoles = <ThrowOnError extends boolean = false>(
   return (options?.client ?? client).get<GetOrgAuthRolesResponse, GetOrgAuthRolesError, ThrowOnError>({
     ...options,
     url: '/org/auth/roles',
+  });
+};
+
+/**
+ * Fetch the SAML SSO URL for a given email address.
+ */
+export const postOrgAuthSamlSso = <ThrowOnError extends boolean = false>(
+  options: Options<PostOrgAuthSamlSsoData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<PostOrgAuthSamlSsoResponse, PostOrgAuthSamlSsoError, ThrowOnError>({
+    ...options,
+    url: '/org/auth/saml_sso',
   });
 };
 

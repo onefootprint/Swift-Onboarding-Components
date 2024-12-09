@@ -29,6 +29,7 @@ use strum_macros::EnumString;
 pub enum WorkosAuthMethod {
     GoogleOauth,
     MagicLink,
+    SamlSso,
     // NOTE: be careful adding new auth methods here. Right now, we use WorkOs to just tell us the
     // authed email address and provider. But, not every auth provider enforces that the email
     // address is owned by the user authing. Chat with Elliott before adding new WorkosAuth types

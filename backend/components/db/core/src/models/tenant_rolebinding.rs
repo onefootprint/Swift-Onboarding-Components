@@ -60,6 +60,7 @@ pub struct TenantRbLoginResult {
     pub t_pt: TenantOrPartnerTenant,
     pub is_first_login: IsFirstLogin,
     pub auth_method: WorkosAuthMethod,
+    pub workos_org_id: Option<String>,
 }
 
 #[derive(From)]
@@ -313,6 +314,7 @@ impl TenantRolebinding {
         conn: &mut TxnPgConn,
         id: T,
         auth_method: WorkosAuthMethod,
+        workos_org_id: Option<String>,
     ) -> FpResult<TenantRbLoginResult>
     where
         T: Into<TenantRolebindingIdentifier<'a>>,
@@ -329,7 +331,8 @@ impl TenantRolebinding {
             TenantOrPartnerTenant::Tenant(t) => (&user.id, &t.id).into(),
             TenantOrPartnerTenant::PartnerTenant(pt) => (&user.id, &pt.id).into(),
         };
-        if !t_pt.supports_auth_method(auth_method) {
+
+        if !t_pt.supports_auth_method(auth_method, workos_org_id.as_ref()) {
             return UnauthorizedInto("Your organization administrator has disabled the ability to log in using this auth method. Please retry using another auth method.");
         }
         let rb = Self::update(conn, rb_id, rb_update)?;
@@ -340,6 +343,7 @@ impl TenantRolebinding {
             t_pt,
             is_first_login,
             auth_method,
+            workos_org_id,
         };
         Ok(result)
     }

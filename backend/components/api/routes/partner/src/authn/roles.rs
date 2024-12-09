@@ -38,7 +38,7 @@ fn get(
     let data = tenants
         .sorted_by_key(|t| t.name.to_lowercase().clone())
         .map(move |t| {
-            let is_auth_supported = IsAuthMethodSupported(t.supports_auth_method(auth_method));
+            let is_auth_supported = IsAuthMethodSupported(t.supports_auth_method(auth_method, None));
             api_wire_types::PartnerOrganization::from_db((t, Some(is_auth_supported)))
         })
         .collect();

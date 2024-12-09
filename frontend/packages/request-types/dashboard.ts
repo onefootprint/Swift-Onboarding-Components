@@ -4863,6 +4863,13 @@ export type SameTenantDupe = {
   startTimestamp: string;
   status: EntityStatus;
 };
+export type SamlSsoRequest = {
+  emailAddress: string;
+  redirectUrl: string;
+};
+export type SamlSsoResponse = {
+  samlSsoUrl?: string;
+};
 export type ScoreBand = 'low' | 'medium' | 'high';
 export type SearchEntitiesRequest = {
   externalId?: string;
@@ -8894,6 +8901,11 @@ export type GetOrgAuthRolesData = {
 };
 export type GetOrgAuthRolesResponse = Array<Organization>;
 export type GetOrgAuthRolesError = unknown;
+export type PostOrgAuthSamlSsoData = {
+  body: SamlSsoRequest;
+};
+export type PostOrgAuthSamlSsoResponse = SamlSsoResponse;
+export type PostOrgAuthSamlSsoError = unknown;
 export type GetOrgClientSecurityConfigData = {
   headers?: {
     /**
@@ -10797,6 +10809,17 @@ export type $OpenApiTs = {
          * OK
          */
         '200': Array<Organization>;
+      };
+    };
+  };
+  '/org/auth/saml_sso': {
+    post: {
+      req: PostOrgAuthSamlSsoData;
+      res: {
+        /**
+         * OK
+         */
+        '200': SamlSsoResponse;
       };
     };
   };

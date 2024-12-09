@@ -39,6 +39,6 @@
         }
       }
     },
-    "cta": "Continue with email"
+    "cta": "Continue with email or SAML SSO"
   }
 }

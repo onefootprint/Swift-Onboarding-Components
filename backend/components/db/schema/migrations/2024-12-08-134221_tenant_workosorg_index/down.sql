@@ -1,0 +1,1 @@
+DROP INDEX CONCURRENTLY IF EXISTS idx_tenant_workos_org_id;

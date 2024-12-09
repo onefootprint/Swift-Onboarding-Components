@@ -11,6 +11,8 @@ use api_core::State;
 use api_errors::FpErrorCode;
 use api_errors::FpErrorTrait;
 use api_errors::ServerErr;
+use api_errors::ServerErrInto;
+use api_errors::UnauthorizedInto;
 use api_wire_types::OrgLoginResponse;
 use api_wire_types::Organization;
 use api_wire_types::OrganizationMember;
@@ -53,7 +55,13 @@ fn get_auth_method(connection_type: &KnownOrUnknown<ConnectionType, String>) -> 
     let result = match connection_type.as_ref() {
         "\"GoogleOAuth\"" => WorkosAuthMethod::GoogleOauth,
         "\"MagicLink\"" => WorkosAuthMethod::MagicLink,
-        _ => return Err(TenantError::UnknownWorkosAuthMethod(connection_type).into()),
+        _ => {
+            if connection_type.to_lowercase().contains("saml") {
+                WorkosAuthMethod::SamlSso
+            } else {
+                return Err(TenantError::UnknownWorkosAuthMethod(connection_type).into());
+            }
+        }
     };
     Ok(result)
 }
@@ -90,20 +98,35 @@ where
     let profile2 = profile.clone();
     let auth_method = get_auth_method(&profile.connection_type)?;
 
+    // In SAML SSO we use the workos org id to ensure the tenant_rolebindings
+    // that the user can login to match the target org
+    let target_workos_org_id = if auth_method == WorkosAuthMethod::SamlSso {
+        profile.organization_id.clone().map(|id| id.to_string())
+    } else {
+        None
+    };
+
     //
     // Get all tenant rolebindings associated with this user and the given login target.
     //
-
     let (user, matching_rolebindings) = state
         .db_transaction(move |conn| {
             let email = OrgMemberEmail::from_str(&profile2.email)?;
+
+
             // Get or create tenant user
             let user =
                 TenantUser::get_and_update_or_create(conn, email, profile2.first_name, profile2.last_name)?;
+
+            if auth_method != WorkosAuthMethod::GoogleOauth && user.is_firm_employee {
+                // error out if the user is a firm employee and the auth method is not Google OAuth
+                return UnauthorizedInto("firm employee cannot login without Google OAuth");
+            }
+
             let matching_rolebindings: Vec<_> = TenantRolebinding::list_by_user(conn, &user.id)?
                 .into_iter()
                 .filter(|(_, t_pt)| {
-                    // Filter down to rolebindings that match the login target (e.g. partner tenant
+                    // Filter down to rolebindings that match the login target (e.g. partner `tenant
                     // rolebindings for the partner dashboard).
                     let rb_kind: TenantKind = t_pt.into();
                     rb_kind == tenant_kind
@@ -116,18 +139,18 @@ where
     //
     // Create a new tenant if there are no rolebindings
     //
-
     let (matching_rolebindings, created_new_tenant) = if !matching_rolebindings.is_empty() {
         (matching_rolebindings, false)
     } else if request_org_id.is_none() {
         let (t_pt, created_new_tenant): (TenantOrPartnerTenant, IsNewTenant) = match tenant_kind {
             TenantKind::Tenant => {
-                let (tenant, created_new_tenant) = find_or_create_tenant(&state, profile).await?;
+                let (tenant, created_new_tenant) =
+                    find_or_create_tenant(&state, profile, auth_method).await?;
                 (tenant.into(), created_new_tenant)
             }
             TenantKind::PartnerTenant => {
                 let (partner_tenant, created_new_tenant) =
-                    find_or_create_partner_tenant(&state, profile).await?;
+                    find_or_create_partner_tenant(&state, profile, auth_method).await?;
                 (partner_tenant.into(), created_new_tenant)
             }
         };
@@ -184,14 +207,13 @@ where
     let (rb, t_pt) = requested_rb
         .or(most_recently_logged_into_rb)
         .ok_or(ServerErr("User has no roles to log into"))?;
-
     //
     // Compose the with a token that has either logged into the single rolebinding OR with a token
     // that allows selecting amongst a list of available rolebindings
     //
 
     let login_result = state
-        .db_transaction(move |conn| TenantRolebinding::login(conn, &rb.id, auth_method))
+        .db_transaction(move |conn| TenantRolebinding::login(conn, &rb.id, auth_method, target_workos_org_id))
         .await?;
 
     let session = TenantRbSession::create(&login_result, TenantSessionPurpose::Dashboard);
@@ -235,68 +257,96 @@ where
 }
 
 type IsNewTenant = bool;
-async fn find_or_create_tenant(state: &State, profile: &Profile) -> FpResult<(Tenant, IsNewTenant)> {
-    // process domain
-    let domain = email_domain::parse_private_email_domain(profile.email.as_str());
+async fn find_or_create_tenant(
+    state: &State,
+    profile: &Profile,
+    auth_method: WorkosAuthMethod,
+) -> FpResult<(Tenant, IsNewTenant)> {
+    match auth_method {
+        WorkosAuthMethod::SamlSso => {
+            let Some(workos_org_id) = profile.organization_id.clone() else {
+                return ServerErrInto("workos org id is required for SAML SSO");
+            };
 
-    if let Some(domain_ref) = domain.as_ref() {
-        use db::models::tenant::TenantDomainLookupFilter::OnlyClaimedDomainAccess;
-        use db::models::tenant::TenantDomainLookupFilter::OnlyProduction;
-        let domain = domain_ref.clone();
-        let (domain_access_tenant, production_tenant) = state
-            .db_query(move |conn| {
-                let domains = &[domain];
-                let domain_access_tenant = Tenant::get_by_domain(conn, domains, OnlyClaimedDomainAccess)?;
-                let production_tenant = Tenant::get_by_domain(conn, domains, OnlyProduction)?;
-                Ok((domain_access_tenant, production_tenant))
-            })
-            .await?;
-        if let Some(tenant) = domain_access_tenant {
-            // A tenant has enabled domain access for this domain, return this tenant
-            return Ok((tenant, false));
+            // For SAML SSO, we don't create a new tenant -- we must locate it by workos org id
+            let Some(tenant) = state
+                .db_query(move |conn| Tenant::get_opt_by_workos_org_id(conn, &workos_org_id.to_string()))
+                .await?
+            else {
+                return ServerErrInto("SAML SSO is not configured");
+            };
+            Ok((tenant, false))
         }
-        if let Some(tenant) = production_tenant {
-            // No tenant has claimed domain access for this domain, but there is a production-enabled
-            // tenant with this domain.
-            // Return an error that asks the user to request access from the admin of this org
-            let domain = domain_ref.clone();
-            return Err(ConflictingTenantDomainError { tenant, domain }.into());
-        }
-    };
+        WorkosAuthMethod::GoogleOauth | WorkosAuthMethod::MagicLink => {
+            let domain = email_domain::parse_private_email_domain(profile.email.as_str());
 
-    // create new tenant in the case of public email tenant user or existing private tenant with
-    // allow_domain_access = false
-    tracing::info!("Creating new tenant with domain {:?}", domain);
-    let tenant_name = domain.clone().unwrap_or_else(|| profile.email.to_string());
-    let (ec_pk_uncompressed, e_priv_key) = state.enclave_client.generate_sealed_keypair().await?;
-    let new_tenant = NewTenant {
-        name: tenant_name,
-        e_private_key: e_priv_key,
-        public_key: ec_pk_uncompressed,
-        workos_id: None,
-        logo_url: None,
-        sandbox_restricted: true,
-        is_demo_tenant: false,
-        is_prod_ob_config_restricted: true,
-        is_prod_kyb_playbook_restricted: true,
-        is_prod_auth_playbook_restricted: true,
-        domains: domain.into_iter().collect(),
-        // false by default on creation, has to become true manually with PATCH /org
-        allow_domain_access: false,
-        super_tenant_id: None,
-        website_url: None,
-        company_size: None,
-    };
-    let tenant = state
-        .db_transaction(move |conn| Tenant::create(conn, new_tenant))
-        .await?;
-    Ok((tenant, true))
+            if let Some(domain_ref) = domain.as_ref() {
+                use db::models::tenant::TenantDomainLookupFilter::OnlyClaimedDomainAccess;
+                use db::models::tenant::TenantDomainLookupFilter::OnlyProduction;
+                let domain = domain_ref.clone();
+                let (domain_access_tenant, production_tenant) = state
+                    .db_query(move |conn| {
+                        let domains = &[domain];
+                        let domain_access_tenant =
+                            Tenant::get_by_domain(conn, domains, OnlyClaimedDomainAccess)?;
+                        let production_tenant = Tenant::get_by_domain(conn, domains, OnlyProduction)?;
+                        Ok((domain_access_tenant, production_tenant))
+                    })
+                    .await?;
+
+                if let Some(tenant) = domain_access_tenant {
+                    // A tenant has enabled domain access for this domain, return this tenant
+                    return Ok((tenant, false));
+                }
+
+                if let Some(tenant) = production_tenant {
+                    // No tenant has claimed domain access for this domain, but there is a production-enabled
+                    // tenant with this domain.
+                    // Return an error that asks the user to request access from the admin of this org
+                    let domain = domain_ref.clone();
+                    return Err(ConflictingTenantDomainError { tenant, domain }.into());
+                }
+            };
+
+            // create new tenant in the case of public email tenant user or existing private tenant with
+            // allow_domain_access = false
+            tracing::info!("Creating new tenant with domain {:?}", domain);
+            let tenant_name = domain.clone().unwrap_or_else(|| profile.email.to_string());
+            let (ec_pk_uncompressed, e_priv_key) = state.enclave_client.generate_sealed_keypair().await?;
+            let new_tenant = NewTenant {
+                name: tenant_name,
+                e_private_key: e_priv_key,
+                public_key: ec_pk_uncompressed,
+                logo_url: None,
+                sandbox_restricted: true,
+                is_demo_tenant: false,
+                is_prod_ob_config_restricted: true,
+                is_prod_kyb_playbook_restricted: true,
+                is_prod_auth_playbook_restricted: true,
+                domains: domain.into_iter().collect(),
+                // false by default on creation, has to become true manually with PATCH /org
+                allow_domain_access: false,
+                super_tenant_id: None,
+                website_url: None,
+                company_size: None,
+            };
+            let tenant = state
+                .db_transaction(move |conn| Tenant::create(conn, new_tenant))
+                .await?;
+            Ok((tenant, true))
+        }
+    }
 }
 
 async fn find_or_create_partner_tenant(
     state: &State,
     profile: &Profile,
+    auth_method: WorkosAuthMethod,
 ) -> FpResult<(PartnerTenant, IsNewTenant)> {
+    if auth_method == WorkosAuthMethod::SamlSso {
+        return ServerErrInto("SAML SSO is not supported on partner tenants");
+    }
+
     let domain = email_domain::parse_private_email_domain(profile.email.as_str());
 
     if let Some(domain) = domain.as_ref() {

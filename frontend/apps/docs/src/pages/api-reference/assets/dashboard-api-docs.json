@@ -4882,6 +4882,38 @@
                 ]
             }
         },
+        "/org/auth/saml_sso": {
+            "post": {
+                "tags": [
+                    "Auth",
+                    "Private"
+                ],
+                "description": "Fetch the SAML SSO URL for a given email address.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SamlSsoRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SamlSsoResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": []
+            }
+        },
         "/org/client_security_config": {
             "get": {
                 "tags": [
@@ -18742,6 +18774,29 @@
                     "start_timestamp",
                     "status"
                 ]
+            },
+            "SamlSsoRequest": {
+                "type": "object",
+                "properties": {
+                    "email_address": {
+                        "type": "string"
+                    },
+                    "redirect_url": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "email_address",
+                    "redirect_url"
+                ]
+            },
+            "SamlSsoResponse": {
+                "type": "object",
+                "properties": {
+                    "saml_sso_url": {
+                        "type": "string"
+                    }
+                }
             },
             "ScoreBand": {
                 "type": "string",

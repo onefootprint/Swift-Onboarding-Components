@@ -7,6 +7,7 @@ mod login;
 mod logout;
 mod magic_link;
 mod roles;
+mod saml_sso;
 
 pub fn routes(config: &mut web::ServiceConfig) {
     config
@@ -16,5 +17,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(magic_link::handler)
         .service(google_oauth::handler)
         .service(roles::get)
-        .service(assume_role::post);
+        .service(assume_role::post)
+        .service(saml_sso::handler);
 }

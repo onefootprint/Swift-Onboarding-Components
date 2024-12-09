@@ -54,6 +54,13 @@ impl TenantSessionAuth {
         }
     }
 
+    pub fn workos_org_id(&self) -> Option<String> {
+        match self {
+            Either::Left(l) => l.data.0.data.workos_org_id.clone(),
+            Either::Right(_) => None,
+        }
+    }
+
     pub fn purpose(&self) -> TenantSessionPurpose {
         match self {
             Either::Left(l) => l.data.0.data.purpose,

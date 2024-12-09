@@ -12,7 +12,6 @@ pub fn create(conn: &mut TxnPgConn) -> Tenant {
         name: "Test tenant".to_owned(),
         public_key: VaultPublicKey::unvalidated(vec![]),
         e_private_key: EncryptedVaultPrivateKey(vec![]),
-        workos_id: None,
         logo_url: None,
         sandbox_restricted: false,
         is_demo_tenant: false,
@@ -37,7 +36,6 @@ pub fn create_with_keys(
         name: "Test tenant".to_owned(),
         public_key,
         e_private_key,
-        workos_id: None,
         logo_url: None,
         sandbox_restricted: false,
         is_demo_tenant: false,
@@ -59,7 +57,6 @@ pub fn create_in_memory(public_key: VaultPublicKey, e_private_key: EncryptedVaul
         name: "Test tenant".to_owned(),
         public_key,
         e_private_key,
-        workos_id: None,
         logo_url: None,
         sandbox_restricted: false,
         id: TenantId::from("t".to_string()),
@@ -85,5 +82,6 @@ pub fn create_in_memory(public_key: VaultPublicKey, e_private_key: EncryptedVaul
         super_tenant_id: None,
         svix_app_id_live: None,
         svix_app_id_sandbox: None,
+        workos_org_id: None,
     }
 }

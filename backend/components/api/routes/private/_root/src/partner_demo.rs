@@ -148,7 +148,7 @@ pub async fn post(
                     let (manager_rb, _) =
                         TenantRolebinding::create(conn, user.id.clone(), manager_role.id.clone(), &pt.id)?;
                     let login_result =
-                        TenantRolebinding::login(conn, &manager_rb.id, WorkosAuthMethod::MagicLink)?;
+                        TenantRolebinding::login(conn, &manager_rb.id, WorkosAuthMethod::MagicLink, None)?;
                     let session = TenantRbSession::create(&login_result, TenantSessionPurpose::Dashboard);
                     let (auth_token, _) =
                         AuthSession::create_sync(conn, &session_sealing_key, session, Duration::minutes(1))?;
@@ -168,7 +168,6 @@ pub async fn post(
                         name: tenant_spec.name.to_owned(),
                         e_private_key,
                         public_key,
-                        workos_id: None,
                         logo_url: None,
                         sandbox_restricted: false,
                         is_demo_tenant: true,
@@ -221,7 +220,7 @@ pub async fn post(
                             &tenant.id,
                         )?;
                         let login_result =
-                            TenantRolebinding::login(conn, &admin_rb.id, WorkosAuthMethod::MagicLink)?;
+                            TenantRolebinding::login(conn, &admin_rb.id, WorkosAuthMethod::MagicLink, None)?;
                         let session = TenantRbSession::create(&login_result, TenantSessionPurpose::Dashboard);
                         let (auth_token, _) = AuthSession::create_sync(
                             conn,

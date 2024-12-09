@@ -1283,7 +1283,6 @@ diesel::table! {
         name -> Text,
         public_key -> Bytea,
         e_private_key -> Bytea,
-        workos_id -> Nullable<Varchar>,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         logo_url -> Nullable<Text>,
@@ -1308,6 +1307,7 @@ diesel::table! {
         super_tenant_id -> Nullable<Text>,
         svix_app_id_sandbox -> Nullable<Text>,
         svix_app_id_live -> Nullable<Text>,
+        workos_org_id -> Nullable<Text>,
     }
 }
 

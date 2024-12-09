@@ -305,6 +305,8 @@ import type {
   RuleSet,
   RuleSetResult,
   SameTenantDupe,
+  SamlSsoRequest,
+  SamlSsoResponse,
   ScoreBand,
   SearchEntitiesRequest,
   SecretApiKey,
@@ -9580,6 +9582,31 @@ export const getSameTenantDupe = (
       fpId: '8b552a04-fb13-4769-bc6a-5a23fcc559c4',
       startTimestamp: '1904-01-21T04:30:04.0Z',
       status: 'fail',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getSamlSsoRequest = (
+  props: Partial<SamlSsoRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): SamlSsoRequest =>
+  deepmerge<SamlSsoRequest>(
+    {
+      emailAddress: 'mekhi_mccullough@gmail.com',
+      redirectUrl: 'https://insistent-injunction.net/',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getSamlSsoResponse = (
+  props: Partial<SamlSsoResponse>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): SamlSsoResponse =>
+  deepmerge<SamlSsoResponse>(
+    {
+      samlSsoUrl: 'https://liquid-shadowbox.us/',
     },
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },

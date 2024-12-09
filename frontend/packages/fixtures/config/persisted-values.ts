@@ -425,6 +425,8 @@ import type {
   RuleSet,
   RuleSetResult,
   SameTenantDupe,
+  SamlSsoRequest,
+  SamlSsoResponse,
   ScoreBand,
   SearchEntitiesRequest,
   SecretApiKey,
@@ -10575,6 +10577,13 @@ export const dashboard_SameTenantDupe: SameTenantDupe = {
   fpId: '8b552a04-fb13-4769-bc6a-5a23fcc559c4',
   startTimestamp: '1904-01-21T04:30:04.0Z',
   status: 'fail',
+};
+export const dashboard_SamlSsoRequest: SamlSsoRequest = {
+  emailAddress: 'mekhi_mccullough@gmail.com',
+  redirectUrl: 'https://insistent-injunction.net/',
+};
+export const dashboard_SamlSsoResponse: SamlSsoResponse = {
+  samlSsoUrl: 'https://liquid-shadowbox.us/',
 };
 export const dashboard_ScoreBand: ScoreBand = 'low';
 export const dashboard_SearchEntitiesRequest: SearchEntitiesRequest = {

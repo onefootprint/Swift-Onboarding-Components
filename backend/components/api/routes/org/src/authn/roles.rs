@@ -21,6 +21,7 @@ use paperclip::actix::web;
 #[get("/org/auth/roles")]
 fn get(state: web::Data<State>, auth: TenantSessionAuth) -> ApiListResponse<Organization> {
     let auth_method = auth.auth_method();
+    let workos_org_id = auth.workos_org_id();
     let auth = auth.check_guard(Any)?;
     let actor = auth.actor();
     let tu_id = actor.tenant_user_id()?.clone();
@@ -36,7 +37,8 @@ fn get(state: web::Data<State>, auth: TenantSessionAuth) -> ApiListResponse<Orga
     let data = tenants
         .sorted_by_key(|t| t.name.to_lowercase().clone())
         .map(move |t| {
-            let is_auth_supported = IsAuthMethodSupported(t.supports_auth_method(auth_method));
+            let is_auth_supported =
+                IsAuthMethodSupported(t.supports_auth_method(auth_method, workos_org_id.as_ref()));
             Organization::from_db((t, is_auth_supported))
         })
         .collect();
