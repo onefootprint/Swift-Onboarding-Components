@@ -4,7 +4,7 @@ import 'react-app-polyfill/stable';
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
+import './styles/globals.css';
 import App from './App';
 
 const rootElement = document.getElementById('root');
