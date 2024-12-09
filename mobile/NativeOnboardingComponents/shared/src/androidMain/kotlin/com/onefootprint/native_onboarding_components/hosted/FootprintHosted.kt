@@ -1,8 +1,9 @@
 package com.onefootprint.native_onboarding_components.hosted
 
-import android.content.Context
+import android.app.Activity
 import com.onefootprint.native_onboarding_components.Footprint.vaultingToken
 import com.onefootprint.native_onboarding_components.Footprint.authToken
+import com.onefootprint.native_onboarding_components.Footprint.sessionId
 import com.onefootprint.native_onboarding_components.Footprint.authValidationToken
 import com.onefootprint.native_onboarding_components.Footprint.l10n
 import com.onefootprint.native_onboarding_components.Footprint.mutex
@@ -20,8 +21,7 @@ import org.openapitools.client.models.ObConfigurationKind
 
 object FootprintHosted {
     suspend fun launchIdentify(
-        redirectActivityName: String,
-        context: Context,
+        context: Activity,
         email: String? = null,
         phone: String? = null,
         onCancel: (() -> Unit)? = null,
@@ -44,22 +44,24 @@ object FootprintHosted {
                 )
             }
 
-            val onAuthenticationCompleteCallback: ((authToken: String, vToken: String) -> Unit) =
+            val onAuthenticationCompleteCallback: ((authToken: String, vToken: String) -> String) =
                 { authToken: String, vToken: String ->
                     verifiedAuthToken = authToken
                     vaultingToken = vToken
                     runBlocking {
-                        when (configKind) {
+                        val validationToken = when (configKind) {
                             ObConfigurationKind.auth -> {
                                 // It's unlikely that we will reach this block because onCompleteCallback below will take care of it
                                 val validationTokenResponse = FootprintQueries.validateOnboarding(authToken)
                                 authValidationToken = validationTokenResponse.validationToken
                                 onAuthenticated?.invoke(VerificationResponse(validationToken = validationTokenResponse.validationToken))
+                                validationTokenResponse.validationToken
                             }
                             ObConfigurationKind.kyc -> {
                                 val validationTokenResponse = FootprintQueries.getValidationToken(authToken)
                                 authValidationToken = validationTokenResponse.validationToken
                                 onAuthenticated?.invoke(VerificationResponse(validationToken = validationTokenResponse.validationToken))
+                                validationTokenResponse.validationToken
                             }
                             else -> {
                                 throw FootprintException(
@@ -68,6 +70,7 @@ object FootprintHosted {
                                 )
                             }
                         }
+                        return@runBlocking validationToken
                     }
                 }
 
@@ -79,12 +82,14 @@ object FootprintHosted {
                 }
             }
 
+            val activityClassName = context.javaClass.name
+
             val userData = FootprintBootstrapData(
                 email = email,
                 phoneNumber = phone,
             )
             val config = FootprintConfiguration(
-                redirectActivityName = redirectActivityName,
+                redirectActivityName = activityClassName,
                 publicKey = publicKey,
                 authToken = authToken,
                 bootstrapData = userData,
@@ -100,6 +105,7 @@ object FootprintHosted {
                 isAuthPlaybook = configKind == ObConfigurationKind.auth,
                 shouldRelayToComponents = true,
                 isComponentSdk = true,
+                sessionId = sessionId
             )
             FootprintHostedInternal.init(
                 context = context,
@@ -109,8 +115,7 @@ object FootprintHosted {
     }
 
     suspend fun handoff(
-        redirectActivityName: String,
-        context: Context,
+        context: Activity,
         onComplete: ((validationToken: String) -> Unit)? = null,
         onCancel: (() -> Unit)? = null,
         onError: ((error: String) -> Unit)? = null,
@@ -136,8 +141,10 @@ object FootprintHosted {
                     "Auth token missing. Please authenticate before calling handoff"
                 )
 
+            val activityClassName = context.javaClass.name
+
             val config = FootprintConfiguration(
-                redirectActivityName = redirectActivityName,
+                redirectActivityName = activityClassName,
                 publicKey = publicKey,
                 authToken = authToken,
                 l10n = l10n,
@@ -151,6 +158,7 @@ object FootprintHosted {
                 isAuthPlaybook = false,
                 shouldRelayToComponents = false,
                 isComponentSdk = true,
+                sessionId = sessionId
             )
             FootprintHostedInternal.init(
                 context = context,

@@ -55,6 +55,7 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.kotlinx.coroutines)
             implementation(libs.kotlinx.serialization)
+            implementation(libs.ktor.client.logging)
 
             api(libs.ktor.client.core)
             api(libs.ktor.client.serialization)

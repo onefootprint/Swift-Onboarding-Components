@@ -1,7 +1,8 @@
 package com.onefootprint.native_onboarding_components
 
-interface Platform {
+interface Package {
     val name: String
+    val version: String
 }
 
-expect fun getPlatform(): Platform
+expect fun getPackage(): Package

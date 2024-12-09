@@ -10,6 +10,7 @@ import kotlinx.serialization.Transient
 @Serializable
 internal data class FootprintConfiguration(
     @Transient val redirectActivityName: String? = null,
+    @Transient val sessionId: String? = null,
     @SerialName("public_key") val publicKey: String? = null,
     @SerialName("auth_token") val authToken: String? = null,
     @SerialName("user_data") val bootstrapData: FootprintBootstrapData? = null,
@@ -26,7 +27,7 @@ internal data class FootprintConfiguration(
     @Transient val onCancel: (() -> Unit)? = null,
     @Transient val onError: ((errorMessage: String) -> Unit)? = null,
     @Transient val isAuthPlaybook: Boolean = false,
-    @Transient val onAuthenticationComplete: ((authToken: String, vaultingToken: String) -> Unit)? = null
+    @Transient val onAuthenticationComplete: ((authToken: String, vaultingToken: String) -> String)? = null
 ) {
     init {
         require((publicKey != null).or(authToken != null)) {

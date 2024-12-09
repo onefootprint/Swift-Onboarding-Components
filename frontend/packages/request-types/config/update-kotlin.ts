@@ -20,6 +20,10 @@ const updateDataIdentifierVarNaming = async (dir: string) => {
     return camelCase(updatedWord); // Convert to camelCase
   });
 
+  // Replace the trailing comma with semicolon from the line containing "investor_profile.funding_sources"
+  const trailingCommaRegex = /(investor_profile\.funding_sources.*?),$/gm;
+  fileContent = fileContent.replace(trailingCommaRegex, '$1;');
+
   await fs.writeFile(filePath, fileContent);
 };
 
@@ -82,6 +86,29 @@ const updateOnboardingRequirementCollectDocument = async (dir: string) => {
   await fs.writeFile(filePath, fileContent);
 };
 
+const updateModernRawUserDataRequest = async (dir: string) => {
+  const files = ['ModernRawUserDataRequest.kt', 'ModernUserDecryptResponse.kt', 'DataIdentifier.kt'];
+  const basePath = 'src/commonMain/kotlin/org/openapitools/client/models/';
+
+  files.forEach(async file => {
+    const filePath = path.join(dir, basePath + file);
+    let fileContent = await fs.readFile(filePath, 'utf8');
+
+    const keywords = ['bank.', 'card.', 'custom.', 'document.', 'business.'];
+
+    // Create a regular expression to match lines containing any of the keywords
+    const regex = new RegExp(`.*(${keywords.join('|')}).*\\n?`, 'gi');
+
+    // Replace matching lines with an empty string
+    fileContent = fileContent
+      .replace(regex, '')
+      // Remove any consecutive empty lines
+      .replace(/(\r?\n){2,}/g, '\n\n')
+      .trim();
+    await fs.writeFile(filePath, fileContent);
+  });
+};
+
 export const updateKotlin = async (dir: string) => {
   await updateCollectedDataOption(dir);
   await updateDataIdentifierVarNaming(dir);
@@ -89,4 +116,5 @@ export const updateKotlin = async (dir: string) => {
   await updateOnboardingRequirementSerializer(dir);
   await updateOnboardingRequirementCollectDocument(dir);
   await updateOnboardingRequirementDataClasses(dir);
+  await updateModernRawUserDataRequest(dir);
 };

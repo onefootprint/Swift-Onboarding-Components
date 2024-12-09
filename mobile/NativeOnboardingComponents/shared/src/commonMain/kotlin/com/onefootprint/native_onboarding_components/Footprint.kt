@@ -11,18 +11,26 @@ import com.onefootprint.native_onboarding_components.models.FootprintSupportedLo
 import com.onefootprint.native_onboarding_components.models.OverallOutcome
 import com.onefootprint.native_onboarding_components.models.Requirements
 import com.onefootprint.native_onboarding_components.models.SandboxOutcome
+import com.onefootprint.native_onboarding_components.models.VaultData
 import com.onefootprint.native_onboarding_components.models.VerificationResponse
 import com.onefootprint.native_onboarding_components.utils.AuthUtils
 import com.onefootprint.native_onboarding_components.utils.RequirementUtil
+import com.onefootprint.native_onboarding_components.utils.VaultUtils
 import com.onefootprint.native_onboarding_components.utils.generateRandomString
+import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.request.header
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import org.openapitools.client.models.DataIdentifier
 import org.openapitools.client.models.IdentifyChallengeResponse
 import org.openapitools.client.models.ObConfigurationKind
 import org.openapitools.client.models.PublicOnboardingConfiguration
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 object Footprint {
     internal var publicKey: String? = null
+    internal var sessionId: String? = null
     internal var authToken: String? = null
     internal var verifiedAuthToken: String? = null
     internal var vaultingToken: String? = null
@@ -61,17 +69,28 @@ object Footprint {
             locale = FootprintSupportedLocale.EN_US,
             language = FootprintSupportedLanguage.ENGLISH
         )
+        sessionId = null
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     suspend fun initialize(
         publicKey: String? = null,
         authToken: String? = null,
         sandboxId: String? = null,
         sandboxOutcome: SandboxOutcome? = null,
-        l10n: FootprintL10n? = null
+        l10n: FootprintL10n? = null,
+        sessionId: String = Uuid.random().toString(),
     ): FootprintAuthRequirement {
         mutex.withLock {
             reset()
+            this.sessionId = sessionId
+
+            FootprintQueries.initialize(httpClientConfig = {
+                it.defaultRequest {
+                    header("X-Fp-Session-Id", sessionId)
+                    header("X-Fp-Client-Version", "${getPackage().name} ${getPackage().version}")
+                }
+            })
             if (publicKey == null && authToken == null) {
                 throw FootprintException(
                     kind = FootprintException.ErrorKind.INITIALIZATION_ERROR,
@@ -79,7 +98,7 @@ object Footprint {
                 )
             }
 
-            if (l10n != null){
+            if (l10n != null) {
                 this.l10n = l10n
             }
 
@@ -196,6 +215,53 @@ object Footprint {
     }
 
     suspend fun getRequirements(): Requirements {
-        return RequirementUtil.getRequirements(authToken = verifiedAuthToken)
+        mutex.withLock {
+            return RequirementUtil.getRequirements(authToken = verifiedAuthToken)
+        }
+    }
+
+    suspend fun vault(data: VaultData) {
+        mutex.withLock {
+            VaultUtils.vaultData(data = data, authToken = vaultingToken)
+        }
+    }
+
+    suspend fun getVaultData(fields: List<DataIdentifier>): VaultData {
+        mutex.withLock {
+            return VaultUtils.decryptVaultData(authToken = verifiedAuthToken, fields = fields)
+        }
+    }
+
+    suspend fun process(): String {
+        mutex.withLock {
+            val authToken = verifiedAuthToken
+            val overallOutcome = sandboxOutcome?.overallOutcome
+
+            if (authToken == null) {
+                throw FootprintException(
+                    kind = FootprintException.ErrorKind.ONBOARDING_ERROR,
+                    message = "Could not process without an authToken"
+                )
+            }
+
+            val requirements = RequirementUtil.getRequirements(authToken = authToken)
+            if(!requirements.canProcessInline){
+                throw FootprintException(
+                    kind = FootprintException.ErrorKind.INLINE_PROCESS_NOT_SUPPORTED,
+                    message = "Inline processing is not supported. Make sure that all requirements are met or use the hosted handoff."
+                )
+            }
+
+            FootprintQueries.process(
+                authToken = authToken,
+                overallOutcome = overallOutcome
+            )
+
+            val validationToken = FootprintQueries.validateOnboarding(
+                authToken = authToken
+            ).validationToken
+
+            return validationToken
+        }
     }
 }

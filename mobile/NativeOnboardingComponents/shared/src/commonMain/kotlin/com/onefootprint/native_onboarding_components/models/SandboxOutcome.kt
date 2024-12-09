@@ -51,4 +51,4 @@ enum class DocumentOutcome {
     }
 }
 
-class SandboxOutcome(val overallOutcome: OverallOutcome, val documentOutcome: DocumentOutcome?)
+class SandboxOutcome(val overallOutcome: OverallOutcome, val documentOutcome: DocumentOutcome? = null)

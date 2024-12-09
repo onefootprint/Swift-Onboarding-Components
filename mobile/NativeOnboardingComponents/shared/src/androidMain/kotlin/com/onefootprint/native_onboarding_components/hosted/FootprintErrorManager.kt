@@ -1,4 +1,5 @@
 import android.util.Log
+import com.onefootprint.native_onboarding_components.getPackage
 import com.onefootprint.native_onboarding_components.hosted.FootprintConfiguration
 import com.onefootprint.native_onboarding_components.hosted.FootprintHttpClient
 import com.onefootprint.native_onboarding_components.hosted.FootprintSdkMetadata
@@ -50,8 +51,8 @@ internal class FootprintErrorManager(private val configuration: FootprintConfigu
             val requestBody = FootprintSdkTelemetry(
                 tenantDomain = configuration.redirectActivityName,
                 sdkKind = sdkKind,
-                sdkName = FootprintSdkMetadata.name,
-                sdkVersion = FootprintSdkMetadata.version,
+                sdkName = getPackage().name,
+                sdkVersion = getPackage().version,
                 logLevel = "error",
                 logMessage = error,
             )

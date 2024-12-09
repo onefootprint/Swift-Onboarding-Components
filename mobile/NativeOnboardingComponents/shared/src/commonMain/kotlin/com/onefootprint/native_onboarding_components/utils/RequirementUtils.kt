@@ -43,28 +43,7 @@ internal object RequirementUtil {
                 DataIdentifier.idCitizenships,
                 DataIdentifier.idNationality
             )
-
-            // business
-            CollectedDataOption.business_name -> arrayOf(
-                DataIdentifier.businessName,
-                DataIdentifier.businessDba
-            )
-
-            CollectedDataOption.business_tin -> arrayOf(DataIdentifier.businessTin)
-            CollectedDataOption.business_address -> arrayOf(
-                DataIdentifier.businessAddressLine1,
-                DataIdentifier.businessAddressLine2,
-                DataIdentifier.businessCity,
-                DataIdentifier.businessState,
-                DataIdentifier.businessZip,
-                DataIdentifier.businessCountry
-            )
-
-            CollectedDataOption.business_phone_number -> arrayOf(DataIdentifier.businessPhoneNumber)
-            CollectedDataOption.business_website -> arrayOf(DataIdentifier.businessWebsite)
-            CollectedDataOption.business_corporation_type -> arrayOf(DataIdentifier.businessCorporationType)
-            CollectedDataOption.business_kyced_beneficial_owners -> arrayOf()
-
+            
             // Investor Profile
             CollectedDataOption.investor_profile -> arrayOf(
                 DataIdentifier.investorProfileEmploymentStatus,

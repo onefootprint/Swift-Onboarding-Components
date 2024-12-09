@@ -7,11 +7,31 @@ import androidx.activity.ComponentActivity
 import androidx.browser.customtabs.CustomTabsIntent
 import java.lang.Exception
 
-sealed class SessionResult {
-    object Canceled : SessionResult()
+internal sealed class SessionResult {
+    data object Canceled : SessionResult()
     class Complete(val validationToken: String) : SessionResult()
     class OnAuthenticationComplete(val authToken: String, val vaultingToken: String): SessionResult()
-    object Error : SessionResult()
+    data object Error : SessionResult()
+}
+
+sealed class VerificationStatus {
+    data class Success(val validationToken: String) : VerificationStatus() {
+        override fun toString(): String {
+            return "validation_token=$validationToken"
+        }
+    }
+
+    object Error : VerificationStatus() {
+        override fun toString(): String {
+            return "error"
+        }
+    }
+
+    object Canceled : VerificationStatus() {
+        override fun toString(): String {
+            return "canceled"
+        }
+    }
 }
 
 internal class HostedLauncherActivity : ComponentActivity() {
@@ -48,7 +68,7 @@ internal class HostedLauncherActivity : ComponentActivity() {
         // activity and call the onCancel callback
         isCustomTabOpen = false
         config?.onCancel?.invoke()
-        startDestinationActivity(SessionResult.Canceled)
+        startDestinationActivity(VerificationStatus.Canceled)
     }
 
     override fun onPause() {
@@ -67,14 +87,26 @@ internal class HostedLauncherActivity : ComponentActivity() {
     }
 
     private fun handleResultFromUrl(url: String) {
-        val result = parseResultFromUrl(url)
-        when (result) {
-            is SessionResult.Canceled -> config?.onCancel?.invoke()
-            is SessionResult.Complete -> config?.onComplete?.invoke(result.validationToken)
-            is SessionResult.OnAuthenticationComplete -> config?.onAuthenticationComplete?.invoke(result.authToken, result.vaultingToken)
+        when (val sessionResult = parseResultFromUrl(url)) {
+            is SessionResult.Canceled -> {
+                config?.onCancel?.invoke()
+                startDestinationActivity(VerificationStatus.Canceled)
+            }
+            is SessionResult.Complete -> {
+                config?.onComplete?.invoke(sessionResult.validationToken)
+                startDestinationActivity(VerificationStatus.Success(sessionResult.validationToken))
+            }
+            is SessionResult.OnAuthenticationComplete -> {
+                val validationToken = config?.onAuthenticationComplete?.invoke(sessionResult.authToken, sessionResult.vaultingToken)
+                if (validationToken != null) {
+                    startDestinationActivity(VerificationStatus.Success(validationToken))
+                } else {
+                    // Handle the error if validationToken is null
+                    handleError("Error: Validation token is null.")
+                }
+            }
             is SessionResult.Error -> handleError("Error parsing redirect URL.")
         }
-        startDestinationActivity(result)
     }
 
     private fun parseResultFromUrl(url: String): SessionResult {
@@ -104,10 +136,10 @@ internal class HostedLauncherActivity : ComponentActivity() {
     }
     private fun handleError(error: String, shouldRedirect: Boolean = false) {
         errorManager?.log(error)
-        if (shouldRedirect) startDestinationActivity(SessionResult.Error)
+        if (shouldRedirect) startDestinationActivity(VerificationStatus.Error)
     }
 
-    private fun startDestinationActivity(verificationResult: SessionResult) {
+    private fun startDestinationActivity(verificationResult: VerificationStatus) {
         config?.redirectActivityName?.let { redirectActivityName ->
             var intent: Intent? = null
             try {
@@ -117,6 +149,7 @@ internal class HostedLauncherActivity : ComponentActivity() {
                 )
                 footprint.setHasActiveSession(false)
                 intent.putExtra("FOOTPRINT_VERIFICATION_RESULT", verificationResult.toString())
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                 startActivity(intent)
                 finish() // Important cause we don't want the user to be able to come back to our activity on backspace
             } catch (e: ClassNotFoundException) {

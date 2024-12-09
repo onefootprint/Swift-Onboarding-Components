@@ -1,5 +1,6 @@
 package com.onefootprint.native_onboarding_components.hosted
 
+import com.onefootprint.native_onboarding_components.getPackage
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -26,7 +27,8 @@ internal data class FootprintSdkTokenResponse(
 
 internal class FootprintSdkArgsManager(private val config: FootprintConfiguration) {
     fun sendArgs(onSuccess: (String?) -> Unit, onError: (String) -> Unit) {
-        val sdkRequest = buildSdkRequest(kind = if(config.isAuthPlaybook) FootprintSdkMetadata.kindAuth else FootprintSdkMetadata.kindVerify)
+        val sdkRequest =
+            buildSdkRequest(kind = if (config.isAuthPlaybook) FootprintSdkMetadata.kindAuth else FootprintSdkMetadata.kindVerify)
         FootprintHttpClient.client.newCall(sdkRequest).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 onError(e.toString())
@@ -40,7 +42,8 @@ internal class FootprintSdkArgsManager(private val config: FootprintConfiguratio
                     }
                     try {
                         val responseBody = it.body?.string() ?: ""
-                        val responseObject = Json.decodeFromString<FootprintSdkTokenResponse>(responseBody)
+                        val responseObject =
+                            Json.decodeFromString<FootprintSdkTokenResponse>(responseBody)
                         onSuccess(responseObject.token)
                     } catch (e: Exception) {
                         onError("Parsing SDK Args response failed. $e")
@@ -56,11 +59,16 @@ internal class FootprintSdkArgsManager(private val config: FootprintConfiguratio
             kind = kind,
             data = config
         )
-        return Request.Builder()
+        val builder = Request.Builder()
             .url("${FootprintSdkMetadata.apiBaseUrl}/org/sdk_args")
-            .header("x-fp-client-version", "${FootprintSdkMetadata.name} ${FootprintSdkMetadata.version}")
+            .header("X-Fp-Client-Version", "${getPackage().name} ${getPackage().version}")
             .header("Content-Type", "application/json")
             .post(Json.encodeToString(requestBody).toRequestBody())
-            .build()
+
+        if (!config.sessionId.isNullOrEmpty()) {
+            builder.addHeader("X-Fp-Session-Id", config.sessionId)
+        }
+
+        return builder.build()
     }
 }

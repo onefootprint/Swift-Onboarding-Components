@@ -18,17 +18,17 @@ internal object FootprintSdkMetadata {
     const val bifrostBaseUrl: String = "https://id.onefootprint.com"
     const val authBaseUrl: String = "https://auth.onefootprint.com"
     const val apiBaseUrl: String = "https://api.onefootprint.com"
-    const val name: String = "footprint-android-onboarding-components"
     const val kindVerify: String = "verify_v1"
     const val kindAuth: String = "auth_v1"
-    const val version: String = "1.0.0" // TODO: Add the version number of the sdk
 }
+
 internal class FootprintHostedInternal private constructor() {
     private var config: FootprintConfiguration? = null
     private var context: Context? = null
     private var errorManager: FootprintErrorManager? = null
     private var sdkArgsManager: FootprintSdkArgsManager? = null
     private var hasActiveSession = false
+
     companion object {
         internal val instance: FootprintHostedInternal by lazy { FootprintHostedInternal() }
 
@@ -76,17 +76,32 @@ internal class FootprintHostedInternal private constructor() {
 
     private fun getUrl(config: FootprintConfiguration, token: String): Uri? {
         try {
-            val builder = if(config.isAuthPlaybook) Uri.parse(FootprintSdkMetadata.authBaseUrl).buildUpon() else Uri.parse(FootprintSdkMetadata.bifrostBaseUrl).buildUpon()
-            builder.appendQueryParameter("redirect_url", "com.onefootprint.android-onboarding-components://")
+            val builder = if (config.isAuthPlaybook) Uri.parse(FootprintSdkMetadata.authBaseUrl)
+                .buildUpon() else Uri.parse(FootprintSdkMetadata.bifrostBaseUrl).buildUpon()
+            builder.appendQueryParameter(
+                "redirect_url",
+                "com.onefootprint.android-onboarding-components://"
+            )
+
+            if (!config.sessionId.isNullOrEmpty()) builder.appendQueryParameter(
+                "xfpsessionid",
+                config.sessionId
+            );
+
             val appearanceJson = config.appearance?.toJSON()
-            val language =config.l10n?.language
+            val language = config.l10n?.language
             language?.let {
                 builder.appendQueryParameter("lng", Json.encodeToString(it).replace("\"", ""))
             }
             appearanceJson?.let {
                 it["fontSrc"]?.let { fontSrc -> builder.appendQueryParameter("font_src", fontSrc) }
                 it["variant"]?.let { variant -> builder.appendQueryParameter("variant", variant) }
-                it["variables"]?.let { variables -> builder.appendQueryParameter("variables", variables) }
+                it["variables"]?.let { variables ->
+                    builder.appendQueryParameter(
+                        "variables",
+                        variables
+                    )
+                }
                 it["rules"]?.let { rules -> builder.appendQueryParameter("rules", rules) }
             }
 
@@ -113,10 +128,10 @@ internal class FootprintHostedInternal private constructor() {
 
     internal fun start() {
         // Prevents launching multiple verification flows at the same time
-        if(hasActiveSession) {
-           return
+        if (hasActiveSession) {
+            return
         }
-        if(!validateConfig()) {
+        if (!validateConfig()) {
             return
         }
         setHasActiveSession(true)
