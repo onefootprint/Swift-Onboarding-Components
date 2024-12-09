@@ -17,7 +17,7 @@ const useCreatePlaybook = () => {
   return useMutation({
     mutationFn: (body: CreateOnboardingConfigurationRequest) => {
       buttons.setBusy(true);
-      return postOrgPlaybooks({ body });
+      return postOrgPlaybooks({ body, throwOnError: true });
     },
     onSuccess: () => {
       toast.show({
