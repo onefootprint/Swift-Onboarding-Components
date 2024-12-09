@@ -4,7 +4,6 @@ use actix_web::http::header::HeaderMap;
 use actix_web::FromRequest;
 use futures_util::Future;
 use newtypes::SessionId;
-use newtypes::Uuid;
 use paperclip::actix::Apiv2Schema;
 use serde::Deserialize;
 use serde::Serialize;
@@ -25,13 +24,7 @@ impl TelemetryHeaders {
     pub const SESSION_HEADER_NAME: &'static str = "x-fp-session-id";
 
     pub fn parse_from_request(headers: &HeaderMap) -> Self {
-        let session_id = get_header(Self::SESSION_HEADER_NAME, headers)
-            // Make sure the provided value is a Uuid to prevent accepting arbitrary user input
-            .map(|h| Uuid::parse_str(&h))
-            .transpose()
-            .unwrap_or(None)
-            .map(|uuid| uuid.to_string())
-            .map(SessionId::from);
+        let session_id = get_header(Self::SESSION_HEADER_NAME, headers).map(SessionId::from);
         let client_version = get_header(Self::CLIENT_VERSION_HEADER_NAME, headers);
         let is_integration_test_req =
             get_bool_header(Self::INTEGRATION_TESTS_HEADER_NAME, headers).unwrap_or_default();
