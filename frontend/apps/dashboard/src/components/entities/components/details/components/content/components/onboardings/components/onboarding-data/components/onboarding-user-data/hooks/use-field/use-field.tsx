@@ -1,21 +1,19 @@
-import useEntityVault from '@/entities/hooks/use-entity-vault';
 import type { DataIdentifier } from '@onefootprint/request-types/dashboard';
-import { type Entity, IdDI, type VaultValue, isVaultDataDecrypted, isVaultDataEmpty } from '@onefootprint/types';
-import type { Transforms } from '@onefootprint/types/src/data/entity';
+import { IdDI, isVaultDataDecrypted, isVaultDataEmpty } from '@onefootprint/types';
 import type { ParseKeys } from 'i18next';
 import { useTranslation } from 'react-i18next';
+import type { VaultType } from '../use-seqno-vault';
 
 export type UseFieldProps = {
   label: string;
-  value: VaultValue;
-  transforms: Transforms | undefined;
+  value: unknown;
+  transforms: unknown;
   isDecrypted: boolean;
   isEmpty: boolean;
 };
 
-const useField = (entity: Entity, _seqno?: number) => {
+const useField = (vaultData: VaultType | undefined) => {
   const { t } = useTranslation('common', { keyPrefix: 'di' });
-  const { data: vaultData } = useEntityVault(entity.id, entity);
 
   const getLabel = (di: DataIdentifier) => {
     const hasLegalStatus = !!vaultData?.vault[IdDI.usLegalStatus];

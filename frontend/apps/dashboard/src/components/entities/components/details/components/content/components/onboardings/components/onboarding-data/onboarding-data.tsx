@@ -1,5 +1,8 @@
 import useEntityId from '@/entities/components/details/hooks/use-entity-id';
-import { getEntitiesByFpIdOnboardingsByOnboardingIdRiskSignalsOptions } from '@onefootprint/axios/dashboard';
+import {
+  getEntitiesByFpIdDataOptions,
+  getEntitiesByFpIdOnboardingsByOnboardingIdRiskSignalsOptions,
+} from '@onefootprint/axios/dashboard';
 import { IcoShuffle16, IcoUserCircle16, IcoWarning16 } from '@onefootprint/icons';
 import type { EntityOnboarding } from '@onefootprint/request-types/dashboard';
 import { Box } from '@onefootprint/ui';
@@ -8,10 +11,12 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import Subsection from '../subsection';
+import Decrypt from './components/decrypt';
 import OnboardingRiskSignals from './components/onboarding-risk-signals';
 import OnboardingRules from './components/onboarding-rules';
 import RulesDropdown from './components/onboarding-rules/components/rules-dropdown';
 import OnboardingUserData from './components/onboarding-user-data';
+import useSeqnoVault from './components/onboarding-user-data/hooks/use-seqno-vault';
 import groupRiskSignals from './utils/group-risk-signals';
 
 type OnboardingDataProps = {
@@ -28,7 +33,19 @@ const OnboardingData = ({ onboarding }: OnboardingDataProps) => {
       path: { fpId: entityId, onboardingId: onboarding.id },
     }),
   );
+  const { data: entityAttributes } = useQuery(
+    getEntitiesByFpIdDataOptions({
+      path: { fpId: entityId },
+      query: { seqno: onboarding.seqno },
+    }),
+  );
+  const {
+    data: vaultData,
+    update: updateVault,
+    isAllDecrypted,
+  } = useSeqnoVault(entityAttributes, onboarding.seqno?.toString());
   const [showTriggeredRules, setShowTriggeredRules] = useState(true);
+  const hasDecryptableDIs = Boolean(entityAttributes?.some(attr => attr.isDecryptable));
 
   const subsections = {
     riskSignals: {
@@ -71,8 +88,21 @@ const OnboardingData = ({ onboarding }: OnboardingDataProps) => {
         )}
       </TopSection>
       <Box marginTop={8}>
-        <Subsection icon={subsections.userData.iconComponent} title={subsections.userData.title}>
-          <OnboardingUserData seqno={onboarding.seqno} />
+        <Subsection
+          icon={subsections.userData.iconComponent}
+          title={subsections.userData.title}
+          rightComponent={
+            !isAllDecrypted && (
+              <Decrypt
+                canDecrypt={hasDecryptableDIs}
+                onDecryptSuccess={updateVault}
+                onboardingId={onboarding.id}
+                vaultData={vaultData}
+              />
+            )
+          }
+        >
+          <OnboardingUserData vaultData={vaultData} />
         </Subsection>
       </Box>
     </Box>

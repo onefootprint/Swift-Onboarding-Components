@@ -145,6 +145,38 @@ const useDecryptControls = () => {
     }, DECRYPT_MANUALLY_TIMEOUT);
   };
 
+  /** Used for onboardings: same as decryptManually, but bipasses the state machine to avoid opening the ReasonDialog */
+  // TODO: consolidate with decryptToViewDocumentDetails
+  const decryptWithoutMachine = (
+    payload: {
+      reason: string;
+      dis?: DataIdentifier[];
+      documents?: SupportedIdDocTypes[];
+      entityId: string;
+      vaultData?: Partial<Record<DataIdentifier, VaultValue>>;
+    },
+    callbacks?: {
+      onSuccess?: (response: EntityVault) => void;
+      onError?: (error: unknown) => void;
+    },
+  ) => {
+    const { reason, dis = [], documents = [], entityId, vaultData = {} } = payload;
+    decryptFields(
+      { reason, dis, documents, entityId, vaultData },
+      {
+        onSuccess: results => {
+          send(Event.decryptSucceeded);
+          callbacks?.onSuccess?.(results);
+        },
+        onError: (error: unknown) => {
+          send(Event.decryptFailed);
+          showRequestErrorToast(error);
+          callbacks?.onError?.(error);
+        },
+      },
+    );
+  };
+
   const decryptToViewDocumentDetails = (
     payload: {
       documents: SupportedIdDocTypes[];
@@ -186,6 +218,7 @@ const useDecryptControls = () => {
     inProgressDecryptingAll,
     decrypt,
     decryptManually,
+    decryptWithoutMachine,
     decryptToViewDocumentDetails,
   };
 };

@@ -1,21 +1,21 @@
-import type { WithEntityProps } from '@/entities/components/details/components/with-entity';
-import { hasEntityNationality, hasEntityUsLegalStatus } from '@onefootprint/types';
 import { Box } from '@onefootprint/ui';
 import styled, { css } from 'styled-components';
+import hasLegalStatus from '../../utils/has-legal-status';
+import hasNationality from '../../utils/has-nationality';
 import Fieldset from './components/fieldset';
 import useField from './hooks/use-field';
 import useFieldsets from './hooks/use-fieldsets';
+import type { VaultType } from './hooks/use-seqno-vault';
 
-type OnboardingUserDataProps = WithEntityProps & {
-  seqno?: number;
+type OnboardingUserDataProps = {
+  vaultData: VaultType | undefined;
 };
 
-const OnboardingUserData = ({ entity, seqno }: OnboardingUserDataProps) => {
-  const hasCustomData = entity.data.some(attr => attr.identifier.startsWith('custom'));
-  const hasLegalStatus = hasEntityUsLegalStatus(entity);
-  const includeNationality = hasEntityNationality(entity) && !hasLegalStatus;
+const OnboardingUserData = ({ vaultData }: OnboardingUserDataProps) => {
+  const hasCustomData = Object.keys(vaultData?.vault || {}).some(di => di.startsWith('custom'));
+  const includeNationality = hasNationality(vaultData) && !hasLegalStatus(vaultData);
   const { basic, address, identity, custom } = useFieldsets(includeNationality);
-  const getFieldProps = useField(entity, seqno);
+  const getFieldProps = useField(vaultData);
 
   return (
     <Container>

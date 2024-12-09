@@ -1,7 +1,6 @@
 import type { DataIdentifier } from '@onefootprint/request-types/dashboard';
-import { Shimmer, Stack, Text } from '@onefootprint/ui';
+import { Stack, Text } from '@onefootprint/ui';
 import EncryptedCell from 'src/components/encrypted-cell';
-import { useDecryptControls } from '../../../../../../../vault/components/vault-actions';
 import type { UseFieldProps } from '../../hooks/use-field';
 
 export type FieldProps = {
@@ -11,12 +10,8 @@ export type FieldProps = {
 
 const Field = ({ di, useField }: FieldProps) => {
   const { label, value, isDecrypted, isEmpty } = useField(di);
-  const decryptControls = useDecryptControls();
 
   const renderValue = () => {
-    if (decryptControls.inProgressDecryptingAll) {
-      return <Shimmer height="20px" width="100px" />;
-    }
     if (isDecrypted || isEmpty) {
       return <Text variant="body-3">{value ? (value as string) : '-'}</Text>;
     }
