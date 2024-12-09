@@ -22,7 +22,6 @@ use feature_flag::FeatureFlagClient;
 use geoutils::Distance;
 use geoutils::Location;
 use newtypes::DecisionIntentKind;
-use newtypes::DecisionStatus;
 use newtypes::DocumentFixtureResult;
 use newtypes::OnboardingStatus;
 use newtypes::RiskSignalGroupKind;
@@ -83,16 +82,15 @@ pub(super) fn get_final_rules_outcome(
     };
 
     // Otherwise, parse the desired outcome from the fixture_result and assemble a fixture RulesOutcome
-    let (decision_status, create_manual_review) = fixture_result.decision_status();
-    let action = match decision_status {
-        DecisionStatus::Fail => Some(RuleAction::Fail),
-        DecisionStatus::StepUp => Some(RuleAction::identity_stepup()),
-        DecisionStatus::Pass => None,
-        DecisionStatus::None => return RulesOutcome::RulesNotExecuted,
+    let action = match fixture_result {
+        WorkflowFixtureResult::Fail | WorkflowFixtureResult::ManualReview => Some(RuleAction::Fail),
+        WorkflowFixtureResult::StepUp => Some(RuleAction::identity_stepup()),
+        WorkflowFixtureResult::Pass | WorkflowFixtureResult::UseRulesOutcome => None,
     };
-
+    let should_commit = action.is_none();
+    let create_manual_review = matches!(fixture_result, WorkflowFixtureResult::ManualReview);
     RulesOutcome::RulesExecuted {
-        should_commit: decision_status == DecisionStatus::Pass,
+        should_commit,
         create_manual_review,
         action,
         rule_action: action.map(|a| a.to_rule_action()),

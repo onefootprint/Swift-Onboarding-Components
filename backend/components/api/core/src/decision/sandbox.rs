@@ -29,7 +29,6 @@ use idv::ParsedResponse;
 use idv::VendorResponse;
 use newtypes::CipKind;
 use newtypes::DecisionIntentId;
-use newtypes::DecisionStatus;
 use newtypes::FootprintReasonCode;
 use newtypes::NeuroIdentityId;
 use newtypes::ScopedVaultId;
@@ -149,19 +148,19 @@ pub fn make_random_kyc_reason_codes_for_fixture_decision(
     let reason_code_map = build_reason_code_map(vault_kind);
 
     // Create some mock risk signals that are somewhat consistent with the mock decision
-    match fixture_result.decision_status() {
-        // Straight out rejection
-        (DecisionStatus::Fail, false) => choose_random_reason_codes(reason_code_map, SignalSeverity::High, 3),
-        // Manual review
-        (DecisionStatus::Fail, true) => {
+    match fixture_result {
+        WorkflowFixtureResult::Fail => choose_random_reason_codes(reason_code_map, SignalSeverity::High, 3),
+        WorkflowFixtureResult::ManualReview => {
             choose_random_reason_codes(reason_code_map, SignalSeverity::Medium, 3)
         }
         // TODO: probably need to pass in Alpaca specific context here to get reason codes that make sense for
         // that workflow
-        (DecisionStatus::StepUp, _) => choose_random_reason_codes(reason_code_map, SignalSeverity::Medium, 3),
-        // Approved
-        (DecisionStatus::Pass, _) => choose_random_reason_codes(reason_code_map, SignalSeverity::Info, 4),
-        (DecisionStatus::None, _) => vec![],
+        WorkflowFixtureResult::StepUp => {
+            choose_random_reason_codes(reason_code_map, SignalSeverity::Medium, 3)
+        }
+        WorkflowFixtureResult::Pass | WorkflowFixtureResult::UseRulesOutcome => {
+            choose_random_reason_codes(reason_code_map, SignalSeverity::Info, 4)
+        }
     }
 }
 
@@ -174,9 +173,10 @@ pub fn make_random_kyc_reason_codes_for_fixture_decision(
 pub fn get_fixture_reason_codes_alpaca(
     fixture_result: WorkflowFixtureResult,
 ) -> Vec<(FootprintReasonCode, VendorAPI)> {
-    let reason_codes = match fixture_result.decision_status() {
-        // #pass | #manualreview
-        (DecisionStatus::Pass, _) | (DecisionStatus::Fail, true) | (DecisionStatus::None, _) => {
+    let reason_codes = match fixture_result {
+        WorkflowFixtureResult::Pass
+        | WorkflowFixtureResult::ManualReview
+        | WorkflowFixtureResult::UseRulesOutcome => {
             // TODO: later could randomize some other innocuous reason codes here if we wanted
             vec![
                 FootprintReasonCode::AddressMatches,
@@ -185,8 +185,7 @@ pub fn get_fixture_reason_codes_alpaca(
                 FootprintReasonCode::NameMatches,
             ]
         }
-        // #stepup
-        (DecisionStatus::StepUp, _) => {
+        WorkflowFixtureResult::StepUp => {
             let mismatch_reason_codes = [
                 FootprintReasonCode::AddressDoesNotMatch,
                 FootprintReasonCode::DobDoesNotMatch,
@@ -200,8 +199,7 @@ pub fn get_fixture_reason_codes_alpaca(
                 .chain(vec![FootprintReasonCode::SsnMatches])
                 .collect()
         }
-        // #fail
-        (DecisionStatus::Fail, false) => vec![FootprintReasonCode::SsnDoesNotMatch],
+        WorkflowFixtureResult::Fail => vec![FootprintReasonCode::SsnDoesNotMatch],
     };
 
     reason_codes
@@ -252,8 +250,8 @@ pub fn get_fixture_aml_reason_codes(
 ) -> Vec<(FootprintReasonCode, VendorAPI)> {
     match obc.cip_kind {
         // For Alpaca, for the manual_review fixture, we want to simulate a watchlist hit
-        Some(CipKind::Alpaca) => match fixture_result.decision_status() {
-            (DecisionStatus::Fail, true) => vec![
+        Some(CipKind::Alpaca) => match fixture_result {
+            WorkflowFixtureResult::ManualReview => vec![
                 (
                     FootprintReasonCode::WatchlistHitOfac,
                     VendorAPI::IncodeWatchlistCheck,
@@ -274,9 +272,8 @@ pub fn get_fixture_aml_reason_codes(
 }
 
 fn incode_watchlist_result_response_for_fixture(fixture_result: WorkflowFixtureResult) -> serde_json::Value {
-    match fixture_result.decision_status() {
-        // #manualreview
-        (newtypes::DecisionStatus::Fail, true) => {
+    match fixture_result {
+        WorkflowFixtureResult::ManualReview => {
             idv::test_incode_fixtures::incode_watchlist_result_response_yes_hits()
         }
         _ => idv::test_incode_fixtures::incode_watchlist_result_response_no_hits(),

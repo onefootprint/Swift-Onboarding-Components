@@ -76,7 +76,6 @@ impl From<DecisionStatus> for OnboardingStatus {
         match s {
             DecisionStatus::Fail => OnboardingStatus::Fail,
             DecisionStatus::Pass => OnboardingStatus::Pass,
-            DecisionStatus::StepUp => OnboardingStatus::Incomplete,
             DecisionStatus::None => OnboardingStatus::None,
         }
     }

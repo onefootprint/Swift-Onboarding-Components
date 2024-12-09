@@ -1,7 +1,6 @@
 use idv::neuro_id::response::Model;
 use idv::neuro_id::response::NeuroIdAnalyticsResponse;
 use itertools::Itertools;
-use newtypes::DecisionStatus;
 use newtypes::FootprintReasonCode as FRC;
 pub fn footprint_reason_codes(res: &NeuroIdAnalyticsResponse) -> Vec<FRC> {
     let mut frcs = vec![];
@@ -28,10 +27,10 @@ pub fn footprint_reason_codes(res: &NeuroIdAnalyticsResponse) -> Vec<FRC> {
     // For logging, this is Neuro's suggested decision for now (2024-04-12)
     // https://www.notion.so/onefootprint/2024-04-12-Neuro-Decision-Matrix-a374616605994b55aca0b804b3ed3bc6?pvs=4
     let overall_neuro_decision = match (behavior_decision, device_decision) {
-        (_, NeuroDecisionRiskLevel::High) => DecisionStatus::Fail,
-        (NeuroDecisionRiskLevel::High, _) => DecisionStatus::Fail,
-        (_, NeuroDecisionRiskLevel::Medium) => DecisionStatus::StepUp,
-        _ => DecisionStatus::Pass,
+        (_, NeuroDecisionRiskLevel::High) => "fail",
+        (NeuroDecisionRiskLevel::High, _) => "fail",
+        (_, NeuroDecisionRiskLevel::Medium) => "stepup",
+        _ => "pass",
     };
     tracing::info!(overall=?overall_neuro_decision, behavior=?behavior_decision, device=?device_decision, "neuro decision logic");
 

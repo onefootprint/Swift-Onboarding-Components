@@ -28,9 +28,6 @@ use strum_macros::EnumString;
 #[diesel(sql_type = Text)]
 pub enum DecisionStatus {
     Fail,
-    /// This status is deprecated for onboarding decisions as of April 2024. All OnboardingDecisions
-    /// after this time should have a terminal status
-    StepUp,
     Pass,
     None,
 }

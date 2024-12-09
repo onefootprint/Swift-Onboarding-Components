@@ -262,7 +262,7 @@ pub(crate) async fn create_cip_request(
 
             let (mr, manual_obd, annotation) = match fp_obd.status {
                 DecisionStatus::Pass => (None, None, None),
-                DecisionStatus::Fail | DecisionStatus::StepUp | DecisionStatus::None => {
+                DecisionStatus::Fail | DecisionStatus::None => {
                     // Get the MR associated with FPs initial decision
                     let mr_filters = ManualReviewFilters {
                         only_active: false,

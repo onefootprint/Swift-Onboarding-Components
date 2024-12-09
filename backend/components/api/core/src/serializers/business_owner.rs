@@ -38,7 +38,6 @@ impl<'a> DbToApi<BusinessOwnerSerializableInfo<'a>> for api_wire_types::PrivateB
                 DecisionStatus::Pass => BeneficialOwnerStatus::Pass,
                 DecisionStatus::Fail => BeneficialOwnerStatus::Fail,
                 DecisionStatus::None => BeneficialOwnerStatus::None,
-                DecisionStatus::StepUp => BeneficialOwnerStatus::AwaitingKyc,
             },
             // If there's no onboarding decision, the workflow must be incomplete
             (Some(OnboardingStatus::Incomplete), None) => BeneficialOwnerStatus::Incomplete,

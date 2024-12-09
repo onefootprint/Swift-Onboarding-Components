@@ -50,7 +50,6 @@ impl From<DecisionStatus> for BeneficialOwnerStatus {
             DecisionStatus::Fail => Self::Fail,
             DecisionStatus::Pass => Self::Pass,
             DecisionStatus::None => Self::None,
-            DecisionStatus::StepUp => Self::AwaitingKyc,
         }
     }
 }

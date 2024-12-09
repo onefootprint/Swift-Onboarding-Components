@@ -1,6 +1,5 @@
 use super::DocumentAndCountryConfiguration;
 use crate::util::impl_enum_string_diesel;
-use crate::DecisionStatus;
 use crate::DocumentRequestConfig;
 use diesel::sql_types::Text;
 use diesel::AsExpression;
@@ -196,17 +195,6 @@ impl paperclip::v2::schema::Apiv2Schema for RuleAction {
     }
 }
 impl paperclip::actix::OperationModifier for RuleAction {}
-
-impl From<RuleAction> for DecisionStatus {
-    fn from(value: RuleAction) -> Self {
-        match value {
-            RuleAction::PassWithManualReview => DecisionStatus::Pass,
-            RuleAction::StepUp(_) => DecisionStatus::StepUp,
-            RuleAction::ManualReview => DecisionStatus::Fail,
-            RuleAction::Fail => DecisionStatus::Fail,
-        }
-    }
-}
 
 impl RuleAction {
     pub fn should_create_review(&self) -> bool {

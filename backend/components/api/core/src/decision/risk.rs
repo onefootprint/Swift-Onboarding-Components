@@ -1,6 +1,7 @@
 use super::onboarding::RulesOutcome;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
+use api_errors::ServerErrInto;
 use api_wire_types::RuleResultRuleAction;
 use db::models::data_lifetime::DataLifetime;
 use db::models::document::Document;
@@ -24,6 +25,7 @@ use newtypes::DocumentReviewStatus;
 use newtypes::ManualReviewKind;
 use newtypes::OnboardingStatus;
 use newtypes::ReviewReason;
+use newtypes::RuleAction;
 use newtypes::RuleSetResultId;
 use newtypes::WorkflowId;
 use newtypes::WorkflowSource;
@@ -90,12 +92,9 @@ pub fn save_final_decision(
     let sv = ScopedVault::get(conn, &wf.scoped_vault_id)?;
     let has_doc_mr = doc_manual_review.is_some();
     let (status, failed_for_doc_review) =
-        get_final_decision_status(rules_outcome.clone(), has_doc_mr, sv.status);
+        get_final_decision_status(rules_outcome.clone(), has_doc_mr, sv.status)?;
 
     let manual_reviews = chain(rules_manual_review, doc_manual_review).collect();
-    if status == DecisionStatus::StepUp {
-        tracing::error!(%wf_id, "Saving final decision with non-terminal status");
-    }
 
     // Bookkeeping if this is the first Footprint decision
     if wf.decision_made_at.is_none() {
@@ -128,12 +127,20 @@ fn get_final_decision_status(
     decision: RulesOutcome,
     has_doc_mr: bool,
     existing_status: OnboardingStatus,
-) -> (DecisionStatus, FailedForDocReview) {
+) -> FpResult<(DecisionStatus, FailedForDocReview)> {
     let can_fail_for_doc_review = has_doc_mr && existing_status != OnboardingStatus::Pass;
 
-    match decision {
-        RulesOutcome::RulesExecuted { action, .. } => match action.map(DecisionStatus::from) {
-            Some(status) => (status, false),
+    let result = match decision {
+        RulesOutcome::RulesExecuted { action, .. } => match action {
+            Some(action) => {
+                let status = match action {
+                    RuleAction::PassWithManualReview => DecisionStatus::Pass,
+                    RuleAction::ManualReview => DecisionStatus::Fail,
+                    RuleAction::Fail => DecisionStatus::Fail,
+                    RuleAction::StepUp(_) => return ServerErrInto!("Received StepUp action in decisioning"),
+                };
+                (status, false)
+            }
             // If there's a document MR and the user doesn't already have a pass status, we'll fail them.
             // This is a kind of implicit rule needed to put users in fail after a step up to provide, eg, PoA
             None if can_fail_for_doc_review => (DecisionStatus::Fail, true),
@@ -144,7 +151,8 @@ fn get_final_decision_status(
         // (and not fail the user). The rule to "fail a user if there's a document review" is kind of like
         // an implicit rule, so we don't want to run it if rules don't run at all
         RulesOutcome::RulesNotExecuted => (DecisionStatus::None, false),
-    }
+    };
+    Ok(result)
 }
 
 fn log_canonical_line(
@@ -220,7 +228,9 @@ mod test {
         has_doc_mr: bool,
         existing_status: OnboardingStatus,
     ) -> DecisionStatus {
-        get_final_decision_status(decision, has_doc_mr, existing_status).0
+        get_final_decision_status(decision, has_doc_mr, existing_status)
+            .unwrap()
+            .0
     }
 
     #[test_case(RulesOutcome::RulesNotExecuted, false, OnboardingStatus::None => false)]
@@ -245,6 +255,8 @@ mod test {
         has_doc_mr: bool,
         existing_status: OnboardingStatus,
     ) -> bool {
-        get_final_decision_status(decision, has_doc_mr, existing_status).1
+        get_final_decision_status(decision, has_doc_mr, existing_status)
+            .unwrap()
+            .1
     }
 }
