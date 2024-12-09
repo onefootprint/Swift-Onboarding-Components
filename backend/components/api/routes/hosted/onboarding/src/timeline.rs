@@ -5,6 +5,8 @@ use api_core::types::ApiResponse;
 use api_core::utils::headers::InsightHeaders;
 use api_core::web::Json;
 use api_wire_types::CreateOnboardingTimelineRequest;
+use db::models::data_lifetime::DataLifetime;
+use db::models::scoped_vault::ScopedVault;
 use db::models::user_timeline::UserTimeline;
 use newtypes::OnboardingTimelineInfo;
 use paperclip::actix::api_v2_operation;
@@ -29,10 +31,13 @@ pub async fn post(
 
     let session_id = insights.session_id;
     let event = OnboardingTimelineInfo { event, session_id };
-    let v_id = user_auth.user.id.clone();
     let sv_id = user_auth.scoped_user.id.clone();
     state
-        .db_transaction(move |conn| UserTimeline::create(conn, event, v_id, sv_id))
+        .db_transaction(move |conn| {
+            let sv = ScopedVault::lock(conn, &sv_id)?;
+            let sv_txn = DataLifetime::new_sv_txn(conn, &sv)?;
+            UserTimeline::create(conn, &sv_txn, event)
+        })
         .await?;
 
     Ok(api_wire_types::Empty)

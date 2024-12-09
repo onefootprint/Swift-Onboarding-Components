@@ -47,7 +47,7 @@ pub async fn post(
 
     let outcomes = state
         .db_transaction(move |conn| {
-            let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
+            let sv = ScopedVault::lock(conn, (&fp_id, &tenant_id, is_live))?;
 
             let outcomes = actions
                 .into_iter()

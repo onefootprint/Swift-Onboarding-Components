@@ -3,6 +3,7 @@ use crate::config::Config;
 use crate::FpResult;
 use api_errors::FpErrorCode;
 use api_errors::ServerErr;
+use db::models::data_lifetime::DataLifetimeSeqnoTxn;
 use db::models::liveness_event::NewLivenessEvent;
 use db::models::passkey::NewPasskey;
 use db::models::passkey::Passkey;
@@ -204,6 +205,7 @@ impl VerifyChallengeResult {
     pub fn save_credential(
         self,
         conn: &mut TxnPgConn,
+        sv_txn: &DataLifetimeSeqnoTxn<'_>,
         user_auth: &CheckedUserAuthContext,
         ie_id: InsightEventId,
     ) -> FpResult<Passkey> {
@@ -231,7 +233,7 @@ impl VerifyChallengeResult {
             let info = LivenessInfo {
                 id: liveness_event.id,
             };
-            UserTimeline::create(conn, info, vault_id.clone(), su_id.clone())?;
+            UserTimeline::create(conn, sv_txn, info)?;
         }
 
         // Save the webauthn credential to the DB

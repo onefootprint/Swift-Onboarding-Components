@@ -26,8 +26,10 @@ use crypto::sha256;
 use db::models::auth_event::AuthEvent;
 use db::models::auth_event::NewAuthEventArgs;
 use db::models::contact_info::ContactInfo;
+use db::models::data_lifetime::DataLifetime;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::passkey::Passkey;
+use db::models::scoped_vault::ScopedVault;
 use db::TxnPgConn;
 use itertools::Itertools;
 use newtypes::ActionKind;
@@ -116,9 +118,13 @@ pub async fn post(
                 .ok_or(ServerErr("No auth events found for user"))?;
             let existing_auth_event = AuthEvent::get(conn, &auth_event.id)?;
             let vault_id = user_auth.user.id.clone();
+
+            let sv = ScopedVault::lock(conn, &sv_id)?;
+            let sv_txn = DataLifetime::new_sv_txn(conn, &sv)?;
+
             let args = NewAuthEventArgs {
                 vault_id: vault_id.clone(),
-                scoped_vault_id: Some(sv_id.clone()),
+                sv_txn: Some(sv_txn),
                 insight_event_id: Some(ie.id),
                 kind: event_kind,
                 webauthn_credential_id: passkey_cred_id,
@@ -213,7 +219,8 @@ impl Action {
                         }
                     }
                 }
-                let cred = res.save_credential(conn, user_auth, ie_id)?;
+                let sv_txn = DataLifetime::new_sv_txn(conn, &vw.sv)?;
+                let cred = res.save_credential(conn, &sv_txn, user_auth, ie_id)?;
                 (AuthEventKind::Passkey, Some(cred.id))
             }
         };

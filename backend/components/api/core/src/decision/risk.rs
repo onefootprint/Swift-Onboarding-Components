@@ -45,14 +45,13 @@ pub fn save_final_decision(
     review_reasons: Vec<ReviewReason>,
 ) -> FpResult<()> {
     let wf = Workflow::lock(conn, wf_id)?;
-    let scoped_user = ScopedVault::get(conn, &wf.scoped_vault_id)?;
     let (playbook, obc) = ObConfiguration::get(conn, wf_id)?;
     let tenant = Tenant::get(conn, &playbook.tenant_id)?;
 
     // If we should commit, portablize all data for the onboarding
     // But, don't portabalize vaults from no-phone onboardings,
     // and don't portablize vaults from tenant-initiated flows via POST /kyc
-    let seqno =
+    let sv_txn =
         if rules_outcome.should_commit() && !obc.is_no_phone_flow && wf.source != WorkflowSource::Tenant {
             // We may decide to start portablizing data from tenant-initiated workflows, but leave
             // the vaults un-identifiable.
@@ -61,7 +60,8 @@ pub fn save_final_decision(
             // Explicitly use the seqno from portablizing data on the decision
             vw.portablize_identity_data(conn)?
         } else {
-            DataLifetime::get_current_seqno(conn)?
+            let sv = ScopedVault::lock(conn, &wf.scoped_vault_id)?;
+            DataLifetime::new_sv_txn(conn, sv)?
         };
 
     let rules_manual_review = rules_outcome.create_manual_review().then_some(ManualReviewArgs {
@@ -103,13 +103,12 @@ pub fn save_final_decision(
 
     // Create an OBD, update ManualReviews, and update Workflow state
     let new_decision = NewDecisionArgs {
-        vault_id: scoped_user.vault_id,
+        sv_txn: &sv_txn,
         logic_git_hash: crate::GIT_HASH.to_string(),
         status,
         failed_for_doc_review,
         annotation_id: None,
         actor: DbActor::Footprint,
-        seqno,
         manual_reviews,
         rule_set_result_id: rsr_id,
     };

@@ -143,23 +143,23 @@ pub async fn post(
             let uv_id = &user_auth.user_vault_id;
 
             // Get or create the ScopedVault for non-my1fp flows
-            let su = if let Some(su_id) = user_auth.su_id.as_ref() {
-                let su = ScopedVault::get(conn, su_id)?;
-                Some(su)
+            let sv = if let Some(su_id) = user_auth.su_id.as_ref() {
+                let sv = ScopedVault::lock(conn, su_id)?;
+                Some(sv)
             } else if let Some(obc) = user_auth.obc.as_ref() {
                 // Create a ScopedVault for this tenant if we are onboarding onto a new tenant.
                 let uv = Vault::lock(conn, uv_id)?;
                 let playbook = Playbook::get(conn, &obc.playbook_id)?;
-                let (su, is_new_su) = ScopedVault::get_or_create_for_tenant(conn, &uv, &playbook.tenant_id)?;
-                root_span.record_su(&su);
-                if is_new_su {
+                let (sv, is_new_sv) = ScopedVault::lock_or_create_for_tenant(conn, &uv, &playbook.tenant_id)?;
+                root_span.record_su(&sv);
+                if is_new_sv {
                     // If the scoped vault is brand new, prefill its data
-                    let tenant_vw: WriteableVw<Any> = VaultWrapper::lock_for_onboarding(conn, &su.id)?;
+                    let tenant_vw: WriteableVw<Any> = VaultWrapper::lock_for_onboarding(conn, &sv.id)?;
                     let prefill_data = prefill_data.ok_or(ServerErr("Missing prefill data for new SV"))?;
                     tenant_vw.prefill_portable_data(conn, prefill_data, None)?;
-                    Passkey::prefill_to_new_sv(conn, &su.vault_id, &su.id)?;
+                    Passkey::prefill_to_new_sv(conn, &sv.vault_id, &sv.id)?;
                 }
-                Some(su)
+                Some(sv)
             } else {
                 // We're allowed to not have a ScopedVault only for my1fp
                 None
@@ -168,7 +168,7 @@ pub async fn post(
             // Apply auth-method-specific updates
             let (passkey_cred_id, added_auth_method) = match verified_credential {
                 VerifiedCredential::ContactInfo(verified_data, ci_dl_id, ci_kind) => {
-                    let added_auth_methods = if let Some((su, data)) = su.as_ref().zip(verified_data) {
+                    let added_auth_methods = if let Some((su, data)) = sv.as_ref().zip(verified_data) {
                         // For bifrost logins that already have a SV (created in the signup challenge or via
                         // API) we can mark the contact info as OTP verified
                         let vw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id)?;
@@ -209,7 +209,7 @@ pub async fn post(
 
                     // Since the challenge generated for the client allows using one of multiple webauthn
                     // credentials, find the exact Passkey id that was utilized
-                    let identifier = if let Some(su_id) = su.as_ref().map(|su| &su.id) {
+                    let identifier = if let Some(su_id) = sv.as_ref().map(|su| &su.id) {
                         su_id.into()
                     } else {
                         uv_id.into() // Only m1fp
@@ -223,9 +223,14 @@ pub async fn post(
                 AuthEventResult::Create(kind) => {
                     // Record the new auth event
                     let insight = CreateInsightEvent::from(insight_headers).insert_with_conn(conn)?;
+                    let sv_txn = sv
+                        .as_ref()
+                        .map(|sv| DataLifetime::new_sv_txn(conn, sv))
+                        .transpose()?;
+
                     let ae_args = NewAuthEventArgs {
                         vault_id: uv_id.clone(),
-                        scoped_vault_id: su.as_ref().map(|su| su.id.clone()),
+                        sv_txn,
                         insight_event_id: Some(insight.id),
                         kind,
                         webauthn_credential_id: passkey_cred_id,
@@ -239,7 +244,7 @@ pub async fn post(
                     // The auth event was already created - only used for SmsLink challenges
                     let ae = AuthEvent::get(conn, &id)?;
                     let ae_sv_id = ae.scoped_vault_id.as_ref();
-                    if ae_sv_id.is_none() || ae_sv_id != su.as_ref().map(|su| &su.id) {
+                    if ae_sv_id.is_none() || ae_sv_id != sv.as_ref().map(|su| &su.id) {
                         return ServerErrInto("Auth event does not correspond to the correct user");
                     }
                     ae
@@ -249,7 +254,7 @@ pub async fn post(
             // Token-specific handling
             let su_id = match scope {
                 IdentifyScope::Auth => {
-                    let su = su.ok_or(BadRequest("No scoped vault available"))?;
+                    let su = sv.ok_or(BadRequest("No scoped vault available"))?;
                     if !user_auth.user.is_portable {
                         // If this is an auth playbook and the user was previously non-portable, we are
                         // currently portablizing an NYPID.
@@ -266,14 +271,14 @@ pub async fn post(
                         vw.portablize_identity_data(conn)?;
                     }
 
-                    Some(su.id)
+                    Some(su.into_inner().id)
                 }
                 IdentifyScope::Onboarding => {
-                    let su = su.ok_or(BadRequest("No scoped vault available"))?;
+                    let su = sv.ok_or(BadRequest("No scoped vault available"))?;
                     if let Some(bo_id) = user_auth.bo_id.as_ref() {
                         register_business_owner(conn, &su, bo_id)?;
                     }
-                    Some(su.id)
+                    Some(su.into_inner().id)
                 }
                 IdentifyScope::My1fp => None,
             };

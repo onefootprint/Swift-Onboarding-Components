@@ -1,4 +1,5 @@
 use super::apple_device_attest::AppleDeviceAttestation;
+use super::data_lifetime::DataLifetimeSeqnoTxn;
 use super::google_device_attest::GoogleDeviceAttestation;
 use super::insight_event::InsightEvent;
 use super::user_timeline::UserTimeline;
@@ -57,9 +58,9 @@ pub struct NewAuthEventRow {
 }
 
 #[derive(Debug)]
-pub struct NewAuthEventArgs {
+pub struct NewAuthEventArgs<'a> {
     pub vault_id: VaultId,
-    pub scoped_vault_id: Option<ScopedVaultId>,
+    pub sv_txn: Option<DataLifetimeSeqnoTxn<'a>>,
     pub insight_event_id: Option<InsightEventId>,
     pub kind: AuthEventKind,
     pub webauthn_credential_id: Option<PasskeyId>,
@@ -73,10 +74,10 @@ pub struct NewAuthEventArgs {
 
 impl AuthEvent {
     #[tracing::instrument("AuthEvent::save", skip_all)]
-    pub fn save(args: NewAuthEventArgs, conn: &mut TxnPgConn) -> FpResult<AuthEvent> {
+    pub fn save(args: NewAuthEventArgs<'_>, conn: &mut TxnPgConn) -> FpResult<AuthEvent> {
         let NewAuthEventArgs {
             vault_id,
-            scoped_vault_id,
+            sv_txn,
             insight_event_id,
             kind,
             webauthn_credential_id,
@@ -84,6 +85,8 @@ impl AuthEvent {
             scope,
             new_auth_method_action,
         } = args;
+
+        let scoped_vault_id = sv_txn.as_ref().map(|txn| txn.scoped_vault().id.clone());
 
         match scope {
             IdentifyScope::My1fp => (),
@@ -96,7 +99,7 @@ impl AuthEvent {
         }
         let row = NewAuthEventRow {
             vault_id: vault_id.clone(),
-            scoped_vault_id: scoped_vault_id.clone(),
+            scoped_vault_id,
             insight_event_id,
             kind,
             webauthn_credential_id,
@@ -109,7 +112,7 @@ impl AuthEvent {
 
         // For auth events when a new auth method is registered, create a timeline event
         if let Some(new_auth_method_action) = new_auth_method_action {
-            if let Some(sv_id) = ev.scoped_vault_id.clone() {
+            if let Some(sv_txn) = sv_txn.as_ref() {
                 let kind = AuthMethodKind::try_from(ev.kind)
                     .map_err(|_| BadRequest("Can't create a timeline event for third-party auth event"))?;
                 // Create a timeline event that shows the passkey was added
@@ -118,7 +121,7 @@ impl AuthEvent {
                     action: new_auth_method_action,
                     auth_event_id: ev.id.clone(),
                 };
-                UserTimeline::create(conn, info, ev.vault_id.clone(), sv_id)?;
+                UserTimeline::create(conn, sv_txn, info)?;
             }
         }
         Ok(ev)

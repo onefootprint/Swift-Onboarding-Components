@@ -1,6 +1,6 @@
 use super::annotation::AnnotationInfo;
 use super::auth_event::AuthEvent;
-use super::data_lifetime::DataLifetime;
+use super::data_lifetime::DataLifetimeSeqnoTxn;
 use super::document::Document;
 use super::document_request::DocumentRequest;
 use super::insight_event::InsightEvent;
@@ -113,25 +113,20 @@ pub struct UserTimelineInfo(pub UserTimeline, pub SaturatedTimelineEvent);
 
 impl UserTimeline {
     #[tracing::instrument("UserTimeline::create", skip_all)]
-    pub fn create<T>(
-        conn: &mut TxnPgConn,
-        event: T,
-        vault_id: VaultId,
-        scoped_vault_id: ScopedVaultId,
-    ) -> FpResult<()>
+    pub fn create<T>(conn: &mut TxnPgConn, sv_txn: &DataLifetimeSeqnoTxn<'_>, event: T) -> FpResult<()>
     where
         T: Into<DbUserTimelineEvent>,
     {
         let event = event.into();
         let event_kind = (&event).into();
-        let seqno = DataLifetime::get_current_seqno(conn)?;
+        let sv = sv_txn.scoped_vault();
         let new = NewUserTimeline {
             event,
-            scoped_vault_id,
-            vault_id,
+            scoped_vault_id: sv.id.clone(),
+            vault_id: sv.vault_id.clone(),
             timestamp: chrono::Utc::now(),
             event_kind,
-            seqno,
+            seqno: sv_txn.seqno(),
         };
         diesel::insert_into(user_timeline::table)
             .values(new)
@@ -418,6 +413,7 @@ impl ComputeCursor<UserTimelineCursor> for UserTimelineInfo {
 mod tests {
     use super::*;
     use crate::actor::SaturatedActor;
+    use crate::models::data_lifetime::DataLifetime;
     use crate::tests::prelude::*;
     use crate::CursorPagination;
     // TODO modernize utils
@@ -453,12 +449,13 @@ mod tests {
         let tenant_user1 = test_tenant_user(conn, String::from("tu1@acme.com"), None, None);
         let tenant_user2 = test_tenant_user(conn, String::from("tu2@acme.com"), None, None);
 
+        let sv_txn = DataLifetime::new_sv_txn(conn, &scoped_vault).unwrap();
+
         let annotation1 = test_annotation(
             conn,
             String::from("yo sup"),
             false,
-            scoped_vault.id.clone(),
-            vault.id.clone(),
+            &sv_txn,
             DbActor::TenantUser {
                 id: tenant_user1.id.clone(),
             },
@@ -469,8 +466,7 @@ mod tests {
             conn,
             String::from("yo sup"),
             false,
-            scoped_vault.id.clone(),
-            vault.id.clone(),
+            &sv_txn,
             DbActor::TenantUser {
                 id: tenant_user2.id.clone(),
             },
@@ -485,13 +481,11 @@ mod tests {
             role.id,
         );
 
-        let user_vault_id = vault.id;
         let annotation3 = test_annotation(
             conn,
             String::from("yo sup"),
             false,
-            scoped_vault.id.clone(),
-            user_vault_id,
+            &sv_txn,
             DbActor::TenantApiKey {
                 id: tenant_api_key.id.clone(),
             },

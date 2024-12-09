@@ -28,6 +28,7 @@ use crate::State;
 use api_errors::FpError;
 use crypto::aead::AeadSealedBytes;
 use crypto::aead::SealingKey;
+use db::models::data_lifetime::DataLifetime;
 use db::models::decision_intent::DecisionIntent;
 use db::models::document_request::DocumentRequest;
 use db::models::document_request::NewDocumentRequestArgs;
@@ -74,7 +75,6 @@ use newtypes::SealedVaultBytes;
 use newtypes::StepUpInfo;
 use newtypes::TenantId;
 use newtypes::UsStateAndTerritories;
-use newtypes::VaultId;
 use newtypes::VaultOperation;
 use newtypes::VendorAPI;
 use newtypes::VerificationResultId;
@@ -362,7 +362,6 @@ pub enum DecisionOutput {
 pub fn handle_rules_output(
     conn: &mut TxnPgConn,
     wf: Locked<Workflow>,
-    v_id: VaultId,
     rules_output: RulesOutcome,
     rsr_id: Option<RuleSetResultId>,
     review_reasons: Vec<ReviewReason>,
@@ -372,7 +371,7 @@ pub fn handle_rules_output(
         ..
     } = rules_output
     {
-        handle_stepup(conn, wf, v_id, step_up_configs, rsr_id.clone())?;
+        handle_stepup(conn, wf, step_up_configs, rsr_id.clone())?;
         Ok(DecisionOutput::NonTerminal)
     } else {
         risk::save_final_decision(conn, &wf.id, rules_output, rsr_id, review_reasons)?;
@@ -385,25 +384,28 @@ pub fn handle_rules_output(
 pub fn handle_stepup(
     conn: &mut TxnPgConn,
     wf: Locked<Workflow>,
-    v_id: VaultId,
     step_up_configs: Vec<DocumentRequestConfig>,
     rsr_id: Option<RuleSetResultId>,
 ) -> FpResult<()> {
+    let sv_id = &wf.scoped_vault_id;
     let doc_reqs = step_up_configs
         .into_iter()
         .map(|config| NewDocumentRequestArgs {
-            scoped_vault_id: wf.scoped_vault_id.clone(),
+            scoped_vault_id: sv_id.clone(),
             workflow_id: wf.id.clone(),
             rule_set_result_id: rsr_id.clone(),
             config,
         })
         .collect();
+
+    // Leave a timeline event showing step up was requested
+    let sv = ScopedVault::lock(conn, sv_id)?;
+    let sv_txn = DataLifetime::new_sv_txn(conn, &sv)?;
     let doc_reqs = DocumentRequest::bulk_create(conn, doc_reqs)?;
     let stepup_info = StepUpInfo {
         document_request_ids: doc_reqs.into_iter().map(|dr| dr.id).collect(),
     };
-    // Leave a timeline event showing step up was requested
-    UserTimeline::create(conn, stepup_info, v_id, wf.scoped_vault_id.clone())?;
+    UserTimeline::create(conn, &sv_txn, stepup_info)?;
 
     // Move the workflow back into an Incomplete state to show we are waiting for data from user
     Workflow::update_status_if_valid(wf, conn, OnboardingStatus::Incomplete)?;

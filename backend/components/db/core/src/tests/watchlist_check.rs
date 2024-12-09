@@ -1,4 +1,5 @@
 use super::fixtures::ob_configuration::ObConfigurationOpts;
+use crate::models::data_lifetime::DataLifetime;
 use crate::models::onboarding_decision::NewDecisionArgs;
 use crate::models::onboarding_decision::OnboardingDecision;
 use crate::models::task::NewTask;
@@ -14,7 +15,6 @@ use chrono::Duration;
 use chrono::Utc;
 use macros::db_test;
 use newtypes::AmlMatchKind;
-use newtypes::DataLifetimeSeqno;
 use newtypes::DbActor;
 use newtypes::DecisionStatus;
 use newtypes::EnhancedAmlOption;
@@ -254,14 +254,14 @@ fn make_vault(
         let sv = fixtures::scoped_vault::create(conn, &uvid, tenant_id);
         if let Some(ob_decision_made_at) = ob_decision_made_at {
             let wf = fixtures::workflow::create(conn, &sv.id, &ob_config.id, None);
+            let sv_txn = DataLifetime::new_sv_txn(conn, &sv).unwrap();
 
             let decision = NewDecisionArgs {
-                vault_id: uv.id.clone(),
+                sv_txn: &sv_txn,
                 logic_git_hash: "".to_string(),
                 status: DecisionStatus::Pass,
                 annotation_id: None,
                 actor: DbActor::Footprint,
-                seqno: DataLifetimeSeqno::from(0),
                 manual_reviews: vec![],
                 rule_set_result_id: None,
                 failed_for_doc_review: false,

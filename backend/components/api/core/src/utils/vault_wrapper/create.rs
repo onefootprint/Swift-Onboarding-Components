@@ -50,7 +50,7 @@ impl VaultWrapper<Person> {
         ctx: VaultContext,
         root_span: &RootSpan,
         duplicate_of_id: Option<VaultId>,
-    ) -> FpResult<(Locked<Vault>, ScopedVault, PatchDataResult)> {
+    ) -> FpResult<(Locked<Vault>, Locked<ScopedVault>, PatchDataResult)> {
         let VaultContext {
             data,
             sources,

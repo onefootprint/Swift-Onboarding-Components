@@ -8,8 +8,10 @@ use crate::State;
 use actix_web::HttpResponseBuilder;
 use api_core::auth::user::UserAuthScope;
 use api_errors::ServerErr;
+use db::models::data_lifetime::DataLifetime;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::liveness_event::NewLivenessEvent;
+use db::models::scoped_vault::ScopedVault;
 use db::models::user_timeline::UserTimeline;
 use newtypes::LivenessAttributes;
 use newtypes::LivenessInfo;
@@ -73,7 +75,7 @@ async fn authorize_privacy_pass(
     insight: InsightHeaders,
 ) -> ApiResponse<HttpResponse> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
-    let scoped_user_id =
+    let scoped_vault_id =
         (user_auth.su_id.clone()).ok_or(ServerErr("User not initialized for privacy pass"))?;
     let nonce = user_auth.auth_token.hash_bytes();
 
@@ -90,7 +92,7 @@ async fn authorize_privacy_pass(
             let insight_event = CreateInsightEvent::from(insight).insert_with_conn(conn)?;
 
             let liveness_event = NewLivenessEvent {
-                scoped_vault_id: scoped_user_id.clone(),
+                scoped_vault_id: scoped_vault_id.clone(),
                 attributes: Some(LivenessAttributes {
                     issuers: vec![LivenessIssuer::Cloudflare, LivenessIssuer::Footprint],
                     ..Default::default()
@@ -101,10 +103,12 @@ async fn authorize_privacy_pass(
             }
             .insert(conn)?;
 
+            let sv = ScopedVault::lock(conn, &scoped_vault_id)?;
+            let sv_txn = DataLifetime::new_sv_txn(conn, &sv)?;
             let info = LivenessInfo {
                 id: liveness_event.id,
             };
-            UserTimeline::create(conn, info, user_auth.user.id.clone(), scoped_user_id)?;
+            UserTimeline::create(conn, &sv_txn, info)?;
 
             Ok(())
         })

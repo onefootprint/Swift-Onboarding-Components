@@ -708,7 +708,6 @@ impl OnAction<MakeDecision, KybState> for KybStepUpDecisioning {
         let (vault_data_for_rules, lists_for_rules) = async_res;
         let (playbook, obc) = ObConfiguration::get(conn, &self.wf_id)?;
 
-        let sv = ScopedVault::get(conn, &self.wf_id)?;
         let kyb_rs: Vec<RiskSignal> = RiskSignal::latest_by_risk_signal_group_kinds(
             conn,
             &wf.scoped_vault_id,
@@ -727,7 +726,7 @@ impl OnAction<MakeDecision, KybState> for KybStepUpDecisioning {
         // TODO should we be using evaluate_workflow_decision?
         let (decision, rsr_id) = if let Some((rsr, _)) = decision::rule_engine::engine::evaluate_rules(
             conn,
-            &sv.id,
+            &wf.scoped_vault_id,
             &playbook,
             &obc,
             Some(&self.wf_id),
@@ -756,7 +755,7 @@ impl OnAction<MakeDecision, KybState> for KybStepUpDecisioning {
             ..
         } = decision
         {
-            handle_stepup(conn, wf, sv.vault_id, step_up_configs, rsr_id)?;
+            handle_stepup(conn, wf, step_up_configs, rsr_id)?;
             Ok(KybState::from(KybDocCollection {
                 wf_id: self.wf_id,
                 t_id: self.t_id,

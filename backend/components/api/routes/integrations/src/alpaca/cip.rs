@@ -33,6 +33,7 @@ use chrono::Utc;
 use db::actor::saturate_actors;
 use db::actor::SaturatedActor;
 use db::models::annotation::Annotation;
+use db::models::data_lifetime::DataLifetime;
 use db::models::document::Document;
 use db::models::document_request::DocumentRequest;
 use db::models::insight_event::InsightEvent;
@@ -132,8 +133,9 @@ pub async fn post(
 
     state
         .db_transaction(move |conn| {
-            let sv = ScopedVault::get(conn, (&fp_id2, &tenant_id2, is_live))?;
-            UserTimeline::create(conn, info, sv.vault_id, sv.id)?;
+            let sv = ScopedVault::lock(conn, (&fp_id2, &tenant_id2, is_live))?;
+            let sv_txn = DataLifetime::new_sv_txn(conn, &sv)?;
+            UserTimeline::create(conn, &sv_txn, info)?;
 
             Ok(())
         })
@@ -171,8 +173,9 @@ pub async fn post_old(
 
     state
         .db_transaction(move |conn| {
-            let sv = ScopedVault::get(conn, (&fp_id, &tenant_id2, is_live))?;
-            UserTimeline::create(conn, info, sv.vault_id, sv.id)?;
+            let sv = ScopedVault::lock(conn, (&fp_id, &tenant_id2, is_live))?;
+            let sv_txn = DataLifetime::new_sv_txn(conn, &sv)?;
+            UserTimeline::create(conn, &sv_txn, info)?;
 
             Ok(())
         })

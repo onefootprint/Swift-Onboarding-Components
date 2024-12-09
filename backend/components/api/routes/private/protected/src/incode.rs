@@ -200,7 +200,6 @@ async fn handle_forcing_failure(
             Fail::enter(
                 conn,
                 &su.id,
-                &su.vault_id,
                 &dr.workflow_id,
                 &old_session.identity_document_id,
                 vres_id,

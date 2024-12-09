@@ -1,5 +1,4 @@
-use super::data_lifetime::DataLifetime;
-use super::scoped_vault::ScopedVault;
+use super::data_lifetime::DataLifetimeSeqnoTxn;
 use super::user_timeline::UserTimeline;
 use crate::PgConn;
 use crate::TxnPgConn;
@@ -72,23 +71,20 @@ impl ScopedVaultLabel {
     }
 
     #[tracing::instrument("ScopedVaultLabel::deactivate", skip_all)]
-    pub fn deactivate(
-        conn: &mut PgConn,
-        scoped_vault_id: &ScopedVaultId,
-        actor: DbActor,
-    ) -> FpResult<DataLifetimeSeqno> {
-        let seqno = DataLifetime::get_current_seqno(conn)?;
+    pub fn deactivate(conn: &mut PgConn, sv_txn: &DataLifetimeSeqnoTxn<'_>, actor: DbActor) -> FpResult<()> {
         let update: DeactivateLabelUpdate = DeactivateLabelUpdate {
             deactivated_at: Utc::now(),
-            deactivated_seqno: seqno,
+            deactivated_seqno: sv_txn.seqno(),
             deactivated_by_actor: actor.clone(),
         };
-        let _: Vec<ScopedVaultLabel> = diesel::update(scoped_vault_label::table)
-            .filter(scoped_vault_label::scoped_vault_id.eq(scoped_vault_id))
+
+        diesel::update(scoped_vault_label::table)
+            .filter(scoped_vault_label::scoped_vault_id.eq(&sv_txn.scoped_vault().id))
             .filter(scoped_vault_label::deactivated_seqno.is_null())
             .set(update)
-            .get_results(conn)?;
-        Ok(seqno)
+            .execute(conn)?;
+
+        Ok(())
     }
 }
 #[derive(Debug, Clone, Insertable)]
@@ -115,21 +111,23 @@ impl ScopedVaultLabel {
     #[tracing::instrument("ScopedVaultLabel::create", skip_all)]
     pub fn create(
         conn: &mut TxnPgConn,
-        sv: ScopedVault,
+        sv_txn: &DataLifetimeSeqnoTxn<'_>,
         kind: LabelKind,
         actor: DbActor,
     ) -> FpResult<ScopedVaultLabel> {
         // First deactivate
-        let seqno = Self::deactivate(conn.conn(), &sv.id, actor.clone())?;
+        Self::deactivate(conn.conn(), sv_txn, actor.clone())?;
+
+        let sv = sv_txn.scoped_vault();
 
         // now insert the new one
         let row = NewScopedVaultLabelRow {
             created_at: Utc::now(),
-            created_seqno: seqno,
+            created_seqno: sv_txn.seqno(),
             scoped_vault_id: sv.id.clone(),
             created_by_actor: actor,
             kind,
-            tenant_id: sv.tenant_id,
+            tenant_id: sv.tenant_id.clone(),
             is_live: sv.is_live,
         };
         let ev = diesel::insert_into(db_schema::schema::scoped_vault_label::table)
@@ -137,7 +135,7 @@ impl ScopedVaultLabel {
             .get_result::<Self>(conn.conn())?;
 
         let info = LabelAddedInfo { id: ev.id.clone() };
-        UserTimeline::create(conn, info, sv.vault_id, sv.id)?;
+        UserTimeline::create(conn, sv_txn, info)?;
 
         Ok(ev)
     }

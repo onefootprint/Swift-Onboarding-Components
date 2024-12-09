@@ -261,7 +261,6 @@ impl IncodeStateTransition for FetchScores {
     ) -> FpResult<TransitionResult> {
         // TODO could represent enter inside the state transition
         let args = CompleteArgs {
-            vault: &ctx.vault,
             sv_id: &ctx.sv_id,
             wf_id: &ctx.wf_id,
             obc_id: &ctx.obc.id,

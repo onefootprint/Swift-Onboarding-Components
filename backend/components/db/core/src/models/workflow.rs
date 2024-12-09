@@ -1,3 +1,4 @@
+use super::data_lifetime::DataLifetime;
 use super::document::Document;
 use super::document::DocumentUpdate;
 use super::fingerprint::Fingerprint;
@@ -224,7 +225,7 @@ impl Workflow {
             is_neuro_enabled,
         } = args;
 
-        let sv = ScopedVault::lock(conn, &scoped_vault_id)?.into_inner();
+        let sv = ScopedVault::lock(conn, &scoped_vault_id)?;
         let v = Vault::get(conn.conn(), &scoped_vault_id)?;
 
         if sv.is_live && fixture_result.is_some() {
@@ -322,11 +323,12 @@ impl Workflow {
         ScopedVault::update_status_if_valid(conn, &sv.id, OnboardingStatus::Incomplete)?;
 
         // Create a timeline event showing the onboarding started
+        let sv_txn = DataLifetime::new_sv_txn(conn, &sv)?;
         let info = WorkflowStartedInfo {
             workflow_id: wf.id.clone(),
             pb_id: ob_configuration_id,
         };
-        UserTimeline::create(conn, info, sv.vault_id, sv.id)?;
+        UserTimeline::create(conn, &sv_txn, info)?;
 
         Ok((wf, true))
     }

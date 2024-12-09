@@ -3,11 +3,11 @@ use crate::utils::vault_wrapper::Person;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use db::models::data_lifetime::DataLifetime;
+use db::models::data_lifetime::DataLifetimeSeqnoTxn;
 use db::models::vault::Vault;
 use db::TxnPgConn;
 use newtypes::CollectedDataOption;
 use newtypes::DataIdentifier;
-use newtypes::DataLifetimeSeqno;
 use std::collections::HashMap;
 use std::collections::HashSet;
 
@@ -64,7 +64,7 @@ impl WriteableVw<Person> {
     /// NOTE: this DOES NOT portablize custom data or identity documents since we haven't figured
     /// out the portability story for those types of data.
     #[tracing::instrument("WriteableVw::portablize_identity_data", skip_all)]
-    pub fn portablize_identity_data(self, conn: &mut TxnPgConn) -> FpResult<DataLifetimeSeqno> {
+    pub fn portablize_identity_data(self, conn: &mut TxnPgConn) -> FpResult<DataLifetimeSeqnoTxn<'static>> {
         // TODO only portablize data collected by the ob config rather than all data
         // TODO also only portablize the _exact_ data that was sent off to be verified. It's possible
         // the data has been changed via API in between sending VReqs and now.
@@ -103,10 +103,10 @@ impl WriteableVw<Person> {
             .filter_map(|di| speculative.remove(&di))
             .collect();
 
-        let sv_txn = DataLifetime::new_sv_txn(conn, &sv)?;
+        let sv_txn = DataLifetime::new_sv_txn(conn, sv)?;
         DataLifetime::bulk_portablize_for_tenant(conn, &sv_txn, to_portablize_ids)?;
 
-        Ok(sv_txn.seqno())
+        Ok(sv_txn)
     }
 }
 

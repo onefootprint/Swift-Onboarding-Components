@@ -14,6 +14,7 @@ use api_wire_types::AnnotationFilters;
 use api_wire_types::UpdateAnnotationRequest;
 use db::models::annotation::Annotation;
 use db::models::annotation::AnnotationInfo;
+use db::models::data_lifetime::DataLifetime;
 use db::models::scoped_vault::ScopedVault;
 use db::models::user_timeline::UserTimeline;
 use newtypes::AnnotationId;
@@ -125,15 +126,16 @@ pub fn post(
     // tests, from future spots where we want to create annotations (eg: decision engine)
     let annotation: AnnotationInfo = state
         .db_transaction(move |conn| {
-            let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
+            let sv = ScopedVault::lock(conn, (&fp_id, &tenant_id, is_live))?;
+            let sv_txn = DataLifetime::new_sv_txn(conn, &sv)?;
 
             let annotation: AnnotationInfo =
-                Annotation::create(conn, note, is_pinned, scoped_user.id.clone(), auth_actor)?;
+                Annotation::create(conn, note, is_pinned, sv.id.clone(), auth_actor)?;
 
             let info = newtypes::AnnotationInfo {
                 annotation_id: annotation.0.id.clone(),
             };
-            UserTimeline::create(conn, info, scoped_user.vault_id, scoped_user.id)?;
+            UserTimeline::create(conn, &sv_txn, info)?;
 
             Ok(annotation)
         })

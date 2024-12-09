@@ -1,4 +1,6 @@
 use super::business_workflow_link::BusinessWorkflowLink;
+use super::data_lifetime::DataLifetime;
+use super::data_lifetime::DataLifetimeSeqnoTxn;
 use super::manual_review::ManualReview;
 use super::manual_review::ManualReviewArgs;
 use super::manual_review::ManualReviewDelta;
@@ -36,7 +38,6 @@ use newtypes::OnboardingDecisionId;
 use newtypes::OnboardingDecisionInfo;
 use newtypes::RuleSetResultId;
 use newtypes::ScopedVaultId;
-use newtypes::VaultId;
 use newtypes::WorkflowId;
 use std::collections::HashMap;
 
@@ -78,13 +79,12 @@ struct NewOnboardingDecisionRow {
     failed_for_doc_review: FailedForDocReview,
 }
 #[derive(Debug)]
-pub struct NewDecisionArgs {
-    pub vault_id: VaultId,
+pub struct NewDecisionArgs<'a> {
+    pub sv_txn: &'a DataLifetimeSeqnoTxn<'a>,
     pub logic_git_hash: String,
     pub status: DecisionStatus,
     pub annotation_id: Option<AnnotationId>,
     pub actor: DbActor,
-    pub seqno: DataLifetimeSeqno,
     /// List of actions to perform for each ManualReviewKind. If no action is provided for a
     /// ManualReviewKind, we'll leave any existing ManualReview for that kind untouched.
     pub manual_reviews: Vec<ManualReviewArgs>,
@@ -109,12 +109,11 @@ impl OnboardingDecision {
         args: NewDecisionArgs,
     ) -> FpResult<(Self, ManualReviewDelta)> {
         let NewDecisionArgs {
-            vault_id,
+            sv_txn,
             logic_git_hash,
             status,
             annotation_id,
             actor,
-            seqno,
             rule_set_result_id,
             failed_for_doc_review,
             manual_reviews,
@@ -131,7 +130,7 @@ impl OnboardingDecision {
             logic_git_hash,
             status,
             actor,
-            seqno,
+            seqno: sv_txn.seqno(),
             rule_set_result_id,
             failed_for_doc_review,
             created_at: Utc::now(),
@@ -146,19 +145,22 @@ impl OnboardingDecision {
             id: result.id.clone(),
             annotation_id,
         };
-        UserTimeline::create(conn, decision_info, vault_id, wf.scoped_vault_id.clone())?;
+        UserTimeline::create(conn, sv_txn, decision_info)?;
 
         // If the Workflow that is getting a new decision is associated with a business, make a timeline
         // event for the business
         // Handle situation where this workflow is a business owner completing a workflow
         let bo_info = BusinessWorkflowLink::get_business_workflow_for_user_workflow(conn, &wf.id)?;
-        if let Some((bo, biz_wf)) = bo_info {
+        if let Some((_bo, biz_wf)) = bo_info {
+            let sb = ScopedVault::lock(conn, &biz_wf.scoped_vault_id)?;
+            let sb_txn = DataLifetime::new_sv_txn(conn, &sb)?;
+
             // Event is for _this_ user completing KYC
             let event = BusinessOwnerCompletedKycInfo {
                 onboarding_decision_id: result.id.clone(),
             };
             // Note: we associate this event with the corresponding _business_!
-            UserTimeline::create(conn, event, bo.business_vault_id, biz_wf.scoped_vault_id)?;
+            UserTimeline::create(conn, &sb_txn, event)?;
         }
 
         let mr_deltas = ManualReview::apply_actions(conn, wf, &result, manual_reviews)?;

@@ -16,6 +16,7 @@ use api_wire_types::EntityActionResponse;
 use api_wire_types::TokenOperationKind;
 use chrono::Duration;
 use crypto::aead::ScopedSealingKey;
+use db::models::data_lifetime::DataLifetime;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::ob_configuration::ObConfigurationQuery;
 use db::models::scoped_vault::ScopedVault;
@@ -31,6 +32,7 @@ use db::TxnPgConn;
 use newtypes::ApiKeyStatus;
 use newtypes::DbActor;
 use newtypes::DocumentRequestConfig;
+use newtypes::Locked;
 use newtypes::ObConfigurationKind;
 use newtypes::SessionAuthToken;
 use newtypes::TriggerRequest;
@@ -94,7 +96,7 @@ pub(super) struct TriggerRequestOutcome {
 pub(super) fn apply_trigger_request(
     conn: &mut TxnPgConn,
     request: TriggerRequest,
-    su: &ScopedVault,
+    sv: &Locked<ScopedVault>,
     actor: DbActor,
     session_key: &ScopedSealingKey,
 ) -> FpResult<TriggerRequestOutcome> {
@@ -104,22 +106,22 @@ pub(super) fn apply_trigger_request(
         fp_bid,
     } = request;
 
-    if su.kind != VaultKind::Person {
+    if sv.kind != VaultKind::Person {
         return BadRequestInto("Must be a person vault");
     }
 
     let sb = fp_bid
         .as_ref()
         .map(|fp_bid| {
-            let uv_id = &su.vault_id;
+            let uv_id = &sv.vault_id;
             let id = ScopedVaultIdentifier::OwnedFpBid { fp_bid, uv_id };
-            ScopedVault::get(conn, id)
+            ScopedVault::lock(conn, id)
         })
         .transpose()?;
 
-    validate(conn, &trigger, su, sb.as_ref())?;
+    validate(conn, &trigger, sv, sb.as_deref())?;
 
-    let vault = Vault::get(conn, &su.id)?;
+    let vault = Vault::get(conn, &sv.id)?;
     if vault.kind != VaultKind::Person {
         return Err(TenantError::IncorrectVaultKindForRedoKyc.into());
     }
@@ -127,14 +129,14 @@ pub(super) fn apply_trigger_request(
     let obc = match &trigger {
         WorkflowRequestConfig::Onboard { playbook_id, .. } => {
             // Trigger specifically requested the playbook onto which the user should onboard
-            let (_, obc) = ObConfiguration::get(conn, (playbook_id, &su.tenant_id, su.is_live))?;
+            let (_, obc) = ObConfiguration::get(conn, (playbook_id, &sv.tenant_id, sv.is_live))?;
             obc
         }
         WorkflowRequestConfig::Document { .. } => {
             // For all other trigger kinds, just associate the last playbook with the WFR.
             // This is mostly just used to serialize information on the tenant. Would be nice if we could stop
             // associating a playbook with these WFRs
-            if let Some((_, obc)) = Workflow::latest_reonboardable(conn, &su.id, false)? {
+            if let Some((_, obc)) = Workflow::latest_reonboardable(conn, &sv.id, false)? {
                 obc
             } else {
                 // Overall hack: these triggers all need a playbook associated to display various tenant
@@ -150,8 +152,8 @@ pub(super) fn apply_trigger_request(
                     ObConfigurationKind::reonboardable()
                 };
                 let query = ObConfigurationQuery {
-                    tenant_id: su.tenant_id.clone(),
-                    is_live: su.is_live,
+                    tenant_id: sv.tenant_id.clone(),
+                    is_live: sv.is_live,
                     status: Some(ApiKeyStatus::Enabled),
                     kinds: Some(kinds),
                     search: None,
@@ -174,7 +176,7 @@ pub(super) fn apply_trigger_request(
     }
 
     let wfr_args = NewWorkflowRequestArgs {
-        su_id: &su.id,
+        su_id: &sv.id,
         sb_id: sb.as_ref().map(|sb| &sb.id),
         ob_configuration_id: &obc.id,
         created_by: &actor,
@@ -185,25 +187,27 @@ pub(super) fn apply_trigger_request(
     let wfr = WorkflowRequest::create(conn, wfr_args)?;
 
     // Create a timeline event logging that the workflow was triggered
+    let sv_txn = DataLifetime::new_sv_txn(conn, sv)?;
     let event = WorkflowTriggeredInfo {
         workflow_id: None,
         ob_config_id: obc.id,
         workflow_request_id: Some(wfr.id.clone()),
         actor,
     };
-    UserTimeline::create(conn, event.clone(), su.vault_id.clone(), su.id.clone())?;
+    UserTimeline::create(conn, &sv_txn, event.clone())?;
 
     // Create the same workflow request timeline event on the business to indicate that the workflow was
     // triggered
     if let Some(sb) = sb.as_ref() {
-        UserTimeline::create(conn, event, sb.vault_id.clone(), sb.id.clone())?;
+        let sb_txn = DataLifetime::new_sv_txn(conn, sb)?;
+        UserTimeline::create(conn, &sb_txn, event)?;
     }
 
     // Create an inherit token for the WFR
-    let vw = VaultWrapper::<Any>::build_for_tenant(conn, &su.id)?;
+    let vw = VaultWrapper::<Any>::build_for_tenant(conn, &sv.id)?;
     let args = CreateTokenArgs {
         vw: &vw,
-        sb_id: sb.map(|sb| sb.id),
+        sb_id: sb.map(|sb| sb.id.clone()),
         kind: TokenOperationKind::Inherit,
         key: None,
         wf: None,
@@ -215,7 +219,7 @@ pub(super) fn apply_trigger_request(
     };
     let CreateTokenResult { token, session, .. } = create_token(conn, session_key, args, Duration::days(3))?;
 
-    su.create_webhook_task(conn, UserSpecificWebhookKind::InfoRequested)?;
+    sv.create_webhook_task(conn, UserSpecificWebhookKind::InfoRequested)?;
 
     // Create an auth token for this workflow that we will send to the user
     let outcome = TriggerRequestOutcome { token, session };

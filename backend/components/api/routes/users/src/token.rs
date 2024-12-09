@@ -12,8 +12,6 @@ use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::token::create_token;
 use api_core::utils::token::CreateTokenArgs;
 use api_core::utils::token::CreateTokenResult;
-use api_core::utils::vault_wrapper::Any;
-use api_core::utils::vault_wrapper::TenantVw;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_errors::BadRequest;
 use api_errors::BadRequestInto;
@@ -25,6 +23,7 @@ use chrono::Duration;
 use chrono::Utc;
 use db::models::auth_event::AuthEvent;
 use db::models::auth_event::NewAuthEventArgs;
+use db::models::data_lifetime::DataLifetime;
 use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault::ScopedVaultIdentifier;
 use feature_flag::BoolFlag;
@@ -110,7 +109,7 @@ pub async fn post(
     let (token, session) = state
         .db_transaction(move |conn| {
             let su = ScopedVault::get(conn, (&fp_id, &tenant.id, is_live))?;
-            let vw: TenantVw<Any> = VaultWrapper::build_for_tenant(conn, &su.id)?;
+            let vw = VaultWrapper::lock_for_onboarding(conn, &su.id)?;
 
             let sb = if let Some(fp_bid) = fp_bid {
                 let id = ScopedVaultIdentifier::OwnedFpBid {
@@ -126,13 +125,14 @@ pub async fn post(
             };
 
             let third_party_auth_event = if use_third_party_auth {
+                let sv_txn = DataLifetime::new_sv_txn(conn, &vw.sv)?;
                 // Trust that the tenant has authenticated this user already. Only certain tenants
                 // are permissioned to provide us with third-party auth.
                 // We'll still portablize users with third-part auth (TODO if there's not already
                 // a portable vault for the phone number)
                 let args = NewAuthEventArgs {
                     vault_id: su.vault_id.clone(),
-                    scoped_vault_id: Some(su.id.clone()),
+                    sv_txn: Some(sv_txn),
                     insight_event_id: None,
                     kind: AuthEventKind::ThirdParty,
                     webauthn_credential_id: None,

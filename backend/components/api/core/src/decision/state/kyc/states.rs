@@ -667,7 +667,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
 
         let decision = get_final_rules_outcome(fixture_result, decision);
 
-        let output = common::handle_rules_output(conn, wf, v.id, decision, rsr_id, review_reasons)?;
+        let output = common::handle_rules_output(conn, wf, decision, rsr_id, review_reasons)?;
         match output {
             DecisionOutput::Terminal => Ok(KycState::from(KycComplete)),
             DecisionOutput::NonTerminal => Ok(KycState::from(KycDocCollection {

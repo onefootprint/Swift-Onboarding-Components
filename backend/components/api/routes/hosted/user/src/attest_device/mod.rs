@@ -13,9 +13,11 @@ use api_wire_types::hosted::device_attestation::GetDeviceAttestationChallengeReq
 use chrono::Duration;
 use chrono::Utc;
 use db::models::apple_device_attest::NewAppleDeviceAttestation;
+use db::models::data_lifetime::DataLifetime;
 use db::models::google_device_attest::NewGoogleDeviceAttestation;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::liveness_event::NewLivenessEvent;
+use db::models::scoped_vault::ScopedVault;
 use db::models::user_timeline::UserTimeline;
 use newtypes::LivenessAttributes;
 use newtypes::LivenessInfo;
@@ -133,7 +135,6 @@ pub async fn post_attestation(
     let wf_id = auth.workflow.id.clone();
     let vault_key = auth.user.public_key.clone();
     let is_live = auth.user.is_live;
-    let v_id = auth.user.id.clone();
     state
         .db_transaction(move |conn| {
             let attestation = match new_attestation {
@@ -162,10 +163,12 @@ pub async fn post_attestation(
                 .insert(conn)?;
 
                 // create the timeline event for a liveness
+                let sv = ScopedVault::lock(conn, &sv_id)?;
+                let sv_txn = DataLifetime::new_sv_txn(conn, &sv)?;
                 let info = LivenessInfo {
                     id: liveness_event.id,
                 };
-                UserTimeline::create(conn, info, v_id, sv_id.clone())?;
+                UserTimeline::create(conn, &sv_txn, info)?;
             }
 
             Ok(())

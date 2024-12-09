@@ -5,6 +5,7 @@ use api_core::auth::tenant::TenantApiKeyGated;
 use api_core::types::ApiResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_wire_types::UpdateLabelRequest;
+use db::models::data_lifetime::DataLifetime;
 use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault_label::ScopedVaultLabel;
 use newtypes::preview_api;
@@ -33,11 +34,13 @@ pub async fn post(
 
     state
         .db_transaction(move |conn| {
-            let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
+            let sv = ScopedVault::lock(conn, (&fp_id, &tenant_id, is_live))?;
+            let sv_txn = DataLifetime::new_sv_txn(conn, &sv)?;
+
             if let Some(label) = label_kind {
-                ScopedVaultLabel::create(conn, sv, label, actor)?;
+                ScopedVaultLabel::create(conn, &sv_txn, label, actor)?;
             } else {
-                ScopedVaultLabel::deactivate(conn, &sv.id, actor)?;
+                ScopedVaultLabel::deactivate(conn, &sv_txn, actor)?;
             }
 
             Ok(())

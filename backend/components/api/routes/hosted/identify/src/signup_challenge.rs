@@ -117,7 +117,7 @@ pub async fn post(
     let (uv, sv, root_span) = state
         .db_transaction(move |conn| {
             let (uv, sv, _) = VaultWrapper::create_unverified(conn, ctx, &root_span, duplicate_of_id)?;
-            Ok((uv.into_inner(), sv, root_span))
+            Ok((uv.into_inner(), sv.into_inner(), root_span))
         })
         .await?;
     let ctx = get_user_auth_methods(&state, sv.id.clone().into(), None).await?;

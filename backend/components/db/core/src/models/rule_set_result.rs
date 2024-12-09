@@ -458,19 +458,20 @@ mod tests {
 
     fn create_wf(
         conn: &mut TxnPgConn,
-        sv: &ScopedVault,
+        sv: &Locked<ScopedVault>,
         obc_id: &ObConfigurationId,
         decision_status: Option<DecisionStatus>,
     ) -> Workflow {
         let wf = tests::fixtures::workflow::create(conn, &sv.id, obc_id, None);
+        let sv_txn = DataLifetime::new_sv_txn(conn, sv).unwrap();
+
         if let Some(decision_status) = decision_status {
             let decision = crate::models::onboarding_decision::NewDecisionArgs {
-                vault_id: sv.vault_id.clone(),
+                sv_txn: &sv_txn,
                 logic_git_hash: "".to_string(),
                 status: decision_status,
                 annotation_id: None,
                 actor: DbActor::Footprint,
-                seqno: DataLifetimeSeqno::from(0),
                 manual_reviews: vec![],
                 rule_set_result_id: None,
                 failed_for_doc_review: false,

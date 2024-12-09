@@ -34,7 +34,6 @@ use db::models::playbook::Playbook;
 use db::models::risk_signal::RiskSignal;
 use db::models::risk_signal_group::RiskSignalGroupScope;
 use db::models::user_timeline::UserTimeline;
-use db::models::vault::Vault;
 use db::models::workflow::Workflow;
 use db::DbPool;
 use db::TxnPgConn;
@@ -322,7 +321,6 @@ fn vault_complete_images_unsafe(
 }
 
 pub struct CompleteArgs<'a> {
-    pub vault: &'a Vault,
     pub sv_id: &'a ScopedVaultId,
     pub wf_id: &'a WorkflowId,
     pub obc_id: &'a ObConfigurationId,
@@ -339,7 +337,6 @@ impl Complete {
     #[tracing::instrument("Complete::enter", skip_all)]
     pub fn enter(conn: &mut TxnPgConn, args: CompleteArgs) -> FpResult<()> {
         let CompleteArgs {
-            vault,
             sv_id,
             wf_id,
             obc_id,
@@ -355,10 +352,11 @@ impl Complete {
         let validated_doc_kind = dk.into_inner();
 
         // Create a timeline event
+        let sv_txn = DataLifetime::new_sv_txn(conn, &uvw.sv)?;
         let info = newtypes::DocumentUploadedInfo {
             id: id_doc_id.clone(),
         };
-        UserTimeline::create(conn, info, vault.id.clone(), sv_id.clone())?;
+        UserTimeline::create(conn, &sv_txn, info)?;
 
         let sv_txn = DataLifetime::new_sv_txn(conn, &uvw.sv)?;
 

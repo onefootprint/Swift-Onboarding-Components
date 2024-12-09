@@ -200,8 +200,7 @@ impl<Type> WriteableVw<Type> {
                 actor: actor.map(|a| a.into()),
                 is_prefill,
             };
-            let sv = sv_txn.scoped_vault();
-            UserTimeline::create(conn, info, sv.vault_id.clone(), sv.id.clone())?;
+            UserTimeline::create(conn, sv_txn, info)?;
         }
         Ok(())
     }

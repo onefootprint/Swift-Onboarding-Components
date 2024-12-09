@@ -200,21 +200,21 @@ pub struct SvStatusDelta {
 impl ScopedVault {
     /// Creates a new ScopedVault for the provided (vault, tenant) combo if one doesn't already
     /// exist.
-    #[tracing::instrument("ScopedVault::get_or_create_for_tenant", skip_all)]
-    pub fn get_or_create_for_tenant(
+    #[tracing::instrument("ScopedVault::lock_or_create_for_tenant", skip_all)]
+    pub fn lock_or_create_for_tenant(
         conn: &mut TxnPgConn,
         vault: &Locked<Vault>,
         tenant_id: &TenantId,
-    ) -> FpResult<(Self, IsNew)> {
+    ) -> FpResult<(Locked<Self>, IsNew)> {
         // Has to be inside locked txn, otherwise this could be a stale read.
         // Still protected by uniqueness constraints, but those are clunkier
-        let scoped_vault = scoped_vault::table
+        let scoped_vault: Option<ScopedVault> = scoped_vault::table
             .filter(scoped_vault::vault_id.eq(&vault.id))
             .filter(scoped_vault::tenant_id.eq(&tenant_id))
             .first(conn.conn())
             .optional()?;
         if let Some(scoped_vault) = scoped_vault {
-            return Ok((scoped_vault, false));
+            return Ok((Locked::new(scoped_vault), false));
         }
         // Row doesn't exist for vault_id, tenant_id - create a new one
         let args = NewScopedVaultArgs {
@@ -265,7 +265,7 @@ impl ScopedVault {
         };
 
         let su = if is_new_vault {
-            Self::create(conn, &uv, args)?
+            Self::create(conn, &uv, args)?.into_inner()
         } else {
             scoped_vault::table
                 .filter(scoped_vault::vault_id.eq(&uv.id))
@@ -283,7 +283,11 @@ impl ScopedVault {
     }
 
     #[tracing::instrument("ScopedVault::create", skip_all)]
-    pub fn create(conn: &mut TxnPgConn, uv: &Locked<Vault>, args: NewScopedVaultArgs) -> FpResult<Self> {
+    pub fn create(
+        conn: &mut TxnPgConn,
+        uv: &Locked<Vault>,
+        args: NewScopedVaultArgs,
+    ) -> FpResult<Locked<Self>> {
         let NewScopedVaultArgs {
             tenant_id,
             is_active,
@@ -309,7 +313,7 @@ impl ScopedVault {
         let sv = diesel::insert_into(scoped_vault::table)
             .values(new)
             .get_result::<ScopedVault>(conn.conn())?;
-        Ok(sv)
+        Ok(Locked::new(sv))
     }
 
     #[tracing::instrument("ScopedVault::get", skip_all)]

@@ -28,7 +28,7 @@ pub fn save_review_decision(
     actor: DbActor,
 ) -> FpResult<OnboardingDecisionId> {
     let wf = Workflow::lock(conn, &wf.id)?;
-    let sv = ScopedVault::get(conn, &wf.scoped_vault_id)?;
+    let sv = ScopedVault::lock(conn, &wf.scoped_vault_id)?;
 
     // If a manual review will be cleared or we will create a new decision, the operation
     // is not a no-op and we should create an annotation in the DB
@@ -69,14 +69,13 @@ pub fn save_review_decision(
 
     // Make the decision regardless of whether the status changed - the actor of the decision
     // may be different
-    let seqno = DataLifetime::get_current_seqno(conn)?;
+    let sv_txn = DataLifetime::new_sv_txn(conn, &sv)?;
     let decision = NewDecisionArgs {
-        vault_id: sv.vault_id,
+        sv_txn: &sv_txn,
         logic_git_hash: crate::GIT_HASH.to_string(),
         status,
         annotation_id: annotation.map(|(a, _)| a.id),
         actor,
-        seqno,
         manual_reviews: mrs_to_clear,
         rule_set_result_id: None,
         failed_for_doc_review: false,

@@ -7,10 +7,12 @@ use crate::errors::ApiCoreError;
 use crate::vendor_clients::IncodeClients;
 use crate::FpResult;
 use async_trait::async_trait;
+use db::models::data_lifetime::DataLifetime;
 use db::models::document::Document;
 use db::models::document::DocumentUpdate;
 use db::models::risk_signal::RiskSignal;
 use db::models::risk_signal_group::RiskSignalGroupScope;
+use db::models::scoped_vault::ScopedVault;
 use db::models::user_timeline::UserTimeline;
 use db::DbPool;
 use db::TxnPgConn;
@@ -18,7 +20,6 @@ use newtypes::DocumentId;
 use newtypes::DocumentStatus;
 use newtypes::FootprintReasonCode;
 use newtypes::ScopedVaultId;
-use newtypes::VaultId;
 use newtypes::VendorAPI;
 use newtypes::VerificationResultId;
 use newtypes::WorkflowId;
@@ -33,12 +34,13 @@ impl Fail {
     pub fn enter(
         conn: &mut TxnPgConn,
         sv_id: &ScopedVaultId,
-        vault_id: &VaultId,
         wf_id: &WorkflowId,
         id_doc_id: &DocumentId,
         vres_id: VerificationResultId,
         vendor_api: VendorAPI,
     ) -> FpResult<()> {
+        let sv = ScopedVault::lock(conn, sv_id)?;
+
         // Mark the id doc as failed
         let update = DocumentUpdate {
             status: Some(DocumentStatus::Failed),
@@ -54,11 +56,13 @@ impl Fail {
         );
 
         Document::update(conn, id_doc_id, update)?;
+
         // Create a timeline event
+        let sv_txn = DataLifetime::new_sv_txn(conn, &sv)?;
         let info = newtypes::DocumentUploadedInfo {
             id: id_doc_id.clone(),
         };
-        UserTimeline::create(conn, info, vault_id.clone(), sv_id.clone())?;
+        UserTimeline::create(conn, &sv_txn, info)?;
 
         Ok(())
     }

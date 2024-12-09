@@ -25,18 +25,18 @@ impl<Type> VaultWrapper<Type> {
     pub fn build_for_tenant_version(
         conn: &mut PgConn,
         sv_id: &ScopedVaultId,
-        version: DataLifetimeSeqno,
+        seqno: DataLifetimeSeqno,
     ) -> FpResult<TenantVw<Type>> {
-        Self::build_inner(conn, sv_id, version)
+        Self::build_inner(conn, sv_id, seqno)
     }
 
     pub fn build_for_tenant_maybe_version(
         conn: &mut PgConn,
         sv_id: &ScopedVaultId,
-        version: Option<DataLifetimeSeqno>,
+        seqno: Option<DataLifetimeSeqno>,
     ) -> FpResult<TenantVw<Type>> {
-        if let Some(version) = version {
-            Self::build_for_tenant_version(conn, sv_id, version)
+        if let Some(seqno) = seqno {
+            Self::build_for_tenant_version(conn, sv_id, seqno)
         } else {
             Self::build_for_tenant(conn, sv_id)
         }
@@ -45,9 +45,9 @@ impl<Type> VaultWrapper<Type> {
     pub fn build_inner(
         conn: &mut PgConn,
         sv_id: &ScopedVaultId,
-        version: DataLifetimeSeqno,
+        seqno: DataLifetimeSeqno,
     ) -> FpResult<TenantVw<Type>> {
-        let uvw = Self::build(conn, VwArgs::Historical(sv_id, version))?;
+        let uvw = Self::build(conn, VwArgs::Historical(sv_id, seqno))?;
         let workflows = Workflow::bulk_get_for_users(conn, vec![sv_id])?
             .remove(sv_id)
             .unwrap_or_default();

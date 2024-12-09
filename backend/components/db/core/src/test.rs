@@ -1,5 +1,6 @@
 use crate::models::annotation::Annotation;
 use crate::models::annotation::AnnotationInfo;
+use crate::models::data_lifetime::DataLifetimeSeqnoTxn;
 use crate::models::tenant_api_key::TenantApiKey;
 use crate::models::tenant_user::TenantUser;
 use crate::models::user_timeline::UserTimeline;
@@ -7,11 +8,9 @@ use crate::TxnPgConn;
 use newtypes::DbActor;
 use newtypes::Fingerprint;
 use newtypes::OrgMemberEmail;
-use newtypes::ScopedVaultId;
 use newtypes::SealedVaultBytes;
 use newtypes::TenantId;
 use newtypes::TenantRoleId;
-use newtypes::VaultId;
 use std::str::FromStr;
 
 pub(crate) fn test_tenant_user(
@@ -33,8 +32,7 @@ pub(crate) fn test_annotation<T>(
     conn: &mut TxnPgConn,
     note: String,
     is_pinned: bool,
-    scoped_user_id: ScopedVaultId,
-    user_vault_id: VaultId,
+    sv_txn: &DataLifetimeSeqnoTxn<'_>,
     actor: T,
 ) -> AnnotationInfo
 where
@@ -44,14 +42,14 @@ where
     // UserTimeline creations here should be thrown into a helper (or db) func so that tests
     //      (and other future users) don't need to recreate the logic that route is doing
 
-    let annotation = Annotation::create(conn, note, is_pinned, scoped_user_id.clone(), actor).unwrap();
+    let annotation =
+        Annotation::create(conn, note, is_pinned, sv_txn.scoped_vault().id.clone(), actor).unwrap();
     UserTimeline::create(
         conn,
+        sv_txn,
         newtypes::AnnotationInfo {
             annotation_id: annotation.0.id.clone(),
         },
-        user_vault_id,
-        scoped_user_id,
     )
     .unwrap();
     annotation

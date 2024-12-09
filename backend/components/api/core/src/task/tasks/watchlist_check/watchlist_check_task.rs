@@ -14,6 +14,7 @@ use api_errors::ServerErr;
 use api_errors::ServerErrInto;
 use async_trait::async_trait;
 use chrono::Utc;
+use db::models::data_lifetime::DataLifetime;
 use db::models::decision_intent::DecisionIntent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::risk_signal::NewRiskSignalInfo;
@@ -184,7 +185,6 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
         };
 
         // Save final status, write timeline event, and enqueue webhook task
-        let vault_id = uvw.vault().id.clone();
         let wc_id = wc.id.clone();
         state
             .db_transaction(move |conn| {
@@ -215,7 +215,9 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
                     false,
                 )?;
 
-                UserTimeline::create(conn, WatchlistCheckInfo { id: wc.id }, vault_id, sv.id.clone())?;
+                let sv = ScopedVault::lock(conn, &sv.id)?;
+                let sv_txn = DataLifetime::new_sv_txn(conn, &sv)?;
+                UserTimeline::create(conn, &sv_txn, WatchlistCheckInfo { id: wc.id })?;
 
                 let error = match wc.status_details {
                     WatchlistCheckStatus::Error(e) => Some(e),

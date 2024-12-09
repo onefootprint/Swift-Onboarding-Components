@@ -23,6 +23,7 @@ use api_errors::BadRequestInto;
 use api_wire_types::UpdateEntityRequest;
 use db::models::audit_event::AuditEvent;
 use db::models::audit_event::NewAuditEvent;
+use db::models::data_lifetime::DataLifetime;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::NewScopedVaultArgs;
 use db::models::scoped_vault::ScopedVault;
@@ -119,9 +120,12 @@ pub async fn create_non_portable_vault(
             let (su, vault, is_new) =
                 ScopedVault::get_or_create_by_external_id(conn, new_user, sv_args, idempotency_id)?;
             if is_new {
+                let sv_lock = ScopedVault::lock(conn, &su.id)?;
+                let sv_txn = DataLifetime::new_sv_txn(conn, &sv_lock)?;
+
                 let actor: DbActor = actor.clone().into();
                 let event = VaultCreatedInfo { actor };
-                UserTimeline::create(conn, event, vault.id.clone(), su.id.clone())?;
+                UserTimeline::create(conn, &sv_txn, event)?;
             }
 
             let svv = if let Some((targets, request)) = request_info {

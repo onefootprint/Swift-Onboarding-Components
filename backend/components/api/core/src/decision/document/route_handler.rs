@@ -418,15 +418,15 @@ pub async fn complete_non_identity_document(
         .db_transaction(move |conn| {
             let dk = id_doc.document_type;
             let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &sv_id)?;
-            let seqno = DataLifetime::get_current_seqno(conn)?;
+            let sv_txn = DataLifetime::new_sv_txn(conn, &uvw.sv)?;
             // Create a timeline event
             let info = newtypes::DocumentUploadedInfo {
                 id: id_doc.id.clone(),
             };
-            UserTimeline::create(conn, info, uvw.vault.id.clone(), sv_id.clone())?;
+            UserTimeline::create(conn, &sv_txn, info)?;
             // mark identity doc as complete
             let update = DocumentUpdate {
-                completed_seqno: Some(seqno),
+                completed_seqno: Some(sv_txn.seqno()),
                 status: Some(DocumentStatus::Complete),
                 vaulted_document_type: Some(dk),
                 // Non-ID docs need to be reviewed by a human - put them into a review required state

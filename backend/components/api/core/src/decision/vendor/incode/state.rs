@@ -213,15 +213,7 @@ where
                                 "cannot find incode vres for doc upload failed FRC",
                             ))?;
                             // Fail if theres an unhandled error
-                            Fail::enter(
-                                conn,
-                                &ctx.sv_id,
-                                &ctx.vault.id,
-                                &ctx.wf_id,
-                                &ctx.id_doc_id,
-                                vres_id,
-                                vendor_api,
-                            )?;
+                            Fail::enter(conn, &ctx.sv_id, &ctx.wf_id, &ctx.id_doc_id, vres_id, vendor_api)?;
                             ((StepResult::Ready, Fail::new(), None), true)
                         } else {
                             let new_ignore_reasons = unhandled_failure_reasons

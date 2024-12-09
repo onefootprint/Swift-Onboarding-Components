@@ -205,7 +205,6 @@ pub async fn save_incode_fixtures(
         .db_transaction(move |conn| {
             // Enter the complete state to save risk signals
             let args = CompleteArgs {
-                vault: &vw.vault,
                 sv_id: &suid,
                 wf_id: &wfid,
                 obc_id: &obc.id,
