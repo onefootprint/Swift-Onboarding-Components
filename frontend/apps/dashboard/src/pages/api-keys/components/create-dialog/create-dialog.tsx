@@ -1,12 +1,14 @@
-import { RoleKind } from '@onefootprint/types';
 import { Dialog, Form, Grid, useToast } from '@onefootprint/ui';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import useRoles from 'src/hooks/use-roles/use-roles';
-import styled from 'styled-components';
 
+import { postOrgApiKeysMutation } from '@onefootprint/axios/dashboard';
+import { getOrgRolesOptions } from '@onefootprint/axios/dashboard';
+import { useRequestErrorToast } from '@onefootprint/hooks';
+import type { OrganizationRole } from '@onefootprint/request-types/dashboard';
+import useInvalidateQueries from 'src/hooks/use-invalidate-queries';
 import Loading from './components/loading';
-import useCreateApiKey from './hooks/use-create-api-key';
 
 type CreateDialogProps = {
   open: boolean;
@@ -15,7 +17,6 @@ type CreateDialogProps = {
 
 type FormData = { name: string; role: string };
 const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
-  const createApiKeyMutation = useCreateApiKey();
   const { t } = useTranslation('api-keys', {
     keyPrefix: 'create',
   });
@@ -26,8 +27,11 @@ const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>();
+  const showErrorToast = useRequestErrorToast();
+  const invalidateQueries = useInvalidateQueries();
+  const rolesQuery = useQuery(getOrgRolesOptions({ params: { kind: 'api_key' } }));
 
-  const rolesQuery = useRoles(RoleKind.apiKey);
+  const createApiKeyMutation = useMutation(postOrgApiKeysMutation());
 
   const handleClose = () => {
     reset();
@@ -35,16 +39,25 @@ const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
   };
 
   const handleBeforeSubmit = (formData: FormData) => {
-    const data = { name: formData.name, roleId: formData.role };
-    createApiKeyMutation.mutate(data, {
-      onSuccess: () => {
-        toast.show({
-          title: t('feedback.success.title'),
-          description: t('feedback.success.description'),
-        });
-        handleClose();
+    createApiKeyMutation.mutate(
+      {
+        body: { name: formData.name, roleId: formData.role },
       },
-    });
+      {
+        onSuccess: () => {
+          toast.show({
+            title: t('feedback.success.title'),
+            description: t('feedback.success.description'),
+          });
+          invalidateQueries();
+          handleClose();
+        },
+        onError: (e: Error) => {
+          showErrorToast(e);
+          invalidateQueries();
+        },
+      },
+    );
   };
 
   return (
@@ -68,7 +81,7 @@ const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
     >
       <form id="create-secret-key-form" onSubmit={handleSubmit(handleBeforeSubmit)} aria-label={t('form.aria')}>
         <Grid.Container columns={['2fr', '1fr']} gap={5}>
-          <StyledGridItem>
+          <Grid.Item className="flex-1 min-w-0">
             <Form.Field>
               <Form.Label>{t('form.name.label')}</Form.Label>
               <Form.Input
@@ -84,20 +97,20 @@ const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
               />
               <Form.Errors>{errors.name?.message}</Form.Errors>
             </Form.Field>
-          </StyledGridItem>
+          </Grid.Item>
           {rolesQuery.isPending && (
-            <StyledGridItem>
+            <Grid.Item className="flex-1 min-w-0">
               <Loading />
-            </StyledGridItem>
+            </Grid.Item>
           )}
-          <StyledGridItem>
+          <Grid.Item className="flex-1 min-w-0">
             <Form.Field>
               <Form.Label>{t('form.access-control.label')}</Form.Label>
               <Form.Select
                 {...register('role', { required: t('form.access-control.errors.required') })}
-                defaultValue={rolesQuery.data?.find(role => role.name === 'Member')?.id}
+                defaultValue={rolesQuery.data?.data.find((role: OrganizationRole) => role.name === 'Member')?.id}
               >
-                {rolesQuery.data?.map(role => (
+                {rolesQuery.data?.data.map((role: OrganizationRole) => (
                   <option key={role.id} value={role.id}>
                     {role.name}
                   </option>
@@ -105,16 +118,11 @@ const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
               </Form.Select>
               <Form.Errors>{errors.role?.message}</Form.Errors>
             </Form.Field>
-          </StyledGridItem>
+          </Grid.Item>
         </Grid.Container>
       </form>
     </Dialog>
   );
 };
-
-const StyledGridItem = styled(Grid.Item)`
-  flex: 1;
-  min-width: 0;
-`;
 
 export default CreateDialog;
