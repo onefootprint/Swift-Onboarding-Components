@@ -22,9 +22,11 @@ const useFootprint = () => {
     const response = await verifyChallenge(
       {
         challenge: verificationCode,
+        // @ts-ignore
         challengeToken: challengeData.challenge_token,
       },
       {
+        // @ts-ignore
         token: challengeData.token,
         sandboxOutcome: 'pass',
       },
