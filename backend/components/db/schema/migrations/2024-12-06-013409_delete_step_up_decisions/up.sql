@@ -1,6 +1,6 @@
 -- TODO: run before merging
-CREATE TABLE onboarding_decision_verification_result_junction_step_up_12_15_2024 AS SELECT * from onboarding_decision_verification_result_junction where onboarding_decision_id in (select id from onboarding_decision where status = 'step_up');
-CREATE TABLE onboarding_decision_step_up_12_15_2024 AS SELECT * from onboarding_decision where status = 'step_up';
+-- CREATE TABLE onboarding_decision_verification_result_junction_step_up_12_15_2024 AS SELECT * from onboarding_decision_verification_result_junction where onboarding_decision_id in (select id from onboarding_decision where status = 'step_up');
+-- CREATE TABLE onboarding_decision_step_up_12_15_2024 AS SELECT * from onboarding_decision where status = 'step_up';
 
 
 
