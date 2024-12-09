@@ -479,6 +479,25 @@
         "title": "Meet our happy customers",
         "subtitle": "Footprint powers many product teams, from ambitious startups to multi-national companies."
       },
+      "featured-customers": {
+        "coba": {
+          "title": "Coba",
+          "subtitle": "The US Dollar Account for Mexico – No Hidden Fees & Competitive FX Rates"
+        },
+        "flexcar": {
+          "title": "Flexcar",
+          "subtitle": "Making car ownership affordable and flexible."
+        },
+        "bloom": {
+          "title": "Bloom",
+          "subtitle": "The investing app for building longterm wealth."
+        },
+        "composer": {
+          "title": "Composer",
+          "subtitle": "Build trading algorithms with AI, backtest them, then execute—all in one platform. No coding skills required."
+        },
+        "read-story": "Read story"
+      },
       "other-customers": {
         "title": "Trusted by the best teams",
         "subtitle": "Empowering elite teams with efficient customer onboarding solutions"

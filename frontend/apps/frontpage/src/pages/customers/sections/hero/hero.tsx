@@ -1,7 +1,5 @@
-import { Container, Stack, Text } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
 
 import Illustration from './components/illustration';
 
@@ -20,40 +18,19 @@ const Hero = () => {
   });
 
   return (
-    <HeroContainer>
+    <motion.div className="flex flex-col gap-10 pt-10">
       <Illustration />
-      <TitleContainer initial="hidden" animate="visible" variants={titleVariants}>
-        <Text variant="display-2" tag="h1">
-          {t('title')}
-        </Text>
-        <Text variant="display-4" color="secondary" tag="h4">
-          {t('subtitle')}
-        </Text>
-      </TitleContainer>
-    </HeroContainer>
+      <motion.div
+        className="container flex flex-col items-center justify-center gap-4 mx-auto mt-6 text-center"
+        initial="hidden"
+        animate="visible"
+        variants={titleVariants}
+      >
+        <h1 className="text-display-2 max-w-[600px]">{t('title')}</h1>
+        <h4 className="text-display-4 text-secondary max-w-[600px]">{t('subtitle')}</h4>
+      </motion.div>
+    </motion.div>
   );
 };
-
-const TitleContainer = styled(motion(Container))`
-  ${({ theme }) => css`
-    gap: ${theme.spacing[4]};
-    flex-direction: column;
-    text-align: center;
-    align-items: center;
-    justify-content: center;
-
-    & > * {
-      max-width: 600px;
-    }
-  `}
-`;
-
-const HeroContainer = styled(motion(Stack))`
-  ${({ theme }) => css`
-    flex-direction: column;
-    gap: ${theme.spacing[9]};
-    padding-top: ${theme.spacing[9]};
-  `}
-`;
 
 export default Hero;

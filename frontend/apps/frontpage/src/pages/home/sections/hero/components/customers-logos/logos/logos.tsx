@@ -2,7 +2,7 @@ import { Box, media } from '@onefootprint/ui';
 import { motion, useAnimation } from 'framer-motion';
 import uniqueId from 'lodash/uniqueId';
 import { useEffect, useState } from 'react';
-import styled, { css, useTheme } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import {
   ApitureLogo,
@@ -59,7 +59,6 @@ const marqueeItemVariants = {
 };
 
 const Logos = () => {
-  const theme = useTheme();
   const [currentLogos, setCurrentLogos] = useState(logos.slice(0, GROUP_SIZE));
   const [index, setIndex] = useState(0);
   const controls = useAnimation();
@@ -91,7 +90,7 @@ const Logos = () => {
         const RenderedLogo = logo;
         return (
           <MarqueeItem variants={marqueeItemVariants} key={uniqueId()}>
-            <RenderedLogo color={theme.color.tertiary} />
+            <RenderedLogo className="text-tertiary" />
           </MarqueeItem>
         );
       })}

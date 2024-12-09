@@ -1,3 +1,3 @@
 export type Logo = {
-  color: string;
+  className?: string;
 };

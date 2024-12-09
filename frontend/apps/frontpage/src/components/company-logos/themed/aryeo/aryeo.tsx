@@ -1,19 +1,19 @@
-import styled from 'styled-components';
 import type { Logo } from '../logo.type';
 
-const Aryeo = ({ color }: Logo) => {
+const Aryeo = ({ className }: Pick<Logo, 'className'>) => {
   return (
-    <StyledSvg
+    <svg
       fill="none"
       height="144"
       viewBox="0 0 552 144"
       width="552"
       xmlns="http://www.w3.org/2000/svg"
       xmlnsXlink="http://www.w3.org/1999/xlink"
+      className={`h-auto w-[100px] text-current ${className}`}
     >
       <linearGradient id="a" gradientUnits="userSpaceOnUse" x1="66.25" x2="66.25" y1="0" y2="132.5">
-        <stop offset="0" stopColor={color} />
-        <stop offset="1" stopColor={color} />
+        <stop offset="0" stopColor="currentColor" />
+        <stop offset="1" stopColor="currentColor" />
       </linearGradient>
       <mask id="b" height="126" maskUnits="userSpaceOnUse" width="383" x="169" y="18">
         <path
@@ -40,7 +40,7 @@ const Aryeo = ({ color }: Logo) => {
         />
       </mask>
       <g mask="url(#b)">
-        <path d="m169.548 18.0682h381.894v125.6418h-381.894z" fill={color} />
+        <path d="m169.548 18.0682h381.894v125.6418h-381.894z" fill="currentColor" />
       </g>
       <g mask="url(#c)">
         <path d="m0 0h132.5v132.5h-132.5z" fill="url(#a)" />
@@ -56,13 +56,8 @@ const Aryeo = ({ color }: Logo) => {
       <g mask="url(#e)">
         <path d="m35 30h62.5v71.25h-62.5z" fill="#fff" />
       </g>
-    </StyledSvg>
+    </svg>
   );
 };
-
-const StyledSvg = styled.svg`
-  height: auto;
-  width: 100px;
-`;
 
 export default Aryeo;

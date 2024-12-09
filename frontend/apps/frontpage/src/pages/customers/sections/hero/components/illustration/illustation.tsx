@@ -1,7 +1,5 @@
-import { Box, media } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import styled from 'styled-components';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -30,142 +28,68 @@ const penguinAppearVariants = {
   },
 };
 
-const smokeAppearVariants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, x: -50, transition: { delay: 0.5, duration: 0.5 } },
-};
-
 const Illustration = () => (
-  <IllustrationContainer variants={containerVariants} initial="hidden" animate="visible">
-    <Cloud
-      src="/customers/section/cloud.svg"
-      alt="Cloud"
-      width={400}
-      height={400}
+  <motion.div
+    className="relative h-[320px] w-full overflow-hidden"
+    variants={containerVariants}
+    initial="hidden"
+    animate="visible"
+  >
+    <motion.div
+      className="absolute top-0 -translate-x-1/2 left-1/2"
       variants={itemVariants}
       custom={1}
       initial="hidden"
       animate="visible"
-    />
-    <Sun
-      src="/customers/section/sun.svg"
-      alt="Sun"
-      width={400}
-      height={400}
+    >
+      <Image src="/customers/section/cloud.svg" alt="Cloud" width={200} height={200} className="h-auto w-[200px]" />
+    </motion.div>
+
+    <motion.div
+      className="absolute top-0 left-[10%] -translate-x-1/2 md:left-[30%]"
       variants={itemVariants}
       custom={2}
       initial="hidden"
       animate="visible"
-    />
-    <CloudGroup
-      src="/customers/section/cloud-group.svg"
-      alt="Cloud2"
-      width={400}
-      height={400}
+    >
+      <Image src="/customers/section/sun.svg" alt="Sun" width={56} height={56} className="h-auto w-[56px]" />
+    </motion.div>
+
+    <motion.div
+      className="absolute top-1/2 left-[40%] -translate-x-1/2 -translate-y-1/2"
       variants={itemVariants}
       custom={3}
       initial="hidden"
       animate="visible"
-    />
-    <Character>
-      <Smoke
-        src="/customers/section/smoke.svg"
-        alt="Smoke"
-        width={400}
-        height={400}
-        variants={smokeAppearVariants}
-        initial="hidden"
-        animate="visible"
+    >
+      <Image
+        src="/customers/section/cloud-group.svg"
+        alt="Cloud2"
+        width={150}
+        height={150}
+        className="h-auto w-[150px]"
       />
-      <Penguin
-        src="/customers/section/penguin.svg"
-        alt="Penguin"
-        width={400}
-        height={400}
-        variants={penguinAppearVariants}
-        initial="hidden"
-        animate="visible"
-      />
-    </Character>
-  </IllustrationContainer>
+    </motion.div>
+
+    <motion.div
+      className="absolute bottom-0 translate-x right-[52%]"
+      variants={itemVariants}
+      custom={4}
+      initial="hidden"
+      animate="visible"
+    >
+      <Image src="/customers/section/smoke.svg" alt="Smoke" width={300} height={300} className="h-auto w-[300px]" />
+    </motion.div>
+    <motion.div
+      className="absolute bottom-0 translate-x-1/2 left-[52%]"
+      variants={penguinAppearVariants}
+      custom={4}
+      initial="hidden"
+      animate="visible"
+    >
+      <Image src="/customers/section/penguin.svg" alt="Penguin" width={200} height={200} className="h-auto w-[200px]" />
+    </motion.div>
+  </motion.div>
 );
-
-const IllustrationContainer = styled(motion(Box))`
-  position: relative;
-  height: 320px;
-  width: 100%;
-  overflow: hidden;
-`;
-
-const Penguin = styled(motion(Image))`
-  position: absolute;
-  height: auto;
-  width: 200px;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-
-  ${media.greaterThan('md')`
-    transform: translateX(0);
-    left: 100%;
-  `}
-`;
-
-const Cloud = styled(motion(Image))`
-  position: absolute;
-  transform: translateX(-50%);
-  top: 0;
-  left: 50%;
-  height: auto;
-  width: 200px;
-`;
-
-const Sun = styled(motion(Image))`
-  position: absolute;
-  width: 56px;
-  height: auto;
-  top: 0;
-  left: 10%;
-  transform: translateX(-50%);
-
-  ${media.greaterThan('md')`
-    left: 30%;
-  `}
-`;
-
-const CloudGroup = styled(motion(Image))`
-  position: absolute;
-  height: auto;
-  width: 150px;
-  top: 50%;
-  left: 40%;
-  transform: translate(-50%, -50%);
-`;
-
-const Smoke = styled(motion(Image))`
-  position: absolute;
-  height: auto;
-  width: 300px;
-  bottom: 0;
-  right: 100%;
-  display: none;
-
-  ${media.greaterThan('md')`
-    display: block;
-  `}
-`;
-
-const Character = styled(motion(Box))`
-  position: absolute;
-  height: auto;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  max-width: 50%;
-
-  ${media.greaterThan('md')`
-    max-width: 40%;
-  `}
-`;
 
 export default Illustration;
