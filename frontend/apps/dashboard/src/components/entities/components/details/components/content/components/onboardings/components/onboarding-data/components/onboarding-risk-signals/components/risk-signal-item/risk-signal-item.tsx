@@ -1,5 +1,7 @@
+import useRiskSignalsFilters from '@/entities/components/details/hooks/use-risk-signals-filters';
 import type { RiskSignal } from '@onefootprint/request-types/dashboard';
 import { Divider, Stack, Text } from '@onefootprint/ui';
+import isSentilinkSignal from '../../../../../../../risk-signals/utils/is-sentilink-signal';
 import useRiskSignalSeverityText from '../../../../hooks/use-risk-signal-severity-text';
 
 type RiskSignalItemProps = {
@@ -8,7 +10,18 @@ type RiskSignalItemProps = {
 
 const RiskSignalItem = ({ riskSignal }: RiskSignalItemProps) => {
   const riskSignalSeverityT = useRiskSignalSeverityText();
-  const { reasonCode, severity } = riskSignal;
+  const filters = useRiskSignalsFilters();
+  const { id, reasonCode, severity } = riskSignal;
+
+  // This will open StandardDetails or SentilinkDetails
+  // TODO: move both components and isSentilinkSignal here after RiskSignalsList is removed
+  const handleRowClick = () => {
+    if (isSentilinkSignal(riskSignal)) {
+      filters.push({ risk_signal_id: id, is_sentilink: 'true' });
+    } else {
+      filters.push({ risk_signal_id: id });
+    }
+  };
 
   const getSeverityColor = () => {
     if (severity === 'high') return 'error';
@@ -18,7 +31,7 @@ const RiskSignalItem = ({ riskSignal }: RiskSignalItemProps) => {
   };
 
   return (
-    <Stack gap={3} align="flex-end" paddingTop={2} paddingBottom={2}>
+    <Stack gap={3} align="flex-end" paddingTop={2} paddingBottom={2} cursor="pointer" onClick={handleRowClick}>
       <Text variant="snippet-1" color="secondary">
         {reasonCode}
       </Text>

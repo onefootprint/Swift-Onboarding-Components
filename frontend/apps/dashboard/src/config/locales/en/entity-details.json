@@ -1148,6 +1148,49 @@
         "low": "Low",
         "medium": "Medium",
         "high": "High"
+      },
+      "drawer": {
+        "aml-title": "Relevant media ⋅ {{scopesTitle}}",
+        "overview": {
+          "title": "Overview",
+          "severity": "Severity",
+          "scopes": "Scopes",
+          "description": "Description"
+        },
+        "protected-details": {
+          "title": "Protected details",
+          "description": "For security reasons, this section requires you to explicitly decrypt these details.",
+          "button": "Decrypt",
+          "no-permission": {
+            "message": "You don't have permission to decrypt this data.",
+            "button": "Contact Admin"
+          },
+          "error": {
+            "title": "Sorry, something went wrong!",
+            "description": "Decryption failed. Please try again."
+          }
+        },
+        "source-url": {
+          "label": "Source URL",
+          "aria-label": "Copy source url",
+          "read-full-report": "Read full match report"
+        },
+        "hits": {
+          "show-all": {
+            "label_one": "{{count}} more data match",
+            "label_other": "{{count}} more data matches",
+            "value": "Show all"
+          },
+          "media": "See more",
+          "copy": "Copy source url"
+        },
+        "hits-media": {
+          "drawer-title": "Relevant media",
+          "date": "Date",
+          "title": "Title",
+          "snippet": "Snippet",
+          "url": "Go to article"
+        }
       }
     },
     "rules": {

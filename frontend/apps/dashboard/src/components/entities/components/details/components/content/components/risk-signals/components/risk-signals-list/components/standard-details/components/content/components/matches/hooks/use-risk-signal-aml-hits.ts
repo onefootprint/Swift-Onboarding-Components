@@ -1,19 +1,8 @@
-import request from '@onefootprint/request';
-import type { DecryptRiskSignalAmlHitsRequest, DecryptRiskSignalAmlHitsResponse } from '@onefootprint/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import useSession from 'src/hooks/use-session';
 
 import useEntityId from '@/entity/hooks/use-entity-id';
-
-const decryptRiskSignalAmlHits = async ({ authHeaders, entityId, riskSignalId }: DecryptRiskSignalAmlHitsRequest) => {
-  const { data: response } = await request<DecryptRiskSignalAmlHitsResponse>({
-    headers: authHeaders,
-    method: 'POST',
-    url: `/entities/${entityId}/decrypt_aml_hits/${riskSignalId}`,
-  });
-
-  return response;
-};
+import { postEntitiesByFpIdDecryptAmlHitsBySignalIdMutation } from '@onefootprint/axios/dashboard/@tanstack/react-query.gen';
 
 const useRiskSignalAmlHits = () => {
   const { authHeaders } = useSession();
@@ -21,8 +10,11 @@ const useRiskSignalAmlHits = () => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: (riskSignalId: string) => decryptRiskSignalAmlHits({ authHeaders, entityId, riskSignalId }),
-    onSuccess: (response, riskSignalId) => {
+    ...postEntitiesByFpIdDecryptAmlHitsBySignalIdMutation({
+      headers: { 'X-Fp-Dashboard-Authorization': authHeaders['x-fp-dashboard-authorization'] },
+    }),
+    onSuccess: (response, options) => {
+      const riskSignalId = options.path.signalId;
       queryClient.setQueryData(['entity', entityId, 'risk-signals', riskSignalId, 'aml-hits'], response);
     },
   });

@@ -5,8 +5,8 @@ import StandardDetails from './standard-details';
 import {
   amlDetailFixture,
   entityIdFixture,
-  riskSignalDetailsFixture,
-  riskSignalDetailsWithAmlFixture,
+  riskSignalDetailFixture,
+  riskSignalDetailWithAmlFixture,
   withData,
   withDecryptRiskSignalAmlHits,
   withEntity,
@@ -35,11 +35,12 @@ describe('<StandardDetails />', () => {
     beforeEach(() => {
       mockRouter.setCurrentUrl('/users/details');
       mockRouter.query = {
-        risk_signal_id: riskSignalDetailsFixture.id,
+        risk_signal_id: riskSignalDetailFixture.id,
         id: entityIdFixture,
       };
 
       withData();
+      withEntity();
     });
 
     describe('when the request fails', () => {
@@ -88,8 +89,8 @@ describe('<StandardDetails />', () => {
           );
           expect(description).toBeInTheDocument();
 
-          const scopes = screen.getByText('Phone number and date of birth');
-          expect(scopes).toBeInTheDocument();
+          const scopes = screen.getAllByText('Phone number and date of birth');
+          expect(scopes.length).toBe(2); // Dialog title and the scope text
 
           const amlDecryptTitle = screen.queryByText('Protected details');
           expect(amlDecryptTitle).not.toBeInTheDocument();
@@ -98,8 +99,7 @@ describe('<StandardDetails />', () => {
 
       describe('when there are AML hits', () => {
         beforeEach(() => {
-          withRiskSignalDetails(riskSignalDetailsWithAmlFixture);
-          withEntity();
+          withRiskSignalDetails(riskSignalDetailWithAmlFixture);
         });
 
         it('should initially be encrypted', async () => {
@@ -210,7 +210,7 @@ describe('<StandardDetails />', () => {
           await userEvent.click(screen.getByText('See more'));
 
           await waitFor(() => {
-            const drawerTitle = screen.getByText('Relevant media • ', {
+            const drawerTitle = screen.getByText('Relevant media', {
               exact: false,
             });
             expect(drawerTitle).toBeInTheDocument();
@@ -249,7 +249,7 @@ describe('<StandardDetails />', () => {
   describe('isOpen logic', () => {
     it('should not open when is_sentilink is in the query params', async () => {
       mockRouter.query = {
-        risk_signal_id: riskSignalDetailsFixture.id,
+        risk_signal_id: riskSignalDetailFixture.id,
         id: entityIdFixture,
         is_sentilink: 'true',
       };
@@ -257,7 +257,7 @@ describe('<StandardDetails />', () => {
       renderRiskSignalStandardDetails();
 
       await waitFor(() => {
-        const drawer = screen.queryByRole('dialog', { name: 'Name and dob' });
+        const drawer = screen.queryByRole('dialog');
         expect(drawer).not.toBeInTheDocument();
       });
     });
@@ -270,20 +270,20 @@ describe('<StandardDetails />', () => {
       renderRiskSignalStandardDetails();
 
       await waitFor(() => {
-        const drawer = screen.queryByRole('dialog', { name: 'Name and dob' });
+        const drawer = screen.queryByRole('dialog');
         expect(drawer).not.toBeInTheDocument();
       });
     });
 
     it('should open the drawer when risk_signal_id and id are in the query params', async () => {
       mockRouter.query = {
-        risk_signal_id: riskSignalDetailsFixture.id,
+        risk_signal_id: riskSignalDetailFixture.id,
         id: entityIdFixture,
       };
 
       renderRiskSignalStandardDetails();
 
-      const drawer = await screen.findByRole('dialog', { name: 'Name and dob' });
+      const drawer = await screen.findByRole('dialog');
       expect(drawer).toBeInTheDocument();
     });
   });

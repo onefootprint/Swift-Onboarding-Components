@@ -1,9 +1,10 @@
 import { IcoArrowRightSmall16, IcoCopy16 } from '@onefootprint/icons';
-import type { AmlHit, AmlHitMedia } from '@onefootprint/types';
+import type { AmlHit, AmlHitMedia } from '@onefootprint/request-types/dashboard';
 import { Box, CopyButton, LinkButton, Stack, Text, useToast } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
+import useEntityId from '@/entities/components/details/hooks/use-entity-id';
 import HitItem from './components/hit-item';
 import HitsShimmer from './components/hits-shimmer';
 import ProtectedDetails from './components/protected-details';
@@ -17,23 +18,27 @@ type MatchesProps = {
 
 const Matches = ({ riskSignalId, handleShowAmlMedia }: MatchesProps) => {
   const { t } = useTranslation('entity-details', {
-    keyPrefix: 'risk-signals.details.matches',
+    keyPrefix: 'onboardings.risk-signals.drawer',
   });
+  const entityId = useEntityId();
   const cachedAmlHit = useCachedRiskSignalAmlHint(riskSignalId);
   const decryptMutation = useRiskSignalAmlHits();
   const aml = decryptMutation.data || cachedAmlHit;
   const toast = useToast();
 
   const handleDecrypt = () => {
-    decryptMutation.mutate(riskSignalId, {
-      onError: () => {
-        toast.show({
-          title: t('protected-details.error.title'),
-          description: t('protected-details.error.description'),
-          variant: 'error',
-        });
+    decryptMutation.mutate(
+      { path: { fpId: entityId, signalId: riskSignalId } },
+      {
+        onError: () => {
+          toast.show({
+            title: t('protected-details.error.title'),
+            description: t('protected-details.error.description'),
+            variant: 'error',
+          });
+        },
       },
-    });
+    );
   };
 
   return (
@@ -57,7 +62,7 @@ const Matches = ({ riskSignalId, handleShowAmlMedia }: MatchesProps) => {
                 </Text>
               </Box>
               <CopyButton
-                ariaLabel={t('source-url.copy')}
+                ariaLabel={t('source-url.aria-label')}
                 contentToCopy={aml.shareUrl}
                 tooltip={{ position: 'bottom' }}
               >

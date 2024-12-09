@@ -1,19 +1,15 @@
+import type { FootprintReasonCode } from '@onefootprint/request-types/dashboard';
 import isSentilinkSignal from './is-sentilink-signal';
-import { nonSentilinkRiskSignal, sentilinkRiskSignal } from './is-sentilink-signal.test.config';
+import { riskSignal } from './is-sentilink-signal.test.config';
 
 describe('isSentilinkSignal', () => {
-  it('should return true for a Sentilink risk signal', () => {
-    const result = isSentilinkSignal(sentilinkRiskSignal);
-    expect(result).toBe(true);
-  });
-
   it('should return false for a non-Sentilink risk signal', () => {
-    const result = isSentilinkSignal(nonSentilinkRiskSignal);
+    const result = isSentilinkSignal(riskSignal);
     expect(result).toBe(false);
   });
 
   it('should return true for all Sentilink reason codes', () => {
-    const sentilinkReasonCodes = [
+    const sentilinkReasonCodes: FootprintReasonCode[] = [
       'sentilink_synthetic_identity_high_risk',
       'sentilink_synthetic_identity_medium_risk',
       'sentilink_synthetic_identity_low_risk',
@@ -23,14 +19,14 @@ describe('isSentilinkSignal', () => {
     ];
 
     sentilinkReasonCodes.forEach(reasonCode => {
-      const testSignal = { ...sentilinkRiskSignal, reasonCode };
+      const testSignal = { ...riskSignal, reasonCode };
       const result = isSentilinkSignal(testSignal);
       expect(result).toBe(true);
     });
   });
 
   it('should return false for a risk signal with an unknown reason code', () => {
-    const unknownReasonCodeSignal = { ...sentilinkRiskSignal, reasonCode: 'unknown_reason_code' };
+    const unknownReasonCodeSignal = { ...riskSignal, reasonCode: 'unknown_reason_code' as FootprintReasonCode };
     const result = isSentilinkSignal(unknownReasonCodeSignal);
     expect(result).toBe(false);
   });

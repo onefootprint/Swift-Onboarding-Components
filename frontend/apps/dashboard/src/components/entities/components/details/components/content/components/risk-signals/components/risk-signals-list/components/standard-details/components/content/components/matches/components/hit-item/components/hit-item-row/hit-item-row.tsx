@@ -1,4 +1,4 @@
-import type { AmlHitMedia } from '@onefootprint/types';
+import type { AmlHitMedia } from '@onefootprint/request-types/dashboard';
 import { Box, CopyButton, LinkButton, Stack, Text, createFontStyles } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -14,7 +14,7 @@ type HitItemRowProps = {
 
 const HitItemRow = ({ fieldName, fieldValue, handleShowAllFields, handleShowAmlMedia }: HitItemRowProps) => {
   const { t } = useTranslation('entity-details', {
-    keyPrefix: 'risk-signals.details.matches.hits',
+    keyPrefix: 'onboardings.risk-signals.drawer.hits',
   });
 
   const renderMatchTypes = (matchTypes: string[]) => matchTypes.map((str: string) => toReadableString(str)).join(', ');

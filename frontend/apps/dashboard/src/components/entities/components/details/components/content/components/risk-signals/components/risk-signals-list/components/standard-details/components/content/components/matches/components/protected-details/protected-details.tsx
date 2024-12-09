@@ -1,22 +1,22 @@
+import type { WithEntityProps } from '@/entities/components/details/components/with-entity';
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { IcoShield40 } from '@onefootprint/icons';
-import { type Entity, IdDI } from '@onefootprint/types';
+import type { DataIdentifier } from '@onefootprint/request-types/dashboard';
 import { Box, Button, LinkButton, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import isDiDecryptable from 'src/utils/is-di-decryptable';
 import styled, { css } from 'styled-components';
 
-type ProtectedDetailsProps = {
-  entity: Entity;
+type ProtectedDetailsProps = WithEntityProps & {
   onClick: () => void;
   isPending: boolean;
 };
 
-const REQUIRED_DECRYPTABLE_ATTRS = [IdDI.firstName, IdDI.lastName, IdDI.dob];
+const REQUIRED_DECRYPTABLE_ATTRS: DataIdentifier[] = ['id.first_name', 'id.last_name', 'id.dob'];
 
 const ProtectedDetails = ({ entity, onClick, isPending }: ProtectedDetailsProps) => {
   const { t } = useTranslation('entity-details', {
-    keyPrefix: 'risk-signals.details.matches.protected-details',
+    keyPrefix: 'onboardings.risk-signals.drawer.protected-details',
   });
   const canDecrypt = REQUIRED_DECRYPTABLE_ATTRS.every(di => isDiDecryptable(entity, di));
 
@@ -52,7 +52,6 @@ const ProtectedSection = styled.section`
     z-index: 2;
     opacity: 0.9;
     padding: 0 ${theme.spacing[9]};
-
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[5]};

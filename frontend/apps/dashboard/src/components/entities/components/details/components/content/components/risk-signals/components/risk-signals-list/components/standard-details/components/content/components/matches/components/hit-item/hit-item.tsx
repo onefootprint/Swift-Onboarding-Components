@@ -1,4 +1,4 @@
-import type { AmlHit, AmlHitMedia } from '@onefootprint/types';
+import type { AmlHit, AmlHitMedia } from '@onefootprint/request-types/dashboard';
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
 

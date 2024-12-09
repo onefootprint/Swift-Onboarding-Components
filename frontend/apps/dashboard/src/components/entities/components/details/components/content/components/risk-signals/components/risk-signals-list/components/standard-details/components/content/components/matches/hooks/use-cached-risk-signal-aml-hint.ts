@@ -1,4 +1,4 @@
-import type { AmlDetail } from '@onefootprint/types';
+import type { AmlDetail } from '@onefootprint/request-types/dashboard';
 import { useQueryClient } from '@tanstack/react-query';
 
 import useEntityId from '@/entity/hooks/use-entity-id';
