@@ -7,6 +7,7 @@ import Head from 'next/head';
 // import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
+import useSession from 'src/hooks/use-session';
 // import CreateDialog from './components/create-dialog';
 import Table from './components/table';
 
@@ -15,6 +16,7 @@ const List = () => {
   //   const [dialogOpen, setDialogOpen] = useState(false);
   const listsQuery = useQuery(getOrgListsOptions());
   const { data, error, isPending } = listsQuery;
+  const { data: session } = useSession();
 
   //   const handleOpen = () => {
   //     setDialogOpen(true);
@@ -23,6 +25,10 @@ const List = () => {
   //   const handleClose = () => {
   //     setDialogOpen(false);
   //   };
+
+  if (!session?.user?.isFirmEmployee) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col gap-8">
