@@ -257,6 +257,16 @@ object Footprint {
                 overallOutcome = overallOutcome
             )
 
+            // Another check to ensure that the requirements are met
+            // to handle the step-up case
+            val requirementsAfterProcessing = RequirementUtil.getRequirements(authToken = authToken)
+            if(!requirementsAfterProcessing.canProcessInline){
+                throw FootprintException(
+                    kind = FootprintException.ErrorKind.INLINE_PROCESS_NOT_SUPPORTED,
+                    message = "Inline processing is not supported. Make sure that all requirements are met or use the hosted handoff."
+                )
+            }
+
             val validationToken = FootprintQueries.validateOnboarding(
                 authToken = authToken
             ).validationToken

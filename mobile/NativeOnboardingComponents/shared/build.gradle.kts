@@ -10,6 +10,8 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
 }
 
+version = "1.0.0-beta"
+
 kotlin {
     androidTarget {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
@@ -87,4 +89,10 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.material)
     implementation(libs.androidx.activity)
+}
+
+tasks.register("printVersion") {
+    doLast {
+        println(project.version)  // Print the version
+    }
 }
