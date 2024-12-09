@@ -3,6 +3,7 @@ import { Box, Divider } from '@onefootprint/ui';
 import { useEffect } from 'react';
 
 import { MAIN_PAGE_ID } from 'src/config/constants';
+import useSession from 'src/hooks/use-session';
 import { createGlobalStyle, css } from 'styled-components';
 import { useEntityContext } from '../../hooks/use-entity-context';
 import useEntitySeqno from '../../hooks/use-entity-seqno';
@@ -22,12 +23,17 @@ import {
   Vault,
 } from './components';
 import BusinessInsights from './components/business-insights';
+import Onboardings from './components/onboardings';
 
 const Content = () => {
   const { kind } = useEntityContext();
   const shownSeqno = useEntitySeqno();
   const isHeadingDisabled = !!shownSeqno;
   useHistoricalLayout(!!shownSeqno);
+  const {
+    data: { user },
+  } = useSession();
+  const isFirmEmployee = user?.isFirmEmployee;
 
   return (
     <>
@@ -54,6 +60,11 @@ const Content = () => {
         {shownSeqno ? null : (
           <Box marginBottom={9}>
             <AuditTrail />
+          </Box>
+        )}
+        {isFirmEmployee && kind === EntityKind.person && (
+          <Box marginBottom={9}>
+            <Onboardings />
           </Box>
         )}
         {kind === EntityKind.business && (
