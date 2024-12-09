@@ -1125,9 +1125,10 @@
   "onboardings": {
     "title": "Onboardings",
     "header": {
-      "onboarded-onto": "Onboarded onto {{playbookName}}",
-      "document-upload": "Document upload",
-      "outcome": "Outcome:"
+      "timestamp": "on {{timestamp}}",
+      "outcome": "Outcome:",
+      "trigger": "Change onboard session",
+      "latest": "Latest"
     },
     "risk-signals": {
       "title": "Risk signals",

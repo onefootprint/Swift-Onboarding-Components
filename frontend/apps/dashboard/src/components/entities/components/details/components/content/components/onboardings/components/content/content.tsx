@@ -1,14 +1,12 @@
-import { IcoCheck16 } from '@onefootprint/icons';
 import type { EntityOnboarding } from '@onefootprint/request-types/dashboard';
-import { Dropdown, Stack, Text } from '@onefootprint/ui';
-import { format } from 'date-fns';
+import { Dropdown, LinkButton } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
-import { FIELDSET_HEADER_HEIGHT } from '../../../../constants';
 import useStatusText from '../../hooks/use-status-text';
 import OnboardingData from '../onboarding-data';
-import Trigger from '../trigger ';
+import LatestTag from './components/latest-tag';
+import OnboardingItem from './components/onboarding-item';
+import { getStatusColor, getTimestampText } from './utils';
 
 type ContentProps = {
   onboardings: EntityOnboarding[];
@@ -21,101 +19,47 @@ const Content = ({ onboardings }: ContentProps) => {
   const statusT = useStatusText();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOnboarding, setSelectedOnboarding] = useState<EntityOnboarding>(onboardings[0]);
-  const { kind, playbookName, status, timestamp } = selectedOnboarding;
+  const { playbookName, status, timestamp } = selectedOnboarding;
+  const isLatest = selectedOnboarding.id === onboardings[0].id;
 
   const toggleDropdown = () => {
     setIsOpen(prev => !prev);
   };
 
-  const getTimestampText = (ts: string) => format(new Date(ts), 'MM/dd/yyyy, hh:mm a');
-
-  const getOnboardingLabel = (playbookName: string, kind: unknown, timestamp?: string) => {
-    const nameText = kind === 'document' ? t('document-upload') : t('onboarded-onto', { playbookName });
-    return timestamp ? `${nameText} ⋅ ${getTimestampText(timestamp)}` : nameText;
-  };
-
-  const getStatusColor = () => {
-    if (status === 'pass') return 'success';
-    if (status === 'fail') return 'error';
-    return 'neutral';
-  };
-
   return (
-    <Container>
-      <Header>
+    <fieldset className="flex flex-col justify-between w-full h-full border border-solid border-tertiary rounded">
+      <header className="flex justify-between bg-secondary py-2 px-5 border-b border-solid border-tertiary rounded-t max-h-40px">
+        <div className="flex items-center gap-2">
+          <span className="text-primary text-label-3">
+            {playbookName} {timestamp && t('timestamp', { timestamp: getTimestampText(timestamp) })}
+          </span>
+          <span className="text-primary text-label-2">⋅</span>
+          <span className="text-label-2">{t('outcome')}</span>
+          <span className={`text-${getStatusColor(status)} text-label-2`}>{statusT(status)}</span>
+          {isLatest && <LatestTag />}
+        </div>
         <Dropdown.Root open={isOpen} onOpenChange={toggleDropdown}>
-          <Trigger isOpen={isOpen} value={getOnboardingLabel(playbookName, kind, timestamp)} />
+          <Dropdown.Trigger asChild>
+            <LinkButton>{t('trigger')}</LinkButton>
+          </Dropdown.Trigger>
           <Dropdown.Portal>
-            <ContentContainer align="end" sideOffset={4}>
+            <Dropdown.Content className="w-[360px] max-h-[230px] py-3 flex flex-col gap-1" align="end" sideOffset={4}>
               {onboardings.map(onboarding => (
-                <ItemContainer
+                <OnboardingItem
                   key={onboarding.id}
+                  isChecked={selectedOnboarding.id === onboarding.id}
+                  isLatest={onboarding.id === onboardings[0].id}
+                  onboarding={onboarding}
                   onClick={() => setSelectedOnboarding(onboarding)}
-                  checked={selectedOnboarding.id === onboarding.id}
-                  iconRight={selectedOnboarding.id === onboarding.id ? IcoCheck16 : undefined}
-                >
-                  <Stack direction="column" gap={2} align="flex-start">
-                    <Text variant="label-3">{getOnboardingLabel(onboarding.playbookName, onboarding.kind)}</Text>
-                    <Text variant="label-3" color="tertiary">
-                      {getTimestampText(onboarding.timestamp)}
-                    </Text>
-                  </Stack>
-                </ItemContainer>
+                />
               ))}
-            </ContentContainer>
+            </Dropdown.Content>
           </Dropdown.Portal>
         </Dropdown.Root>
-        <Stack align="center" gap={3}>
-          <Text variant="label-3">{t('outcome')}</Text>
-          <Text variant="label-3" color={getStatusColor()}>
-            {statusT(status)}
-          </Text>
-        </Stack>
-      </Header>
+      </header>
       <OnboardingData onboarding={selectedOnboarding} />
-    </Container>
+    </fieldset>
   );
 };
-
-const Container = styled.fieldset`
-  ${({ theme }) => css`
-    border-radius: ${theme.spacing[2]};
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
-    justify-content: space-between;
-  `};
-`;
-
-const Header = styled.header`
-  ${({ theme }) => css`
-    background-color: ${theme.backgroundColor.secondary};
-    border-bottom: 1px solid ${theme.borderColor.tertiary};
-    border-radius: ${theme.spacing[2]} ${theme.spacing[2]} 0 0;
-    display: flex;
-    justify-content: space-between;
-    padding: ${theme.spacing[3]} ${theme.spacing[5]};
-    height: ${FIELDSET_HEADER_HEIGHT}px;
-  `};
-`;
-
-const ContentContainer = styled(Dropdown.Content)`
-  ${({ theme }) => css`
-    width: 340px;
-    padding: ${theme.spacing[3]} 0;
-  `};
-`;
-
-const ItemContainer = styled(Dropdown.Item)`
-  ${({ theme }) => css`
-    height: fit-content;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    padding: ${theme.spacing[3]} ${theme.spacing[5]};
-  `};
-`;
 
 export default Content;

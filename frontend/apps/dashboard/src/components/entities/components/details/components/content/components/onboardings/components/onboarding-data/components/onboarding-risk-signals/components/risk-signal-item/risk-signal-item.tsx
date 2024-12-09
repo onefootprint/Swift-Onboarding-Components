@@ -46,8 +46,20 @@ const RiskSignalItem = ({ riskSignal }: RiskSignalItemProps) => {
 
 const Container = styled(Stack)`
   ${({ theme }) => css`
-  &:hover {
-      background-color: ${theme.backgroundColor.secondary};
+    position: relative;
+
+    &:hover {
+      &:after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: calc(-${theme.spacing[3]});
+        width: calc(100% + 2 * ${theme.spacing[3]});
+        height: 100%;
+        background-color: ${theme.backgroundColor.secondary};
+        border-radius: 2px;
+        z-index: -1;
+      }
     }
   `};
 `;
