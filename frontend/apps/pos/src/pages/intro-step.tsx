@@ -1,7 +1,7 @@
+import { useMutation } from '@tanstack/react-query';
 import { useForm, useWatch } from 'react-hook-form';
 import request from '../config/request';
 import useFootprint from '../hooks/use-footprint';
-import useRequest from '../hooks/use-request';
 import logo from '../images/avis.png';
 
 const Intro = ({ onHandoff, onFillout }) => {
@@ -14,21 +14,30 @@ const Intro = ({ onHandoff, onFillout }) => {
     trigger,
   } = useForm();
   const { createChallenge } = useFootprint();
-  const { isLoading: isStartLoading, error: startError, makeRequest: makeStartRequest } = useRequest();
-  const { isLoading: isChallengeLoading, error: challengeError, makeRequest: makeChallengeRequest } = useRequest();
   const phoneNumber = useWatch({ control, name: 'phoneNumber' });
 
-  const start = async data => {
-    try {
-      await makeStartRequest(async () => {
-        const response = await request({ url: '/start', method: 'post', data: { phoneNumber: data.phoneNumber } });
-        onHandoff(response.data.fpId);
-      });
-    } catch (error) {
+  const startMutation = useMutation({
+    mutationFn: async (data: { phoneNumber: string }) => {
+      const response = await request({ url: '/start', method: 'post', data: { phoneNumber: data.phoneNumber } });
+      return response.data;
+    },
+    onSuccess: data => {
+      onHandoff(data.fpId);
+    },
+    onError: error => {
       alert('An error occurred while starting the process. Please try again.');
       console.error('Start process error:', error);
-    }
-  };
+    },
+  });
+
+  const challengeMutation = useMutation({
+    mutationFn: async () => {
+      await createChallenge(phoneNumber);
+    },
+    onSuccess: () => {
+      onFillout(phoneNumber);
+    },
+  });
 
   const validatePhoneNumber = value => {
     const cleanedNumber = value.replace(/\D/g, '');
@@ -37,16 +46,13 @@ const Intro = ({ onHandoff, onFillout }) => {
 
   const onSubmit = data => {
     clearErrors();
-    start(data);
+    startMutation.mutate(data);
   };
 
   const handleFillout = async () => {
     const isValid = await trigger();
     if (!isValid) return;
-    await makeChallengeRequest(async () => {
-      await createChallenge(phoneNumber);
-      onFillout(phoneNumber);
-    });
+    challengeMutation.mutate();
   };
 
   return (
@@ -68,12 +74,16 @@ const Intro = ({ onHandoff, onFillout }) => {
             {...register('phoneNumber', { required: 'Phone number is required', validate: validatePhoneNumber })}
           />
           {errors.phoneNumber?.message && <p className="form-error">{errors.phoneNumber.message as string}</p>}
-          {startError && <p className="form-error">{startError}</p>}
-          {challengeError && <p className="form-error">{challengeError}</p>}
+          {startMutation.error && <p className="form-error">{startMutation.error.message}</p>}
+          {challengeMutation.error && <p className="form-error">{challengeMutation.error.message}</p>}
         </div>
         <div className="form-button">
-          <button type="submit" className="button button-primary" disabled={isStartLoading || isChallengeLoading}>
-            {isStartLoading ? 'Verifying...' : 'Continue'}
+          <button
+            type="submit"
+            className="button button-primary"
+            disabled={startMutation.isPending || challengeMutation.isPending}
+          >
+            {startMutation.isPending ? 'Verifying...' : 'Continue'}
           </button>
           <div className="or-container">
             <div className="or-divider" />
@@ -83,10 +93,10 @@ const Intro = ({ onHandoff, onFillout }) => {
           <button
             type="button"
             className="button button-secondary"
-            disabled={isStartLoading || isChallengeLoading}
+            disabled={startMutation.isPending || challengeMutation.isPending}
             onClick={handleFillout}
           >
-            {isChallengeLoading ? 'Creating challenge...' : 'Fill out for customer'}
+            {challengeMutation.isPending ? 'Creating challenge...' : 'Fill out for customer'}
           </button>
         </div>
       </form>

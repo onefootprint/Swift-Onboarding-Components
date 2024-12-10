@@ -1,78 +1,53 @@
-import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import { useForm } from 'react-hook-form';
 import Header from '../components/header';
 import useFootprint from '../hooks/use-footprint';
-import useRequest from '../hooks/use-request';
+
+type FormData = {
+  firstName: string;
+  middleName: string;
+  lastName: string;
+  dob: string;
+};
 
 const BasicDataStep = ({ onboardingData, onSubmit }) => {
   const { save } = useFootprint();
-  const { isLoading, error, makeRequest } = useRequest();
-  const [formData, setFormData] = useState({
-    firstName: onboardingData.firstName || '',
-    middleName: onboardingData.middleName || '',
-    lastName: onboardingData.lastName || '',
-    dob: onboardingData.dob || '',
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>({
+    defaultValues: {
+      firstName: onboardingData.firstName || '',
+      middleName: onboardingData.middleName || '',
+      lastName: onboardingData.lastName || '',
+      dob: onboardingData.dob || '',
+    },
   });
 
-  const [validationErrors, setValidationErrors] = useState({
-    firstName: '',
-    lastName: '',
-    dob: '',
-    general: '',
-  });
-
-  const handleInputChange = e => {
-    const { id, value } = e.target;
-    setFormData(prevData => ({
-      ...prevData,
-      [id]: value,
-    }));
-    setValidationErrors(prevErrors => ({
-      ...prevErrors,
-      [id]: '',
-      general: '',
-    }));
-  };
-
-  const validateForm = () => {
-    const errors = {
-      firstName: formData.firstName ? '' : 'First name is required',
-      lastName: formData.lastName ? '' : 'Last name is required',
-      dob: formData.dob ? '' : 'Date of birth is required',
-      general: '',
-    };
-    setValidationErrors(errors);
-    return Object.values(errors).every(error => error === '');
-  };
-
-  const handleSubmit = async e => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
-    try {
-      await makeRequest(async () => {
-        await save({
-          'id.first_name': formData.firstName,
-          'id.middle_name': formData.middleName,
-          'id.last_name': formData.lastName,
-          'id.dob': formData.dob,
-        });
-        onSubmit(formData);
+  const mutation = useMutation({
+    mutationFn: async (data: FormData) => {
+      await save({
+        'id.first_name': data.firstName,
+        'id.middle_name': data.middleName,
+        'id.last_name': data.lastName,
+        'id.dob': data.dob,
       });
-    } catch (_) {
-      setValidationErrors(prevErrors => ({
-        ...prevErrors,
-        general: 'An error occurred while saving the data. Please try again.',
-      }));
-    }
+      return data;
+    },
+    onSuccess: data => {
+      onSubmit(data);
+    },
+  });
+
+  const onSubmitForm = (data: FormData) => {
+    mutation.mutate(data);
   };
 
   return (
     <div className="app-form basic-data-step">
       <Header title="Basic data" subtitle="We're legally required to collect this information." />
-      <form className="form" onSubmit={handleSubmit}>
+      <form className="form" onSubmit={handleSubmit(onSubmitForm)}>
         <div className="row">
           <div className="col">
             <div className="form-field">
@@ -83,10 +58,9 @@ const BasicDataStep = ({ onboardingData, onSubmit }) => {
                 className="form-input"
                 id="firstName"
                 placeholder="Jane"
-                value={formData.firstName}
-                onChange={handleInputChange}
+                {...register('firstName', { required: 'First name is required' })}
               />
-              {validationErrors.firstName && <p className="form-error">{validationErrors.firstName}</p>}
+              {errors.firstName && <p className="form-error">{errors.firstName.message}</p>}
             </div>
           </div>
           <div className="col">
@@ -94,13 +68,7 @@ const BasicDataStep = ({ onboardingData, onSubmit }) => {
               <label className="form-label" htmlFor="middleName">
                 Middle name
               </label>
-              <input
-                className="form-input"
-                id="middleName"
-                placeholder="Sue"
-                value={formData.middleName}
-                onChange={handleInputChange}
-              />
+              <input className="form-input" id="middleName" placeholder="Sue" {...register('middleName')} />
             </div>
           </div>
         </div>
@@ -114,10 +82,9 @@ const BasicDataStep = ({ onboardingData, onSubmit }) => {
                 className="form-input"
                 id="lastName"
                 placeholder="Doe"
-                value={formData.lastName}
-                onChange={handleInputChange}
+                {...register('lastName', { required: 'Last name is required' })}
               />
-              {validationErrors.lastName && <p className="form-error">{validationErrors.lastName}</p>}
+              {errors.lastName && <p className="form-error">{errors.lastName.message}</p>}
             </div>
           </div>
         </div>
@@ -131,17 +98,15 @@ const BasicDataStep = ({ onboardingData, onSubmit }) => {
                 className="form-input"
                 id="dob"
                 placeholder="MM/DD/YYYY"
-                value={formData.dob}
-                onChange={handleInputChange}
+                {...register('dob', { required: 'Date of birth is required' })}
               />
-              {validationErrors.dob && <p className="form-error">{validationErrors.dob}</p>}
+              {errors.dob && <p className="form-error">{errors.dob.message}</p>}
             </div>
           </div>
         </div>
-        {validationErrors.general && <p className="form-error">{validationErrors.general}</p>}
-        {error && <p className="form-error">{error}</p>}
-        <button type="submit" className="button button-primary" disabled={isLoading}>
-          {isLoading ? 'Saving...' : 'Continue'}
+        {mutation.error && <p className="form-error">{mutation.error.message}</p>}
+        <button type="submit" className="button button-primary" disabled={mutation.isPending}>
+          {mutation.isPending ? 'Saving...' : 'Continue'}
         </button>
       </form>
     </div>

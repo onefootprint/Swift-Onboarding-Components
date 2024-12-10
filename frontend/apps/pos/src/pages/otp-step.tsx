@@ -1,36 +1,40 @@
+import { useMutation } from '@tanstack/react-query';
 import { useContext, useState } from 'react';
 import { AppContext } from '../App';
 import PinInput from '../components/pin-input';
 import useFootprint from '../hooks/use-footprint';
-import useRequest from '../hooks/use-request';
 import logo from '../images/avis.png';
 import loading from '../images/loading.svg';
 import success from '../images/success.png';
 
 const OtpStep = ({ onSuccess }) => {
   const { verify } = useFootprint();
-  const { isLoading, error, makeRequest } = useRequest();
   const { phoneNumber } = useContext(AppContext);
   const [verificationError, setVerificationError] = useState('');
   const [isWaiting, setIsWaiting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const handleSubmit = async verificationCode => {
-    try {
-      await makeRequest(async () => {
-        await verify(verificationCode);
-        setIsWaiting(true);
+  const verifyMutation = useMutation({
+    mutationFn: async (verificationCode: string) => {
+      await verify(verificationCode);
+    },
+    onSuccess: () => {
+      setIsWaiting(true);
+      setTimeout(() => {
+        setIsWaiting(false);
+        setIsSuccess(true);
         setTimeout(() => {
-          setIsWaiting(false);
-          setIsSuccess(true);
-          setTimeout(() => {
-            onSuccess();
-          }, 1000);
-        }, 1500);
-      });
-    } catch (_e) {
+          onSuccess();
+        }, 1000);
+      }, 1500);
+    },
+    onError: () => {
       setVerificationError('Verification failed. Please try again.');
-    }
+    },
+  });
+
+  const handleSubmit = async (verificationCode: string) => {
+    verifyMutation.mutate(verificationCode);
   };
 
   return (
@@ -46,7 +50,7 @@ const OtpStep = ({ onSuccess }) => {
           </div>
         ) : (
           <>
-            {isLoading ? (
+            {verifyMutation.isPending ? (
               <div style={{ height: 95 }}>
                 <img src={loading} className="loading-spinner" width={32} height={32} alt="Loading" />
                 <p style={{ marginTop: 24 }}>Verifying...</p>
@@ -54,9 +58,9 @@ const OtpStep = ({ onSuccess }) => {
             ) : (
               <>
                 <PinInput onComplete={handleSubmit} />
-                {error && <p className="form-error">{error}</p>}
+                {verifyMutation.error && <p className="form-error">{verifyMutation.error.message}</p>}
                 {verificationError && <p className="form-error">{verificationError}</p>}
-                <button className="link-button" type="button" disabled={isLoading}>
+                <button className="link-button" type="button" disabled={verifyMutation.isPending}>
                   Resend code
                 </button>
               </>

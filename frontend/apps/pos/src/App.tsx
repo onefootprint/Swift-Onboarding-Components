@@ -1,4 +1,5 @@
 import './App.css';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createContext, useCallback, useState } from 'react';
 
 import { obConfig } from './config/constants';
@@ -8,6 +9,7 @@ import SuccessStep from './pages/success-step';
 import WaitingStep from './pages/waiting-step';
 
 const sandboxId = Math.random().toString(36).substring(2, 12);
+const queryClient = new QueryClient();
 
 type AppContextState = {
   sandboxId: string;
@@ -49,37 +51,39 @@ function App() {
   };
 
   return (
-    <AppContext.Provider value={contextValue}>
-      <div className="App">
-        {step === 'intro' && (
-          <IntroStep
-            onHandoff={fpId => {
-              updateContext({ fpId });
-              setStep('waiting');
-            }}
-            onFillout={phoneNumber => {
-              updateContext({ phoneNumber });
-              setStep('onboarding');
-            }}
-          />
-        )}
-        {step === 'waiting' && (
-          <WaitingStep
-            onSuccess={() => {
-              setStep('success');
-            }}
-          />
-        )}
-        {step === 'onboarding' && (
-          <OnboardingStep
-            onSuccess={() => {
-              setStep('success');
-            }}
-          />
-        )}
-        {step === 'success' && <SuccessStep />}
-      </div>
-    </AppContext.Provider>
+    <QueryClientProvider client={queryClient}>
+      <AppContext.Provider value={contextValue}>
+        <div className="App">
+          {step === 'intro' && (
+            <IntroStep
+              onHandoff={fpId => {
+                updateContext({ fpId });
+                setStep('waiting');
+              }}
+              onFillout={phoneNumber => {
+                updateContext({ phoneNumber });
+                setStep('onboarding');
+              }}
+            />
+          )}
+          {step === 'waiting' && (
+            <WaitingStep
+              onSuccess={() => {
+                setStep('success');
+              }}
+            />
+          )}
+          {step === 'onboarding' && (
+            <OnboardingStep
+              onSuccess={() => {
+                setStep('success');
+              }}
+            />
+          )}
+          {step === 'success' && <SuccessStep />}
+        </div>
+      </AppContext.Provider>
+    </QueryClientProvider>
   );
 }
 

@@ -1,88 +1,66 @@
-import { useEffect, useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import { useForm } from 'react-hook-form';
 import Header from '../components/header';
 import Navigation from '../components/navigation';
 import useFootprint from '../hooks/use-footprint';
-import useRequest from '../hooks/use-request';
+
+type FormData = {
+  country: string;
+  addressLine1: string;
+  addressLine2: string;
+  city: string;
+  state: string;
+  zipcode: string;
+};
 
 const AddressDataStep = ({ onboardingData, onGoBack, onSubmit }) => {
   const { save } = useFootprint();
-  const { isLoading, error, makeRequest } = useRequest();
-
-  const [formData, setFormData] = useState({
-    country: onboardingData.country || 'US',
-    addressLine1: onboardingData.addressLine1 || '',
-    addressLine2: onboardingData.addressLine2 || '',
-    city: onboardingData.city || '',
-    state: onboardingData.state || 'NY',
-    zipcode: onboardingData.zipcode || '',
+  const {
+    register,
+    handleSubmit: handleFormSubmit,
+    formState: { errors },
+    watch,
+  } = useForm<FormData>({
+    defaultValues: {
+      country: onboardingData.country || 'US',
+      addressLine1: onboardingData.addressLine1 || '',
+      addressLine2: onboardingData.addressLine2 || '',
+      city: onboardingData.city || '',
+      state: onboardingData.state || 'NY',
+      zipcode: onboardingData.zipcode || '',
+    },
   });
 
-  const [validationErrors, setValidationErrors] = useState({
-    country: '',
-    addressLine1: '',
-    city: '',
-    state: '',
-    zipcode: '',
-    general: '',
+  const {
+    mutate,
+    isPending: isLoading,
+    error,
+  } = useMutation({
+    mutationFn: async (data: FormData) => {
+      await save({
+        'id.country': data.country,
+        'id.address_line1': data.addressLine1,
+        'id.address_line2': data.addressLine2,
+        'id.city': data.city,
+        'id.state': data.state,
+        'id.zip': data.zipcode,
+      });
+      return data;
+    },
   });
 
-  const [states, setStates] = useState(countryStates[formData.country] || []);
+  const selectedCountry = watch('country');
+  const states = countryStates[selectedCountry] || [];
 
-  useEffect(() => {
-    setStates(countryStates[formData.country] || []);
-  }, [formData.country]);
-
-  const handleInputChange = e => {
-    const { id, value } = e.target;
-    setFormData(prevData => ({
-      ...prevData,
-      [id]: value,
-    }));
-    setValidationErrors(prevErrors => ({
-      ...prevErrors,
-      [id]: '',
-      general: '',
-    }));
-  };
-
-  const validateForm = () => {
-    const errors = {
-      country: formData.country ? '' : 'Country is required',
-      addressLine1: formData.addressLine1 ? '' : 'Address Line 1 is required',
-      city: formData.city ? '' : 'City is required',
-      state: formData.state ? '' : 'State is required',
-      zipcode: formData.zipcode ? '' : 'Zipcode is required',
-      general: '',
-    };
-    setValidationErrors(errors);
-    return Object.values(errors).every(error => error === '');
-  };
-
-  const handleSubmit = async e => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
+  const onSubmitForm = (data: FormData) => {
     try {
-      await makeRequest(async () => {
-        await save({
-          'id.country': formData.country,
-          'id.address_line1': formData.addressLine1,
-          'id.address_line2': formData.addressLine2,
-          'id.city': formData.city,
-          'id.state': formData.state,
-          'id.zip': formData.zipcode,
-        });
-        onSubmit(formData);
+      mutate(data, {
+        onSuccess: data => {
+          onSubmit(data);
+        },
       });
     } catch (error) {
       console.error('Error saving address data:', error);
-      setValidationErrors(prevErrors => ({
-        ...prevErrors,
-        general: 'An error occurred while saving. Please try again.',
-      }));
     }
   };
 
@@ -93,18 +71,18 @@ const AddressDataStep = ({ onboardingData, onGoBack, onSubmit }) => {
         title="What's their residential address?"
         subtitle="We need to collect this information to verify their identity."
       />
-      <form className="form" onSubmit={handleSubmit}>
+      <form className="form" onSubmit={handleFormSubmit(onSubmitForm)}>
         <div className="row">
           <div className="col">
             <div className="form-field">
               <label className="form-label" htmlFor="country">
                 Country
               </label>
-              <select className="form-input" id="country" value={formData.country} onChange={handleInputChange}>
+              <select className="form-input" id="country" {...register('country', { required: 'Country is required' })}>
                 <option value="US">United States</option>
                 <option value="CA">Canada</option>
               </select>
-              {validationErrors.country && <p className="form-error">{validationErrors.country}</p>}
+              {errors.country && <p className="form-error">{errors.country.message}</p>}
             </div>
           </div>
         </div>
@@ -118,10 +96,9 @@ const AddressDataStep = ({ onboardingData, onGoBack, onSubmit }) => {
                 className="form-input"
                 id="addressLine1"
                 placeholder="123 Main St"
-                value={formData.addressLine1}
-                onChange={handleInputChange}
+                {...register('addressLine1', { required: 'Address Line 1 is required' })}
               />
-              {validationErrors.addressLine1 && <p className="form-error">{validationErrors.addressLine1}</p>}
+              {errors.addressLine1 && <p className="form-error">{errors.addressLine1.message}</p>}
             </div>
           </div>
         </div>
@@ -131,13 +108,7 @@ const AddressDataStep = ({ onboardingData, onGoBack, onSubmit }) => {
               <label className="form-label" htmlFor="addressLine2">
                 Address Line 2
               </label>
-              <input
-                className="form-input"
-                id="addressLine2"
-                placeholder="Apt 4B"
-                value={formData.addressLine2}
-                onChange={handleInputChange}
-              />
+              <input className="form-input" id="addressLine2" placeholder="Apt 4B" {...register('addressLine2')} />
             </div>
           </div>
         </div>
@@ -151,10 +122,9 @@ const AddressDataStep = ({ onboardingData, onGoBack, onSubmit }) => {
                 className="form-input"
                 id="city"
                 placeholder="New York"
-                value={formData.city}
-                onChange={handleInputChange}
+                {...register('city', { required: 'City is required' })}
               />
-              {validationErrors.city && <p className="form-error">{validationErrors.city}</p>}
+              {errors.city && <p className="form-error">{errors.city.message}</p>}
             </div>
           </div>
         </div>
@@ -164,14 +134,14 @@ const AddressDataStep = ({ onboardingData, onGoBack, onSubmit }) => {
               <label className="form-label" htmlFor="state">
                 State
               </label>
-              <select className="form-input" id="state" value={formData.state} onChange={handleInputChange}>
+              <select className="form-input" id="state" {...register('state', { required: 'State is required' })}>
                 {states.map(state => (
                   <option key={state.value} value={state.value}>
                     {state.label}
                   </option>
                 ))}
               </select>
-              {validationErrors.state && <p className="form-error">{validationErrors.state}</p>}
+              {errors.state && <p className="form-error">{errors.state.message}</p>}
             </div>
           </div>
           <div className="col">
@@ -183,15 +153,13 @@ const AddressDataStep = ({ onboardingData, onGoBack, onSubmit }) => {
                 className="form-input"
                 id="zipcode"
                 placeholder="10001"
-                value={formData.zipcode}
-                onChange={handleInputChange}
+                {...register('zipcode', { required: 'Zipcode is required' })}
               />
-              {validationErrors.zipcode && <p className="form-error">{validationErrors.zipcode}</p>}
+              {errors.zipcode && <p className="form-error">{errors.zipcode.message}</p>}
             </div>
           </div>
         </div>
-        {error && <p className="form-error">{error}</p>}
-        {validationErrors.general && <p className="form-error">{validationErrors.general}</p>}
+        {error && <p className="form-error">{error.message}</p>}
         <button type="submit" className="button button-primary" disabled={isLoading}>
           {isLoading ? 'Saving...' : 'Continue'}
         </button>

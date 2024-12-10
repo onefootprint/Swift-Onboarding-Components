@@ -1,8 +1,8 @@
+import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import Header from '../components/header';
 import Navigation from '../components/navigation';
 import useFootprint from '../hooks/use-footprint';
-import useRequest from '../hooks/use-request';
 
 type FormValues = {
   category: string;
@@ -24,7 +24,6 @@ type CustomDataStepProps = {
 
 const CustomDataStep = ({ onboardingData, onSubmit, onGoBack }: CustomDataStepProps) => {
   const { save, process } = useFootprint();
-  const { isLoading, error, makeRequest } = useRequest();
   const {
     register,
     handleSubmit,
@@ -43,26 +42,29 @@ const CustomDataStep = ({ onboardingData, onSubmit, onGoBack }: CustomDataStepPr
     },
   });
 
-  const onSubmitForm = async (data: FormValues) => {
-    try {
-      await makeRequest(async () => {
-        await save({
-          'custom.category': data.category,
-          'custom.awd': data.awd,
-          'custom.reserved_car_class': data.reservedCarClass,
-          'custom.elor': data.elor,
-          'custom.rental_state': data.rentalZone,
-          'custom.under_24h_rental': data.under24hRental,
-          'custom.business_leisure': data.businessLeisure,
-          'custom.local_market_indicator': data.localMarketIndicator,
-          'custom.distribution_channel': data.distributionChannel,
-        });
-        await process();
-        onSubmit(data);
+  const mutation = useMutation({
+    mutationFn: async (data: FormValues) => {
+      await save({
+        'custom.category': data.category,
+        'custom.awd': data.awd,
+        'custom.reserved_car_class': data.reservedCarClass,
+        'custom.elor': data.elor,
+        'custom.rental_state': data.rentalZone,
+        'custom.under_24h_rental': data.under24hRental,
+        'custom.business_leisure': data.businessLeisure,
+        'custom.local_market_indicator': data.localMarketIndicator,
+        'custom.distribution_channel': data.distributionChannel,
       });
-    } catch (error) {
+      await process();
+      onSubmit(data);
+    },
+    onError: error => {
       console.error('Error saving data:', error);
-    }
+    },
+  });
+
+  const onSubmitForm = async (data: FormValues) => {
+    mutation.mutate(data);
   };
 
   return (
@@ -419,11 +421,11 @@ const CustomDataStep = ({ onboardingData, onSubmit, onGoBack }: CustomDataStepPr
             </select>
             {errors.distributionChannel && <p className="form-error">{errors.distributionChannel.message}</p>}
           </div>
-          {error && <p className="form-error">{error}</p>}
+          {mutation.error && <p className="form-error">{mutation.error.message}</p>}
         </div>
         <div className="form-footer">
-          <button type="submit" className="button button-primary" disabled={isLoading}>
-            {isLoading ? 'Saving...' : 'Continue'}
+          <button type="submit" className="button button-primary" disabled={mutation.isPending}>
+            {mutation.isPending ? 'Saving...' : 'Continue'}
           </button>
         </div>
       </form>
