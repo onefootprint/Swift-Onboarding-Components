@@ -1,36 +1,19 @@
 import { useMutation } from '@tanstack/react-query';
 import { useForm, useWatch } from 'react-hook-form';
-import request from '../config/request';
 import useFootprint from '../hooks/use-footprint';
 import logo from '../images/avis.png';
 
-const Intro = ({ onHandoff, onFillout }) => {
+const Intro = ({ onFillout }) => {
   const {
     register,
     handleSubmit,
     control,
     formState: { errors },
     clearErrors,
-    trigger,
   } = useForm();
   const { createChallenge } = useFootprint();
   const phoneNumber = useWatch({ control, name: 'phoneNumber' });
-
-  const startMutation = useMutation({
-    mutationFn: async (data: { phoneNumber: string }) => {
-      const response = await request({ url: '/start', method: 'post', data: { phoneNumber: data.phoneNumber } });
-      return response.data;
-    },
-    onSuccess: data => {
-      onHandoff(data.fpId);
-    },
-    onError: error => {
-      alert('An error occurred while starting the process. Please try again.');
-      console.error('Start process error:', error);
-    },
-  });
-
-  const challengeMutation = useMutation({
+  const mutation = useMutation({
     mutationFn: async () => {
       await createChallenge(phoneNumber);
     },
@@ -46,13 +29,7 @@ const Intro = ({ onHandoff, onFillout }) => {
 
   const onSubmit = data => {
     clearErrors();
-    startMutation.mutate(data);
-  };
-
-  const handleFillout = async () => {
-    const isValid = await trigger();
-    if (!isValid) return;
-    challengeMutation.mutate();
+    mutation.mutate(data);
   };
 
   return (
@@ -74,29 +51,12 @@ const Intro = ({ onHandoff, onFillout }) => {
             {...register('phoneNumber', { required: 'Phone number is required', validate: validatePhoneNumber })}
           />
           {errors.phoneNumber?.message && <p className="form-error">{errors.phoneNumber.message as string}</p>}
-          {startMutation.error && <p className="form-error">{startMutation.error.message}</p>}
-          {challengeMutation.error && <p className="form-error">{challengeMutation.error.message}</p>}
+          {mutation.error && <p className="form-error">{mutation.error.message}</p>}
+          {mutation.error && <p className="form-error">{mutation.error.message}</p>}
         </div>
         <div className="form-button">
-          <button
-            type="submit"
-            className="button button-primary"
-            disabled={startMutation.isPending || challengeMutation.isPending}
-          >
-            {startMutation.isPending ? 'Verifying...' : 'Continue'}
-          </button>
-          <div className="or-container">
-            <div className="or-divider" />
-            <div className="or-text">or</div>
-            <div className="or-divider" />
-          </div>
-          <button
-            type="button"
-            className="button button-secondary"
-            disabled={startMutation.isPending || challengeMutation.isPending}
-            onClick={handleFillout}
-          >
-            {challengeMutation.isPending ? 'Creating challenge...' : 'Fill out for customer'}
+          <button type="submit" className="button button-primary" disabled={mutation.isPending || mutation.isPending}>
+            {mutation.isPending ? 'Verifying...' : 'Continue'}
           </button>
         </div>
       </form>

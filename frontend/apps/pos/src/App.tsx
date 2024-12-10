@@ -56,10 +56,6 @@ function App() {
         <div className="App">
           {step === 'intro' && (
             <IntroStep
-              onHandoff={fpId => {
-                updateContext({ fpId });
-                setStep('waiting');
-              }}
               onFillout={phoneNumber => {
                 updateContext({ phoneNumber });
                 setStep('onboarding');
