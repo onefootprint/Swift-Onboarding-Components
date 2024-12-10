@@ -1,10 +1,12 @@
 import { ThemedLogoFpCompact } from '@onefootprint/icons';
-import { Box, Divider, Stack, Text, media } from '@onefootprint/ui';
+import { Box, Divider, Text, media } from '@onefootprint/ui';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
+import { IS_DEV } from '@onefootprint/global-constants';
+import AuthTokenForm from '../components/auth-token-form';
 import Blur from '../components/blur';
 import ContainerBox from '../components/container-box';
 import EmailForm from '../components/email-form';
@@ -32,18 +34,26 @@ const Login = () => {
             <ThemedLogoFpCompact color="primary" />
             <Text variant="label-2">{t('title')}</Text>
             <SocialButtons />
-            <Stack direction="row" center gap={4}>
+            <div className="flex flex-row items-center gap-4">
               <Divider />
-              <Text variant="body-3" color="tertiary">
-                {t('or')}
-              </Text>
+              <div className="text-body-3 text-tertiary">{t('or')}</div>
               <Divider />
-            </Stack>
+            </div>
             <EmailForm />
-            <Text color="secondary" variant="body-3" gap={2} display="inline-flex">
+            <div className="flex flex-row items-center gap-2 text-body-3 text-tertiary">
               <span>{t('do-not-have-an-account')}</span>
               <Link href="/authentication/sign-up">{t('sign-up')}</Link>
-            </Text>
+            </div>
+            {IS_DEV && (
+              <>
+                <div className="flex flex-row items-center gap-4">
+                  <Divider />
+                  <div className="text-body-3 text-tertiary">{t('or')}</div>
+                  <Divider />
+                </div>
+                <AuthTokenForm />
+              </>
+            )}
           </ContainerBox>
         </Container>
       </Layout>
