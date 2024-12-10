@@ -1,11 +1,10 @@
 import '@onefootprint/footprint-react/dist/footprint-react.css';
-
 import type { AppProps } from 'next/app';
-import Head from 'next/head';
-
 import { DM_Mono, DM_Sans } from 'next/font/google';
+import Head from 'next/head';
 import { createGlobalStyle } from 'styled-components';
 import Providers from '../components/providers';
+import '../styles/globals.css';
 
 const defaultFont = DM_Sans({
   display: 'swap',

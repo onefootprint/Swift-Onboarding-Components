@@ -4,7 +4,6 @@ import { media } from '@onefootprint/ui';
 import type React from 'react';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
 import styled from 'styled-components';
-
 import Footer from './components/footer';
 import SandboxBanner from './components/sandbox-banner';
 

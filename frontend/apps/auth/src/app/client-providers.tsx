@@ -1,14 +1,13 @@
 'use client';
 
-import { AppearanceProvider } from '@onefootprint/appearance';
-import '@onefootprint/ui/styles.css';
-import { Logger } from '@onefootprint/idv';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import type React from 'react';
-
 import configureI18n from '@/src/config/initializers/18next';
 import FootprintProvider from '@/src/provider-footprint';
 import configureFootprint from '@/src/provider-footprint/adapters';
+import { AppearanceProvider } from '@onefootprint/appearance';
+import { Logger } from '@onefootprint/idv';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import type React from 'react';
+import '../styles/globals.css';
 
 type AppearanceResponse = Parameters<typeof AppearanceProvider>[0];
 type Theme = AppearanceResponse['theme'];

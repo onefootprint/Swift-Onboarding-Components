@@ -1,8 +1,7 @@
 import { IcoChevronDown16 } from '@onefootprint/icons';
-import { Box, DateSelectorSheet, SelectNew, Stack, Text } from '@onefootprint/ui';
+import { DateSelectorSheet, SelectCustom } from '@onefootprint/ui';
+import { cx } from 'class-variance-authority';
 import { useState } from 'react';
-import styled, { css } from 'styled-components';
-
 import useFilters from '../../hooks/use-filters';
 import type { DateFilterPeriod } from './date-filter.types';
 import useOptions from './hooks/use-options';
@@ -12,8 +11,10 @@ import getFormattedRange from './utils/get-formatted-range';
 const DateFilter = () => {
   const filters = useFilters();
   const [isDateSheetOpen, setIsDateSheetOpen] = useState(false);
+
   const options = useOptions();
   const values = useValues();
+  const selectedOption = options.find(option => option.value === values.period);
 
   const handleToggleDataSheet = () => {
     setIsDateSheetOpen(!isDateSheetOpen);
@@ -53,9 +54,32 @@ const DateFilter = () => {
   };
 
   return (
-    <Stack direction="row" align="center" justify="center">
-      <StyledSelectNew onChange={handleSelectChange} options={options} size="compact" value={values.period} />
-      <Line />
+    <div className="flex items-center justify-center">
+      <SelectCustom.Root value={values.period} onValueChange={handleSelectChange}>
+        <SelectCustom.Trigger
+          className={cx(
+            'border border-solid border-primary h-8 px-2 py-2 bg-primary rounded-l rounded-r-none border-r-0 w-full hover:border-gray-300',
+            {
+              'border-gray-300': isDateSheetOpen,
+            },
+          )}
+        >
+          <SelectCustom.Value placeholder="Select">{selectedOption?.label}</SelectCustom.Value>
+          <SelectCustom.ChevronIcon />
+        </SelectCustom.Trigger>
+        <SelectCustom.Content popper align="start" minWidth="200px">
+          <SelectCustom.Group>
+            {options.map(option => {
+              return (
+                <SelectCustom.Item key={option.value} value={option.value}>
+                  {option.label}
+                </SelectCustom.Item>
+              );
+            })}
+          </SelectCustom.Group>
+        </SelectCustom.Content>
+      </SelectCustom.Root>
+      <div className="w-px h-full bg-primary" />
       <DateSelectorSheet
         startDate={values.start}
         endDate={values.end}
@@ -65,86 +89,30 @@ const DateFilter = () => {
         disableFutureDates
         asChild
       >
-        <Range onClick={handleToggleDataSheet} data-is-focus={isDateSheetOpen}>
-          <Text
-            color="primary"
-            height="22px"
-            lineHeight="22px"
-            variant="body-3"
-            whiteSpace="nowrap"
-            minWidth="190px"
-            textAlign="center"
-          >
+        <button
+          onClick={handleToggleDataSheet}
+          type="button"
+          className={cx(
+            'flex items-center gap-1 h-8 px-2 py-2 bg-primary border border-solid border-primary hover:border-gray-300 rounded-r cursor-pointer text-input-color',
+            {
+              'border-gray-300': isDateSheetOpen,
+            },
+          )}
+        >
+          <span className="text-body-3 whitespace-nowrap min-w-[190px] text-center leading-[22px]">
             {getFormattedRange(values.start, values.end)}
-          </Text>
-          <IconContainer align="center" data-is-open={isDateSheetOpen} justify="center">
+          </span>
+          <div
+            className={cx('flex items-center justify-center text-primary transition-transform duration-100 ease-in', {
+              'rotate-180': isDateSheetOpen,
+            })}
+          >
             <IcoChevronDown16 />
-          </IconContainer>
-        </Range>
+          </div>
+        </button>
       </DateSelectorSheet>
-    </Stack>
+    </div>
   );
 };
-
-const Range = styled.button`
-  ${({ theme }) => {
-    const { input } = theme.components;
-    return css`
-      all: unset;
-      display: flex;
-      align-items: center;
-      position: relative;
-      gap: ${theme.spacing[2]};
-      padding: ${theme.spacing[2]} ${theme.spacing[3]};
-      background-color: ${input.state.default.initial.bg};
-      border: ${input.global.borderWidth} solid
-        ${input.state.default.initial.border};
-      cursor: pointer;
-      border-radius: 0 ${input.global.borderRadius} ${input.global.borderRadius}
-        0;
-      border-left: 0;
-      isolation: isolate;
-      color: ${input.global.color};
-
-      &[data-is-focus='true'],
-      &:focus {
-        background-color: ${input.state.default.focus.bg};
-      }
-
-      &:hover {
-        border-color: ${input.state.default.hover.border};
-      }
-    `;
-  }};
-`;
-
-const StyledSelectNew = styled(SelectNew)`
-  ${({ theme }) => css`
-    && {
-      border-radius: ${theme.borderRadius.default} 0 0
-        ${theme.borderRadius.default};
-      border-right: 0;
-    }
-  `}
-`;
-
-const IconContainer = styled(Stack)`
-  ${({ theme }) => css`
-    transition: transform 0.1s ease;
-    color: ${theme.color.primary};
-
-    &[data-is-open='true'] {
-      transform: rotate(180deg);
-    }
-  `}
-`;
-
-const Line = styled(Box)`
-  ${({ theme }) => css`
-    width: 1px;
-    height: 100%;
-    background-color: ${theme.borderColor.primary};
-  `}
-`;
 
 export default DateFilter;

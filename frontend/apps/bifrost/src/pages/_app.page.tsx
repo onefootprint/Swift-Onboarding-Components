@@ -1,12 +1,12 @@
 import { Logger } from '@onefootprint/idv';
 import type { AppProps } from 'next/app';
+import { DM_Mono, DM_Sans } from 'next/font/google';
 import Head from 'next/head';
 import Script from 'next/script';
 import { createGlobalStyle } from 'styled-components';
-
-import { DM_Mono, DM_Sans } from 'next/font/google';
 import Providers from '../components/providers';
 import { GOOGLE_MAPS_SRC } from '../config/constants';
+import '../styles/globals.css';
 
 const defaultFont = DM_Sans({
   display: 'swap',

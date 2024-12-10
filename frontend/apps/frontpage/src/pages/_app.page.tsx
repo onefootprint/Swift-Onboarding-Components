@@ -1,5 +1,4 @@
 import '@onefootprint/footprint-js/dist/footprint-js.css';
-import '@onefootprint/ui/styles.css';
 import Intercom from '@intercom/messenger-js-sdk';
 import { GoogleTagManager } from '@next/third-parties/google';
 import type { AppProps } from 'next/app';

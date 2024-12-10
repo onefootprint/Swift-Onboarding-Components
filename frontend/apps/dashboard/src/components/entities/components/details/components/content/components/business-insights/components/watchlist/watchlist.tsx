@@ -30,12 +30,12 @@ const Watchlist = ({ data }: WatchlistProps) => {
         {selectedEntity && (
           <>
             <SelectNew
+              className="w-[300px]"
+              contentWidth="300px"
               onChange={handleChange}
               options={options}
               size="compact"
               value={selectedEntity}
-              triggerWidth="300px"
-              contentWidth="300px"
             />
             <Tag>{watchlist[selectedEntity].kind === EntityKind.business ? t('tags.business') : t('tags.person')}</Tag>
           </>

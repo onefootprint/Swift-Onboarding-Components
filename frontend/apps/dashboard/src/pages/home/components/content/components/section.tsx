@@ -1,5 +1,4 @@
 import type { OrgMetricsResponse } from '@onefootprint/request-types/dashboard';
-import { Box, Grid, Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
@@ -12,32 +11,23 @@ const Section = ({ metrics }: SectionProps) => {
   const formattedMetrics = formatMetrics(metrics);
 
   return (
-    <Grid.Container gap={5} columns={['repeat(3, 1fr)']}>
+    <div className="grid grid-cols-3 gap-4">
       {formattedMetrics.map(({ key, value }) => {
         const translationKey = `onboarding-metrics.metrics.${key}` as ParseKeys<'common'>;
         const displayValue = typeof value === 'number' ? value.toLocaleString('en-US') : value;
 
         return (
-          <section aria-label={t(translationKey)}>
-            <Box
-              borderColor="tertiary"
-              borderRadius="default"
-              borderStyle="solid"
-              borderWidth={1}
-              key={key}
-              padding={5}
-            >
-              <Grid.Item gridArea={key}>
-                <Stack direction="column" gap={7}>
-                  <Text variant="body-2">{t(translationKey)}</Text>
-                  <Text variant="display-3">{displayValue}</Text>
-                </Stack>
-              </Grid.Item>
-            </Box>
+          <section key={key} aria-label={t(translationKey)}>
+            <div className="border border-solid border-tertiary rounded p-4">
+              <div className="flex flex-col gap-6">
+                <div className="text-body-2">{t(translationKey)}</div>
+                <div className="text-display-3">{displayValue}</div>
+              </div>
+            </div>
           </section>
         );
       })}
-    </Grid.Container>
+    </div>
   );
 };
 

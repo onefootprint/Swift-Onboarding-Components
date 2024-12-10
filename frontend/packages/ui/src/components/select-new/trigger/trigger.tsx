@@ -1,103 +1,43 @@
 import { IcoChevronDown16 } from '@onefootprint/icons';
 import * as Select from '@radix-ui/react-select';
-import styled, { css } from 'styled-components';
+import { cva, cx } from 'class-variance-authority';
 
-import { createFontStyles } from '../../../utils';
-import type { SelectNewProps, TriggerProps } from '../select-new.types';
+import type { TriggerProps } from '../select-new.types';
 
-const Trigger = ({
-  size,
-  disabled,
-  placeholder,
-  triggerWidth,
-  ariaLabel,
-  className,
-}: TriggerProps & { className?: string }) => (
-  <StyledTrigger size={size} width={triggerWidth} aria-label={ariaLabel} className={className}>
-    <ValueContainer>
-      <Select.Value placeholder={placeholder} />
-    </ValueContainer>
-    <IconContainer>
-      <IcoChevronDown16 color={disabled ? 'quaternary' : 'secondary'} />
-    </IconContainer>
-  </StyledTrigger>
-);
+const Trigger = ({ size, disabled, placeholder, ariaLabel, className }: TriggerProps & { className?: string }) => {
+  return (
+    <Select.Trigger
+      aria-label={ariaLabel}
+      className={cx(
+        'flex items-center justify-between cursor-pointer bg-input-default text-input-color rounded border border-solid border-input-default gap-2',
+        'hover:border-input-hover',
+        'data-[state=open]:[&_[role=icon]]:rotate-180',
+        'data-[placeholder=true]:text-input-placeholder',
+        'data-[disabled]:bg-input-disabled data-[disabled]:border-input-disabled data-[disabled]:text-input-disabled',
+        trigger({ size }),
+        className,
+      )}
+    >
+      <span className="overflow-hidden text-ellipsis whitespace-nowrap">
+        <Select.Value placeholder={placeholder} />
+      </span>
+      <Select.Icon className="flex items-center justify-center transition-transform duration-100 ease-in">
+        <IcoChevronDown16 color={disabled ? 'quaternary' : 'secondary'} />
+      </Select.Icon>
+    </Select.Trigger>
+  );
+};
 
-const StyledTrigger = styled(Select.Trigger)<{
-  size: SelectNewProps['size'];
-  width: TriggerProps['triggerWidth'];
-}>`
-  ${({ theme, size, width = 'default' }) => {
-    const { input } = theme.components;
-
-    return css`
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background-color: ${input.state.default.initial.bg};
-      color: ${input.global.color};
-      border-radius: ${input.global.borderRadius};
-      border: ${input.global.borderWidth} solid
-        ${input.state.default.initial.border};
-      width: ${width};
-      gap: ${theme.spacing[2]};
-
-      ${IconContainer} {
-        transition: transform 0.1s ease;
-      }
-
-      &[data-state='open'] {
-        ${IconContainer} {
-          transform: rotate(180deg);
-        }
-      }
-
-      &:hover {
-        border-color: ${input.state.default.hover.border};
-      }
-
-      &[data-placeholder='true'] {
-        color: ${input.global.placeholderColor};
-      }
-
-      &[data-disabled] {
-        background-color: ${input.state.disabled.bg};
-        border-color: ${input.state.disabled.border};
-        color: ${input.state.disabled.color};
-      }
-
-      ${
-        size === 'compact' &&
-        css`
-        ${createFontStyles('body-3')} 
-        height: ${input.size.compact.height};
-        padding: ${theme.spacing[2]} ${theme.spacing[3]};
-      `
-      }
-
-      ${
-        size === 'default' &&
-        css`
-        ${createFontStyles('body-2')}
-        height: ${input.size.default.height};
-        padding: ${theme.spacing[3]} ${theme.spacing[4]};
-      `
-      }
-    `;
-  }};
-`;
-
-const IconContainer = styled(Select.Icon)`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const ValueContainer = styled.span`
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-`;
+const trigger = cva([], {
+  variants: {
+    size: {
+      compact: 'text-body-3 h-8 px-3 py-2',
+      default: 'text-body-2 h-10 px-4 py-3',
+    },
+  },
+  defaultVariants: {
+    size: 'default',
+  },
+});
 
 export default Trigger;

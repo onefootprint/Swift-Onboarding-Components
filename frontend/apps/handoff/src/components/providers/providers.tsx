@@ -1,4 +1,3 @@
-import '@onefootprint/ui/styles.css';
 import { AppearanceProvider } from '@onefootprint/appearance';
 import { QueryClientProvider } from '@tanstack/react-query';
 import type { AppProps } from 'next/app';

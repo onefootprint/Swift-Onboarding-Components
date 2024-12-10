@@ -2,8 +2,13 @@
   "name": "@onefootprint/tailwind-config",
   "version": "0.0.0",
   "private": true,
+  "scripts": {
+    "build": "tailwindcss -i ./tailwind.css -o ./dist/tailwind.css",
+    "dev": "tailwindcss -i ./tailwind.css -o ./dist/tailwind.css --watch"
+  },
   "exports": {
-    ".": "./tailwind.config.ts"
+    ".": "./tailwind.config.ts",
+    "./tailwind.css": "./dist/tailwind.css"
   },
   "devDependencies": {
     "tsconfig": "workspace:*",

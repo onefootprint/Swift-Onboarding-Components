@@ -5,36 +5,34 @@ import Label from '../label';
 import Hint from './hint';
 import Item from './item';
 import type { SelectNewOption, SelectNewProps } from './select-new.types';
-import Trigger from './trigger/trigger';
+import Trigger from './trigger';
 
 const SelectNew = ({
-  size = 'default',
-  disabled = false,
-  placeholder = 'Select',
-  triggerWidth = 'default',
+  ariaLabel = 'select',
+  className,
   contentWidth = 'default',
-  label,
+  disabled = false,
   hint,
+  label,
   onChange,
   options,
-  ariaLabel = 'select',
+  placeholder = 'Select',
+  size = 'default',
   value,
-  className,
 }: SelectNewProps & { className?: string }) => (
-  <StyledRoot onValueChange={onChange} disabled={disabled} value={value}>
+  <Select.Root onValueChange={onChange} disabled={disabled} value={value}>
     {label && <Label>{label}</Label>}
     <Trigger
       placeholder={placeholder}
       size={size}
       disabled={disabled}
-      triggerWidth={triggerWidth}
       ariaLabel={ariaLabel}
       value={value}
       className={className}
     />
     {hint && <Hint text={hint} />}
     <StyledContent sideOffset={8} width={contentWidth} position="popper">
-      <Viewport>
+      <Select.Viewport className="max-h-50vh overflow-y-auto">
         {options.map((option: SelectNewOption, index: number) => (
           <Item
             key={option.value}
@@ -44,14 +42,10 @@ const SelectNew = ({
             isFirst={index === 0}
           />
         ))}
-      </Viewport>
+      </Select.Viewport>
     </StyledContent>
-  </StyledRoot>
+  </Select.Root>
 );
-
-const StyledRoot = styled(Select.Root)`
-  position: relative;
-`;
 
 const StyledContent = styled(Select.Content)<{
   width?: string;
@@ -65,11 +59,6 @@ const StyledContent = styled(Select.Content)<{
     z-index: 1;
     padding: 0 ${theme.spacing[2]} 0 ${theme.spacing[2]};
   `}
-`;
-
-const Viewport = styled(Select.Viewport)`
-  max-height: 50vh;
-  overflow-y: auto;
 `;
 
 export default SelectNew;

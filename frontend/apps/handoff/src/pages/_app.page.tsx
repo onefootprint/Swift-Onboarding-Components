@@ -5,6 +5,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { createGlobalStyle, css } from 'styled-components';
 import Providers from '../components/providers';
+import '../styles/globals.css';
 
 // Don't enable logger replay until we know we are in a live onboarding
 Logger.init('handoff', /* deferSessionRecord */ true);

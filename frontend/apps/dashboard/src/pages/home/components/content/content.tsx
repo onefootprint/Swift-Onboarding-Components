@@ -1,7 +1,5 @@
 import { IcoStore24, IcoUsers24 } from '@onefootprint/icons';
 import type { OrgMetricsResponse } from '@onefootprint/request-types/dashboard';
-import { Stack } from '@onefootprint/ui';
-import { Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import Section from './components/section';
 
@@ -13,28 +11,28 @@ const Content = ({ metrics }: ContentProps) => {
   const { t } = useTranslation('home');
 
   return (
-    <Stack direction="column" gap={9}>
+    <div className="flex flex-col gap-10">
       <fieldset aria-label={t('users')}>
-        <Stack direction="column" gap={5}>
-          <Stack gap={3} align="center">
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-2">
             <IcoUsers24 />
-            <Text variant="heading-5">{t('users')}</Text>
-          </Stack>
+            <h2 className="text-heading-5">{t('users')}</h2>
+          </div>
           <Section metrics={metrics.user} />
-        </Stack>
+        </div>
       </fieldset>
       {metrics.business.newVaults ? (
         <fieldset aria-label={t('businesses')}>
-          <Stack direction="column" gap={5}>
-            <Stack gap={3} align="center">
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center gap-2">
               <IcoStore24 />
-              <Text variant="heading-5">{t('businesses')}</Text>
-            </Stack>
+              <h2 className="text-heading-5">{t('businesses')}</h2>
+            </div>
             <Section metrics={metrics.business} />
-          </Stack>
+          </div>
         </fieldset>
       ) : null}
-    </Stack>
+    </div>
   );
 };
 

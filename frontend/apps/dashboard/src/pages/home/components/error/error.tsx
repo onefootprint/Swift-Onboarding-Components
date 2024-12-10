@@ -1,15 +1,13 @@
 import { getErrorMessage } from '@onefootprint/request';
-import { createFontStyles } from '@onefootprint/ui';
 import Link from 'next/link';
 import { Trans } from 'react-i18next';
-import styled, { css } from 'styled-components';
 
 type ErrorProps = {
   error: unknown;
 };
 
 const ErrorComponent = ({ error }: ErrorProps) => (
-  <Container>
+  <p className="text-body-2 text-secondary text-decoration-none">
     {`${getErrorMessage(error)}. `}
     <Trans
       ns="home"
@@ -17,19 +15,11 @@ const ErrorComponent = ({ error }: ErrorProps) => (
       components={{
         refresh: (
           // eslint-disable-next-line jsx-a11y/anchor-is-valid
-          <Link onClick={() => window.location.reload()} href="" style={{ textDecoration: 'none', color: '#4A24DB' }} />
+          <Link onClick={() => window.location.reload()} href="" className="no-underline text-accent" />
         ),
       }}
     />
-  </Container>
+  </p>
 );
-
-const Container = styled.p`
-  ${({ theme }) => css`
-    ${createFontStyles('body-2')};
-    color: ${theme.color.secondary};
-    text-decoration: none;
-  `}
-`;
 
 export default ErrorComponent;

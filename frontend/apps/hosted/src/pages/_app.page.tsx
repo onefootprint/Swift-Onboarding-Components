@@ -2,8 +2,8 @@ import { Logger } from '@onefootprint/idv';
 import type { AppProps } from 'next/app';
 import { DM_Mono, DM_Sans } from 'next/font/google';
 import { createGlobalStyle, css } from 'styled-components';
-
 import Providers from '../components/providers';
+import '../styles/globals.css';
 
 // Don't enable logger replay until we know we are in a live onboarding
 Logger.init('hosted', /* deferSessionRecord */ true);

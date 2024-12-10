@@ -1,4 +1,4 @@
-import '../../static/server-loading.css';
+import '../../styles/server-loading.css';
 
 const Loading = () => (
   <div id="auth-method-app-loading">

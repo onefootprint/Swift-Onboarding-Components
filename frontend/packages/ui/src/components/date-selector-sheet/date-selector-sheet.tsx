@@ -14,10 +14,7 @@ import {
 import { motion } from 'framer-motion';
 import type React from 'react';
 import { forwardRef, useEffect, useMemo, useState } from 'react';
-import styled, { css } from 'styled-components';
 import Popover from '../popover/';
-
-import Stack from '../stack';
 import DayButton from './components/day-button';
 import Header from './components/header';
 import RangeInputs from './components/range-inputs';
@@ -31,21 +28,22 @@ const today = startOfToday();
 const DateSelectorSheet = forwardRef<HTMLDivElement, DateSelectorSheetProps>(
   (
     {
-      startDate,
-      endDate,
       ariaLabel = 'Select date range',
-      open,
       asChild,
       children,
+      className,
       disableFutureDates,
       disablePastDates,
-      onOpenChange,
-      onClickOutside,
+      endDate,
       onChange,
+      onClickOutside,
+      onOpenChange,
+      open,
       position = {
         alignment: 'start',
         side: 'bottom',
       },
+      startDate,
     },
     ref,
   ) => {
@@ -128,7 +126,9 @@ const DateSelectorSheet = forwardRef<HTMLDivElement, DateSelectorSheetProps>(
 
     return (
       <Popover.Root onOpenChange={onOpenChange} open={open}>
-        <Popover.Trigger asChild={asChild}>{children}</Popover.Trigger>
+        <Popover.Trigger asChild={asChild} className={className}>
+          {children}
+        </Popover.Trigger>
         <Popover.Content
           sideOffset={8}
           align={position.alignment}
@@ -139,15 +139,22 @@ const DateSelectorSheet = forwardRef<HTMLDivElement, DateSelectorSheetProps>(
           aria-label={ariaLabel}
           ref={ref}
           maxWidth="312px"
+          className="border border-solid border-tertiary"
         >
-          <Container transition={containerVariants} layout layoutRoot initial={false}>
+          <motion.div
+            className="flex flex-col pb-2 overflow-hidden isolate"
+            transition={containerVariants}
+            layout
+            layoutRoot
+            initial={false}
+          >
             <Header
               handleMonthChange={handleMonthChange}
               firstDayCurrentMonth={firstDayCurrentMonth}
               movingDirection={movingDirection}
               setMovingDirection={setMovingDirection}
             />
-            <Stack direction="column" marginBottom={3}>
+            <div className="flex flex-col mb-2">
               <RangeInputs
                 onChange={handleRangeChange}
                 onFocus={handleRangeInputFocus}
@@ -157,9 +164,10 @@ const DateSelectorSheet = forwardRef<HTMLDivElement, DateSelectorSheetProps>(
                 disablePastDates={disablePastDates}
               />
               <div id="error-message" />
-            </Stack>
+            </div>
             <WeekHeader />
-            <Days
+            <motion.div
+              className="grid grid-rows-[40px] gap-y-0.5 grid-cols-7 px-4"
               key={format(firstDayCurrentMonth, 'MMMM yyyy')}
               initial={movingDirection ? 'initial' : false}
               animate={movingDirection ? 'animate' : false}
@@ -178,32 +186,12 @@ const DateSelectorSheet = forwardRef<HTMLDivElement, DateSelectorSheetProps>(
                   disabled={(disableFutureDates && isAfter(day, today)) || (disablePastDates && isBefore(day, today))}
                 />
               ))}
-            </Days>
-          </Container>
+            </motion.div>
+          </motion.div>
         </Popover.Content>
       </Popover.Root>
     );
   },
 );
-
-const Container = styled(motion.div)`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    isolation: isolate;
-    overflow: hidden;
-    padding-bottom: ${theme.spacing[3]};
-  `}
-`;
-
-const Days = styled(motion.div)`
-  ${({ theme }) => css`
-    display: grid;
-    grid-auto-rows: ${theme.spacing[9]};
-    grid-row-gap: ${theme.spacing[1]};
-    grid-template-columns: repeat(7, 1fr);
-    padding: 0 ${theme.spacing[5]};
-  `}
-`;
 
 export default DateSelectorSheet;

@@ -6,14 +6,13 @@ export type HeaderProps = {
 };
 
 export type DateSelectorSheetProps = {
-  open: boolean;
-  startDate?: Date;
-  endDate?: Date;
   ariaLabel?: string;
   asChild?: boolean;
   children: React.ReactNode;
+  className?: string;
   disableFutureDates?: boolean;
   disablePastDates?: boolean;
+  endDate?: Date;
   onChange: ({
     startDate,
     endDate,
@@ -21,13 +20,15 @@ export type DateSelectorSheetProps = {
     startDate?: Date;
     endDate?: Date;
   }) => void;
-  onOpenChange?: (open: boolean) => void;
   onClickOutside?: () => void;
+  onOpenChange?: (open: boolean) => void;
+  open: boolean;
   position?: {
     alignment?: 'start' | 'center' | 'end';
     side?: 'top' | 'right' | 'bottom' | 'left';
     avoidCollisions?: boolean;
   };
+  startDate?: Date;
 };
 
 export enum DirectionChange {

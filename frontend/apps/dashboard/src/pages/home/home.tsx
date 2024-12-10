@@ -1,9 +1,7 @@
 import { getOrgMetricsOptions } from '@onefootprint/axios/dashboard';
-import { Box, Stack, Text } from '@onefootprint/ui';
 import { useQuery } from '@tanstack/react-query';
 import Head from 'next/head';
 import { useTranslation } from 'react-i18next';
-
 import Content from './components/content';
 import DateFilter from './components/date-filter';
 import ErrorComponent from './components/error';
@@ -14,42 +12,26 @@ import useFilters from './hooks/use-filters';
 const Home = () => {
   const { t } = useTranslation('home');
   const filters = useFilters();
-  const metricsQuery = useQuery(
-    getOrgMetricsOptions({
-      query: filters.requestParams,
-    }),
-  );
+  const metricsQuery = useQuery(getOrgMetricsOptions({ query: filters.requestParams }));
 
   return (
     <>
       <Head>
         <title>{t('page-title')}</title>
       </Head>
-      <Text variant="heading-2" marginBottom={7}>
-        {t('header.title')}
-      </Text>
-      <Box aria-busy={metricsQuery.isPending}>
-        <Stack
-          alignItems="center"
-          borderBottomWidth={1}
-          borderColor="tertiary"
-          borderStyle="solid"
-          justifyContent="space-between"
-          marginBottom={4}
-          paddingBottom={4}
-        >
-          <Text variant="heading-5" tag="h1">
-            {t('onboarding-metrics.title')}
-          </Text>
-          <Stack gap={4}>
+      <h2 className="text-heading-2 mb-6">{t('header.title')}</h2>
+      <div aria-busy={metricsQuery.isPending}>
+        <div className="flex items-center justify-between pb-3 mb-3 border-b border-solid border-tertiary">
+          <h1 className="text-heading-5">{t('onboarding-metrics.title')}</h1>
+          <div className="flex gap-3">
             <DateFilter />
             <PlaybooksFilter />
-          </Stack>
-        </Stack>
+          </div>
+        </div>
         {metricsQuery.isPending ? <Loading /> : null}
         {metricsQuery.error ? <ErrorComponent error={metricsQuery.error} /> : null}
         {metricsQuery.data ? <Content metrics={metricsQuery.data} /> : null}
-      </Box>
+      </div>
     </>
   );
 };

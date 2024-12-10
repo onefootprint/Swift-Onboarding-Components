@@ -42,7 +42,7 @@ const PlaybooksFilter = () => {
           <SelectCustom.Input size="compact" placeholder={t('all-playbooks')}>
             <SelectCustom.Value placeholder={t('all-playbooks')}>{playbooksFilterValue.label}</SelectCustom.Value>
           </SelectCustom.Input>
-          <SelectCustom.Content maxHeight="50vh" maxWidth="400px">
+          <SelectCustom.Content maxHeight="50vh" maxWidth="400px" minWidth="240px" popper align="end">
             <SelectCustom.Group>
               {playbooksData.map(option => (
                 <SelectCustom.Item key={option.value} value={option.value} showChecked>
