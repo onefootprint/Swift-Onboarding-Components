@@ -1,35 +1,49 @@
+import { postHostedIdentifySignupChallengeMutation } from '@onefootprint/axios';
 import { useMutation } from '@tanstack/react-query';
-import { useForm, useWatch } from 'react-hook-form';
-import useFootprint from '../hooks/use-footprint';
+import { useForm } from 'react-hook-form';
 import logo from '../images/avis.png';
 
-const Intro = ({ onFillout }) => {
+type IntroStepProps = {
+  onFillout: (data: FormData) => void;
+};
+
+type FormData = {
+  email: string;
+  phoneNumber: string;
+};
+
+const Intro = ({ onFillout }: IntroStepProps) => {
   const {
     register,
     handleSubmit,
-    control,
     formState: { errors },
-    clearErrors,
-  } = useForm();
-  const { createChallenge } = useFootprint();
-  const phoneNumber = useWatch({ control, name: 'phoneNumber' });
-  const mutation = useMutation({
-    mutationFn: async () => {
-      await createChallenge(phoneNumber);
-    },
-    onSuccess: () => {
-      onFillout(phoneNumber);
-    },
-  });
-
-  const validatePhoneNumber = value => {
-    const cleanedNumber = value.replace(/\D/g, '');
-    return (cleanedNumber.length >= 10 && cleanedNumber.length <= 15) || 'Please enter a valid phone number';
-  };
+  } = useForm<FormData>();
+  const mutation = useMutation(
+    postHostedIdentifySignupChallengeMutation({
+      headers: {
+        'X-Fp-Is-Components-Sdk': true,
+      },
+    }),
+  );
 
   const onSubmit = data => {
-    clearErrors();
-    mutation.mutate(data);
+    mutation.mutate(
+      {
+        body: {
+          phoneNumber: {
+            value: data.phoneNumber,
+            isBootstrap: false,
+          },
+          challengeKind: 'sms_link',
+          scope: 'onboarding',
+        },
+      },
+      {
+        onSuccess: () => {
+          onFillout(data);
+        },
+      },
+    );
   };
 
   return (
@@ -37,9 +51,27 @@ const Intro = ({ onFillout }) => {
       <header className="header">
         <img src={logo} alt="Avis Logo" className="logo" width={92} height={30} />
         <h1 className="title">Let's verify your customer's identity!</h1>
-        <h2 className="subtitle">Enter their phone number to proceed.</h2>
+        <h2 className="subtitle">Enter their email and phone number to begin the identity verification process.</h2>
       </header>
       <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="form-field">
+          <label className="form-label" htmlFor="email">
+            Email
+          </label>
+          <input
+            id="email"
+            className="form-input"
+            placeholder="customer@example.com"
+            {...register('email', {
+              required: 'Email is required',
+              pattern: {
+                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                message: 'Please enter a valid email address',
+              },
+            })}
+          />
+          {errors.email?.message && <p className="form-error">{errors.email.message as string}</p>}
+        </div>
         <div className="form-field">
           <label className="form-label" htmlFor="phoneNumber">
             Phone number
@@ -48,10 +80,17 @@ const Intro = ({ onFillout }) => {
             id="phoneNumber"
             className="form-input"
             placeholder="+1 555-555-0100"
-            {...register('phoneNumber', { required: 'Phone number is required', validate: validatePhoneNumber })}
+            {...register('phoneNumber', {
+              required: 'Phone number is required',
+              validate: (value: string) => {
+                const cleanedNumber = value.replace(/\D/g, '');
+                return (
+                  (cleanedNumber.length >= 10 && cleanedNumber.length <= 15) || 'Please enter a valid phone number'
+                );
+              },
+            })}
           />
           {errors.phoneNumber?.message && <p className="form-error">{errors.phoneNumber.message as string}</p>}
-          {mutation.error && <p className="form-error">{mutation.error.message}</p>}
           {mutation.error && <p className="form-error">{mutation.error.message}</p>}
         </div>
         <div className="form-button">

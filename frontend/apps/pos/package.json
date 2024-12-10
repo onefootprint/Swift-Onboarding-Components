@@ -3,24 +3,29 @@
   "version": "0.1.2",
   "private": true,
   "dependencies": {
+    "@onefootprint/axios": "workspace:*",
+    "@onefootprint/request": "workspace:*",
+    "@onefootprint/request-types": "workspace:*",
     "@tanstack/react-query": "^5.56.2",
     "axios": "^1.7.7",
     "lodash": "^4.17.21",
+    "react": "^18",
     "react-app-polyfill": "^3.0.0",
     "react-dom": "^18",
     "react-hook-form": "^7.53.0",
     "react-scripts": "5.0.1",
-    "react": "^18",
     "typescript": "^5.6.2"
   },
   "devDependencies": {
     "@types/node": "^22.7.4",
+    "@types/react": "^18.3.10",
     "@types/react-dom": "^18.3.0",
-    "@types/react": "^18.3.10"
+    "customize-cra": "^1.0.0",
+    "react-app-rewired": "^2.2.1"
   },
   "scripts": {
-    "dev": "react-scripts start",
-    "build": "react-scripts build",
+    "dev": "react-app-rewired start",
+    "build": "react-app-rewired build",
     "eject": "react-scripts eject",
     "lint:ci": "biome ci src",
     "lint": "biome check src --fix --unsafe"
