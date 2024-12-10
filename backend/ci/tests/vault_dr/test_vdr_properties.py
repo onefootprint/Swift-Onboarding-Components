@@ -1,4 +1,3 @@
-from collections import defaultdict
 from datetime import timedelta
 import json
 import pexpect
@@ -8,9 +7,7 @@ from hypothesis import (
     settings,
     assume,
     note,
-    reproduce_failure,
 )
-from hypothesis.strategies import composite
 from hypothesis.stateful import (
     RuleBasedStateMachine,
     Bundle,
@@ -61,7 +58,6 @@ def new_vdr_state_machine(tenant, cfg, tmp_path_factory, enable_backfill=False):
 
     num_fp_ids_initialized_with_data = 1
     num_fp_ids_initialized_without_data = 1
-    num_fp_ids = num_fp_ids_initialized_with_data + num_fp_ids_initialized_without_data
 
     num_pii_values = 2
     num_dis = 2
@@ -215,7 +211,7 @@ def new_vdr_state_machine(tenant, cfg, tmp_path_factory, enable_backfill=False):
             # versions as not backed up. Simulates a DB backfill that results in
             # VDR needing to backfill.
             post(
-                f"private/vault_dr/test_backfill",
+                "private/vault_dr/test_backfill",
                 [fp_id],
                 CUSTODIAN_AUTH,
             )
@@ -299,32 +295,30 @@ def new_vdr_state_machine(tenant, cfg, tmp_path_factory, enable_backfill=False):
                 fp_id = record["fp_id"]
                 version = record["version"]
 
-                assert (
-                    record["fp_id"] in self.expected_vault_data
-                ), "fp_id in footprint-dr list-records not found in ground truth"
-                assert (
-                    version in self.expected_vault_data[fp_id]
-                ), "vault version in footprint-dr list-records not found in ground truth"
+                assert record["fp_id"] in self.expected_vault_data, (
+                    "fp_id in footprint-dr list-records not found in ground truth"
+                )
+                assert version in self.expected_vault_data[fp_id], (
+                    "vault version in footprint-dr list-records not found in ground truth"
+                )
                 assert sorted(record["fields"]) == sorted(
                     self.expected_vault_data[fp_id][version].keys()
                 )
 
                 # This is only true if the VDR batch runs to completion.
-                assert version == max(
-                    self.expected_vault_data[fp_id].keys()
-                ), "vault version from footprint-dr list-records is not the latest version"
+                assert version == max(self.expected_vault_data[fp_id].keys()), (
+                    "vault version from footprint-dr list-records is not the latest version"
+                )
 
             # Decrypt all past versions of the data.
             records_to_decrypt = []
             for fp_id, versions in self.expected_vault_data.items():
                 for version, data in versions.items():
-                    records_to_decrypt.append(
-                        {
-                            "fp_id": fp_id,
-                            "version": version,
-                            "fields": list(data.keys()),
-                        }
-                    )
+                    records_to_decrypt.append({
+                        "fp_id": fp_id,
+                        "version": version,
+                        "fields": list(data.keys()),
+                    })
 
             note(f"Decrypting {records_to_decrypt}")
 

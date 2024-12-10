@@ -3,7 +3,10 @@ TLA2TOOLS := ${PWD}/tla2tools-${TLAPLUS_VERSION}.jar
 SPEC := vdr.tla
 
 .PHONY: check_all
-check_all: check_small_fairspec check_medium_fairspec check_large_terminatesspec
+check_all:
+	$(MAKE) check_small_fairspec
+	$(MAKE) check_medium_fairspec
+	$(MAKE) check_large_terminatesspec
 
 # Takes about 1 minute. checks for termination.
 .PHONY: check_small_fairspec
