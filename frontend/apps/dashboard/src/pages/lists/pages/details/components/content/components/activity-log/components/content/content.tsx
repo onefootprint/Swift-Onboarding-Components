@@ -14,29 +14,25 @@ const Content = ({ timeline }: ContentProps) => {
     keyPrefix: 'details.activity-log',
   });
 
-  const items: TimelineItem[] = [];
-
-  timeline.forEach(({ timestamp, principal, detail }: ListEvent) => {
+  const items = timeline.reduce<TimelineItem[]>((acc, { timestamp, principal, detail }) => {
     const { kind } = detail;
 
     // TK - timeline events for createList and updateList
-    if (kind === 'create_list_entry' && principal?.kind === 'user') {
-      items.push({
+    if (kind === 'create_list_entry') {
+      acc.push({
         timestamp,
-        // TK - possibly come back, not sure if we actually want to pass the ID
-        // down as the name / what was supposed to be here
-        // still can't see any of this so unclear
-        headerComponent: <ListEntryCreatedEventHeader user={principal.id} event={detail} />,
+        headerComponent: <ListEntryCreatedEventHeader principal={principal} event={detail} />,
       });
-    } else if (kind === 'delete_list_entry' && principal?.kind === 'user') {
-      items.push({
+    } else if (kind === 'delete_list_entry') {
+      acc.push({
         timestamp,
-        headerComponent: <ListEntryDeletedEventHeader user={principal.id} event={detail} />,
+        headerComponent: <ListEntryDeletedEventHeader principal={principal} event={detail} />,
       });
     }
-  });
+    return acc;
+  }, []);
 
-  return timeline.length > 0 ? (
+  return items.length > 0 ? (
     <div className="w-full">
       <Timeline items={items} />
     </div>
