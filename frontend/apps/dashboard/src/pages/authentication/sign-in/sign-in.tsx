@@ -1,11 +1,10 @@
+import { IS_DEV } from '@onefootprint/global-constants';
 import { ThemedLogoFpCompact } from '@onefootprint/icons';
 import { Box, Divider, Text, media } from '@onefootprint/ui';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-
-import { IS_DEV } from '@onefootprint/global-constants';
 import AuthTokenForm from '../components/auth-token-form';
 import Blur from '../components/blur';
 import ContainerBox from '../components/container-box';

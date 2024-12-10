@@ -6,20 +6,20 @@ type FormData = {
   authToken: string;
 };
 
-const EmailForm = () => {
+const AuthTokenForm = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>();
-
   const { logIn } = useSession();
-  const onSubmit = async ({ authToken }: FormData) => {
+
+  const submit = async ({ authToken }: FormData) => {
     await logIn({ auth: authToken });
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(submit)}>
       <div className="flex flex-col gap-4">
         <Form.Field>
           <Form.Label>[DEV ONLY] Auth token copied from another session</Form.Label>
@@ -40,4 +40,4 @@ const EmailForm = () => {
   );
 };
 
-export default EmailForm;
+export default AuthTokenForm;
