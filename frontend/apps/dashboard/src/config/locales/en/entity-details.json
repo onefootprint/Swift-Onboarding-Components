@@ -1124,6 +1124,7 @@
   },
   "onboardings": {
     "title": "Onboardings",
+    "no-onboardings": "This {{kind}} has no onboardings.",
     "header": {
       "timestamp": "on {{timestamp}}",
       "outcome": "Outcome:",
