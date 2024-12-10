@@ -203,6 +203,13 @@
       },
       "delete-list-entry": {
         "verb": "removed"
+      },
+      "principal-actor": {
+        "footprint": "Footprint",
+        "firm-employee": "Firm employee",
+        "employees": "Employees",
+        "api-key": "API key",
+        "user": "User"
       }
     }
   },
