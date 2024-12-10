@@ -27,15 +27,15 @@ const Content = ({ onboardings }: ContentProps) => {
   };
 
   return (
-    <fieldset className="flex flex-col justify-between w-full h-full border border-solid border-tertiary rounded">
-      <header className="flex justify-between bg-secondary py-2 px-5 border-b border-solid border-tertiary rounded-t max-h-40px">
+    <fieldset className="flex flex-col justify-between w-full h-full border border-solid rounded border-tertiary">
+      <header className="flex justify-between px-5 py-2 border-b border-solid rounded-t bg-secondary border-tertiary max-h-40px">
         <div className="flex items-center gap-2">
-          <span className="text-primary text-label-3">
+          <p className="text-primary text-label-3">
             {playbookName} {timestamp && t('timestamp', { timestamp: getTimestampText(timestamp) })}
-          </span>
+          </p>
           <span className="text-primary text-label-2">⋅</span>
-          <span className="text-label-2">{t('outcome')}</span>
-          <span className={`text-${getStatusColor(status)} text-label-2`}>{statusT(status)}</span>
+          <p className="text-label-2">{t('outcome')}</p>
+          <p className={`text-${getStatusColor(status)} text-label-2`}>{statusT(status)}</p>
           {isLatest && <LatestTag />}
         </div>
         <Dropdown.Root open={isOpen} onOpenChange={toggleDropdown}>
@@ -43,16 +43,18 @@ const Content = ({ onboardings }: ContentProps) => {
             <LinkButton>{t('trigger')}</LinkButton>
           </Dropdown.Trigger>
           <Dropdown.Portal>
-            <Dropdown.Content className="w-[360px] max-h-[230px] py-3 flex flex-col gap-1" align="end" sideOffset={4}>
-              {onboardings.map(onboarding => (
-                <OnboardingItem
-                  key={onboarding.id}
-                  isChecked={selectedOnboarding.id === onboarding.id}
-                  isLatest={onboarding.id === onboardings[0].id}
-                  onboarding={onboarding}
-                  onClick={() => setSelectedOnboarding(onboarding)}
-                />
-              ))}
+            <Dropdown.Content maxWidth="360px" minWidth="fit-content" align="end" sideOffset={4}>
+              <Dropdown.RadioGroup value={selectedOnboarding.id}>
+                {onboardings.map(onboarding => (
+                  <OnboardingItem
+                    key={onboarding.id}
+                    isChecked={selectedOnboarding.id === onboarding.id}
+                    isLatest={onboarding.id === onboardings[0].id}
+                    onboarding={onboarding}
+                    onClick={() => setSelectedOnboarding(onboarding)}
+                  />
+                ))}
+              </Dropdown.RadioGroup>
             </Dropdown.Content>
           </Dropdown.Portal>
         </Dropdown.Root>

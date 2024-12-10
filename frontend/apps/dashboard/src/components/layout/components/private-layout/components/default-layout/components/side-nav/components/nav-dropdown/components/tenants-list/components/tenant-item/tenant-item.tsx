@@ -1,5 +1,6 @@
+import { IcoCheckSmall16 } from '@onefootprint/icons';
 import type { GetAuthRolesOrg } from '@onefootprint/types';
-import { Dropdown, Text } from '@onefootprint/ui';
+import { Dropdown } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
 type TenantItemProps = {
@@ -21,9 +22,10 @@ const TenantItem = ({ tenant, children, onClick }: TenantItemProps) => {
         value={tenant.id}
         onSelect={onClick}
       >
-        <Text variant="body-3" truncate>
-          {children}
-        </Text>
+        <p className="truncate body-3">{children}</p>
+        <Dropdown.ItemIndicator>
+          <IcoCheckSmall16 />
+        </Dropdown.ItemIndicator>
       </Dropdown.RadioItem>
     )
   );

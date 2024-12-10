@@ -1,4 +1,4 @@
-import { IcoCheck16 } from '@onefootprint/icons';
+import { IcoCheckSmall16 } from '@onefootprint/icons';
 import type { EntityOnboarding } from '@onefootprint/request-types/dashboard';
 import { Dropdown } from '@onefootprint/ui';
 import useStatusText from '../../../../hooks/use-status-text';
@@ -13,26 +13,26 @@ type OnboardingItemProps = {
   onClick: () => void;
 };
 
-const OnboardingItem = ({ isChecked, isLatest, onboarding, onClick }: OnboardingItemProps) => {
+const OnboardingItem = ({ isLatest, onboarding, onClick }: OnboardingItemProps) => {
   const statusT = useStatusText();
   const statusColor = getStatusColor(onboarding.status);
   const timestampText = getTimestampText(onboarding.timestamp);
 
   return (
-    <Dropdown.Item className="!h-fit flex items-start py-2 px-4" onClick={onClick}>
-      <div className="flex justify-between items-start w-full">
-        <div className="flex flex-col gap-1 mr-3 flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-1 min-w-0">
-            <span className="text-label-3 truncate flex-1 min-w-0 w-0 max-w-fit">{onboarding.playbookName}</span>
-            <span className="text-primary text-label-3 flex-shrink-0">⋅</span>
-            <span className={`text-${statusColor} text-label-3 flex-shrink-0`}>{statusT(onboarding.status)}</span>
-            {isLatest && <LatestTag />}
-          </div>
-          <p className="text-label-3 text-tertiary">{timestampText}</p>
+    <Dropdown.RadioItem onSelect={onClick} height="68px" value={onboarding.id}>
+      <div className="flex flex-col p-2">
+        <div className="flex items-center gap-1">
+          <p>{onboarding.playbookName}</p>
+          <span>⋅</span>
+          <p className={`text-${statusColor}`}>{statusT(onboarding.status)}</p>
+          {isLatest && <LatestTag />}
         </div>
-        {isChecked && <IcoCheck16 className="flex-shrink-0 mt-1" />}
+        <p className="text-label-3 text-tertiary">{timestampText}</p>
       </div>
-    </Dropdown.Item>
+      <Dropdown.ItemIndicator className="flex items-start justify-center w-6 h-full pt-3">
+        <IcoCheckSmall16 />
+      </Dropdown.ItemIndicator>
+    </Dropdown.RadioItem>
   );
 };
 

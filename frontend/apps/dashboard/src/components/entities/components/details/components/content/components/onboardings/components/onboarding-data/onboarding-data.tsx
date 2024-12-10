@@ -69,7 +69,7 @@ const OnboardingData = ({ onboarding }: OnboardingDataProps) => {
   };
 
   return (
-    <Box paddingTop={4} paddingRight={6} paddingBottom={7} paddingLeft={6}>
+    <div className="p-6">
       <TopSection>
         {riskSignals && (
           <Subsection icon={subsections.riskSignals.iconComponent} title={subsections.riskSignals.title}>
@@ -107,7 +107,7 @@ const OnboardingData = ({ onboarding }: OnboardingDataProps) => {
           <OnboardingUserData vaultData={vaultData} />
         </Subsection>
       </Box>
-    </Box>
+    </div>
   );
 };
 

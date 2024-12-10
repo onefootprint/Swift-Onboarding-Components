@@ -58,6 +58,7 @@ const BaseItem = styled(Box)<BaseItemProps>`
       &:focus-visible:not(:hover) {
         background-color: ${theme.backgroundColor.primary};
         outline: ${theme.borderWidth[1]} solid ${theme.borderColor.secondary};
+        outline-offset: calc(-${theme.spacing[1]} / 2);
       }
 
       &[data-disabled] {

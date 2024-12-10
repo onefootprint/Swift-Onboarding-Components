@@ -10,7 +10,7 @@ import Stack from '../../stack';
 import BaseItem from '../base-item';
 
 const Item = forwardRef<HTMLDivElement, ItemProps>(
-  ({ iconLeft: IconLeft, iconRight, children, checked, asLink, size, variant, height, onSelect, ...props }, ref) => {
+  ({ iconLeft: IconLeft, iconRight, children, asLink, size, variant, height, onSelect, ...props }, ref) => {
     const IconRight = asLink ? StyledIcoArrowTopRight16 : iconRight;
 
     return (
