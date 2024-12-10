@@ -220,13 +220,12 @@ class TestVaultProxy:
 
         assert result["message"] == "hello world"
 
-
     def test_proxy_ssrf_protection(self, sandbox_tenant):
         for url in [
             "http://localhost/foo",
             "http://example.com:8443",
             "http://127.0.0.1/",
-            "http://magic.127.0.0.1.nip.io/example", # Resolves to 127.0.0.1
+            "http://magic.127.0.0.1.nip.io/example",  # Resolves to 127.0.0.1
             "http://169.254.170.2/v2/metadata",
             "http://magic.169.254.170.2.nip.io/example",
             "ftp://myserver.com",
@@ -245,7 +244,6 @@ class TestVaultProxy:
                 ],
                 files=None,
             )
-
 
     def test_ingress(self, sandbox_tenant):
         # create the vault
@@ -336,8 +334,13 @@ class TestVaultProxy:
         )
 
         # test the header came in
-        assert response.headers["x-footprint-proxy-fwd-my-secret-header"] == "footprintrocks"
-        assert response.headers["x-footprint-proxy-fwd-my-test-header"] == "my-test-value"
+        assert (
+            response.headers["x-footprint-proxy-fwd-my-secret-header"]
+            == "footprintrocks"
+        )
+        assert (
+            response.headers["x-footprint-proxy-fwd-my-test-header"] == "my-test-value"
+        )
 
         assert response.headers["x-footprint-proxy-upstream-status-code"] == "200"
 

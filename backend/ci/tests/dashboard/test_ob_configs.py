@@ -68,11 +68,13 @@ def test_list_playbook_versions(sandbox_tenant, ob_configuration):
 
     assert len(body["data"]) == 1, "Only one version for a playbook without edits"
     assert (
-        len([
-            obc_version
-            for obc_version in body["data"]
-            if obc_version["id"] == ob_configuration.id
-        ])
+        len(
+            [
+                obc_version
+                for obc_version in body["data"]
+                if obc_version["id"] == ob_configuration.id
+            ]
+        )
         == 1
     )
 
@@ -1701,19 +1703,23 @@ def test_playbook_versions(sandbox_tenant, tenant):
     )
     # Rule IDs and timestamps are not maintained.
     rules_v2_repr = set(
-        json.dumps({
-            "name": r["name"],
-            "rule_expression": r["rule_expression"],
-            "action": r["action"],
-        })
+        json.dumps(
+            {
+                "name": r["name"],
+                "rule_expression": r["rule_expression"],
+                "action": r["action"],
+            }
+        )
         for r in rules_v2
     )
     rules_v3_repr = set(
-        json.dumps({
-            "name": r["name"],
-            "rule_expression": r["rule_expression"],
-            "action": r["action"],
-        })
+        json.dumps(
+            {
+                "name": r["name"],
+                "rule_expression": r["rule_expression"],
+                "action": r["action"],
+            }
+        )
         for r in rules_v3
     )
     assert rules_v2_repr == rules_v3_repr

@@ -194,7 +194,10 @@ class BifrostClient:
 
     def get_status(self):
         body = get("hosted/onboarding/status", None, self.auth_token)
-        if any(r["kind"] in ("collect_data", "collect_investor_profile") for r in body["all_requirements"]):
+        if any(
+            r["kind"] in ("collect_data", "collect_investor_profile")
+            for r in body["all_requirements"]
+        ):
             assert body["can_update_user_data"]
         return body
 

@@ -15,19 +15,19 @@ COMPANIES = [
 ]
 
 TEMPLATES = {
-  "Business Continuity or Disaster Recovery Plan": "This document outlines procedures and instructions an organization must follow in the face of disaster, whether fire, flood, or cyberattack. The goal is to enable ongoing operations before and during execution of disaster recovery.",
-  "Information Security Policy": "An Information Security Policy is a set of rules that guide individuals who work with IT assets. It outlines how to protect the organization's information assets from threats, whether internal or external.",
-  "Privacy Policy": "A privacy policy is a statement or legal document that discloses the ways a party gathers, uses, discloses, and manages a customer or client's data, ensuring compliance with privacy laws.",
-  "Articles of Incorporation": "Also known as a certificate of incorporation, it is a set of formal documents filed with a government body to legally document the creation of a corporation.",
-  "SLA": "A Service Level Agreement (SLA) is a contract between a service provider and the end user that defines the level of service expected from the service provider.",
-  "Certificate of Insurance": "A certificate of insurance is a document used to provide information on specific insurance coverage. It verifies the existence of an insurance policy and summarizes the key aspects and conditions of the policy.",
-  "SOC II Report": "A Service Organization Control (SOC) 2 report is designed to provide assurances about the effectiveness of controls at a service organization relevant to security, availability, processing integrity, confidentiality, and privacy.",
-  "Audited Financials": "Audited financial statements are financial reports that have been prepared by a company's management and have been reviewed by an independent auditor.",
-  "Vulnerability Scans": "Vulnerability scans are automated processes used by IT services to identify security weaknesses in software and networks. They aim to detect vulnerabilities that could be exploited by attackers to gain unauthorized access to systems and data.",
-  "Pen Test Report": "A Pen Test Report is a summary or report that outlines the methodologies, scope, findings, and recommendations resulting from a penetration test. This test simulates cyber attacks on a computer system to evaluate the security of the system."
+    "Business Continuity or Disaster Recovery Plan": "This document outlines procedures and instructions an organization must follow in the face of disaster, whether fire, flood, or cyberattack. The goal is to enable ongoing operations before and during execution of disaster recovery.",
+    "Information Security Policy": "An Information Security Policy is a set of rules that guide individuals who work with IT assets. It outlines how to protect the organization's information assets from threats, whether internal or external.",
+    "Privacy Policy": "A privacy policy is a statement or legal document that discloses the ways a party gathers, uses, discloses, and manages a customer or client's data, ensuring compliance with privacy laws.",
+    "Articles of Incorporation": "Also known as a certificate of incorporation, it is a set of formal documents filed with a government body to legally document the creation of a corporation.",
+    "SLA": "A Service Level Agreement (SLA) is a contract between a service provider and the end user that defines the level of service expected from the service provider.",
+    "Certificate of Insurance": "A certificate of insurance is a document used to provide information on specific insurance coverage. It verifies the existence of an insurance policy and summarizes the key aspects and conditions of the policy.",
+    "SOC II Report": "A Service Organization Control (SOC) 2 report is designed to provide assurances about the effectiveness of controls at a service organization relevant to security, availability, processing integrity, confidentiality, and privacy.",
+    "Audited Financials": "Audited financial statements are financial reports that have been prepared by a company's management and have been reviewed by an independent auditor.",
+    "Vulnerability Scans": "Vulnerability scans are automated processes used by IT services to identify security weaknesses in software and networks. They aim to detect vulnerabilities that could be exploited by attackers to gain unauthorized access to systems and data.",
+    "Pen Test Report": "A Pen Test Report is a summary or report that outlines the methodologies, scope, findings, and recommendations resulting from a penetration test. This test simulates cyber attacks on a computer system to evaluate the security of the system.",
 }
 
-SYSTEM_PROMPT ="""
+SYSTEM_PROMPT = """
 You are an assistant who generates documents for demoing a product.
 
 For each prompt, you are to generate HTML documents that can be printed to PDF. The documents should be styled professionally with a header and body.
@@ -47,13 +47,19 @@ HTML_DIR = os.path.join(os.path.dirname(__file__), "html")
 CSS_DIR = os.path.join(os.path.dirname(__file__), "css")
 PDF_DIR = os.path.join(os.path.dirname(__file__), "pdf")
 
+
 def random_stylesheet():
-    return os.path.join(CSS_DIR, random.choice([f for f in os.listdir(CSS_DIR) if f.endswith(".css")]))
+    return os.path.join(
+        CSS_DIR, random.choice([f for f in os.listdir(CSS_DIR) if f.endswith(".css")])
+    )
+
 
 with open(os.path.join(os.path.dirname(__file__), "example_privacy_policy.html")) as f:
     privacy_policy = f.read()
 
-with open(os.path.join(os.path.dirname(__file__), "example_pen_test_results.html")) as f:
+with open(
+    os.path.join(os.path.dirname(__file__), "example_pen_test_results.html")
+) as f:
     pen_test_results = f.read()
 
 
@@ -96,12 +102,9 @@ def generate_document(name, company):
                         "role": "assistant",
                         "content": pen_test_results,
                     },
-                    {
-                        "role": "user",
-                        "content": user_prompt(name, company)
-                    },
+                    {"role": "user", "content": user_prompt(name, company)},
                 ],
-            }
+            },
         )
         resp.raise_for_status()
 

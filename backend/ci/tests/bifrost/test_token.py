@@ -427,9 +427,7 @@ def test_no_implied_auth_for_stale(sandbox_tenant):
     try:
         user = next(i for i in body["data"] if not i["is_created_via_api"])
     except StopIteration:
-        assert (
-            False
-        ), "No old user to use to test implied auth timeout. If you get this error running tests locally, it's likely safe to ignore. See the comment in this test"
+        assert False, "No old user to use to test implied auth timeout. If you get this error running tests locally, it's likely safe to ignore. See the comment in this test"
 
     # Create a token and make sure it does not have implied auth
     fp_id = user["id"]

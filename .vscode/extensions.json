@@ -7,7 +7,6 @@
     "github.vscode-github-actions",
     "graphite.gti-vscode",
     "ms-azuretools.vscode-docker",
-    "ms-python.black-formatter",
     "ms-vscode.vscode-typescript-next",
     "naumovs.color-highlight",
     "rust-lang.rust-analyzer",
@@ -15,6 +14,7 @@
     "streetsidesoftware.code-spell-checker",
     "styled-components.vscode-styled-components",
     "vadimcn.vscode-lldb",
-    "wayou.vscode-todo-highlight"
+    "wayou.vscode-todo-highlight",
+    "charliermarsh.ruff"
   ]
 }

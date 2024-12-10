@@ -51,9 +51,7 @@ def get_audit_event_with_details(tenant, name, is_live=None, **kwargs):
 
 def assert_has_audit_event_with_details(tenant, name, is_live=None, **kwargs):
     event = get_audit_event_with_details(tenant, name, is_live=is_live, **kwargs)
-    assert (
-        event
-    ), f"Expected to find audit event with name={name} and details={kwargs} but found none"
+    assert event, f"Expected to find audit event with name={name} and details={kwargs} but found none"
 
 
 def generate_role(tenant, scopes, kind="api_key"):

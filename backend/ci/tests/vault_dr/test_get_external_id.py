@@ -1,5 +1,10 @@
 import pexpect
-from tests.vault_dr.utils import footprint_dr, login_sandbox, login_live, get_external_id
+from tests.vault_dr.utils import (
+    footprint_dr,
+    login_sandbox,
+    login_live,
+    get_external_id,
+)
 
 
 def test_footprint_dr_get_external_id(tenant):
@@ -23,4 +28,3 @@ def test_footprint_dr_get_external_id(tenant):
 
     # The sandbox and live external IDs should be different.
     assert sandbox_external_id != live_external_id
-

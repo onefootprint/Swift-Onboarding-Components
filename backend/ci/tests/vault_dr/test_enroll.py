@@ -17,7 +17,6 @@ def test_footprint_dr_enroll(tenant):
         cmd.expect(pexpect.EOF)
     assert cmd.exitstatus == 2
 
-
     login_sandbox(tenant)
     external_id = get_external_id("sandbox")
 
@@ -38,35 +37,42 @@ def test_footprint_dr_enroll(tenant):
         "age2123",
         "age1yubikey1q23xqm9y4ym90e90jqzdtjvpm3k65460aqxca5nm2p3vxhtr9dky648v2p3",
         "age1yubikey1q23xqm9y4ym90e90jqzdt460aqxca5nm2p3vxhtr9dky648v2p3vxhtr9dky648v2p3vxhtr9dky648v2p",
-        "age1yubikey1q23xqm9y4ym90e90jqzdt5460aqxca5nm"
+        "age1yubikey1q23xqm9y4ym90e90jqzdt5460aqxca5nm",
     ]:
         with footprint_dr("enroll", "--sandbox") as cmd:
-            i = cmd.expect_exact([
-                r"Re-enrolling will deactivate the current configuration",
-                f"Enrolling {tenant.name} (Sandbox) in Vault Disaster Recovery",
-            ])
+            i = cmd.expect_exact(
+                [
+                    r"Re-enrolling will deactivate the current configuration",
+                    f"Enrolling {tenant.name} (Sandbox) in Vault Disaster Recovery",
+                ]
+            )
             if i == 0:
                 cmd.expect("Type .+ to continue, or anything else to cancel: ")
-                cmd.sendline("restart sandbox-mode Vault Disaster Recovery from scratch")
+                cmd.sendline(
+                    "restart sandbox-mode Vault Disaster Recovery from scratch"
+                )
 
             cmd.expect_exact("Enter org public key (age recipient): ")
             cmd.sendline(bad_recipient)
             cmd.expect(pexpect.EOF)
         assert cmd.exitstatus == 1, bad_recipient
 
-
     # Enrollment fails with bad bucket name.
     with footprint_dr("enroll", "--sandbox") as cmd:
-        i = cmd.expect_exact([
-            r"Re-enrolling will deactivate the current configuration",
-            f"Enrolling {tenant.name} (Sandbox) in Vault Disaster Recovery",
-        ])
+        i = cmd.expect_exact(
+            [
+                r"Re-enrolling will deactivate the current configuration",
+                f"Enrolling {tenant.name} (Sandbox) in Vault Disaster Recovery",
+            ]
+        )
         if i == 0:
             cmd.expect("Type .+ to continue, or anything else to cancel: ")
             cmd.sendline("restart sandbox-mode Vault Disaster Recovery from scratch")
 
         cmd.expect_exact("Enter org public key (age recipient): ")
-        cmd.sendline("age1yubikey1q23xqm9y4ym90e90jqzdtejvpm3k65460aqxca5nm2p3vxhtr9dky648v2p")
+        cmd.sendline(
+            "age1yubikey1q23xqm9y4ym90e90jqzdtejvpm3k65460aqxca5nm2p3vxhtr9dky648v2p"
+        )
 
         cmd.expect_exact("Add another org public key? [y/n] ")
         cmd.sendline("n")
@@ -88,16 +94,20 @@ def test_footprint_dr_enroll(tenant):
 
     # Enrollment fails with bad account ID.
     with footprint_dr("enroll", "--sandbox") as cmd:
-        i = cmd.expect_exact([
-            r"Re-enrolling will deactivate the current configuration",
-            f"Enrolling {tenant.name} (Sandbox) in Vault Disaster Recovery",
-        ])
+        i = cmd.expect_exact(
+            [
+                r"Re-enrolling will deactivate the current configuration",
+                f"Enrolling {tenant.name} (Sandbox) in Vault Disaster Recovery",
+            ]
+        )
         if i == 0:
             cmd.expect("Type .+ to continue, or anything else to cancel: ")
             cmd.sendline("restart sandbox-mode Vault Disaster Recovery from scratch")
 
         cmd.expect_exact("Enter org public key (age recipient): ")
-        cmd.sendline("age1yubikey1q23xqm9y4ym90e90jqzdtejvpm3k65460aqxca5nm2p3vxhtr9dky648v2p")
+        cmd.sendline(
+            "age1yubikey1q23xqm9y4ym90e90jqzdtejvpm3k65460aqxca5nm2p3vxhtr9dky648v2p"
+        )
 
         cmd.expect_exact("Add another org public key? [y/n] ")
         cmd.sendline("n")
@@ -115,19 +125,22 @@ def test_footprint_dr_enroll(tenant):
         cmd.expect(pexpect.EOF)
     assert cmd.exitstatus == 1
 
-
     # Enrollment works with valid data.
     with footprint_dr("enroll", "--sandbox") as cmd:
-        i = cmd.expect_exact([
-            r"Re-enrolling will deactivate the current configuration",
-            f"Enrolling {tenant.name} (Sandbox) in Vault Disaster Recovery",
-        ])
+        i = cmd.expect_exact(
+            [
+                r"Re-enrolling will deactivate the current configuration",
+                f"Enrolling {tenant.name} (Sandbox) in Vault Disaster Recovery",
+            ]
+        )
         if i == 0:
             cmd.expect("Type .+ to continue, or anything else to cancel: ")
             cmd.sendline("restart sandbox-mode Vault Disaster Recovery from scratch")
 
         cmd.expect_exact("Enter org public key (age recipient): ")
-        cmd.sendline("age1yubikey1q23xqm9y4ym90e90jqzdtejvpm3k65460aqxca5nm2p3vxhtr9dky648v2p")
+        cmd.sendline(
+            "age1yubikey1q23xqm9y4ym90e90jqzdtejvpm3k65460aqxca5nm2p3vxhtr9dky648v2p"
+        )
 
         cmd.expect_exact("Add another org public key? [y/n] ")
         cmd.sendline("y")
@@ -135,7 +148,9 @@ def test_footprint_dr_enroll(tenant):
         cmd.expect_exact("Enter org public key (age recipient): ")
         cmd.sendline("age1flfhl58lnf7r98chptw92hlqr7w9qgr47lxvdgtkmjusw6lv75nsfkwwx3")
 
-        cmd.expect_exact("Are you sure you don't want the benefits of a hardware security token?")
+        cmd.expect_exact(
+            "Are you sure you don't want the benefits of a hardware security token?"
+        )
         cmd.sendline("y")
 
         cmd.expect_exact("Add another org public key? [y/n] ")
@@ -155,7 +170,6 @@ def test_footprint_dr_enroll(tenant):
         cmd.expect(pexpect.EOF)
     assert cmd.exitstatus == 0
 
-
     # Status now reflects enrollment.
     with footprint_dr("status", "--sandbox") as cmd:
         cmd.expect(f"Logged in to {tenant.name} \\(Sandbox\\)")
@@ -163,7 +177,9 @@ def test_footprint_dr_enroll(tenant):
         enrolled_at = cmd.match.group(1)
 
         cmd.expect("Organization Public Keys:")
-        cmd.expect("age1yubikey1q23xqm9y4ym90e90jqzdtejvpm3k65460aqxca5nm2p3vxhtr9dky648v2p")
+        cmd.expect(
+            "age1yubikey1q23xqm9y4ym90e90jqzdtejvpm3k65460aqxca5nm2p3vxhtr9dky648v2p"
+        )
         cmd.expect("age1flfhl58lnf7r98chptw92hlqr7w9qgr47lxvdgtkmjusw6lv75nsfkwwx3")
 
         cmd.expect(f"AWS Account ID: {aws_account_id}")
@@ -172,7 +188,6 @@ def test_footprint_dr_enroll(tenant):
         cmd.expect(pexpect.EOF)
     assert cmd.exitstatus == 0
 
-
     # Re-enrollment fails with bogus data.
     with footprint_dr("enroll", "--sandbox") as cmd:
         cmd.expect(r"Re-enrolling will deactivate the current configuration")
@@ -180,7 +195,9 @@ def test_footprint_dr_enroll(tenant):
         cmd.sendline("restart sandbox-mode Vault Disaster Recovery from scratch")
 
         cmd.expect_exact("Enter org public key (age recipient): ")
-        cmd.sendline("age1yubikey1q23xqm9y4ym90e90jqzdtejvpm3k65460aqxca5nm2p3vxhtr9dky648v2p")
+        cmd.sendline(
+            "age1yubikey1q23xqm9y4ym90e90jqzdtejvpm3k65460aqxca5nm2p3vxhtr9dky648v2p"
+        )
 
         cmd.expect_exact("Add another org public key? [y/n] ")
         cmd.sendline("n")

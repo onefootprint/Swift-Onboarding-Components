@@ -36,9 +36,7 @@ class NationalityConfig(Enum):
         auto()
     )  # Tenant is configured to collect UseLegalStatus and the user is not a citizen
     Nationality = auto()  # Tenant is configured to collect Nationality
-    Neither = (
-        auto()
-    )  # Tenant is not configured to collect either Nationality or UsLegalStatus (like Bloom)
+    Neither = auto()  # Tenant is not configured to collect either Nationality or UsLegalStatus (like Bloom)
 
 
 def cdos_for_nationality_config(nationality_config):
@@ -214,14 +212,18 @@ def test_alpaca_cip(
     assert alpaca_response["identity"]["family_name"] == d["id.last_name"]
     assert alpaca_response["identity"]["date_of_birth"] == d["id.dob"]
     declarations = d["investor_profile.declarations"]
-    assert alpaca_response["disclosures"] == {
-        "is_control_person": "senior_executive" in declarations,
-        "is_affiliated_exchange_or_finra": "affiliated_with_us_broker" in declarations,
-        "is_politically_exposed": "senior_political_figure" in declarations,
-        "immediate_family_exposed": "family_of_political_figure" in declarations,
-        "is_discretionary": False,
-        "is_affiliated_exchange_or_iiroc": None,  # idk why they return this now and its not in their docs
-    }
+    assert (
+        alpaca_response["disclosures"]
+        == {
+            "is_control_person": "senior_executive" in declarations,
+            "is_affiliated_exchange_or_finra": "affiliated_with_us_broker"
+            in declarations,
+            "is_politically_exposed": "senior_political_figure" in declarations,
+            "immediate_family_exposed": "family_of_political_figure" in declarations,
+            "is_discretionary": False,
+            "is_affiliated_exchange_or_iiroc": None,  # idk why they return this now and its not in their docs
+        }
+    )
 
     account_id = alpaca_response["id"]
 

@@ -167,8 +167,8 @@ def vdr_download_all_records(partition, bucket, namespace):
                 all_fields = all_fields.union(version_fields)
 
                 if version == latest_record["version"]:
-                    assert sorted(version_fields) == sorted(
-                        latest_record["fields"]
+                    assert (
+                        sorted(version_fields) == sorted(latest_record["fields"])
                     ), f"VDR claims fields for {fp_id} at version {version} are {latest_record['fields']} but API claims they are {version_fields}"
             all_fields = list(all_fields)
 

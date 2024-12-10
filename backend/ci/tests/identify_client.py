@@ -66,9 +66,7 @@ class IdentifyClient:
         elif "email" in self.playbook.required_auth_methods:
             kind = "email"
         else:
-            assert (
-                False
-            ), f"Unsupported required auth methods: {self.playbook.required_auth_methods}"
+            assert False, f"Unsupported required auth methods: {self.playbook.required_auth_methods}"
 
         data = dict(
             phone_number=dict(value=self.phone_number),

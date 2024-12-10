@@ -7,7 +7,9 @@ def test_partner_org_updates(partner_tenant):
     # SVG logo not allowed
     logo_path = os.path.dirname(__file__) + "/data/malicious_logo.svg"
     files = {"upload_file": ("logo.svg", open(logo_path, "rb"), "image/svg")}
-    resp = put("partner/logo", None, *partner_tenant.db_auths, files=files, status_code=400)
+    resp = put(
+        "partner/logo", None, *partner_tenant.db_auths, files=files, status_code=400
+    )
     assert resp["code"] == "E112"
 
     # SVG uploaded with PNG content type is downloaded as a PNG.
@@ -40,9 +42,13 @@ def test_partner_org_updates(partner_tenant):
     old_website_url = body["website_url"]
 
     # PATCH /partner
-    patch("partner", {
-        "website_url": "https://onefootprint.com/?t=" + _gen_random_str(16),
-    }, *partner_tenant.db_auths)
+    patch(
+        "partner",
+        {
+            "website_url": "https://onefootprint.com/?t=" + _gen_random_str(16),
+        },
+        *partner_tenant.db_auths,
+    )
     body = get("partner", {}, *partner_tenant.ro_db_auths)
     # Website URL was updated. (Checking equality is a flake.)
     assert old_website_url != body["website_url"]

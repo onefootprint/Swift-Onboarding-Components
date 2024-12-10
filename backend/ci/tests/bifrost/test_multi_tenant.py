@@ -49,10 +49,13 @@ def dual_onboarded_user(sandbox_tenant, foo_sandbox_tenant):
 
     foo_user = foo_bifrost.run()
     assert foo_user.fp_id == foo_fp_id
-    assert [i["kind"] for i in foo_bifrost.handled_requirements] == [
-        "authorize",  # Should have authorize here because it's a one-click at another tenant
-        "process",
-    ]
+    assert (
+        [i["kind"] for i in foo_bifrost.handled_requirements]
+        == [
+            "authorize",  # Should have authorize here because it's a one-click at another tenant
+            "process",
+        ]
+    )
     assert [i["kind"] for i in foo_bifrost.already_met_requirements] == ["collect_data"]
 
     # Even after running bifrost, we shouldn't be able to make a token with scopes because

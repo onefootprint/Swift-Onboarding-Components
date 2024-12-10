@@ -3,6 +3,7 @@ from tests.utils import (
     post,
 )
 
+
 def test_audit_events(sandbox_user):
     tenant = sandbox_user.tenant
 
@@ -25,19 +26,22 @@ def test_audit_events(sandbox_user):
         for di, value in attributes.items():
             assert sandbox_user.client.decrypted_data[di] == value
 
-
     # Make sure we get back all the audit events when we paginate through all results.
     exp_num_results_by_page = [num_events - 2, 2]
     cursor = None
     got_timestamps = []
     got_reasons = []
     for exp_num_results in exp_num_results_by_page:
-        resp = get(f"org/audit_events", {
-            "names": "decrypt_user_data",
-            "page_size": num_events - 2,
-            "search": sandbox_user.fp_id,
-            "cursor": cursor,
-        }, *tenant.db_auths)
+        resp = get(
+            f"org/audit_events",
+            {
+                "names": "decrypt_user_data",
+                "page_size": num_events - 2,
+                "search": sandbox_user.fp_id,
+                "cursor": cursor,
+            },
+            *tenant.db_auths,
+        )
         assert len(resp["data"]) == exp_num_results
 
         cursor = resp["meta"]["next"]
