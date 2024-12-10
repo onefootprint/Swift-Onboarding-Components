@@ -46,7 +46,7 @@ const Content = styled.div`
     h5,
     h6 {
       color: ${theme.color.primary};
-      margin-top: ${theme.spacing[9]};
+      margin-top: ${theme.spacing[7]};
 
       &:not(:last-child) {
         margin-bottom: ${theme.spacing[7]};
@@ -62,8 +62,8 @@ const Content = styled.div`
     }
 
     ol {
-      ${createFontStyles('body-1')};
-      margin-bottom: ${theme.spacing[9]};
+      ${createFontStyles('body-2')};
+      margin-bottom: ${theme.spacing[7]};
       display: flex;
       flex-direction: column;
       gap: ${theme.spacing[3]};
@@ -74,8 +74,8 @@ const Content = styled.div`
     }
 
     ul {
-      ${createFontStyles('body-1')};
-      margin-bottom: ${theme.spacing[9]};
+      ${createFontStyles('body-2')};
+      margin-bottom: ${theme.spacing[7]};
       list-style: none;
       display: flex;
       flex-direction: column;
@@ -92,7 +92,7 @@ const Content = styled.div`
       max-width: 100%;
       object-fit: contain;
       height: auto;
-      margin-bottom: ${theme.spacing[9]};
+      margin-bottom: ${theme.spacing[7]};
       border-radius: ${theme.borderRadius.default};
       border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     }

@@ -1,6 +1,4 @@
-import { Stack, Text } from '@onefootprint/ui';
 import Image from 'next/image';
-import styled, { css } from 'styled-components';
 
 type AuthorProps = {
   name: string;
@@ -8,29 +6,14 @@ type AuthorProps = {
 };
 
 const Author = ({ name, avatarUrl }: AuthorProps) => (
-  <Stack direction="row" alignItems="center" gap={4}>
+  <div className="flex items-center gap-3">
     {avatarUrl && (
-      <AuthorImg>
-        <Image alt={`Image of ${name}`} src={avatarUrl} height={32} width={32} />
-      </AuthorImg>
+      <div className="w-8 h-8 overflow-hidden rounded-full">
+        <Image alt={`Image of ${name}`} src={avatarUrl} height={32} width={32} className="object-cover w-full h-full" />
+      </div>
     )}
-    <Text variant="label-3">{name}</Text>
-  </Stack>
+    <p className="text-label-3">{name}</p>
+  </div>
 );
-
-const AuthorImg = styled.div`
-  ${({ theme }) => css`
-    border-radius: ${theme.borderRadius.full};
-    overflow: hidden;
-    width: 32px;
-    height: 32px;
-
-    img {
-      object-fit: cover;
-      width: 100%;
-      height: 100%;
-    }
-  `}
-`;
 
 export default Author;
