@@ -33,7 +33,7 @@ const Intro = ({ onFillout }) => {
   };
 
   return (
-    <div className="app-form  intro-step">
+    <div className="app-form intro-step">
       <header className="header">
         <img src={logo} alt="Avis Logo" className="logo" width={92} height={30} />
         <h1 className="title">Let's verify your customer's identity!</h1>
