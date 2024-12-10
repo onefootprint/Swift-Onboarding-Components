@@ -4,6 +4,7 @@ import { RoleScopeKind } from '@onefootprint/types';
 import { Button, CodeInline } from '@onefootprint/ui';
 import { cx } from 'class-variance-authority';
 import type { ParseKeys } from 'i18next';
+import { useRouter } from 'next/router';
 import { Suspense, lazy, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
@@ -53,7 +54,7 @@ const ManageVersions = ({ playbooks }: { playbooks: OnboardingConfiguration[] })
     <>
       <span>·</span>
       <button
-        className="flex gap-2 items-center text-label-3 text-secondary hover:cursor-pointer"
+        className="flex items-center gap-2 text-label-3 text-secondary hover:cursor-pointer"
         type="button"
         onClick={() => setIsOpen(true)}
       >
@@ -70,6 +71,22 @@ const ManageVersions = ({ playbooks }: { playbooks: OnboardingConfiguration[] })
 const EditButton = ({ playbook }: { playbook: OnboardingConfiguration }) => {
   const { t } = useTranslation('playbook-details', { keyPrefix: 'header' });
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
+  const lastTab = router.query.tab as string;
+
+  const handleClose = () => {
+    setIsOpen(false);
+    if (lastTab) {
+      router.replace({ query: { ...router.query, tab: lastTab } });
+    }
+  };
+
+  const handleDone = () => {
+    setIsOpen(false);
+    if (lastTab) {
+      router.replace({ query: { ...router.query, tab: lastTab } });
+    }
+  };
 
   return (
     <>
@@ -83,7 +100,7 @@ const EditButton = ({ playbook }: { playbook: OnboardingConfiguration }) => {
         </Button>
       </PermissionGate>
       <Suspense>
-        <Create open={isOpen} onClose={() => setIsOpen(false)} onDone={() => setIsOpen(false)} playbook={playbook} />
+        <Create open={isOpen} onClose={handleClose} onDone={handleDone} playbook={playbook} />
       </Suspense>
     </>
   );
