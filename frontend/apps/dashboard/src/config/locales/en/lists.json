@@ -61,7 +61,10 @@
         "entries": {
           "label": "Enter values manually",
           "placeholder": "List entries",
-          "hint": "Separated by commas"
+          "hint": "Separated by commas",
+          "errors": {
+            "invalid": "Please enter valid entries for the selected type."
+          }
         }
       },
       "feedback": {

@@ -4,27 +4,27 @@ import { RoleScopeKind } from '@onefootprint/types';
 import { Button } from '@onefootprint/ui';
 import { useQuery } from '@tanstack/react-query';
 import Head from 'next/head';
-// import { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
 import useSession from 'src/hooks/use-session';
-// import CreateDialog from './components/create-dialog';
+import CreateDialog from './components/create-dialog';
 import Table from './components/table';
 
 const List = () => {
   const { t } = useTranslation('lists', { keyPrefix: 'list' });
-  //   const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const listsQuery = useQuery(getOrgListsOptions());
   const { data, error, isPending } = listsQuery;
   const { data: session } = useSession();
 
-  //   const handleOpen = () => {
-  //     setDialogOpen(true);
-  //   };
+  const handleOpen = () => {
+    setDialogOpen(true);
+  };
 
-  //   const handleClose = () => {
-  //     setDialogOpen(false);
-  //   };
+  const handleClose = () => {
+    setDialogOpen(false);
+  };
 
   if (!session?.user?.isFirmEmployee) {
     return null;
@@ -47,14 +47,14 @@ const List = () => {
             scopeKind={RoleScopeKind.writeLists}
             tooltipPosition="left"
           >
-            <Button>{t('create-button')}</Button>
+            <Button onClick={handleOpen}>{t('create-button')}</Button>
           </PermissionGate>
         </div>
       </div>
       <div className="flex flex-col">
         <Table data={data?.data} errorMessage={error ? getErrorMessage(error) : undefined} isPending={isPending} />
       </div>
-      {/* <CreateDialog open={dialogOpen} onClose={handleClose} /> */}
+      <CreateDialog open={dialogOpen} onClose={handleClose} />
     </div>
   );
 };
