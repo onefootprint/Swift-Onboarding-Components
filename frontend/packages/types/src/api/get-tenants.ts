@@ -40,6 +40,7 @@ export enum TenantPreviewApi {
   ManageVerifiedContactInfo = 'manage_verified_contact_info',
   SoftDeleteUsers = 'soft_delete_users',
   PostKycStepupLinks = 'post_kyc_stepup_links',
+  SmsLinkAuthentication = 'sms_link_authentication',
 }
 
 export enum TenantBillingProfileProduct {
