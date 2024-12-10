@@ -9,6 +9,8 @@ struct EmailAndPhoneView: View {
     
     var body: some View {
         FpForm(
+            defaultValues: [.idEmail: "sandbox@onefootprint.com",
+                            .idPhoneNumber: "+15555550100"],
             onSubmit: { vaultData in
                 isLoading = true
                 Task {
@@ -104,7 +106,7 @@ struct EmailAndPhoneView: View {
         .onAppear {
             Task {
                 do {
-                    let sandboxOutcome = SandboxOutcome(overallOutcome: .pass, documentOutcome: .pass)
+                    let sandboxOutcome = SandboxOutcome(overallOutcome: .stepUp, documentOutcome: .pass)
                     try await FootprintProvider.shared.initialize(
                         configKey: "pb_test_qGrzwX22Vu5IGRsjbBFS4s",
                         sandboxOutcome: sandboxOutcome

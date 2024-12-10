@@ -18,6 +18,10 @@ public class FootprintSdkArgsManager {
                 
                 let packageInfo = PackageInfo.getCurrentPackageInfo()
                 request.setValue("footprint-swift-\(packageInfo.installationType):\(packageInfo.version ?? "unknown")", forHTTPHeaderField: "x-fp-client-version")
+                
+                if(self.configuration.sessionId != nil){
+                    request.setValue(self.configuration.sessionId, forHTTPHeaderField: "X-Fp-Session-Id")
+                }
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
                 
                 let encoder = JSONEncoder()
@@ -51,7 +55,7 @@ public class FootprintSdkArgsManager {
                 return nil
             }
         }
-
+        
         return try await token.value!
     }
 }

@@ -93,6 +93,47 @@ public struct RequirementAttributes {
             requirements: requirements
         )
     }
+    
+    
+    public static func hasUnmetRequirement(requirements: RequirementAttributes) -> Bool   {
+        for requirement in requirements.requirements.all {
+            switch requirement {
+            case .typeAuthorizeRequirement(let authorizeReq):
+                if !authorizeReq.isMet {
+                    return true
+                }
+                
+            case .typeCollectDataRequirement(let dataReq):
+                if !dataReq.isMet {
+                    return true
+                }
+                
+            case .typeCollectInvestorProfileRequirement(let investorReq):
+                if !investorReq.isMet {
+                    return true
+                }
+                
+            case .typeDocumentRequirement(let docReq):
+                if !docReq.isMet {
+                    return true
+                }
+                
+            case .typeRegisterAuthMethodRequirement(let authMethodReq):
+                if !authMethodReq.isMet {
+                    return true
+                }
+                
+            case .typeRegisterPasskeyRequirement(let passkeyReq):
+                if !passkeyReq.isMet {
+                    return true
+                }
+                
+            case .typeProcessRequirement:
+                continue
+            }
+        }
+       return false
+    }
 }
 
 

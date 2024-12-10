@@ -14,17 +14,17 @@ struct BasicInfoView: View {
                 if isDataReady {
                     FpForm(
                         defaultValues: [
-                            .idFirstName: vaultData?.idFirstName,
-                            .idMiddleName: vaultData?.idMiddleName,
-                            .idLastName: vaultData?.idLastName,
-                            .idDob: vaultData?.idDob,
-                            .idAddressLine1: vaultData?.idAddressLine1,
-                            .idAddressLine2: vaultData?.idAddressLine2,
-                            .idCity: vaultData?.idCity,
-                            .idState: vaultData?.idState,
-                            .idZip: vaultData?.idZip,
-                            .idCountry: vaultData?.idCountry,
-                            .idSsn9: vaultData?.idSsn9
+                            .idFirstName: vaultData?.idFirstName ?? "John",
+                            .idMiddleName: vaultData?.idMiddleName ?? "",
+                            .idLastName: vaultData?.idLastName ?? "Doe",
+                            .idDob: vaultData?.idDob ?? "01/01/1990",
+                            .idAddressLine1: vaultData?.idAddressLine1 ?? "123 Main St",
+                            .idAddressLine2: vaultData?.idAddressLine2 ?? "Apt 4B",
+                            .idCity: vaultData?.idCity ?? "New York",
+                            .idState: vaultData?.idState ?? "NY",
+                            .idZip: vaultData?.idZip ?? "10001",
+                            .idCountry: vaultData?.idCountry ?? "US",
+                            .idSsn9: vaultData?.idSsn9 ?? "123-45-6789"
                         ],
                         onSubmit: { vaultData in
                             submitVaultData(vaultData)

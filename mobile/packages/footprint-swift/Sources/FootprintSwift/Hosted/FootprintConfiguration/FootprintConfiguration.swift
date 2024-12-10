@@ -4,6 +4,7 @@ public struct FootprintConfiguration: Encodable {
     public var bootstrapData: FootprintBootstrapData?
     public var publicKey: String?
     public var authToken: String?
+    public var sessionId: String?
     public var scheme: String
     public var onCancel: (() -> Void)?
     public var onComplete: ((_ validationToken: String) -> Void)?
@@ -21,6 +22,7 @@ public struct FootprintConfiguration: Encodable {
     public init(publicKey: String? = nil,
                 authToken: String? = nil,
                 sandboxId: String? = nil,
+                sessionId: String? = nil,
                 sandboxOutcome: SandboxOutcome? = nil,
                 scheme: String,
                 bootstrapData: FootprintBootstrapData? = nil,
@@ -46,12 +48,14 @@ public struct FootprintConfiguration: Encodable {
         self.appearance = appearance
         self.sandboxOutcome = sandboxOutcome
         self.sandboxId = sandboxId
+        self.sessionId = sessionId
         self.isAuthPlaybook = isAuthPlaybook ?? false
     }
     
     internal init(publicKey: String? = nil,
                   authToken: String? = nil,
                   sandboxId: String? = nil,
+                  sessionId: String? = nil,
                   sandboxOutcome: SandboxOutcome? = nil,
                   scheme: String,
                   bootstrapData: FootprintBootstrapData? = nil,
@@ -79,6 +83,7 @@ public struct FootprintConfiguration: Encodable {
         self.appearance = appearance
         self.sandboxOutcome = sandboxOutcome
         self.sandboxId = sandboxId
+        self.sessionId = sessionId
         self.isAuthPlaybook = isAuthPlaybook ?? false
         self.isComponentsSdk = isComponentsSdk
         self.shouldRelayToComponents = shouldRelayToComponents

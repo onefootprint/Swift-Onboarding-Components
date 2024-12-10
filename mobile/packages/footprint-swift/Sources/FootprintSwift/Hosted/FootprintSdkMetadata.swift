@@ -10,5 +10,5 @@ internal struct FootprintSdkMetadata {
     static let name: String = "footprint-swift"
     static let kindVerify: String = "verify_v1"
     static let kindAuth: String = "auth_v1"
-    static let version: String = "3.0.1"
+    static let version: String = "3.0.2"
 }

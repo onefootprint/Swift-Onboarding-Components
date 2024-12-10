@@ -5,6 +5,7 @@ public final class FootprintProvider {
     private var client: OpenAPIClient
     private var configKey: String = ""
     private var authToken: String?
+    private var sessionId: String?
     private var verifiedAuthToken: String?
     private var vaultingToken: String?
     private var authTokenStatus: AuthTokenStatus?
@@ -53,6 +54,7 @@ public final class FootprintProvider {
         self.l10n = .init(locale: .enUS, language: .english)
         self.appearance = nil
         self.isReady = false
+        self.sessionId = nil
     }
     
     public func initialize(configKey: String,
@@ -69,7 +71,7 @@ public final class FootprintProvider {
         if let l10n {
             self.l10n = l10n
         }
-        
+        self.sessionId = sessionId
         self.appearance = appearance
         self.configKey = configKey
         self.authToken = authToken
@@ -458,49 +460,21 @@ public final class FootprintProvider {
             throw FootprintError(kind: .authError, message: "Missing authentication token")
         }
         
-        let requirements = try await self.queries.getOnboardingStatus(authToken: authToken)
-        func handleUnmetRequirement() throws {
+        var requirements = try await self.queries.getOnboardingStatus(authToken: authToken)
+        
+        if( RequirementAttributes.hasUnmetRequirement(requirements: requirements) == true ){
             throw FootprintError(kind: .inlineProcessNotSupported, message: "Requirements not met. Please complete all the other requirements before process or call handoff")
         }
         
-        for requirement in requirements.requirements.all {
-            switch requirement {
-            case .typeAuthorizeRequirement(let authorizeReq):
-                if !authorizeReq.isMet {
-                    try handleUnmetRequirement()
-                }
-                
-            case .typeCollectDataRequirement(let dataReq):
-                if !dataReq.isMet {
-                    try handleUnmetRequirement()
-                }
-                
-            case .typeCollectInvestorProfileRequirement(let investorReq):
-                if !investorReq.isMet {
-                    try handleUnmetRequirement()
-                }
-                
-            case .typeDocumentRequirement(let docReq):
-                if !docReq.isMet {
-                    try handleUnmetRequirement()
-                }
-                
-            case .typeRegisterAuthMethodRequirement(let authMethodReq):
-                if !authMethodReq.isMet {
-                    try handleUnmetRequirement()
-                }
-                
-            case .typeRegisterPasskeyRequirement(let passkeyReq):
-                if !passkeyReq.isMet {
-                    try handleUnmetRequirement()
-                }
-                
-            case .typeProcessRequirement:
-                continue
-            }
-        }
-        
         try await self.queries.process(authToken: authToken, overallOutcome: self.sandboxOutcome?.overallOutcome)
+        
+        // Another check to ensure that the requirements are met
+        // to handle the step-up case
+        requirements = try await self.queries.getOnboardingStatus(authToken: authToken)
+        
+        if( RequirementAttributes.hasUnmetRequirement(requirements: requirements) == true ){
+            throw FootprintError(kind: .inlineProcessNotSupported, message: "Requirements not met. Please complete all the other requirements before process or call handoff")
+        }
         
         return try await self.queries.validateOnboarding(authToken: authToken)
     }
@@ -563,8 +537,9 @@ public final class FootprintProvider {
         
         let config = FootprintConfiguration(
             publicKey: self.configKey,
-            authToken:  authToken,
+            authToken:  authToken,        
             sandboxId: self.sandboxId,
+            sessionId: self.sessionId,
             sandboxOutcome: self.sandboxOutcome,
             scheme: "footprintapp-callback",
             bootstrapData: FootprintBootstrapData(email: email, phoneNumber: phone),
@@ -607,6 +582,7 @@ public final class FootprintProvider {
             publicKey: self.configKey,
             authToken:  authToken,
             sandboxId: self.sandboxId,
+            sessionId: self.sessionId,
             sandboxOutcome: self.sandboxOutcome,
             scheme: "footprintapp-callback",
             l10n: self.l10n,

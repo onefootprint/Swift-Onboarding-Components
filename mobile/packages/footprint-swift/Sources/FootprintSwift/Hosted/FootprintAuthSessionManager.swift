@@ -21,6 +21,10 @@ class FootprintAuthSessionManager: NSObject, ASWebAuthenticationPresentationCont
         var queryItems: [URLQueryItem] = []
         queryItems.append(URLQueryItem(name: "redirect_url", value: self.getDeepLink()))
         
+        if(self.configuration.sessionId != nil){
+            queryItems.append(URLQueryItem(name: "xfpsessionid", value:self.configuration.sessionId ))
+        }
+        
         if let appearance = try self.configuration.appearance?.toJSON() {
             if let fontSrc = appearance["fontSrc"] {
                 queryItems.append(URLQueryItem(name: "font_src", value: fontSrc))
@@ -92,7 +96,7 @@ class FootprintAuthSessionManager: NSObject, ASWebAuthenticationPresentationCont
             let urlComponents = URLComponents(url: callbackURL, resolvingAgainstBaseURL: true)
             guard let teamIdentifier = Bundle.main.infoDictionary?["AppIdentifierPrefix"] as? String else {
                 fatalError("AppIdentifierPrefix is missing from Info.plist")
-            }            
+            }
             guard let bundleIdentifier = Bundle.main.bundleIdentifier else {
                 fatalError("Bundle identifier is missing")
             }
