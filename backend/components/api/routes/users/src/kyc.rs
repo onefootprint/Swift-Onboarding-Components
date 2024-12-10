@@ -123,9 +123,6 @@ pub async fn post(
     if uvw.vault.kind != VaultKind::Person {
         return Err(TenantError::IncorrectVaultKindForKyc.into());
     }
-    if !uvw.vault.is_created_via_api {
-        return Err(TenantError::CannotRunKycForPortable.into());
-    }
 
     // fetch country code and validate is US or US territory.
     let is_us_country_code = uvw

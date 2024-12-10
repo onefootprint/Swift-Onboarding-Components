@@ -30,8 +30,6 @@ pub enum TenantError {
     CannotRedoKyc,
     #[error("Cannot run KYB for a vault that was not created via API")]
     CannotRunKybForPortable,
-    #[error("Cannot run KYC for a vault that was not created via API")]
-    CannotRunKycForPortable,
     #[error("Incorrect entity kind for KYB (must be a business vault)")]
     IncorrectVaultKindForKyb,
     #[error("Incorrect entity kind for KYC  (must be a user vault)")]
