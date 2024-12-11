@@ -36,7 +36,7 @@ const createPayload = ({
   return {
     name: nameForm.name,
     kind: 'kyc',
-    cipKind: templateForm.template === OnboardingTemplate.Alpaca ? 'alpaca' : undefined,
+    cipKind: createCipKind(templateForm),
     documentTypesAndCountries: createGovDocsPayload(detailsForm.gov),
     documentsToCollect: createAdditionalDocsPayload(detailsForm.docs),
     requiredAuthMethods: createRequiredAuthMethodsPayload(requiredAuthMethodsForm),
@@ -116,6 +116,16 @@ const createVerificationChecks = (verificationChecksForm: VerificationChecksForm
     ...(verificationChecksForm.runKyc ? [{ kind: 'kyc' as const, data: {} }] : []),
     ...createUserAmlVerificationChecksPayload(verificationChecksForm),
   ];
+};
+
+const createCipKind = (templateForm: TemplatesFormData) => {
+  if (templateForm.template === OnboardingTemplate.Alpaca) {
+    return 'alpaca';
+  }
+  if (templateForm.template === OnboardingTemplate.Apex) {
+    return 'apex';
+  }
+  return undefined;
 };
 
 export default createPayload;
