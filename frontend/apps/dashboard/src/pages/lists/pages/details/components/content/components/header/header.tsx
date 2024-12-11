@@ -1,14 +1,14 @@
 import { getOrgListsByListIdOptions } from '@onefootprint/axios/dashboard';
 import { RoleScopeKind } from '@onefootprint/types';
 import { Button, Shimmer } from '@onefootprint/ui';
-// import useListDetails from 'src/pages/lists/pages/details/hooks/use-list-details';
-// import Actions from './components/actions';
 // import EditDialog from './components/edit-dialog';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
 // import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
+// import useListDetails from 'src/pages/lists/pages/details/hooks/use-list-details';
+import Actions from './components/actions';
 
 const Header = () => {
   const router = useRouter();
@@ -59,8 +59,7 @@ const Header = () => {
           </Button>
         </PermissionGate>
         <PermissionGate fallbackText={t('cta-delete-not-allowed')} scopeKind={RoleScopeKind.writeLists}>
-          {/* <Actions /> */}
-          <div>actions placeholder</div>
+          <Actions />
         </PermissionGate>
       </div>
     </div>
