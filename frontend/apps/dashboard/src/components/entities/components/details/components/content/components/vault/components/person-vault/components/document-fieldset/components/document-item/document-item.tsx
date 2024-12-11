@@ -36,7 +36,7 @@ const DocumentItem = ({ document, entity, vault, onDecrypt }: DocumentItemProps)
     <>
       <Stack justify="space-between">
         {field.showCheckbox ? (
-          <Tooltip disabled={field.isDecryptable} position="right" text={t('decrypt.not-allowed')}>
+          <Tooltip disabled={field.isDecryptable} position="right" text={t('decrypt.not-allowed')} asChild>
             <Checkbox
               checked={field.isChecked || undefined}
               {...register(`documents.${kind}`)}

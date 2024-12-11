@@ -31,7 +31,7 @@ const DocumentFieldOrPlaceholder = ({ kind, entity, vault, documents }: Document
       aria-label={field.label}
     >
       {field.showCheckbox ? (
-        <Tooltip disabled={field.canDecrypt} position="right" text={t('not-allowed')}>
+        <Tooltip disabled={field.canDecrypt} position="right" text={t('not-allowed')} asChild>
           <Checkbox
             checked={isChecked || undefined}
             {...register(`documents.${kind}`)}

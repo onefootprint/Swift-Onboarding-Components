@@ -96,6 +96,7 @@ const CopyButton = ({
       disabled={disable}
       open={isTooltipVisible}
       onOpenChange={setTooltipVisible}
+      asChild
     >
       {children ? (
         <Button

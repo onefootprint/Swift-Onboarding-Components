@@ -43,8 +43,9 @@ const Field = ({ di, entity, renderValue, renderLabel }: FieldProps) => {
         {field.showCheckbox ? (
           <Tooltip
             disabled={field.canDecrypt}
-            position="right"
+            position="top"
             text={field.isEmpty ? t('field-empty-not-allowed', { field: field.label }) : t('not-allowed')}
+            asChild
           >
             <Box>
               <Checkbox

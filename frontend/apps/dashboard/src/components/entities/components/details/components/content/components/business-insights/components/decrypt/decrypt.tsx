@@ -20,7 +20,7 @@ const Decrypt = ({ canDecrypt }: DecryptProps) => {
   return (
     <Stack align="center" gap={2}>
       <Text variant="body-3">{t('message-start')}</Text>
-      <Tooltip disabled={canDecrypt} text={t('not-allowed')}>
+      <Tooltip disabled={canDecrypt} text={t('not-allowed')} asChild>
         <LinkButton disabled={!canDecrypt} onClick={handleDecryptAll}>
           {t('decrypt-all')}
         </LinkButton>

@@ -13,7 +13,7 @@ const Decrypt = ({ isDecryptable, onClick }: DecryptProps) => {
   return (
     <Stack align="center" gap={2} height="fit-content" padding={7}>
       <Text variant="body-3">{t('message-start')}</Text>
-      <Tooltip disabled={isDecryptable} text={t('not-allowed')} position="bottom">
+      <Tooltip disabled={isDecryptable} text={t('not-allowed')} position="bottom" asChild>
         <LinkButton disabled={!isDecryptable} onClick={onClick}>
           {t('decrypt-cta')}
         </LinkButton>

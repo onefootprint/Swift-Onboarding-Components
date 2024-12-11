@@ -1,5 +1,5 @@
 import type { RoleScopeKind } from '@onefootprint/types';
-import { Box, Tooltip } from '@onefootprint/ui';
+import { Tooltip } from '@onefootprint/ui';
 import React from 'react';
 import usePermissions from 'src/hooks/use-permissions';
 
@@ -16,12 +16,10 @@ const PermissionGate = ({ children, scopeKind, fallbackText, tooltipPosition = '
   return hasPermission(scopeKind) ? (
     children
   ) : (
-    <Tooltip text={fallbackText} position={tooltipPosition}>
-      <Box>
-        {React.cloneElement(children, {
-          disabled: true,
-        })}
-      </Box>
+    <Tooltip text={fallbackText} position={tooltipPosition} asChild>
+      {React.cloneElement(children, {
+        disabled: true,
+      })}
     </Tooltip>
   );
 };

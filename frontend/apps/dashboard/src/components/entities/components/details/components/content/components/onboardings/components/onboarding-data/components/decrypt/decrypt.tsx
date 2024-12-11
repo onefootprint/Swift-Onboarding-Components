@@ -53,6 +53,7 @@ const Decrypt = ({ canDecrypt, onDecryptSuccess, onboardingId, vaultData }: Decr
     <Tooltip
       disabled={canDecrypt}
       text={isVaultEmpty ? t('decrypt.vault-empty-not-allowed') : t('decrypt.not-allowed')}
+      asChild
     >
       <LinkButton disabled={!canDecrypt} onClick={handleDecryptSubmit}>
         {t('onboardings.user-data.decrypt-all')}

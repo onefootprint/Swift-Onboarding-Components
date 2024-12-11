@@ -14,7 +14,7 @@ const Row = ({ hit }: RowProps) => {
       <td>
         {entityAliases.length ? (
           <Stack overflow="scroll">
-            <Tooltip text={entityAliases.join(', ')} position="bottom" alignment="start">
+            <Tooltip text={entityAliases.join(', ')} position="bottom" alignment="start" asChild>
               <Stack gap={2} align="center">
                 {entityName}
                 <IcoInfo16 />

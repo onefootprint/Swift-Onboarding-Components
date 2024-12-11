@@ -1,13 +1,9 @@
 'use client';
 
-import * as PopoverPrimitive from '@radix-ui/react-popover';
 import * as TooltipPrimitive from '@radix-ui/react-tooltip';
+import { motion } from 'framer-motion';
 import type React from 'react';
-import { isMobile } from 'react-device-detect';
-import styled, { css, keyframes } from 'styled-components';
-import { createFontStyles } from '../../utils/mixins';
-import Box from '../box';
-import Stack from '../stack';
+import { useState } from 'react';
 
 export type TooltipProps = TooltipPrimitive.TooltipProps & {
   children: React.ReactElement;
@@ -16,9 +12,53 @@ export type TooltipProps = TooltipPrimitive.TooltipProps & {
   position?: TooltipPrimitive.TooltipContentProps['side'];
   alignment?: TooltipPrimitive.TooltipContentProps['align'];
   collisionBoundary?: TooltipPrimitive.TooltipContentProps['collisionBoundary'];
-  sideOffset?: number;
-  ariaLabel?: string;
+  sideOffset?: TooltipPrimitive.TooltipContentProps['sideOffset'];
+  ariaLabel?: TooltipPrimitive.TooltipTriggerProps['aria-label'];
+  asChild?: TooltipPrimitive.TooltipTriggerProps['asChild'];
 };
+
+type TooltipContentProps = {
+  children: React.ReactNode;
+  side: TooltipPrimitive.TooltipContentProps['side'];
+};
+
+const getAnimationProps = (side: TooltipPrimitive.TooltipContentProps['side']) => {
+  const animations = {
+    top: {
+      initial: { opacity: 0.5, y: 2, scale: 0.95 },
+      animate: { opacity: 1, y: 0, scale: 1 },
+    },
+    bottom: {
+      initial: { opacity: 0.5, y: -2, scale: 0.95 },
+      animate: { opacity: 1, y: 0, scale: 1 },
+    },
+    left: {
+      initial: { opacity: 0.5, x: 2, scale: 0.95 },
+      animate: { opacity: 1, x: 0, scale: 1 },
+    },
+    right: {
+      initial: { opacity: 0.5, x: -2, scale: 0.95 },
+      animate: { opacity: 1, x: 0, scale: 1 },
+    },
+  };
+  return animations[side || 'top'];
+};
+
+const TooltipContent = ({ children, side }: TooltipContentProps) => {
+  const animation = getAnimationProps(side);
+
+  return (
+    <motion.div
+      className="min-w-fit w-fit max-w-[300px] px-2 py-1 text-caption-3 text-quinary text-left rounded-sm bg-tertiary shadow-elevation-2 z-tooltip will-change-opacity"
+      initial={animation.initial}
+      animate={animation.animate}
+      transition={{ duration: 0.15, ease: 'easeOut' }}
+    >
+      {children}
+    </motion.div>
+  );
+};
+
 const Tooltip = ({
   children,
   text,
@@ -26,90 +66,54 @@ const Tooltip = ({
   position = 'top',
   alignment = 'center',
   collisionBoundary,
-  open,
-  onOpenChange,
-  sideOffset = isMobile ? 8 : 4,
+  sideOffset = 4,
   ariaLabel,
+  asChild,
 }: TooltipProps) => {
-  if (disabled) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  if (disabled || !text) {
     return children;
   }
 
-  if (isMobile) {
-    return (
-      <PopoverPrimitive.Root>
-        <PopoverPrimitive.Trigger asChild aria-label={ariaLabel}>
-          <Stack>{children}</Stack>
-        </PopoverPrimitive.Trigger>
-        <PopoverPrimitive.Content asChild>
-          <PopoverPrimitive.Content
+  const handleHover = () => {
+    setIsOpen(true);
+  };
+
+  const handleLeave = () => {
+    setIsOpen(false);
+  };
+
+  const handleClick = () => {
+    setIsOpen(!isOpen);
+  };
+
+  return (
+    <TooltipPrimitive.Provider delayDuration={0}>
+      <TooltipPrimitive.Root open={isOpen} onOpenChange={setIsOpen}>
+        <TooltipPrimitive.Trigger
+          aria-label={ariaLabel}
+          onClick={handleClick}
+          onMouseEnter={handleHover}
+          onMouseLeave={handleLeave}
+          asChild={asChild}
+        >
+          {children}
+        </TooltipPrimitive.Trigger>
+        <TooltipPrimitive.Portal>
+          <TooltipPrimitive.Content
             side={position}
             align={alignment}
             sideOffset={sideOffset}
             collisionBoundary={collisionBoundary}
-            role="tooltip"
+            asChild
           >
-            <Container>{text}</Container>
-          </PopoverPrimitive.Content>
-        </PopoverPrimitive.Content>
-      </PopoverPrimitive.Root>
-    );
-  }
-
-  return (
-    <TooltipPrimitive.Provider>
-      <TooltipPrimitive.Root open={open} onOpenChange={onOpenChange} delayDuration={100}>
-        <TooltipPrimitive.Trigger asChild aria-label={ariaLabel}>
-          <Stack align="center" width="fit-content">
-            {children}
-          </Stack>
-        </TooltipPrimitive.Trigger>
-        <TooltipPrimitive.Content
-          side={position}
-          align={alignment}
-          sideOffset={sideOffset}
-          collisionBoundary={collisionBoundary}
-          asChild
-        >
-          <Container>{text}</Container>
-        </TooltipPrimitive.Content>
+            <TooltipContent side={position}>{text}</TooltipContent>
+          </TooltipPrimitive.Content>
+        </TooltipPrimitive.Portal>
       </TooltipPrimitive.Root>
     </TooltipPrimitive.Provider>
   );
 };
-
-const scaleIn = keyframes`
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-`;
-
-const Container = styled(Box)`
-  ${({ theme }) => css`
-    ${createFontStyles('caption-3')}
-    background: ${theme.backgroundColor.tertiary};
-    border-radius: ${theme.borderRadius.default};
-    box-shadow: ${theme.elevation[2]};
-    color: ${theme.color.quinary};
-    max-width: 300px;
-    min-width: fit-content;
-    padding: ${theme.spacing[2]} ${theme.spacing[3]};
-    text-align: left;
-    z-index: ${theme.zIndex.tooltip};
-    will-change: opacity;
-    text-transform: initial;
-    text-wrap: wrap;
-    transform-origin: var(--radix-tooltip-content-transform-origin);
-    animation: ${scaleIn} 0.1s ease-out;
-    &:focus-visible {
-      outline: none;
-    }
-  `}
-`;
 
 export default Tooltip;

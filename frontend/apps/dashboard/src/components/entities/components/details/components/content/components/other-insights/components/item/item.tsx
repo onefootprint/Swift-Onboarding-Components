@@ -19,7 +19,7 @@ const Item = ({ name: rawName, value: rawValue, description, unit: rawUnit }: It
       <Text variant="body-3" maxWidth="50%" truncate display="flex" gap={2} tag="div">
         {name}
         {description && (
-          <Tooltip text={description} position="bottom">
+          <Tooltip text={description}>
             <IcoInfo16 />
           </Tooltip>
         )}

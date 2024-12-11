@@ -43,7 +43,7 @@ const RadioSelectOption = ({
   };
 
   return disabled && disabledHint ? (
-    <Tooltip text={disabledHint} aria-disabled={disabled} alignment="start">
+    <Tooltip text={disabledHint} aria-disabled={disabled} alignment="start" asChild>
       <Content
         description={description}
         disabled={disabled}

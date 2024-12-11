@@ -192,20 +192,22 @@ const RulesActionRow = ({ isEditing, rule, onDelete, onEdit, onUndoDelete, onUnd
               {t('add-risk-signal')}
             </Button>
 
-            <Tooltip text={t('add-list-tooltip')} disabled={!!lists?.data.length}>
-              <Button
-                variant="secondary"
-                size="compact"
-                prefixIcon={IcoShuffle16}
-                disabled={
-                  !lists?.data.length ||
-                  isPendingDeletion ||
-                  expressions.some(expression => !expression.field || !expression.value)
-                }
-                onClick={handleAddListExpression}
-              >
-                {t('add-list')}
-              </Button>
+            <Tooltip text={t('add-list-tooltip')} disabled={!!lists?.data.length} asChild>
+              <div>
+                <Button
+                  variant="secondary"
+                  size="compact"
+                  prefixIcon={IcoShuffle16}
+                  disabled={
+                    !lists?.data.length ||
+                    isPendingDeletion ||
+                    expressions.some(expression => !expression.field || !expression.value)
+                  }
+                  onClick={handleAddListExpression}
+                >
+                  {t('add-list')}
+                </Button>
+              </div>
             </Tooltip>
           </Stack>
           {(isPendingChange || isPendingDeletion) && (
