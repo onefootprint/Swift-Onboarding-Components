@@ -98,6 +98,9 @@ export const templateValues: Record<OnboardingTemplate, Partial<State['data']>> 
         ...defaultFormValues.detailsForm.person,
         usLegalStatus: true,
       },
+      investor: {
+        collect: true,
+      },
     },
     requiredAuthMethodsForm: defaultFormValues.requiredAuthMethodsForm,
     verificationChecksForm: {
@@ -139,6 +142,9 @@ export const templateValues: Record<OnboardingTemplate, Partial<State['data']>> 
       person: {
         ...defaultFormValues.detailsForm.person,
         usLegalStatus: true,
+      },
+      investor: {
+        collect: true,
       },
     },
     requiredAuthMethodsForm: defaultFormValues.requiredAuthMethodsForm,
