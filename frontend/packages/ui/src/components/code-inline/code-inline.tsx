@@ -1,7 +1,6 @@
+import { cx } from 'class-variance-authority';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
 import CopyButton from '../copy-button';
-import Text from '../text';
 
 export type CodeInlineProps = {
   ariaLabel?: string;
@@ -30,15 +29,9 @@ const CodeInline = ({
 
   if (disabled) {
     return (
-      <CodeContent
-        variant={size === 'compact' ? 'snippet-3' : 'snippet-2'}
-        data-disabled={disabled}
-        truncate={truncate}
-        tag="code"
-        {...(isPrivate && { 'data-dd-privacy': 'mask' })}
-      >
+      <BaseCode size={size} truncate={truncate} disabled={disabled} isPrivate={isPrivate}>
         {children}
-      </CodeContent>
+      </BaseCode>
     );
   }
 
@@ -53,41 +46,38 @@ const CodeInline = ({
           tooltip?.textConfirmation ?? (t('components.code-inline.tooltip-text-confirmation-default') as string),
       }}
     >
-      <CodeContent
-        variant={size === 'compact' ? 'snippet-3' : 'snippet-2'}
-        data-disabled={disabled}
-        truncate={truncate}
-        tag="code"
-        {...(isPrivate && { 'data-dd-privacy': 'mask' })}
-      >
+      <BaseCode size={size} truncate={truncate} disabled={disabled} isPrivate={isPrivate}>
         {children}
-      </CodeContent>
+      </BaseCode>
     </CopyButton>
   );
 };
 
-const CodeContent = styled(Text)`
-  ${({ theme }) => css`
-    text-align: left;
-    white-space: break-spaces;
-    word-break: break-word;
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    display: inline-block;
-    background: ${theme.backgroundColor.secondary};
-    border-radius: ${theme.borderRadius.sm};
-    color: ${theme.color.secondary};
-    flex-flow: wrap;
-    padding: ${theme.spacing[1]} ${theme.spacing[2]};
-
-    &:not([data-disabled='true']) {
-      &:hover {
-        cursor: pointer;
-        color: ${theme.color.primary};
-        border-color: ${theme.borderColor.primary};
-      }
-    }
-
-  `}
-`;
+const BaseCode = ({ children, size, truncate, disabled, isPrivate }: CodeInlineProps) => {
+  return (
+    <div
+      className={cx(
+        'flex flex-wrap max-w-full px-1 py-[2px]',
+        'rounded-sm cursor-pointer',
+        'bg-secondary whitespace-nowrap',
+        'border border-solid border-tertiary text-primary',
+        {
+          'cursor-default': disabled,
+          'hover:text-primary hover:border-primary': !disabled,
+        },
+      )}
+    >
+      <code
+        className={cx('max-w-full text-snippet-2', {
+          'text-snippet-3': size === 'compact',
+          'truncate overflow-hidden text-ellipsis': truncate,
+          'data-dd-privacy': isPrivate ? 'mask' : undefined,
+        })}
+      >
+        {children}
+      </code>
+    </div>
+  );
+};
 
 export default CodeInline;
