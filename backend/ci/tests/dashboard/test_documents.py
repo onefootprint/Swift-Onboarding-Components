@@ -322,3 +322,27 @@ def test_review_documents(sandbox_tenant):
 
     body = get(f"entities/{user.fp_id}/documents", None, *sandbox_tenant.db_auths)
     assert all(i["review_status"] == "reviewed_by_human" for i in body)
+
+
+@pytest.mark.parametrize("doc_type", ["proof_of_address", "ssn_card"])
+def test_proof_of_address(sandbox_tenant, doc_type):
+    """
+    Test that we can upload a proof of address and a ssn card and that they are both uploaded
+    """
+    body = post("users", None, sandbox_tenant.sk.key)
+    fp_id = body["id"]
+    file = open_multipart_file("example_pdf.pdf", "application/pdf")()
+    post(
+        f"users/{fp_id}/vault/document.{doc_type}.image/upload",
+        None,
+        *sandbox_tenant.db_auths,
+        files=file,
+    )
+
+    body = get(f"entities/{fp_id}/documents", None, *sandbox_tenant.db_auths)
+
+    # Test voter ID with curp
+    poa = next(i for i in body if i["kind"] == doc_type)
+    assert poa["status"] is None
+    assert len(poa["uploads"]) == 1
+    assert poa["uploads"][0]["side"] == "front"

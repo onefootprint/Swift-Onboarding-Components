@@ -103,6 +103,18 @@ pub async fn get(
                             let already_contains = id_docs.iter().any(|d| d.0.document_type == kind.into());
                             (!already_contains).then_some((kind.into(), (side, dl)))
                         }
+                        DataIdentifier::Document(DocumentDiKind::ProofOfAddress) => {
+                            let already_contains = id_docs
+                                .iter()
+                                .any(|d| d.0.document_type == DocumentKind::ProofOfAddress);
+                            (!already_contains)
+                                .then_some((DocumentKind::ProofOfAddress, (DocumentSide::Front, dl)))
+                        }
+                        DataIdentifier::Document(DocumentDiKind::SsnCard) => {
+                            let already_contains =
+                                id_docs.iter().any(|d| d.0.document_type == DocumentKind::SsnCard);
+                            (!already_contains).then_some((DocumentKind::SsnCard, (DocumentSide::Front, dl)))
+                        }
                         DataIdentifier::Document(DocumentDiKind::Custom(_)) => {
                             let already_contains = custom_dis.iter().any(|i| **i == di);
                             (!already_contains).then_some((DocumentKind::Custom, (DocumentSide::Front, dl)))
