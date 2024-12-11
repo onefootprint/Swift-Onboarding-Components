@@ -1,6 +1,7 @@
 import { postHostedIdentifySignupChallengeMutation } from '@onefootprint/axios';
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
+import Button from '../components/ui/button';
 import logo from '../images/avis.png';
 
 type IntroStepProps = {
@@ -47,20 +48,22 @@ const Intro = ({ onFillout }: IntroStepProps) => {
   };
 
   return (
-    <div className="app-form intro-step">
-      <header className="header">
-        <img src={logo} alt="Avis Logo" className="logo" width={92} height={30} />
-        <h1 className="title">Let's verify your customer's identity!</h1>
-        <h2 className="subtitle">Enter their email and phone number to begin the identity verification process.</h2>
+    <div className="w-[500px] border border-gray-100 px-8 pt-8 pb-4">
+      <header className="mb-6">
+        <img src={logo} alt="Avis Logo" className="mx-auto mb-6" width={92} height={30} />
+        <h1 className="text-heading-3 text-primary">Let's verify your customer's identity!</h1>
+        <h2 className="text-body-2 text-secondary">
+          Enter their email and phone number to begin the identity verification process.
+        </h2>
       </header>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="form-field">
-          <label className="form-label" htmlFor="email">
+        <div className="block w-full mb-6">
+          <label className="block mb-2 text-label-3 text-primary text-left" htmlFor="email">
             Email
           </label>
           <input
             id="email"
-            className="form-input"
+            className="w-full h-10 px-4 text-body-3 bg-white border border-gray-150 text-black outline-none hover:border-gray-300 focus:border-gray-600"
             placeholder="customer@example.com"
             {...register('email', {
               required: 'Email is required',
@@ -70,15 +73,15 @@ const Intro = ({ onFillout }: IntroStepProps) => {
               },
             })}
           />
-          {errors.email?.message && <p className="form-error">{errors.email.message as string}</p>}
+          {errors.email?.message && <p className="mt-1.5 text-sm text-error">{errors.email.message as string}</p>}
         </div>
-        <div className="form-field">
-          <label className="form-label" htmlFor="phoneNumber">
+        <div className="block w-full mb-6">
+          <label className="block mb-2 text-label-3 text-primary text-left" htmlFor="phoneNumber">
             Phone number
           </label>
           <input
             id="phoneNumber"
-            className="form-input"
+            className="w-full h-10 px-4 text-body-3 bg-white border border-gray-150 text-black outline-none hover:border-gray-300 focus:border-gray-600"
             placeholder="+1 555-555-0100"
             {...register('phoneNumber', {
               required: 'Phone number is required',
@@ -90,13 +93,20 @@ const Intro = ({ onFillout }: IntroStepProps) => {
               },
             })}
           />
-          {errors.phoneNumber?.message && <p className="form-error">{errors.phoneNumber.message as string}</p>}
-          {mutation.error && <p className="form-error">{mutation.error.message}</p>}
+          {errors.phoneNumber?.message && (
+            <p className="mt-1.5 text-sm text-error">{errors.phoneNumber.message as string}</p>
+          )}
+          {mutation.error && <p className="mt-1.5 text-sm text-error">{mutation.error.message}</p>}
         </div>
-        <div className="form-button">
-          <button type="submit" className="button button-primary" disabled={mutation.isPending || mutation.isPending}>
+        <div className="mt-3 mb-4">
+          <Button variant="primary" type="submit" disabled={mutation.isPending || mutation.isPending}>
             {mutation.isPending ? 'Verifying...' : 'Continue'}
-          </button>
+          </Button>
+        </div>
+        <div>
+          <p className="text-body-3 text-tertiary text-center">
+            They’ll receive a text message with a link to verify their phone number.
+          </p>
         </div>
       </form>
     </div>

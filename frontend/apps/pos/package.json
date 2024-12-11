@@ -3,9 +3,11 @@
   "version": "0.1.2",
   "private": true,
   "dependencies": {
+    "class-variance-authority": "^0.7.0",
     "@onefootprint/axios": "workspace:*",
     "@onefootprint/request": "workspace:*",
     "@onefootprint/request-types": "workspace:*",
+    "@onefootprint/tailwind-config": "workspace:^",
     "@tanstack/react-query": "^5.56.2",
     "axios": "^1.7.7",
     "lodash": "^4.17.21",
@@ -20,8 +22,14 @@
     "@types/node": "^22.7.4",
     "@types/react": "^18.3.10",
     "@types/react-dom": "^18.3.0",
+    "abortcontroller-polyfill": "^1.7.5",
+    "autoprefixer": "^10.4.20",
     "customize-cra": "^1.0.0",
-    "react-app-rewired": "^2.2.1"
+    "globalthis": "^1.0.4",
+    "postcss": "^8.4.47",
+    "react-app-rewired": "^2.2.1",
+    "tailwindcss": "^3.4.14",
+    "whatwg-fetch": "^3.6.20"
   },
   "scripts": {
     "dev": "react-app-rewired start",

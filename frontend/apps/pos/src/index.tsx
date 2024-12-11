@@ -1,4 +1,5 @@
-import 'react-app-polyfill/ie9';
+import 'abortcontroller-polyfill/dist/abortcontroller-polyfill-only';
+
 import 'react-app-polyfill/ie11';
 import 'react-app-polyfill/stable';
 

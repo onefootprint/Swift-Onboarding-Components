@@ -1,11 +1,17 @@
-const { override, disableEsLint, babelInclude } = require('customize-cra');
+const { override, disableEsLint, babelInclude, addWebpackPlugin } = require('customize-cra');
 const path = require('path');
+const webpack = require('webpack');
 
 module.exports = override(
   config => {
     disableEsLint();
     return config;
   },
+  addWebpackPlugin(
+    new webpack.ProvidePlugin({
+      globalThis: 'globalthis',
+    }),
+  ),
   babelInclude([
     path.resolve('src'),
     path.resolve('../../packages/axios'),

@@ -1,6 +1,5 @@
 import { getHostedOnboardingConfigOptions } from '@onefootprint/axios';
 import { useQuery } from '@tanstack/react-query';
-
 import Router from './pages/router';
 
 const App = () => {
@@ -8,9 +7,15 @@ const App = () => {
   if (isPending) {
     return <div>Loading...</div>;
   }
+
   if (data) {
-    return <Router onboardingConfig={data} />;
+    return (
+      <div className="flex items-center justify-center h-screen bg-primary text-center">
+        <Router onboardingConfig={data} />
+      </div>
+    );
   }
+
   return null;
 };
 

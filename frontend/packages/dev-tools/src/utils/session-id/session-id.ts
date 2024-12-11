@@ -3,11 +3,14 @@ const isBrowser = typeof window !== 'undefined';
 const isTest = process.env.NODE_ENV === 'test';
 const queryParamKey = 'xfpsessionid';
 
-// replaced the uuid lib with custom implementation as the package is not compatible with our UMD build of footprint-js
 export const uuidv4 = () => {
-  return '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, c =>
-    (+c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (+c / 4)))).toString(16),
-  );
+  const timestamp = Date.now();
+  const randomPart = Math.floor(Math.random() * 1000000000);
+
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = (((timestamp + randomPart) * Math.random() * 16) % 16) | 0;
+    return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
+  });
 };
 
 const getParamValue = (param: string, url: string): string | null => {
