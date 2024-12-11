@@ -19,10 +19,33 @@ meta:
 ## What are onboarding components
 
 Our [Android hosted flow](/articles/sdks/android-hosted) provides a handy way to pass pre-existing bootstrap data and appearance styling to open the verification/onboarding flow on a web view. However, many developers prefer to incorporate data collection forms directly within their apps, customized to their specific design needs.
-To address this, our android Onboarding Components SDK provides a set of necessary utility functions to identify users, save data into Footprint vault, etc.
+To address this, our android Onboarding Components SDK provides a set of essential functions, models, classes, and objects to identify users, save data into Footprint vault, etc.
 These methods are designed to easily navigate through the Footprint onboarding flow while letting developers provide their own UI for keeping full control over the appearance and user experience.
 
 ## Installation
+
+In order to use our SDK, you will need to add it using Jitpack, which is a package repository for JVM and Android projects that builds Git projects on demand and provides you with ready-to-use artifacts (jar, aar).
+
+If you are using Gradle for your build system, add the following to your `settings.gradle` file:
+
+```kotlin
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+        maven("https://jitpack.io") // Add this line
+    }
+}
+
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven("https://jitpack.io") // Add this line
+    }
+}
+```
 
 In your app's `build.gradle.kts` file, add the following line in the dependencies block:
 
@@ -33,7 +56,22 @@ dependencies {
     }
 }
 ```
+
 You should replace `<VERSION>` with the version number, like `1.0.0-beta`. We recommend always using the latest available version published. You can find the published versions [here](https://jitpack.io/#onefootprint/android-onboarding-components).
+
+## Permissions
+
+In order to use the package your manifest must include `INTERNET` permission:
+
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+```
+
+## Minimum version requirements
+
+Our onboarding flows require a `compileSdk` version of 35 or above in your app's gradle file.
+
+If you're using older versions, please consider upgrading to ensure compatibility. Failure to meet these requirements could lead to unexpected issues or the package not working at all.
 
 ## Basic concepts
 
@@ -57,6 +95,19 @@ The instance can be accessed by `Footprint` and can be initialized by calling `F
 
 The arguments above create the context for the flow. So, make sure to re-initialize the instance with correct context every time you start a new onboarding/auth flow.
 
+### FootprintHosted
+
+`FootprintHosted` is a class that allows you to launch identity and onboarding flows in Chrome Custom Tabs (overlaid on your app, similar to a WebView but more secure) in cases where inline support is unavailable. It follows a singleton pattern and provides two main functions: `launchIdentify` and `handoff`.
+
+- **`launchIdentify`**: Opens the identity flow in Chrome Custom Tabs when inline OTP or authentication is not supported.
+- **`handoff`**: Completes onboarding requirements in Chrome Custom Tabs when they cannot be handled inline.
+
+These functions are designed to handle rare cases where inline flows are not possible. Therefore, this functions are usually called in `catch` block. Both require an `Activity` context, and once the flow completes in the Custom Tab, control is returned automatically to the provided activity.
+
+<inline-alert variant="info">
+  Note that `FootprintHosted` is NOT the same as our hosted SDK
+</inline-alert>
+
 ## Getting started
 
 ### Get a public key
@@ -69,7 +120,7 @@ The arguments above create the context for the flow. So, make sure to re-initial
 
 ### Initialize the flow
 
-As discussed above in section [3.1](/articles/sdks/swift-onboarding-components#3-basic-concepts-3-1-footprint-provider), we need to initialize the `FootprintProvider` with the context for the flow.
+As discussed above, we need to initialize `Footprint` with the context for the flow.
 
 ```kotlin
 val authRequirement = Footprint.initialize(
@@ -98,14 +149,14 @@ The initialize function will return which auth method is required, so you can st
 ## Identification
 
 Before you can start data-collection, you must identify the user using Footprint auth.
-You can identify a user using authToken (that you pass to the `Footprint`) or email/phone that you collect from user during the identification process.
+You can identify a user using `authToken` (that you pass to the `Footprint`) or email/phone that you collect from user during the identification process.
 We support creating auth flow inline as well as doing the auth on a webview.
-We suggest using the webview auth as a backup for rare cases when inline auth is not supported. 
+We suggest using the webview auth as a backup for rare cases when inline auth is not supported.
 Here is how you can build auth flow using our SDK.
 
 ### Create challenge
 
-We create challenge based on the response from the initialize step. 
+We create challenge based on the response from the initialize step.
 
 - We provide a function for creating challenge: `Footprint.createChallenge`, and one function for verifying challenge `Footprint.verify` (we will talk about verification in the next step).
 - In rare cases when we don’t support inline OTP, we throw a `FootprintException` of error kind `INLINE_OTP_NOT_SUPPORTED` . You can use `FootprintHosted.launchIdentify` to launch the OTP flow on the webview in those cases.
@@ -115,8 +166,8 @@ Here is an example view with the form to collect email and phone and create the 
 ```kotlin
 try {
     // No need to pass email or phone for auth token
-    val createChallengeKind = Footprint.createChallenge() 
-    // Possible values for challengeKind: sms, sms_link, biometric, email. 
+    val createChallengeKind = Footprint.createChallenge()
+    // Possible values for challengeKind: sms, sms_link, biometric, email.
     // But for onboarding components, it will only be email or sms
     println("Challenge Kind: $createChallengeKind")
 } catch (e: FootprintException) {
@@ -148,7 +199,7 @@ try {
 
 ### Verify challenge
 
-Finally we need to verify the challenge calling `Footprint.verify()` . 
+Finally we need to verify the challenge calling `Footprint.verify()` .
 
 ```kotlin
 try {
@@ -162,14 +213,6 @@ try {
 ## Collecting user’s data and finalizing the flow
 
 Once the authentication is completed, you can start collecting user data.
-
-
-### Finalizing the flow
-
-Once all the data are collected, we need to finalizing the onboarding. We can verify if all the data are collected by checking the response from `Footprint.getRequirements()`. In order to finalize the onboarding, we have two options:
-
-1. If all requirements are completed and there is no passkey and id-doc requirements, we can call `Footprint.process()` for process the inline onboarding. `Footprint.process()` return a validation token.
-2. `Footprint.process()` will throw a `FootprintException` of error kind `INLINE_PROCESS_NOT_SUPPORTED` if all requirements are not completed or if inline process is not supported for this case. If that happens you can handoff to Footprint's flow to finalize the onboarding: we'll collect any missing data, as well as register passkeys (if needed) and finalize the onboarding sending you a validation token. You can handoff to Footprint’s flow calling the `FootprintHosted.handoff()` function.
 
 #### Vaulting data
 
@@ -185,7 +228,7 @@ try {
                 DataIdentifier.idDob to dob
             )
         )
-    )        
+    )
 } catch (e: FootprintException) {
     println("Error updating basic info: ${e.message}, ${e.context}")
 
@@ -200,7 +243,7 @@ try {
 }
 ```
 
-#### Fetch requirements and prefill input fields with vault data previously collected  
+#### Fetch requirements and prefill input fields with vault data previously collected
 
 ```kotlin
  try {
@@ -214,11 +257,16 @@ try {
 
 ```
 
-#### Complete the flow
+### Finalizing the flow
+
+Once all the data are collected, we need to finalizing the onboarding. We can verify if all the data are collected by checking the response from `Footprint.getRequirements()`. In order to finalize the onboarding, we have two options:
+
+1. If all requirements are completed and there is no passkey and id-doc requirements, we can call `Footprint.process()` for process the inline onboarding. `Footprint.process()` return a validation token.
+2. `Footprint.process()` will throw a `FootprintException` of error kind `INLINE_PROCESS_NOT_SUPPORTED` if all requirements are not completed or if inline process is not supported for this playbook. You can also check if you can process inline from `Footprint.getRequirements().canProcessInline`. If that happens you can handoff to Footprint's flow to finalize the onboarding: we'll collect any missing data, as well as register passkeys (if needed) and finalize the onboarding sending you a validation token. You can handoff to Footprint’s flow calling the `FootprintHosted.handoff()` function.
 
 ```kotlin
 try {
-    val validationToken = Footprint.process()    
+    val validationToken = Footprint.process()
 } catch (e: FootprintException) {
     when (e.kind) {
         FootprintException.ErrorKind.INLINE_PROCESS_NOT_SUPPORTED -> {
@@ -247,7 +295,6 @@ try {
 }
 ```
 
-
 ## Example
 
-Example of a complete flow implemented using onboarding components can be found [here](https://github.com/onefootprint/examples/tree/master/idv/mobile-android-onboarding-components).
+Example of a complete flow implemented using onboarding components can be found [here](https://github.com/onefootprint/examples/blob/master/idv/mobile-android-onboarding-components/app/src/main/java/com/example/footprintandroidonboardingcomponentsdemo/MainActivity.kt).

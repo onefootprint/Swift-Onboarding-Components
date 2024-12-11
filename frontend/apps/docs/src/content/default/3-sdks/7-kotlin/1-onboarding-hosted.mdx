@@ -13,6 +13,29 @@ meta:
 
 ## Installation
 
+In order to use our SDK, you will need to add it using Jitpack, which is a package repository for JVM and Android projects that builds Git projects on demand and provides you with ready-to-use artifacts (jar, aar).
+
+If you are using Gradle for your build system, add the following to your `settings.gradle` file:
+
+```kotlin
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+        maven("https://jitpack.io") // Add this line
+    }
+}
+
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven("https://jitpack.io") // Add this line
+    }
+}
+```
+
 In your app's `build.gradle.kts` file, add the following line in the dependencies block:
 
 ```kotlin
@@ -21,8 +44,21 @@ dependencies {
 }
 ```
 
-You should replace `<VERSION>` with the version number, like `1.0.0`. We recommend always using the latest available version published. You can find the published versions [here](https://jitpack.io/#onefootprint/footprint-android).
+You should replace `<VERSION>` with the version number, like `1.0.0`. We recommend always using the latest available version published. You can find the published versions and instructions on how to install with different build systems (e.g. maven, sbt, leiningen) [here](https://jitpack.io/#onefootprint/footprint-android).
 
+## Permissions
+
+In order to use the `FootprintAndroid` package your manifest must include `INTERNET` permission:
+
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+```
+
+## Minimum version requirements
+
+Our onboarding flows require a `compileSdk` version of 34 or above in your app's gradle file.
+
+If you're using older versions, please consider upgrading to ensure compatibility with `FootprintAndroid`. Failure to meet these requirements could lead to unexpected issues or the package not working at all.
 
 ## Getting started
 
