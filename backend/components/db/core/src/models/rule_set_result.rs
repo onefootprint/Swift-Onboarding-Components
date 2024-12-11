@@ -294,7 +294,6 @@ mod tests {
     use super::*;
     use crate::models::onboarding_decision::OnboardingDecision;
     use crate::models::risk_signal::RiskSignal;
-    use crate::models::risk_signal_group::RiskSignalGroupScope;
     use crate::models::rule_instance::NewRule;
     use crate::models::rule_instance::RuleInstance;
     use crate::models::scoped_vault::ScopedVault;
@@ -363,7 +362,7 @@ mod tests {
         let vreq =
             tests::fixtures::verification_request::create(conn, &sv.id, &di.id, VendorAPI::IdologyExpectId);
         let vres = tests::fixtures::verification_result::create(conn, &vreq.id, false);
-        let scope = RiskSignalGroupScope::ScopedVaultId { id: &sv.id };
+        let scope = (&sv.id).into();
         let risk_signals = RiskSignal::bulk_save_for_scope(
             conn,
             scope,
@@ -444,7 +443,7 @@ mod tests {
         let vreq =
             tests::fixtures::verification_request::create(conn, &sv.id, &di.id, VendorAPI::IdologyExpectId);
         let vres = tests::fixtures::verification_result::create(conn, &vreq.id, false);
-        let scope = RiskSignalGroupScope::ScopedVaultId { id: &sv.id };
+        let scope = (&sv.id).into();
         let risk_signals = RiskSignal::bulk_save_for_scope(
             conn,
             scope,

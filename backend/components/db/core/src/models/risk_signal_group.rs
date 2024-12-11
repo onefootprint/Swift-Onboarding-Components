@@ -32,11 +32,18 @@ struct NewRiskSignalGroup {
     pub workflow_id: Option<WorkflowId>,
 }
 
-#[derive(Clone, Debug, derive_more::From)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum RiskSignalGroupCreateOp {
+    Create,
+    GetOrCreate,
+}
+
+#[derive(Clone, Debug)]
 pub enum RiskSignalGroupScope<'a> {
     // Risk signals are scoped to a ScopedVault. You almost certainly DO NOT want to use this.
     ScopedVaultId {
         id: &'a ScopedVaultId,
+        op: RiskSignalGroupCreateOp,
     },
     // Risk Signals are scoped to a WorkflowId. You almost certainly want to use this.
     WorkflowId {
@@ -44,10 +51,29 @@ pub enum RiskSignalGroupScope<'a> {
         sv_id: &'a ScopedVaultId,
     },
 }
+
+/// By default, we create a RiskSignalGroup for a ScopedVaultId
+impl<'a> From<&'a ScopedVaultId> for RiskSignalGroupScope<'a> {
+    fn from(value: &'a ScopedVaultId) -> RiskSignalGroupScope<'a> {
+        RiskSignalGroupScope::ScopedVaultId {
+            id: value,
+            op: RiskSignalGroupCreateOp::Create,
+        }
+    }
+}
+impl<'a> From<(&'a WorkflowId, &'a ScopedVaultId)> for RiskSignalGroupScope<'a> {
+    fn from(value: (&'a WorkflowId, &'a ScopedVaultId)) -> RiskSignalGroupScope<'a> {
+        RiskSignalGroupScope::WorkflowId {
+            id: value.0,
+            sv_id: value.1,
+        }
+    }
+}
+
 impl<'a> RiskSignalGroupScope<'a> {
     pub fn scoped_vault_id(&self) -> ScopedVaultId {
         match &self {
-            RiskSignalGroupScope::ScopedVaultId { id } => (*id).clone(),
+            RiskSignalGroupScope::ScopedVaultId { id, .. } => (*id).clone(),
             RiskSignalGroupScope::WorkflowId { sv_id, .. } => (*sv_id).clone(),
         }
     }
@@ -60,41 +86,23 @@ impl<'a> RiskSignalGroupScope<'a> {
     }
 }
 
-
 impl RiskSignalGroup {
-    fn create(conn: &mut PgConn, scope: RiskSignalGroupScope, kind: RiskSignalGroupKind) -> FpResult<Self> {
-        let sv_id = scope.scoped_vault_id();
-        let wf_id = scope.workflow_id();
-        let new = NewRiskSignalGroup {
-            created_at: Utc::now(),
-            scoped_vault_id: sv_id,
-            workflow_id: wf_id,
-            kind,
-        };
-
-        let res = diesel::insert_into(risk_signal_group::table)
-            .values(new)
-            .get_result::<Self>(conn)?;
-        Ok(res)
-    }
-
     #[tracing::instrument("RiskSignalGroup::get_or_create", skip(conn))]
     pub(crate) fn get_or_create<'a>(
         conn: &mut PgConn,
         scope: RiskSignalGroupScope<'a>,
         kind: RiskSignalGroupKind,
     ) -> FpResult<Self> {
-        match scope.clone() {
-            // TODO: I'll clean this up tomorrow
-            // If we are making a set of risk signals for SV scope, we always create.
-            // This is only used in non-test code for watchlist tasks which don't have a WF associated with it
-            s @ RiskSignalGroupScope::ScopedVaultId { .. } => Self::create(conn, s, kind),
-            // If we are making a set of risk signals for WF scope, we only create if it doesn't exist already
-            s @ RiskSignalGroupScope::WorkflowId { .. } => {
-                let existing = Self::latest_by_kind(conn, s.clone(), kind)?;
+        match &scope {
+            RiskSignalGroupScope::ScopedVaultId {
+                op: RiskSignalGroupCreateOp::Create,
+                ..
+            } => Self::create(conn, scope, kind),
+            _ => {
+                let existing = Self::latest_by_kind(conn, scope.clone(), kind)?;
                 match existing {
                     Some(e) => Ok(e),
-                    None => Self::create(conn, s, kind),
+                    None => Self::create(conn, scope, kind),
                 }
             }
         }
@@ -129,6 +137,24 @@ impl RiskSignalGroup {
             .distinct_on(risk_signal_group::kind)
             .get_results(conn)?;
 
+        Ok(res)
+    }
+}
+
+impl RiskSignalGroup {
+    fn create(conn: &mut PgConn, scope: RiskSignalGroupScope, kind: RiskSignalGroupKind) -> FpResult<Self> {
+        let sv_id = scope.scoped_vault_id();
+        let wf_id = scope.workflow_id();
+        let new = NewRiskSignalGroup {
+            created_at: Utc::now(),
+            scoped_vault_id: sv_id,
+            workflow_id: wf_id,
+            kind,
+        };
+
+        let res = diesel::insert_into(risk_signal_group::table)
+            .values(new)
+            .get_result::<Self>(conn)?;
         Ok(res)
     }
 }
