@@ -4,6 +4,7 @@ import { Controller, useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
+import { useEffect } from 'react';
 import Header from '../../../header';
 import useMeta from './hooks/use-meta';
 import type { VerificationChecksFormData } from './verification-checks-step.types';
@@ -21,12 +22,19 @@ export type VerificationChecksStepProps = {
 
 const VerificationChecksStep = ({ defaultValues, meta, onBack, onSubmit }: VerificationChecksStepProps) => {
   const { t } = useTranslation('playbooks', { keyPrefix: 'create.verification-checks' });
-  const { aml, kyc, kyb, kybKind } = useMeta(meta);
-  const { register, control, handleSubmit } = useForm<VerificationChecksFormData>({ defaultValues });
-  const [runKyb] = useWatch({
+  const { register, control, handleSubmit, setValue } = useForm<VerificationChecksFormData>({ defaultValues });
+  const [runKyb, amlEnhancedAml] = useWatch({
     control,
-    name: ['runKyb'],
+    name: ['runKyb', 'aml.enhancedAml'],
   });
+  const { aml, kyc, kyb, kybKind } = useMeta({ ...meta, runKyb });
+
+  useEffect(() => {
+    // Cannot run enhanced AML without running KYB
+    if (!runKyb && amlEnhancedAml) {
+      setValue('aml.enhancedAml', false);
+    }
+  }, [runKyb, amlEnhancedAml]);
 
   return (
     <form

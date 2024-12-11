@@ -4,15 +4,16 @@ type MetaProps = {
   collectsTin: boolean;
   collectsBO: boolean;
   collectsBusinessAddress: boolean;
+  runKyb: boolean;
 };
 
-const useMeta = ({ collectsTin, collectsBO, collectsBusinessAddress }: MetaProps) => {
+const useMeta = ({ runKyb, collectsTin, collectsBO, collectsBusinessAddress }: MetaProps) => {
   const { t } = useTranslation('playbooks', { keyPrefix: 'create.verification-checks' });
 
   return {
     aml: {
-      disabled: !collectsBO,
-      disabledText: t('aml.disabled.missing-bos'),
+      disabled: !runKyb || !collectsBO,
+      disabledText: !runKyb ? t('aml.disabled.must-run-kyb') : t('aml.disabled.missing-bos'),
     },
     kyc: {
       // KYC is always determined by whether we collect BOs
