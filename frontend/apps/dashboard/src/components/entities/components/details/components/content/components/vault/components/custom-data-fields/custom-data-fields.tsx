@@ -1,19 +1,21 @@
-import type { Icon } from '@onefootprint/icons';
-import { DataKind, isVaultDataDecrypted } from '@onefootprint/types';
-import { Box, CodeInline, Grid, LinkButton, Text } from '@onefootprint/ui';
-import { useTranslation } from 'react-i18next';
-import { getCustomDIs } from 'src/components/entities/utils/get-dis';
-import styled, { css } from 'styled-components';
-
 import useEntityVault from '@/entities/hooks/use-entity-vault';
 import type { WithEntityProps } from '@/entity/components/with-entity';
+import type { Icon } from '@onefootprint/icons';
+import { DataKind, isVaultDataDecrypted } from '@onefootprint/types';
+import { CodeInline, LinkButton, Text } from '@onefootprint/ui';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { getCustomDIs } from 'src/components/entities/utils/get-dis';
 
+import { cx } from 'class-variance-authority';
+import { AnimatePresence, motion } from 'framer-motion';
 import useDecryptForm from '../../hooks/use-decrypt-form';
 import useField from '../../hooks/use-field';
 import type { DiField } from '../../vault.types';
 import Field from '../field';
 import { useDecryptControls } from '../vault-actions';
 import CustomDocumentField from './components/custom-document-field';
+import ShowMoreButton from './components/show-more-button';
 
 type CustomDataFieldsProps = WithEntityProps & {
   iconComponent: Icon;
@@ -33,6 +35,12 @@ const CustomDataFields = ({ entity, iconComponent: IconComponent, title }: Custo
   const selectableFields = customDIs.filter(di => getFieldProps(di).canSelect);
   const allSelected = selectableFields.every(decryptForm.isChecked);
   const shouldShowSelectAll = decrypt.inProgress && selectableFields.length > 0;
+  const [showAll, setShowAll] = useState(false);
+
+  const NUMBER_OF_FIELDS_TO_SHOW = 8;
+  const shouldShowShowMore = customDIs.length > NUMBER_OF_FIELDS_TO_SHOW;
+  const initialFields = customDIs.slice(0, NUMBER_OF_FIELDS_TO_SHOW);
+  const additionalFields = customDIs.slice(NUMBER_OF_FIELDS_TO_SHOW);
 
   const handleSelectAll = () => {
     decryptForm.set(selectableFields, true);
@@ -42,84 +50,100 @@ const CustomDataFields = ({ entity, iconComponent: IconComponent, title }: Custo
     decryptForm.set(selectableFields, false);
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0, height: 0, transition: { duration: 0.2 } },
+    show: {
+      opacity: 1,
+      height: 'auto',
+      transition: {
+        height: { duration: 0.3 },
+        opacity: { duration: 0.2 },
+        staggerChildren: 0.05,
+      },
+    },
+  };
+
+  const listItemVariants = {
+    hidden: { opacity: 0, x: -5 },
+    show: {
+      opacity: 1,
+      x: 0,
+      transition: {
+        type: 'tween',
+        duration: 0.15,
+        ease: 'easeOut',
+      },
+    },
+  };
+
   const renderField = (field: DiField) => {
     const isDecrypted = isVaultDataDecrypted(vaultData?.[field.di]);
     const isDocument = dataKinds?.[field.di] === DataKind.documentData;
+
     if (isDecrypted && isDocument) {
-      return <CustomDocumentField field={field} entity={entity} />;
+      return (
+        <motion.div key={field.di} variants={listItemVariants} layout="position">
+          <CustomDocumentField field={field} entity={entity} />
+        </motion.div>
+      );
     }
 
     return (
-      <Field
-        key={field.di}
-        renderLabel={() => <CodeInline disabled>{field.di}</CodeInline>}
-        di={field.di}
-        entity={entity}
-      />
+      <motion.div key={field.di} variants={listItemVariants} layout="position">
+        <Field
+          key={field.di}
+          renderLabel={() => <CodeInline disabled>{field.di}</CodeInline>}
+          di={field.di}
+          entity={entity}
+        />
+      </motion.div>
     );
   };
 
   return vaultData ? (
-    <Container>
-      <Box>
-        <Header>
-          <Title>
-            <IconComponent />
-            <Text variant="label-3">{title}</Text>
-          </Title>
-          {shouldShowSelectAll && (
-            <LinkButton onClick={allSelected ? handleDeselectAll : handleSelectAll}>
-              {allSelected ? t('deselect-all') : t('select-all')}
-            </LinkButton>
+    <div className="flex flex-col overflow-hidden border border-solid rounded border-tertiary">
+      <div className="flex justify-between px-5 py-2 border-b border-solid border-tertiary rounded-t-md bg-secondary">
+        <div className="flex items-center gap-2">
+          <IconComponent />
+          <Text variant="label-3">{title}</Text>
+        </div>
+        {shouldShowSelectAll && (
+          <LinkButton onClick={allSelected ? handleDeselectAll : handleSelectAll}>
+            {allSelected ? t('deselect-all') : t('select-all')}
+          </LinkButton>
+        )}
+      </div>
+      <div className={cx('flex flex-col gap-3 p-5', shouldShowShowMore && 'pb-0')}>
+        <motion.div layout className="flex flex-col gap-3">
+          {initialFields.map(di => renderField({ di }))}
+        </motion.div>
+
+        <AnimatePresence mode="wait" initial={false}>
+          {showAll && (
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate="show"
+              exit="hidden"
+              className="flex flex-col gap-3"
+              layout
+            >
+              {additionalFields.map(di => renderField({ di }))}
+            </motion.div>
           )}
-        </Header>
-        <Grid.Container
-          columnGap={10}
-          rowGap={4}
-          width="100%"
-          columns={['repeat(2, 1fr)']}
-          paddingTop={5}
-          paddingBottom={5}
-          paddingRight={7}
-          paddingLeft={7}
+        </AnimatePresence>
+
+        <ShowMoreButton
+          isVisible={shouldShowShowMore}
+          showingAll={showAll}
+          onClick={() => setShowAll(!showAll)}
+          count={`${t('actions.more-fields', { count: customDIs.length - NUMBER_OF_FIELDS_TO_SHOW })}`}
         >
-          {customDIs.map(di => renderField({ di }))}
-        </Grid.Container>
-      </Box>
-    </Container>
+          {showAll ? t('actions.show-less') : t('actions.show-all')}
+        </ShowMoreButton>
+      </div>
+    </div>
   ) : null;
 };
-
-const Container = styled.fieldset`
-  ${({ theme }) => css`
-    border-radius: ${theme.spacing[2]};
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    width: 100%;
-    justify-content: space-between;
-  `};
-`;
-
-const Title = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    align-items: center;
-    gap: ${theme.spacing[3]};
-  `};
-`;
-
-const Header = styled.header`
-  ${({ theme }) => css`
-    background-color: ${theme.backgroundColor.secondary};
-    border-bottom: 1px solid ${theme.borderColor.tertiary};
-    border-radius: ${theme.spacing[2]} ${theme.spacing[2]} 0 0;
-    display: flex;
-    justify-content: space-between;
-    gap: ${theme.spacing[4]};
-    padding: ${theme.spacing[3]} ${theme.spacing[5]};
-  `};
-`;
 
 export default CustomDataFields;

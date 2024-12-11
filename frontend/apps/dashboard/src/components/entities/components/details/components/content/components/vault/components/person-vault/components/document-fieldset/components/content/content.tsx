@@ -1,7 +1,6 @@
 import useEntitySeqno from '@/entity/hooks/use-entity-seqno';
 import { getErrorMessage } from '@onefootprint/request';
 import type { Document, Entity, SupportedIdDocTypes } from '@onefootprint/types';
-import { Stack } from '@onefootprint/ui';
 import useEntityVault from 'src/components/entities/hooks/use-entity-vault';
 import { useDecryptControls } from '../../../../../vault-actions';
 import useDocuments from '../../hooks/use-documents';
@@ -37,7 +36,7 @@ const Content = ({ entity }: ContentProps) => {
     <>
       {error && getErrorMessage(error)}
       {vault && documents && (
-        <Stack direction="column" gap={4}>
+        <div className="flex flex-col gap-3">
           {documents.map((document: Document) => (
             <DocumentItem
               key={document.startedAt}
@@ -47,7 +46,7 @@ const Content = ({ entity }: ContentProps) => {
               onDecrypt={handleDecryptDocument}
             />
           ))}
-        </Stack>
+        </div>
       )}
     </>
   );

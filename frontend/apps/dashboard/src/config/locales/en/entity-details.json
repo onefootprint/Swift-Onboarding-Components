@@ -341,6 +341,11 @@
   },
   "manual-review-not-allowed": "You're not allowed to manually review users",
   "fieldset": {
+    "actions": {
+      "more-fields": "There are {{count}} more items",
+      "show-all": "Show all",
+      "show-less": "Show less"
+    },
     "select-all": "Select all",
     "deselect-all": "Deselect all",
     "custom": {

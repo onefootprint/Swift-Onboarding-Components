@@ -1,9 +1,9 @@
 import type { WithEntityProps } from '@/entity/components/with-entity';
 import useEntitySeqno from '@/entity/hooks/use-entity-seqno';
 import { IcoFileText16 } from '@onefootprint/icons';
-import { Divider, LinkButton, Stack, Text } from '@onefootprint/ui';
+import { Divider, LinkButton, Text } from '@onefootprint/ui';
+import { cx } from 'class-variance-authority';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
 import useDecryptForm from '../../../../hooks/use-decrypt-form';
 import useField from '../../../../hooks/use-field';
 import type { DiField } from '../../../../vault.types';
@@ -37,60 +37,42 @@ const DocumentFieldset = ({ entity, fields }: DocumentFieldsetProps) => {
   };
 
   return (
-    <Container aria-label={t('documents.title')} data-primary-background={isViewingHistorical}>
-      <Header data-primary-background={isViewingHistorical}>
-        <Stack alignItems="center" gap={3}>
+    <fieldset
+      aria-label={t('documents.title')}
+      className={cx(
+        'rounded-md border border-solid rounded border-tertiary flex flex-col w-full h-full justify-between',
+        {
+          'bg-primary': isViewingHistorical,
+        },
+      )}
+    >
+      <header
+        className={cx('flex justify-between px-5 py-2 border-b border-solid border-tertiary rounded-t-md', {
+          'bg-primary': isViewingHistorical,
+          'bg-secondary': !isViewingHistorical,
+        })}
+      >
+        <div className="flex items-center gap-3 ">
           <IcoFileText16 />
           <Text variant="label-3" tag="h2">
             {t('documents.title')}
           </Text>
-        </Stack>
+        </div>
         {shouldShowSelectAll && (
           <LinkButton onClick={allSelected ? handleDeselectAll : handleSelectAll}>
             {allSelected ? t('deselect-all') : t('select-all')}
           </LinkButton>
         )}
-      </Header>
-      <Stack direction="column" gap={5} paddingTop={5} paddingRight={5} paddingBottom={4} paddingLeft={5}>
+      </header>
+      <div className="flex flex-col gap-5 p-5 pb-4">
         <Content entity={entity} />
-        <Stack tag="footer" direction="column" gap={4}>
+        <footer className="flex flex-col gap-4">
           <Divider />
           <RiskSignalsOverview type="document" />
-        </Stack>
-      </Stack>
-    </Container>
+        </footer>
+      </div>
+    </fieldset>
   );
 };
-
-const Container = styled.fieldset`
-  ${({ theme }) => css`
-    border-radius: ${theme.spacing[2]};
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
-    justify-content: space-between;
-
-    &[data-primary-background='true'] {
-      background-color: ${theme.backgroundColor.primary};
-    }
-  `};
-`;
-
-const Header = styled.header`
-  ${({ theme }) => css`
-    background-color: ${theme.backgroundColor.secondary};
-    border-bottom: 1px solid ${theme.borderColor.tertiary};
-    border-radius: ${theme.spacing[2]} ${theme.spacing[2]} 0 0;
-    display: flex;
-    justify-content: space-between;
-    padding: ${theme.spacing[3]} ${theme.spacing[5]};
-
-    &[data-primary-background='true'] {
-      background-color: ${theme.backgroundColor.primary};
-    }
-  `};
-`;
 
 export default DocumentFieldset;

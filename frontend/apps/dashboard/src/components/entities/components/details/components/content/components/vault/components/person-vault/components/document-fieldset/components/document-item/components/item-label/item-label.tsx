@@ -1,6 +1,6 @@
 import { type Document, SupportedIdDocTypes } from '@onefootprint/types';
-import { CodeInline, Stack, Text } from '@onefootprint/ui';
-import { format } from 'date-fns';
+import { CodeInline } from '@onefootprint/ui';
+import { formatDate } from 'date-fns';
 import DocumentStatusBadge from '../document-status-badge';
 
 type ItemLabelProps = {
@@ -10,20 +10,16 @@ type ItemLabelProps = {
 };
 
 const ItemLabel = ({ document, timestamp, title }: ItemLabelProps) => (
-  <Stack align="center" gap={2}>
-    <Text variant="snippet-1" color="tertiary">
-      {format(new Date(timestamp), 'MM/dd/yy h:mma')}
-    </Text>
-    <Text tag="span" variant="label-3">
-      ⋅
-    </Text>
+  <div className="flex items-center gap-2">
+    <p className="text-snippet-2 text-tertiary">{formatDate(new Date(timestamp), 'MM/dd/yy h:mm a')}</p>
+    <span className="text-label-3">⋅</span>
     {document.kind === SupportedIdDocTypes.custom ? (
-      <CodeInline>{title}</CodeInline>
+      <CodeInline truncate>{title}</CodeInline>
     ) : (
-      <Text variant="body-3">{title}</Text>
+      <p className="truncate text-body-3">{title}</p>
     )}
     <DocumentStatusBadge document={document} />
-  </Stack>
+  </div>
 );
 
 export default ItemLabel;

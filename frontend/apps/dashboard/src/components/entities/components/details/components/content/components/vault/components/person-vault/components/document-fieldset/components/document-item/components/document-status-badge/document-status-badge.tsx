@@ -1,14 +1,26 @@
-import type { UIStates } from '@onefootprint/design-tokens';
 import type { Document } from '@onefootprint/types';
-import { Badge, Text } from '@onefootprint/ui';
+import { Badge } from '@onefootprint/ui';
+import { type VariantProps, cva } from 'class-variance-authority';
 import { useTranslation } from 'react-i18next';
 import getDocumentStatus, { DocumentStatus } from '../../../../utils/get-document-status';
-
 type DocumentStatusBadgeProps = {
   document: Omit<Document, 'uploads'>;
 };
 
-const DocStatusToUIState: Record<DocumentStatus, keyof UIStates> = {
+const badge = cva(['whitespace-nowrap'], {
+  variants: {
+    variant: {
+      neutral: ['bg-neutral-100', 'text-neutral-700'],
+      error: ['bg-error-100', 'text-error-700'],
+      warning: ['bg-warning-100', 'text-warning-700'],
+    },
+  },
+  defaultVariants: {
+    variant: 'neutral',
+  },
+});
+
+const DocStatusToVariant: Record<DocumentStatus, VariantProps<typeof badge>['variant']> = {
   [DocumentStatus.UploadedViaApi]: 'neutral',
   [DocumentStatus.UploadFailed]: 'error',
   [DocumentStatus.UploadAbandoned]: 'neutral',
@@ -25,13 +37,13 @@ const DocumentStatusBadge = ({ document }: DocumentStatusBadgeProps) => {
   });
   const status = getDocumentStatus(document);
 
-  return status ? (
-    <Badge variant={DocStatusToUIState[status]}>
-      <Text variant="caption-1" color={DocStatusToUIState[status]} whiteSpace="nowrap">
-        {t(status)}
-      </Text>
+  if (!status) return null;
+
+  return (
+    <Badge variant={DocStatusToVariant[status]}>
+      <p className={badge({ variant: DocStatusToVariant[status] })}>{t(status)}</p>
     </Badge>
-  ) : null;
+  );
 };
 
 export default DocumentStatusBadge;

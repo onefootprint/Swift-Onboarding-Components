@@ -1,6 +1,6 @@
 import { IcoLock16 } from '@onefootprint/icons';
 import { type Document, type Entity, type EntityVault, SupportedIdDocTypes } from '@onefootprint/types';
-import { Checkbox, LinkButton, Stack, Text, Tooltip } from '@onefootprint/ui';
+import { Checkbox, LinkButton, Tooltip } from '@onefootprint/ui';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import useIdDocText from 'src/hooks/use-id-doc-text';
@@ -34,7 +34,7 @@ const DocumentItem = ({ document, entity, vault, onDecrypt }: DocumentItemProps)
 
   return (
     <>
-      <Stack justify="space-between">
+      <div className="flex justify-between">
         {field.showCheckbox ? (
           <Tooltip disabled={field.isDecryptable} position="right" text={t('decrypt.not-allowed')} asChild>
             <Checkbox
@@ -50,12 +50,12 @@ const DocumentItem = ({ document, entity, vault, onDecrypt }: DocumentItemProps)
         {field.isDecrypted ? (
           <LinkButton onClick={handleClick}>{t('fieldset.documents.see-details')}</LinkButton>
         ) : (
-          <Stack align="center" gap={2}>
+          <div className="flex items-center gap-1">
             <IcoLock16 />
-            <Text variant="body-3">•••••••••</Text>
-          </Stack>
+            <p className="text-body-3">•••••••••</p>
+          </div>
         )}
-      </Stack>
+      </div>
       {open && (
         <Details
           isDecryptable={field.isDecryptable}
