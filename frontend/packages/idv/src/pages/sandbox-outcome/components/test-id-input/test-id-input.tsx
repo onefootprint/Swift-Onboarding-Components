@@ -84,7 +84,7 @@ const TestIdInput = () => {
                   textConfirmation: t('test-id.button.copy-confirmation'),
                 }}
               />
-              <Tooltip text={t('test-id.button.edit')}>
+              <Tooltip text={t('test-id.button.edit')} asChild>
                 <IconButton aria-label={t('test-id.button.edit')} onClick={handleSaveOrEdit} size="compact">
                   <IcoPencil16 />
                 </IconButton>
@@ -92,7 +92,7 @@ const TestIdInput = () => {
             </Stack>
           ) : (
             <Stack>
-              <Tooltip text={t('test-id.button.save')}>
+              <Tooltip text={t('test-id.button.save')} asChild>
                 <IconButton
                   aria-label={t('test-id.button.save')}
                   onClick={handleSaveOrEdit}
@@ -101,7 +101,7 @@ const TestIdInput = () => {
                   <IcoCheck16 />
                 </IconButton>
               </Tooltip>
-              <Tooltip text={t('test-id.button.reset')}>
+              <Tooltip text={t('test-id.button.reset')} asChild>
                 <IconButton aria-label={t('test-id.button.reset')} onClick={handleReset} size="compact">
                   <IcoClose16 />
                 </IconButton>
