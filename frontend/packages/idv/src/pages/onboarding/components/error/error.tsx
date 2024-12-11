@@ -3,7 +3,9 @@ import { Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
+import { getLogger } from '@/idv/utils';
 import { useRequestError } from '@onefootprint/request';
+import { useEffect } from 'react';
 import { NavigationHeader } from '../../../../components/layout';
 
 type ErrorComponentProps = {
@@ -16,6 +18,11 @@ const ErrorComponent = ({ error }: ErrorComponentProps) => {
   });
   const { getErrorCode } = useRequestError();
   const isBusinessNotOwnedByUserErr = getErrorCode(error) === 'E124';
+  const { logError } = getLogger({ location: 'onboarding-components-error' });
+
+  useEffect(() => {
+    logError('ErrorComponent', { error });
+  }, []);
 
   return (
     <Container>
