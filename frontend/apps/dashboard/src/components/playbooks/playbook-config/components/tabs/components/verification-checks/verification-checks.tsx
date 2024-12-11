@@ -122,48 +122,9 @@ const VerificationChecks = ({ playbook: { kind, verificationChecks, mustCollectD
           <Info.Item label={kycText} checked={doesKyc} />
         </Info.Group>
       )}
-      {kind === 'kyc' && (
-        <>
-          <Stack direction="column" gap={4}>
-            <Text variant="label-2">{t('aml.title')}</Text>
-            <Info.Group title={t('screening.title')}>
-              {aml ? (
-                <>
-                  <Info.Item label={t('screening.ofac')} checked={aml.data.ofac} />
-                  <Info.Item label={t('screening.pep')} checked={aml.data.pep} />
-                  <Info.Item
-                    label={t('screening.adverse-media')}
-                    hint={adverseMediaListHint}
-                    checked={aml.data.adverseMedia}
-                  />
-                </>
-              ) : (
-                <Info.Item label={t('screening.none')} checked={false} />
-              )}
-            </Info.Group>
-            <Info.Group title={t('matching-method.title')}>
-              {matchingMethod ? (
-                <Info.Item label={matchingMethod.label} hint={matchingMethod.hint} checked />
-              ) : (
-                <Info.Item label={t('matching-method.none')} checked={false} />
-              )}
-            </Info.Group>
-          </Stack>
-          <Info.Group title={t('fraud-checks.title')}>
-            {hasFraudChecks ? (
-              <>
-                <Info.Item label={t('fraud-checks.sentilink')} checked={isSentilinkEnabled} />
-                <Info.Item label={t('fraud-checks.neuro')} checked={isNeuroEnabled} />
-              </>
-            ) : (
-              <Info.Item label={t('fraud-checks.none')} checked={false} />
-            )}
-          </Info.Group>
-        </>
-      )}
       {kind === 'kyb' && (
         <Stack direction="column" gap={4}>
-          <Text variant="label-2">{t('aml.title')}</Text>
+          <Text variant="label-2">{t('business-aml.title')}</Text>
           <Info.Group title={t('screening.title')}>
             {isBusinessAmlEnabled ? (
               <>
@@ -174,6 +135,43 @@ const VerificationChecks = ({ playbook: { kind, verificationChecks, mustCollectD
             )}
           </Info.Group>
         </Stack>
+      )}
+      <Stack direction="column" gap={4}>
+        <Text variant="label-2">{kind === 'kyb' ? t('business-aml.bo-title') : t('aml.title')}</Text>
+        <Info.Group title={t('screening.title')}>
+          {aml ? (
+            <>
+              <Info.Item label={t('screening.ofac')} checked={aml.data.ofac} />
+              <Info.Item label={t('screening.pep')} checked={aml.data.pep} />
+              <Info.Item
+                label={t('screening.adverse-media')}
+                hint={adverseMediaListHint}
+                checked={aml.data.adverseMedia}
+              />
+            </>
+          ) : (
+            <Info.Item label={t('screening.none')} checked={false} />
+          )}
+        </Info.Group>
+        <Info.Group title={t('matching-method.title')}>
+          {matchingMethod ? (
+            <Info.Item label={matchingMethod.label} hint={matchingMethod.hint} checked />
+          ) : (
+            <Info.Item label={t('matching-method.none')} checked={false} />
+          )}
+        </Info.Group>
+      </Stack>
+      {kind === 'kyc' && (
+        <Info.Group title={t('fraud-checks.title')}>
+          {hasFraudChecks ? (
+            <>
+              <Info.Item label={t('fraud-checks.sentilink')} checked={isSentilinkEnabled} />
+              <Info.Item label={t('fraud-checks.neuro')} checked={isNeuroEnabled} />
+            </>
+          ) : (
+            <Info.Item label={t('fraud-checks.none')} checked={false} />
+          )}
+        </Info.Group>
       )}
     </Stack>
   );

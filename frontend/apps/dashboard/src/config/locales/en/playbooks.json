@@ -445,7 +445,13 @@
           }
         },
         "disabled": {
-          "missing-bos": "You must collect beneficial owners information to enable AML monitoring.",
+          "missing-bos": "You must collect beneficial owners' information to enable AML monitoring."
+        }
+      },
+      "business-aml": {
+        "title": "Business Anti-Money Laundering (AML)",
+        "bo-title": "Beneficial Owner Anti-Money Laundering (AML)",
+        "disabled": {
           "must-run-kyb": "You must run KYB checks to enable AML monitoring."
         }
       },

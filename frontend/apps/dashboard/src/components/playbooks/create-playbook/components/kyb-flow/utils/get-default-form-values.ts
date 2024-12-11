@@ -55,5 +55,28 @@ export const defaultFormValues: State['data'] = {
     runKyb: true,
     runKyc: true,
     kybKind: 'full',
+    aml: {
+      enhancedAml: false,
+      ofac: false,
+      pep: false,
+      adverseMedia: false,
+      hasOptionSelected: false,
+      adverseMediaList: {
+        financial_crime: false,
+        violent_crime: false,
+        sexual_crime: false,
+        cyber_crime: false,
+        terrorism: false,
+        fraud: false,
+        narcotics: false,
+        general_serious: false,
+        general_minor: false,
+      },
+      matchingMethod: {
+        kind: 'fuzzy',
+        fuzzyLevel: 'fuzzy_low',
+        exactLevel: 'exact_name',
+      },
+    },
   },
 };

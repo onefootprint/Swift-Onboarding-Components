@@ -12,8 +12,8 @@ const useMeta = ({ runKyb, collectsTin, collectsBO, collectsBusinessAddress }: M
 
   return {
     businessAml: {
-      disabled: !runKyb || !collectsBO,
-      disabledText: !runKyb ? t('aml.disabled.must-run-kyb') : t('aml.disabled.missing-bos'),
+      disabled: !runKyb,
+      disabledText: t('business-aml.disabled.must-run-kyb'),
     },
     kyc: {
       // KYC is always determined by whether we collect BOs
@@ -29,6 +29,10 @@ const useMeta = ({ runKyb, collectsTin, collectsBO, collectsBusinessAddress }: M
     kybKind: {
       disabled: !collectsBusinessAddress,
       disabledText: t('kyb-checks.full.disabled'),
+    },
+    boAml: {
+      disabled: !collectsBO,
+      disabledText: t('aml.disabled.missing-bos'),
     },
   };
 };

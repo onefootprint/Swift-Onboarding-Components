@@ -304,6 +304,10 @@
     "aml": {
       "title": "Anti-Money Laundering (AML)"
     },
+    "business-aml": {
+      "title": "Business Anti-Money Laundering (AML)",
+      "bo-title": "Beneficial Owner Anti-Money Laundering (AML)"
+    },
     "screening": {
       "title": "Screening types",
       "ofac": "Office of Foreign Assets Control (OFAC)",

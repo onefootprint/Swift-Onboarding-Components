@@ -1,6 +1,7 @@
 import type { CustomDocumentConfig, OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
 import type { NameFormData } from '../../name-step';
 import type { RequiredAuthMethodsFormData } from '../../required-auth-methods-step';
+import { createUserAmlFormData } from '../../user-aml-form/utils';
 import type { BoFormData } from '../components/bo-step';
 import type { BusinessFormData } from '../components/business-step';
 import type { VerificationChecksFormData } from '../components/verification-checks-step';
@@ -227,6 +228,7 @@ export const getInitialValues = (playbook?: OnboardingConfiguration): State => {
         runKyb: playbook.verificationChecks.some(c => c.kind === 'kyb'),
         kybKind: playbook.verificationChecks.some(c => c.kind === 'kyb' && c.data.einOnly) ? 'ein' : 'full',
         businessAml: playbook.verificationChecks.some(c => c.kind === 'business_aml'),
+        ...createUserAmlFormData(playbook),
       },
     },
   };

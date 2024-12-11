@@ -15,6 +15,7 @@ import {
   createGovDocsPayload,
   createRequiredAuthMethodsPayload,
 } from '../../../utils/create-payload';
+import { createUserAmlVerificationChecksPayload } from '../../user-aml-form';
 
 type KycFlowFormData = {
   nameForm: NameFormData;
@@ -167,6 +168,7 @@ const createVerificationChecksPayload = (verificationChecksForm: VerificationChe
       : []),
     ...(verificationChecksForm.runKyc ? [{ kind: 'kyc' as const, data: {} }] : []),
     ...(verificationChecksForm.businessAml ? [{ kind: 'business_aml' as const, data: {} }] : []),
+    ...createUserAmlVerificationChecksPayload(verificationChecksForm),
   ];
 };
 
