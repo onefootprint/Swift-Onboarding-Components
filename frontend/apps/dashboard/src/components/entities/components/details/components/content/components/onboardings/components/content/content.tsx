@@ -1,10 +1,9 @@
 import type { EntityOnboarding } from '@onefootprint/request-types/dashboard';
-import { Dropdown, LinkButton } from '@onefootprint/ui';
+import { Dropdown, LinkButton, Tag } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useStatusText from '../../hooks/use-status-text';
 import OnboardingData from '../onboarding-data';
-import LatestTag from './components/latest-tag';
 import OnboardingItem from './components/onboarding-item';
 import { getStatusColor, getTimestampText } from './utils';
 
@@ -34,30 +33,35 @@ const Content = ({ onboardings }: ContentProps) => {
             {playbookName} {timestamp && t('timestamp', { timestamp: getTimestampText(timestamp) })}
           </p>
           <span className="text-primary text-label-2">⋅</span>
-          <p className="text-label-2">{t('outcome')}</p>
-          <p className={`text-${getStatusColor(status)} text-label-2`}>{statusT(status)}</p>
-          {isLatest && <LatestTag />}
+          <div className="flex items-center gap-1">
+            <p className="text-label-3">{t('outcome')}</p>
+            <p className={`text-${getStatusColor(status)} text-label-3`}>{statusT(status)}</p>
+          </div>
+          <span className="text-primary text-label-2">⋅</span>
+          {isLatest && <Tag className="flex-shrink-0">{t('latest')}</Tag>}
         </div>
-        <Dropdown.Root open={isOpen} onOpenChange={toggleDropdown}>
-          <Dropdown.Trigger asChild>
-            <LinkButton>{t('trigger')}</LinkButton>
-          </Dropdown.Trigger>
-          <Dropdown.Portal>
-            <Dropdown.Content maxWidth="360px" minWidth="fit-content" align="end" sideOffset={4}>
-              <Dropdown.RadioGroup value={selectedOnboarding.id}>
-                {onboardings.map(onboarding => (
-                  <OnboardingItem
-                    key={onboarding.id}
-                    isChecked={selectedOnboarding.id === onboarding.id}
-                    isLatest={onboarding.id === onboardings[0].id}
-                    onboarding={onboarding}
-                    onClick={() => setSelectedOnboarding(onboarding)}
-                  />
-                ))}
-              </Dropdown.RadioGroup>
-            </Dropdown.Content>
-          </Dropdown.Portal>
-        </Dropdown.Root>
+        {onboardings.length > 1 && (
+          <Dropdown.Root open={isOpen} onOpenChange={toggleDropdown}>
+            <Dropdown.Trigger asChild>
+              <LinkButton>{t('trigger')}</LinkButton>
+            </Dropdown.Trigger>
+            <Dropdown.Portal>
+              <Dropdown.Content maxWidth="360px" minWidth="fit-content" align="end" sideOffset={4}>
+                <Dropdown.RadioGroup value={selectedOnboarding.id}>
+                  {onboardings.map(onboarding => (
+                    <OnboardingItem
+                      key={onboarding.id}
+                      isChecked={selectedOnboarding.id === onboarding.id}
+                      isLatest={onboarding.id === onboardings[0].id}
+                      onboarding={onboarding}
+                      onClick={() => setSelectedOnboarding(onboarding)}
+                    />
+                  ))}
+                </Dropdown.RadioGroup>
+              </Dropdown.Content>
+            </Dropdown.Portal>
+          </Dropdown.Root>
+        )}
       </header>
       <OnboardingData onboarding={selectedOnboarding} />
     </fieldset>

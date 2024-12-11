@@ -26,7 +26,7 @@ const ManualReviewTrigger = ({ kind, status, onSelect, disabled, onOpenChange, o
         <Button size="compact">{t('button.review', { kindText })}</Button>
       </Dropdown.Trigger>
       <Dropdown.Portal>
-        <Dropdown.Content align="end" sideOffset={12} minWidth="220px">
+        <Dropdown.Content align="end" sideOffset={8} minWidth="220px">
           <Dropdown.Group>
             <Dropdown.Item
               onClick={() => {
