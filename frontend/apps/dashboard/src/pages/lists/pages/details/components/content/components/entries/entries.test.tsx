@@ -26,18 +26,14 @@ describe('<Entries />', () => {
   describe('When clearing filter', () => {
     beforeEach(() => {
       mockRouter.setCurrentUrl(`/lists/${listId}`);
-      mockRouter.query = {
-        id: listId,
-      };
+      mockRouter.query = { id: listId };
       withListEntries(listId);
     });
 
     it('should clear the filter', async () => {
       mockRouter.setCurrentUrl(`/lists/${listId}`);
-      mockRouter.query = {
-        id: listId,
-        search: 'test2',
-      };
+      mockRouter.query = { id: listId, search: 'test2' };
+
       renderEntries();
 
       await waitFor(() => {
@@ -49,15 +45,15 @@ describe('<Entries />', () => {
       });
 
       const searchInput = screen.getByPlaceholderText('Find...') as HTMLInputElement;
+
       await waitFor(() => {
         expect(searchInput).toHaveValue('test2');
       });
 
       await userEvent.clear(searchInput);
+
       expect(mockRouter).toMatchObject({
-        query: {
-          id: listId,
-        },
+        query: { id: listId },
       });
     });
   });
@@ -83,10 +79,7 @@ describe('<Entries />', () => {
 
       await waitFor(() => {
         expect(mockRouter).toMatchObject({
-          query: {
-            id: listId,
-            search: '2',
-          },
+          query: { id: listId, search: '2' },
         });
       });
     });
@@ -96,9 +89,7 @@ describe('<Entries />', () => {
     beforeEach(() => {
       withListEntries(listId);
       mockRouter.setCurrentUrl(`/lists/${listId}`);
-      mockRouter.query = {
-        id: listId,
-      };
+      mockRouter.query = { id: listId };
     });
 
     it('should render the entries', async () => {
@@ -170,10 +161,9 @@ describe('<Entries />', () => {
         expect(screen.getByText('Deletion successful')).toBeInTheDocument();
       });
 
-      // TK - figure out end to end data handling test
-      //   await waitFor(() => {
-      //     expect(screen.queryByText('test@onefootprint.com')).not.toBeInTheDocument();
-      //   });
+      await waitFor(() => {
+        expect(screen.queryByText('test@onefootprint.com')).not.toBeInTheDocument();
+      });
     });
   });
 });
