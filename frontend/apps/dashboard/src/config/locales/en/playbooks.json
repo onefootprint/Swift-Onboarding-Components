@@ -209,6 +209,10 @@
         }
       }
     },
+    "settings-doc-only": {
+      "title": "Document only playbook details",
+      "subtitle": "Choose the documents..."
+    },
     "settings-person": {
       "title": "Your Playbook recommendation",
       "subtitle": "Here's our recommended Playbook configuration. Feel free to edit it to better suit your needs.",

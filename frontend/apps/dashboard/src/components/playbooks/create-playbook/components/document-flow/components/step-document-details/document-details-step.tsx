@@ -14,7 +14,7 @@ export type DocumentDetailsStepProps = {
 };
 
 const DocumentDetailsStep = ({ onSubmit, onBack, defaultValues }: DocumentDetailsStepProps) => {
-  const { t } = useTranslation('playbooks', { keyPrefix: 'create.settings-auth' });
+  const { t } = useTranslation('playbooks', { keyPrefix: 'create.settings-doc-only' });
   const form = useForm<DocumentsDetailsFormData>({ defaultValues });
 
   return (
