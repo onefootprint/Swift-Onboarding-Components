@@ -17,12 +17,10 @@ import RequestMoreInfoDialog from '../request-more-info-dialog';
 import SummarizeAiDialog from '../summarize-ai-dialog';
 import UpdateAuthDialog from '../update-auth-dialog';
 import UploadDocDialog from '../upload-doc-dialog';
-import ViewHistoricalDataDialog from '../view-historical-data-dialog';
 
 enum ActionDialog {
   Auth = 'auth',
   RequestMoreInfo = 'request-more-info',
-  HistoricalData = 'historical-data',
   Summarize = 'summarize',
   UploadDoc = 'upload-doc',
   EditTags = 'edit-tags',
@@ -78,11 +76,6 @@ const UserActions = ({ entity }: WithEntityProps) => {
                 {t('management.upload-document')}
               </DropdownItem>
             )}
-            {hasPermission(RoleScopeKind.manualReview) && (
-              <DropdownItem onSelect={handleDialogOpen(ActionDialog.HistoricalData)}>
-                {t('management.view-historical-data')}
-              </DropdownItem>
-            )}
             <DropdownItem onSelect={handleDialogOpen(ActionDialog.Summarize)}>{t('management.summarize')}</DropdownItem>
           </Dropdown.Group>
           {hasPermission(RoleScopeKind.manualReview) && (
@@ -117,7 +110,6 @@ const UserActions = ({ entity }: WithEntityProps) => {
       </DecryptMachineProvider>
       <RequestMoreInfoDialog open={openDialog === ActionDialog.RequestMoreInfo} onClose={handleCloseDialog} />
       <UpdateAuthDialog open={openDialog === ActionDialog.Auth} onClose={handleCloseDialog} />
-      <ViewHistoricalDataDialog open={openDialog === ActionDialog.HistoricalData} onClose={handleCloseDialog} />
       <SummarizeAiDialog open={openDialog === ActionDialog.Summarize} onClose={handleCloseDialog} />
       <UploadDocDialog open={openDialog === ActionDialog.UploadDoc} onClose={handleCloseDialog} />
       {hasLabelAndTagPermissions && (
