@@ -209,8 +209,8 @@ config:
       name: execute-tasks
     - args:
         - vault-dr-worker
-        - --manifest-batch-size=256
-        - --blob-batch-size=512
+        - --manifest-batch-size=512
+        - --blob-batch-size=1024
         - --poll-period-ms=5000
         - --record-task-concurrency=128
         - --manifest-task-concurrency=128
