@@ -8,9 +8,11 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
+    id("maven-publish") // Add maven-publish plugin
 }
 
 version = "1.0.0-beta"
+group = "com.onefootprint.native_onboarding_components"
 
 kotlin {
     androidTarget {
@@ -18,6 +20,7 @@ kotlin {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
         }
+        publishLibraryVariants("release")
     }
 
     val xcframeworkName = "SwiftOnboardingComponentsShared"
@@ -31,13 +34,12 @@ kotlin {
         it.binaries.framework {
             baseName = xcframeworkName
 
-            // Specify CFBundleIdentifier to uniquely identify the framework
             binaryOption("bundleId", "com.onefootprint.${xcframeworkName}")
             xcf.add(this)
             isStatic = true
         }
     }
-    
+
     sourceSets {
         androidMain.dependencies {
             implementation(compose.preview)
@@ -84,15 +86,74 @@ android {
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
     }
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+        }
+    }
 }
+
 dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.material)
     implementation(libs.androidx.activity)
 }
 
-tasks.register("printVersion") {
-    doLast {
-        println(project.version)  // Print the version
+// Configure publishing for Android AAR
+publishing {
+    repositories {
+        maven {
+            name = "local"
+            url = uri("$buildDir/repo")
+        }
+    }
+    publications {
+        create<MavenPublication>("release") {
+            groupId = group.toString()
+            artifactId = "native-onboarding-components"
+            version = project.version.toString()
+
+            // Publish AAR file
+            artifact("$buildDir/outputs/aar/${project.name}-release.aar")
+
+            // Sources JAR
+            artifact(tasks.register<Jar>("sourceJar") {
+                from(android.sourceSets["main"].java.srcDirs)
+                archiveClassifier.set("sources")
+            })
+
+            // Customize the POM
+            pom {
+                withXml {
+                    val dependenciesNode = asNode().appendNode("dependencies")
+                    configurations["api"].allDependencies.forEach {
+                        val dependencyNode = dependenciesNode.appendNode("dependency")
+                        dependencyNode.appendNode("groupId", it.group)
+                        dependencyNode.appendNode("artifactId", it.name)
+                        dependencyNode.appendNode("version", it.version)
+                    }
+                }
+            }
+        }
     }
 }
+
+afterEvaluate {
+    tasks.named("publishReleasePublicationToLocalRepository") {
+        dependsOn(tasks.named("bundleReleaseAar"))
+    }
+}
+
+afterEvaluate {
+    configure<PublishingExtension> {
+        publications.all {
+            val mavenPublication = this as? MavenPublication
+            // Rename artifactId from the default one if needed
+            if (mavenPublication?.artifactId == "shared-android") {
+                mavenPublication.artifactId = "android"
+            }
+        }
+    }
+}
+
+
