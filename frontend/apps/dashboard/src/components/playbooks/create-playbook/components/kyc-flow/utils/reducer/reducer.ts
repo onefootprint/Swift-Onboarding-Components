@@ -1,12 +1,8 @@
-import type {
-  AmlMatchKind,
-  CipKind,
-  CustomDocumentConfig,
-  OnboardingConfiguration,
-} from '@onefootprint/request-types/dashboard';
+import type { CipKind, CustomDocumentConfig, OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
 import type { NameFormData } from '../../../name-step';
 import type { RequiredAuthMethodsFormData } from '../../../required-auth-methods-step';
 import type { ResidencyFormData } from '../../../residency-step';
+import { createUserAmlFormData } from '../../../user-aml-form/utils';
 import type { DetailsFormData } from '../../components/details-step';
 import { OnboardingTemplate, type TemplatesFormData } from '../../components/templates-step';
 import type { VerificationChecksFormData } from '../../components/verification-checks-step';
@@ -150,57 +146,11 @@ export const getInitialValues = (playbook?: OnboardingConfiguration): State => {
   };
 
   const getVerificationChecks = (playbook: OnboardingConfiguration): VerificationChecksFormData => {
-    const amlCheck = playbook.verificationChecks.find(c => c.kind === 'aml');
-
-    const getMatchingMethod = (
-      matchingMethod: AmlMatchKind = 'fuzzy_low',
-    ): VerificationChecksFormData['aml']['matchingMethod'] => {
-      const isFuzzy = matchingMethod.startsWith('fuzzy');
-
-      const getFuzzyLevel = () => {
-        if (matchingMethod === 'fuzzy_low' || matchingMethod === 'fuzzy_medium' || matchingMethod === 'fuzzy_high') {
-          return matchingMethod;
-        }
-        return 'fuzzy_low';
-      };
-
-      const getExactLevel = () => {
-        if (matchingMethod === 'exact_name' || matchingMethod === 'exact_name_and_dob_year') {
-          return matchingMethod;
-        }
-        return 'exact_name';
-      };
-
-      return {
-        kind: isFuzzy ? 'fuzzy' : 'exact',
-        fuzzyLevel: getFuzzyLevel(),
-        exactLevel: getExactLevel(),
-      };
-    };
-
     return {
       runKyc: playbook.verificationChecks.some(c => c.kind === 'kyc'),
       isNeuroEnabled: playbook.verificationChecks.some(c => c.kind === 'neuro_id'),
       isSentilinkEnabled: playbook.verificationChecks.some(c => c.kind === 'sentilink'),
-      aml: {
-        enhancedAml: Boolean(amlCheck),
-        ofac: Boolean(amlCheck?.data.ofac),
-        pep: Boolean(amlCheck?.data.pep),
-        adverseMedia: Boolean(amlCheck?.data.adverseMedia),
-        adverseMediaList: {
-          financial_crime: Boolean(amlCheck?.data.adverseMediaLists?.includes('financial_crime')),
-          violent_crime: Boolean(amlCheck?.data.adverseMediaLists?.includes('violent_crime')),
-          sexual_crime: Boolean(amlCheck?.data.adverseMediaLists?.includes('sexual_crime')),
-          cyber_crime: Boolean(amlCheck?.data.adverseMediaLists?.includes('cyber_crime')),
-          terrorism: Boolean(amlCheck?.data.adverseMediaLists?.includes('terrorism')),
-          fraud: Boolean(amlCheck?.data.adverseMediaLists?.includes('fraud')),
-          narcotics: Boolean(amlCheck?.data.adverseMediaLists?.includes('narcotics')),
-          general_serious: Boolean(amlCheck?.data.adverseMediaLists?.includes('general_serious')),
-          general_minor: Boolean(amlCheck?.data.adverseMediaLists?.includes('general_minor')),
-        },
-        hasOptionSelected: true,
-        matchingMethod: getMatchingMethod(amlCheck?.data.matchKind),
-      },
+      ...createUserAmlFormData(playbook),
     };
   };
 

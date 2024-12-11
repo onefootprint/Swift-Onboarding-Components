@@ -56,7 +56,7 @@ const useMeta = ({
     },
     aml: {
       disabled: !canEdit,
-      disableText: t('cannot-edit'),
+      disabledText: t('cannot-edit'),
     },
     neuro: {
       disabled: !hasNeuroPermission || !canEdit,

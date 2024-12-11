@@ -1,5 +1,4 @@
 import type {
-  AdverseMediaListKind,
   CollectedDataOption,
   CreateOnboardingConfigurationRequest,
   VerificationCheck,
@@ -12,6 +11,7 @@ import {
 import type { NameFormData } from '../../name-step';
 import type { RequiredAuthMethodsFormData } from '../../required-auth-methods-step';
 import type { ResidencyFormData } from '../../residency-step';
+import { createUserAmlVerificationChecksPayload } from '../../user-aml-form';
 import type { DetailsFormData } from '../components/details-step';
 import { OnboardingTemplate, type TemplatesFormData } from '../components/templates-step';
 import type { VerificationChecksFormData } from '../components/verification-checks-step';
@@ -110,42 +110,11 @@ const createResidencyPayload = (residencyForm: ResidencyFormData) => {
 };
 
 const createVerificationChecks = (verificationChecksForm: VerificationChecksFormData): VerificationCheck[] => {
-  const createAdverseMediaLists = (adverseMediaList: VerificationChecksFormData['aml']['adverseMediaList']) => {
-    const payload: AdverseMediaListKind[] = [];
-    if (adverseMediaList.financial_crime) payload.push('financial_crime');
-    if (adverseMediaList.violent_crime) payload.push('violent_crime');
-    if (adverseMediaList.sexual_crime) payload.push('sexual_crime');
-    if (adverseMediaList.cyber_crime) payload.push('cyber_crime');
-    if (adverseMediaList.terrorism) payload.push('terrorism');
-    if (adverseMediaList.fraud) payload.push('fraud');
-    if (adverseMediaList.narcotics) payload.push('narcotics');
-    if (adverseMediaList.general_serious) payload.push('general_serious');
-    if (adverseMediaList.general_minor) payload.push('general_minor');
-    return payload;
-  };
-
   return [
     ...(verificationChecksForm.isNeuroEnabled ? [{ kind: 'neuro_id' as const, data: {} }] : []),
     ...(verificationChecksForm.isSentilinkEnabled ? [{ kind: 'sentilink' as const, data: {} }] : []),
     ...(verificationChecksForm.runKyc ? [{ kind: 'kyc' as const, data: {} }] : []),
-    ...(verificationChecksForm.aml.enhancedAml
-      ? [
-          {
-            kind: 'aml' as const,
-            data: {
-              continuousMonitoring: true,
-              ofac: verificationChecksForm.aml.ofac,
-              pep: verificationChecksForm.aml.pep,
-              adverseMedia: verificationChecksForm.aml.adverseMedia,
-              adverseMediaLists: createAdverseMediaLists(verificationChecksForm.aml.adverseMediaList),
-              matchKind:
-                verificationChecksForm.aml.matchingMethod.kind === 'fuzzy'
-                  ? verificationChecksForm.aml.matchingMethod.fuzzyLevel
-                  : verificationChecksForm.aml.matchingMethod.exactLevel,
-            },
-          },
-        ]
-      : []),
+    ...createUserAmlVerificationChecksPayload(verificationChecksForm),
   ];
 };
 
