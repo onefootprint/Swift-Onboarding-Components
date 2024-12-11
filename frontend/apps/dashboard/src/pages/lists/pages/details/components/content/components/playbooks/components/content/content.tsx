@@ -3,6 +3,7 @@ import type { ListDetails } from '@onefootprint/request-types/dashboard';
 import { LinkButton } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'react-i18next';
+import Rule from './components/rule';
 
 type ContentProps = {
   list: ListDetails;
@@ -34,8 +35,7 @@ const Content = ({ list }: ContentProps) => {
             <span className="text-tertiary text-label-3 min-w-[44px]">{t('in-rule')}</span>
             <div className="flex flex-col gap-2">
               {playbook.rules.map(rule => (
-                <div key={rule.ruleId}>{rule.ruleId}</div>
-                // <Rule key={rule.ruleId} rule={rule} />
+                <Rule key={rule.ruleId} rule={rule} />
               ))}
             </div>
           </div>

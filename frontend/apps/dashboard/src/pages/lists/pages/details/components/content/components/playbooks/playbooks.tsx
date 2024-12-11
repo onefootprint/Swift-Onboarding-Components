@@ -1,10 +1,10 @@
-// import Content from './components/content';
 import { getOrgListsByListIdOptions } from '@onefootprint/axios/dashboard';
 import { Stack } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'react-i18next';
 import { ErrorComponent } from 'src/components';
 import SectionTitle from '../../../section-title';
+import Content from './components/content';
 
 import { useQuery } from '@tanstack/react-query';
 import Loading from './components/loading';
@@ -20,7 +20,7 @@ const Playbooks = () => {
       <SectionTitle title={t('title', { alias: data?.alias })} />
       {isPending && <Loading />}
       {error ? <ErrorComponent error={error} /> : null}
-      {/* {data && <Content list={data} />} */}
+      {data && <Content list={data} />}
     </Stack>
   );
 };
