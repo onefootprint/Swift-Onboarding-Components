@@ -37,6 +37,7 @@ const AddEntriesDialog = ({ open, onClose, onAdd }: AddEntriesDialogProps) => {
       },
       {
         onSuccess: () => {
+          invalidateQueries();
           toast.show({
             title: t('feedback.success.title'),
             description: t('feedback.success.description'),

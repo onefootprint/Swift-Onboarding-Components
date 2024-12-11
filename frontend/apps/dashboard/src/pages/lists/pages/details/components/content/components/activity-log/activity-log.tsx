@@ -3,9 +3,9 @@ import { useQueries } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'react-i18next';
 import ErrorComponent from 'src/components/error';
+import SectionTitle from '../../../section-title';
 import Content from './components/content';
 import Loading from './components/loading';
-import SectionTitle from './components/section-title';
 
 const ActivityLog = () => {
   const { t } = useTranslation('lists', { keyPrefix: 'details.activity-log' });

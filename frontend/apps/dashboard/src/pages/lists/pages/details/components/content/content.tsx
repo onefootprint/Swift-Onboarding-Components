@@ -1,6 +1,6 @@
 import ActivityLog from './components/activity-log';
 // import Breadcrumb from './components/breadcrumb';
-// import Entries from './components/entries';
+import Entries from './components/entries';
 // import Header from './components/header';
 // import Playbooks from './components/playbooks';
 
@@ -11,12 +11,12 @@ const Content = () => (
     </div>
     <div className="mb-7">
       <Header />
-    </div>
+    </div> */}
     <div className="flex flex-col gap-9">
       <Entries />
-      <Playbooks /> */}
-    <ActivityLog />
-    {/* </div> */}
+      <ActivityLog />
+    </div>
+    {/* <Playbooks /> */}
   </section>
 );
 
