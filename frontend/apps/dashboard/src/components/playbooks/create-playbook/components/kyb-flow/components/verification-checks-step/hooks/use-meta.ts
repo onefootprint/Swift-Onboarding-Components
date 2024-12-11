@@ -11,7 +11,7 @@ const useMeta = ({ runKyb, collectsTin, collectsBO, collectsBusinessAddress }: M
   const { t } = useTranslation('playbooks', { keyPrefix: 'create.verification-checks' });
 
   return {
-    aml: {
+    businessAml: {
       disabled: !runKyb || !collectsBO,
       disabledText: !runKyb ? t('aml.disabled.must-run-kyb') : t('aml.disabled.missing-bos'),
     },

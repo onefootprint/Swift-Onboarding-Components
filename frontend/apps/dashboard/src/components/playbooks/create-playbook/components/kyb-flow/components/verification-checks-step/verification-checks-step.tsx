@@ -23,18 +23,18 @@ export type VerificationChecksStepProps = {
 const VerificationChecksStep = ({ defaultValues, meta, onBack, onSubmit }: VerificationChecksStepProps) => {
   const { t } = useTranslation('playbooks', { keyPrefix: 'create.verification-checks' });
   const { register, control, handleSubmit, setValue } = useForm<VerificationChecksFormData>({ defaultValues });
-  const [runKyb, amlEnhancedAml] = useWatch({
+  const [runKyb, runBusinessAml] = useWatch({
     control,
-    name: ['runKyb', 'aml.enhancedAml'],
+    name: ['runKyb', 'businessAml'],
   });
-  const { aml, kyc, kyb, kybKind } = useMeta({ ...meta, runKyb });
+  const { businessAml, kyc, kyb, kybKind } = useMeta({ ...meta, runKyb });
 
   useEffect(() => {
     // Cannot run enhanced AML without running KYB
-    if (!runKyb && amlEnhancedAml) {
-      setValue('aml.enhancedAml', false);
+    if (!runKyb && runBusinessAml) {
+      setValue('businessAml', false);
     }
-  }, [runKyb, amlEnhancedAml]);
+  }, [runKyb, runBusinessAml]);
 
   return (
     <form
@@ -124,13 +124,18 @@ const VerificationChecksStep = ({ defaultValues, meta, onBack, onSubmit }: Verif
             <Stack flexDirection="column" gap={5} whiteSpace="pre-wrap">
               <Stack gap={5} direction="column">
                 <Controller
-                  name="aml.enhancedAml"
+                  name="businessAml"
                   control={control}
                   render={({ field }) => (
-                    <Tooltip alignment="start" disabled={!aml.disabled} position="bottom" text={aml.disabledText}>
+                    <Tooltip
+                      alignment="start"
+                      disabled={!businessAml.disabled}
+                      position="bottom"
+                      text={businessAml.disabledText}
+                    >
                       <Toggle
                         checked={field.value}
-                        disabled={aml.disabled}
+                        disabled={businessAml.disabled}
                         hint={t('aml.screening.ofac.hint')}
                         label={t('aml.screening.ofac.label')}
                         size="compact"

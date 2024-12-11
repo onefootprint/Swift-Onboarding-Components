@@ -51,9 +51,7 @@ export const defaultFormValues: State['data'] = {
     phone: true,
   },
   verificationChecksForm: {
-    aml: {
-      enhancedAml: false,
-    },
+    businessAml: false,
     runKyb: true,
     runKyc: true,
     kybKind: 'full',

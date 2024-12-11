@@ -85,7 +85,6 @@ export const reducer = (state: State, action: Action): State => {
           verificationChecksForm: {
             ...state.data.verificationChecksForm,
             runKyc: !!action.payload.data?.collect,
-            aml: defaultFormValues.verificationChecksForm.aml,
           },
         },
       };
@@ -227,9 +226,7 @@ export const getInitialValues = (playbook?: OnboardingConfiguration): State => {
         runKyc: playbook.verificationChecks.some(c => c.kind === 'kyc'),
         runKyb: playbook.verificationChecks.some(c => c.kind === 'kyb'),
         kybKind: playbook.verificationChecks.some(c => c.kind === 'kyb' && c.data.einOnly) ? 'ein' : 'full',
-        aml: {
-          enhancedAml: playbook.verificationChecks.some(c => c.kind === 'aml'),
-        },
+        businessAml: playbook.verificationChecks.some(c => c.kind === 'business_aml'),
       },
     },
   };
