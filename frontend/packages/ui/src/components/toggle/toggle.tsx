@@ -166,15 +166,16 @@ const ToggleContainer = styled(Box)`
 
 const Label = styled.label`
   ${({ theme }) => css`
+    text-align: left;
     color: ${theme.color.primary};
     cursor: pointer;
 
     &[data-size='compact'] {
-      ${createFontStyles('body-3')};
+      ${createFontStyles('label-3')};
     }
 
     &[data-size='default'] {
-      ${createFontStyles('body-2')};
+      ${createFontStyles('label-2')};
     }
   `}
 `;

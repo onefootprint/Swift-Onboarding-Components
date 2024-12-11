@@ -55,7 +55,7 @@ const VerificationChecksStep = ({ defaultValues, meta, onBack, onSubmit }: Verif
                     <Tooltip
                       alignment="start"
                       disabled={!kyc.disabled}
-                      position="bottom"
+                      position="top"
                       text={t('kyc-checks.disabled.must-collect-id-doc')}
                     >
                       <Toggle
@@ -86,7 +86,7 @@ const VerificationChecksStep = ({ defaultValues, meta, onBack, onSubmit }: Verif
                     <Tooltip
                       text={sentilink.disabledText}
                       disabled={!sentilink.disabled}
-                      position="bottom"
+                      position="top"
                       alignment="start"
                     >
                       <Toggle
@@ -105,7 +105,7 @@ const VerificationChecksStep = ({ defaultValues, meta, onBack, onSubmit }: Verif
                   control={form.control}
                   name="isNeuroEnabled"
                   render={({ field }) => (
-                    <Tooltip text={neuro.disabledText} disabled={!neuro.disabled} position="bottom" alignment="start">
+                    <Tooltip text={neuro.disabledText} disabled={!neuro.disabled} position="top" alignment="start">
                       <Toggle
                         checked={field.value}
                         hint={t('fraud-checks.neuro.hint')}
@@ -129,6 +129,7 @@ const VerificationChecksStep = ({ defaultValues, meta, onBack, onSubmit }: Verif
 
 const Section = styled.section`
   ${({ theme }) => css`
+    position: relative;
     border-radius: ${theme.borderRadius.default};
     border: 1px solid ${theme.borderColor.tertiary};
     padding: ${theme.spacing[5]};

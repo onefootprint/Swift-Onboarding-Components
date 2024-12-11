@@ -84,7 +84,9 @@ const Tooltip = ({
     setIsOpen(false);
   };
 
-  const handleClick = () => {
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
     setIsOpen(!isOpen);
   };
 
@@ -100,17 +102,16 @@ const Tooltip = ({
         >
           {children}
         </TooltipPrimitive.Trigger>
-        <TooltipPrimitive.Portal>
-          <TooltipPrimitive.Content
-            side={position}
-            align={alignment}
-            sideOffset={sideOffset}
-            collisionBoundary={collisionBoundary}
-            asChild
-          >
-            <TooltipContent side={position}>{text}</TooltipContent>
-          </TooltipPrimitive.Content>
-        </TooltipPrimitive.Portal>
+
+        <TooltipPrimitive.Content
+          side={position}
+          align={alignment}
+          sideOffset={sideOffset}
+          collisionBoundary={collisionBoundary}
+          asChild
+        >
+          <TooltipContent side={position}>{text}</TooltipContent>
+        </TooltipPrimitive.Content>
       </TooltipPrimitive.Root>
     </TooltipPrimitive.Provider>
   );

@@ -60,7 +60,7 @@ const VerificationChecksStep = ({ defaultValues, meta, onBack, onSubmit }: Verif
                 control={control}
                 name="runKyb"
                 render={({ field }) => (
-                  <Tooltip position="bottom" alignment="start" disabled={!kyb.disabled} text={kyb.disabledText}>
+                  <Tooltip position="top" alignment="start" disabled={!kyb.disabled} text={kyb.disabledText}>
                     <Toggle
                       checked={field.value}
                       hint={t('kyb-checks.toggle.hint')}
@@ -76,7 +76,7 @@ const VerificationChecksStep = ({ defaultValues, meta, onBack, onSubmit }: Verif
               {runKyb ? (
                 <>
                   <Divider variant="secondary" marginBlock={5} />
-                  <Tooltip position="bottom" alignment="start" disabled={!kybKind.disabled} text={kybKind.disabledText}>
+                  <Tooltip position="top" alignment="start" disabled={!kybKind.disabled} text={kybKind.disabledText}>
                     <Stack gap={4} direction="column">
                       <Radio
                         disabled={kybKind.disabled}
@@ -105,7 +105,7 @@ const VerificationChecksStep = ({ defaultValues, meta, onBack, onSubmit }: Verif
                 control={control}
                 name="runKyc"
                 render={({ field }) => (
-                  <Tooltip position="bottom" alignment="start" disabled={!kyc.disabled} text={kyc.disabledText}>
+                  <Tooltip position="top" alignment="start" disabled={!kyc.disabled} text={kyc.disabledText}>
                     <Toggle
                       checked={field.value}
                       disabled={kyc.disabled}
@@ -133,7 +133,7 @@ const VerificationChecksStep = ({ defaultValues, meta, onBack, onSubmit }: Verif
                       <Tooltip
                         alignment="start"
                         disabled={!businessAml.disabled}
-                        position="bottom"
+                        position="top"
                         text={businessAml.disabledText}
                       >
                         <Toggle
