@@ -1,14 +1,13 @@
 import { getOrgListsByListIdOptions } from '@onefootprint/axios/dashboard';
 import { RoleScopeKind } from '@onefootprint/types';
 import { Button, Shimmer } from '@onefootprint/ui';
-// import EditDialog from './components/edit-dialog';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
-// import { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
-// import useListDetails from 'src/pages/lists/pages/details/hooks/use-list-details';
 import Actions from './components/actions';
+import EditDialog from './components/edit-dialog';
 
 const Header = () => {
   const router = useRouter();
@@ -16,19 +15,19 @@ const Header = () => {
   const { isPending, error, data } = useQuery(getOrgListsByListIdOptions({ path: { listId: id } }));
   const { t } = useTranslation('lists', { keyPrefix: 'details.header' });
 
-  //   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   if (isPending || error || !data) {
     return null;
   }
 
-  //   const launchEditDialog = () => {
-  //     setIsEditDialogOpen(true);
-  //   };
+  const launchEditDialog = () => {
+    setIsEditDialogOpen(true);
+  };
 
-  //   const closeDialog = () => {
-  //     setIsEditDialogOpen(false);
-  //   };
+  const closeDialog = () => {
+    setIsEditDialogOpen(false);
+  };
 
   return (
     <div aria-label={data.name} className="flex flex-row justify-between">
@@ -53,8 +52,7 @@ const Header = () => {
       </div>
       <div className="flex items-center gap-2">
         <PermissionGate fallbackText={t('cta-edit-not-allowed')} scopeKind={RoleScopeKind.writeLists}>
-          <Button variant="secondary" size="compact">
-            {/* onClick={launchEditDialog}  */}
+          <Button onClick={launchEditDialog} variant="secondary" size="compact">
             {t('edit')}
           </Button>
         </PermissionGate>
@@ -62,6 +60,7 @@ const Header = () => {
           <Actions />
         </PermissionGate>
       </div>
+      <EditDialog open={isEditDialogOpen} onClose={closeDialog} onEdit={closeDialog} />
     </div>
   );
 };
