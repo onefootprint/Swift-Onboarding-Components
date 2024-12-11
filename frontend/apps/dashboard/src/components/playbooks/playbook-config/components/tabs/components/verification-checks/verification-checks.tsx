@@ -138,9 +138,9 @@ const VerificationChecks = ({ playbook: { kind, verificationChecks, mustCollectD
       )}
       <Stack direction="column" gap={4}>
         <Text variant="label-2">{kind === 'kyb' ? t('business-aml.bo-title') : t('aml.title')}</Text>
-        <Info.Group title={t('screening.title')}>
-          {aml ? (
-            <>
+        {aml ? (
+          <>
+            <Info.Group title={t('screening.title')}>
               <Info.Item label={t('screening.ofac')} checked={aml.data.ofac} />
               <Info.Item label={t('screening.pep')} checked={aml.data.pep} />
               <Info.Item
@@ -148,18 +148,18 @@ const VerificationChecks = ({ playbook: { kind, verificationChecks, mustCollectD
                 hint={adverseMediaListHint}
                 checked={aml.data.adverseMedia}
               />
-            </>
-          ) : (
-            <Info.Item label={t('screening.none')} checked={false} />
-          )}
-        </Info.Group>
-        <Info.Group title={t('matching-method.title')}>
-          {matchingMethod ? (
-            <Info.Item label={matchingMethod.label} hint={matchingMethod.hint} checked />
-          ) : (
-            <Info.Item label={t('matching-method.none')} checked={false} />
-          )}
-        </Info.Group>
+            </Info.Group>
+            <Info.Group title={t('matching-method.title')}>
+              {matchingMethod ? (
+                <Info.Item label={matchingMethod.label} hint={matchingMethod.hint} checked />
+              ) : (
+                <Info.Item label={t('matching-method.none')} checked={false} />
+              )}
+            </Info.Group>
+          </>
+        ) : (
+          <Info.Item label={t('screening.none')} checked={false} />
+        )}
       </Stack>
       {kind === 'kyc' && (
         <Info.Group title={t('fraud-checks.title')}>
