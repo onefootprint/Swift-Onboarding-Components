@@ -47,6 +47,7 @@ const EditDialog = ({ open, onClose, onEdit }: EditDialogProps) => {
             description: t('feedback.success.description'),
           });
           onEdit();
+          onClose();
         },
       },
     );
