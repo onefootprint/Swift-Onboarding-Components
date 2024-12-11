@@ -84,10 +84,19 @@ impl RiskSignalGroup {
         scope: RiskSignalGroupScope<'a>,
         kind: RiskSignalGroupKind,
     ) -> FpResult<Self> {
-        let existing = Self::latest_by_kind(conn, scope.clone(), kind)?;
-        match existing {
-            Some(e) => Ok(e),
-            None => Self::create(conn, scope, kind),
+        match scope.clone() {
+            // TODO: I'll clean this up tomorrow
+            // If we are making a set of risk signals for SV scope, we always create.
+            // This is only used in non-test code for watchlist tasks which don't have a WF associated with it
+            s @ RiskSignalGroupScope::ScopedVaultId { .. } => Self::create(conn, s, kind),
+            // If we are making a set of risk signals for WF scope, we only create if it doesn't exist already
+            s @ RiskSignalGroupScope::WorkflowId { .. } => {
+                let existing = Self::latest_by_kind(conn, s.clone(), kind)?;
+                match existing {
+                    Some(e) => Ok(e),
+                    None => Self::create(conn, s, kind),
+                }
+            }
         }
     }
 
