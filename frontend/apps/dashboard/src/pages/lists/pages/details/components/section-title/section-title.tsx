@@ -5,7 +5,7 @@ type SectionTitleProps = {
 
 const SectionTitle = ({ title, children }: SectionTitleProps) => {
   return (
-    <div className="w-full flex justify-between items-center flex-row gap-2 pb-2 border-b border-tertiary">
+    <div className="flex flex-row items-center justify-between w-full gap-2 pb-2 border-b border-solid border-tertiary">
       <div className="text-label-2 text-primary">{title}</div>
       {children}
     </div>

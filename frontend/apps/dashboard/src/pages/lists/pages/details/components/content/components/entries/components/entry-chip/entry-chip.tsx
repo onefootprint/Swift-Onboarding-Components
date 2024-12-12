@@ -2,7 +2,7 @@ import { deleteOrgListsByListIdEntriesByListEntryIdMutation } from '@onefootprin
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IcoCloseSmall16 } from '@onefootprint/icons';
 import type { ListEntry } from '@onefootprint/request-types/dashboard';
-import { IconButton, LoadingSpinner, useToast } from '@onefootprint/ui';
+import { LoadingSpinner, useToast } from '@onefootprint/ui';
 import { useMutation } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/router';
@@ -40,9 +40,12 @@ const EntryChip = ({ entry: { data, id }, disabled }: EntryChipProps) => {
     }
   };
 
+  const closeButtonStyles =
+    'flex items-center justify-center w-full h-full pr-[6px] pl-1 rounded-r-full bg-secondary hover:bg-senary transition-colors duration-100';
+
   return (
     <motion.div
-      className="flex items-center justify-center rounded-full overflow-hidden w-fit"
+      className="flex items-center justify-center overflow-hidden rounded-full w-fit"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -50,20 +53,22 @@ const EntryChip = ({ entry: { data, id }, disabled }: EntryChipProps) => {
       key={id}
     >
       <span className="bg-secondary py-0.5 pl-3 pr-2">
-        <div className="text-body-3 truncate text-primary">{data}</div>
+        <div className="truncate text-body-3 text-primary">{data}</div>
       </span>
       {deleteEntryMutation.isPending ? (
-        <IconButton aria-label={`Deleting ${data}`} data-disabled={disabled}>
+        <button aria-label={`Deleting ${data}`} data-disabled={disabled} type="button" className={closeButtonStyles}>
           <LoadingSpinner size={16} />
-        </IconButton>
+        </button>
       ) : (
-        <IconButton
+        <button
+          type="button"
           aria-label={`Delete ${data}`}
           onClick={disabled ? undefined : handleDelete}
           data-disabled={disabled}
+          className={closeButtonStyles}
         >
           <IcoCloseSmall16 />
-        </IconButton>
+        </button>
       )}
     </motion.div>
   );

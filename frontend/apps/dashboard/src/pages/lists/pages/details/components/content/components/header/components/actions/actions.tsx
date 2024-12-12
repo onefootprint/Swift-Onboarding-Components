@@ -4,14 +4,15 @@ import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import { Dropdown, IconButton, useConfirmationDialog } from '@onefootprint/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
 type ActionsProps = {
   disabled?: boolean;
 };
 
 const Actions = ({ disabled }: ActionsProps) => {
   const { t } = useTranslation('lists', { keyPrefix: 'details.header.actions' });
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const router = useRouter();
   const id = router.query.id as string;
   const confirmationDialog = useConfirmationDialog();
@@ -37,6 +38,7 @@ const Actions = ({ disabled }: ActionsProps) => {
   };
 
   const launchDeleteConfirmation = () => {
+    setIsDropdownOpen(false);
     // Reset dialog state before opening
     confirmationDialog.open({
       description: t('delete-confirmation.description'),
@@ -53,11 +55,13 @@ const Actions = ({ disabled }: ActionsProps) => {
   };
 
   return (
-    <Dropdown.Root>
+    <Dropdown.Root onOpenChange={setIsDropdownOpen} open={isDropdownOpen}>
       <Dropdown.Trigger aria-label={t('delete')} disabled={disabled} asChild>
-        <IconButton aria-label={t('delete')} size="compact">
-          <IcoDotsHorizontal24 />
-        </IconButton>
+        <div>
+          <IconButton aria-label={t('delete')} size="compact" variant="outline">
+            <IcoDotsHorizontal24 />
+          </IconButton>
+        </div>
       </Dropdown.Trigger>
       <Dropdown.Portal>
         <Dropdown.Content align="end" sideOffset={8}>

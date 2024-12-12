@@ -2,6 +2,7 @@ import { getOrgListsByListIdOptions } from '@onefootprint/axios/dashboard';
 import { RoleScopeKind } from '@onefootprint/types';
 import { Button, Shimmer } from '@onefootprint/ui';
 import { useQuery } from '@tanstack/react-query';
+import { capitalize } from 'lodash';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -29,21 +30,17 @@ const Header = () => {
     setIsEditDialogOpen(false);
   };
 
+  const renderText = (text: string | undefined, className: string) => {
+    return text ? <span className={className}>{capitalize(text)}</span> : <Shimmer height="27px" width="75px" />;
+  };
+
   return (
     <div aria-label={data.name} className="flex flex-row justify-between">
-      <div className="flex flex-col">
-        <div className="flex gap-2">
-          {data.name ? (
-            <span className="text-primary text-label-1">{data.name}</span>
-          ) : (
-            <Shimmer height="27px" width="75px" />
-          )}
-          <span className="text-primary text-label-1">•</span>
-          {data.alias ? (
-            <span className="text-tertiary text-label-1">{data.alias}</span>
-          ) : (
-            <Shimmer height="27px" width="75px" />
-          )}
+      <div className="flex flex-col gap-1">
+        <div className="flex gap-1">
+          {renderText(data.name, 'text-primary text-label-1')}
+          <span className="text-primary text-label-1">⋅</span>
+          {renderText(data.alias, 'text-tertiary text-label-1')}
         </div>
         <div className="flex items-center gap-1">
           <span className="text-secondary text-body-3">{t('kind')}</span>

@@ -34,6 +34,7 @@ const AddEntriesForm = ({ onSubmit }: AddEntriesFormProps) => {
           <Form.Label>{t('form.entries.label')}</Form.Label>
           <Form.TextArea
             placeholder={t('form.entries.placeholder')}
+            hint={t('form.entries.hint')}
             {...register('entries', {
               required: t('form.entries.errors.required'),
               validate: val => validateEntries(list.kind, val),

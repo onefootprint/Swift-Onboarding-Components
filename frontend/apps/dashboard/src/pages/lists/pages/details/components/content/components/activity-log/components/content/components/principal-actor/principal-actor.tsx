@@ -10,7 +10,7 @@ const PrincipalActor = ({ principal }: PrincipalActorProps) => {
 
   return (
     <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 min-h-8">
-      <div className="text-label-3 text-primary">
+      <p className="text-label-3 text-primary">
         {principal.kind === 'footprint' && t('footprint')}
         {principal.kind === 'firm_employee' && t('firm-employee')}
         {principal.kind === 'organization' &&
@@ -19,9 +19,9 @@ const PrincipalActor = ({ principal }: PrincipalActorProps) => {
             : t('employees'))}
         {principal.kind === 'api_key' && `${t('api-key')}`}
         {principal.kind === 'user' && t('user')}
-      </div>
-      {principal.kind === 'organization' && <div className="text-body-3 text-tertiary">({principal.email})</div>}
-      {principal.kind === 'api_key' && <div className="text-body-3 text-tertiary">({principal.name})</div>}
+      </p>
+      {principal.kind === 'organization' && <p className="text-body-3 text-tertiary">({principal.email})</p>}
+      {principal.kind === 'api_key' && <p className="text-body-3 text-tertiary">({principal.name})</p>}
     </div>
   );
 };

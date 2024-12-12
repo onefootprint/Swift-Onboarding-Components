@@ -14,11 +14,11 @@ const ListEntryCreatedEventHeader = ({ principal, event }: ListEntryCreatedEvent
   });
 
   return (
-    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 min-h-[32px]">
+    <div className="flex flex-wrap items-center gap-1 min-h-8">
       {principal && <PrincipalActor principal={principal} />}
-      <span className="text-body-3 text-tertiary inline-flex items-center h-[32px]">{t('verb')}</span>
+      <p className="inline-flex items-center h-8 text-body-3 text-tertiary">{t('verb')}</p>
       {event.data.entries.map(e => (
-        <Pill className="h-[32px]" key={e}>
+        <Pill className="h-8" key={e}>
           {e}
         </Pill>
       ))}
