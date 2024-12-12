@@ -29,9 +29,7 @@ const Row = ({ onboarding }: RowProps) => {
   return (
     <>
       <td>
-        <CodeInline isPrivate truncate>
-          {fpId}
-        </CodeInline>
+        <CodeInline isPrivate>{fpId}</CodeInline>
       </td>
       <td aria-label="status badge">
         <StatusBadge status={currentStatus as unknown as EntityStatus} />

@@ -33,9 +33,7 @@ const Header = ({ playbook, isDisabled, playbooks }: HeaderProps) => {
           <div className="flex items-center justify-center gap-2">
             <h4 className="text-body-3 text-primary">{t(`type.${playbook.kind}` as ParseKeys<'common'>)}</h4>
             <span>·</span>
-            <CodeInline truncate isPrivate>
-              {playbook.key}
-            </CodeInline>
+            <CodeInline isPrivate>{playbook.key}</CodeInline>
             {hasVersions && <ManageVersions playbooks={playbooks} />}
           </div>
           <EditButton playbook={playbook} />

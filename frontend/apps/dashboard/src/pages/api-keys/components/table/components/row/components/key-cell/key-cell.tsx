@@ -12,7 +12,7 @@ const KeyCell = ({ value, isPending }: KeyCellProps) => {
   }
 
   return (
-    <CodeInline isPrivate truncate disabled={!value.key}>
+    <CodeInline isPrivate disabled={!value.key}>
       {value.key ? value.key : value.scrubbedKey.replaceAll('*', '•')}
     </CodeInline>
   );

@@ -22,9 +22,7 @@ const Row = ({ tenant, onAssumeTenant }: TenantProps) => (
       </LinkButton>
     </td>
     <td>
-      <CodeInline isPrivate truncate>
-        {tenant.id}
-      </CodeInline>
+      <CodeInline isPrivate>{tenant.id}</CodeInline>
     </td>
     <td>{tenant.numLiveVaults}</td>
     <td>{tenant.numSandboxVaults}</td>

@@ -14,7 +14,7 @@ const ItemLabel = ({ document, timestamp, title }: ItemLabelProps) => (
     <p className="text-snippet-2 text-tertiary">{formatDate(new Date(timestamp), 'MM/dd/yy h:mm a')}</p>
     <span className="text-label-3">⋅</span>
     {document.kind === SupportedIdDocTypes.custom ? (
-      <CodeInline truncate>{title}</CodeInline>
+      <CodeInline>{title}</CodeInline>
     ) : (
       <p className="truncate text-body-3">{title}</p>
     )}

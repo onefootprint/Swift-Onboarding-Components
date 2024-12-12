@@ -18,7 +18,7 @@ const Row = ({ proxyConfig }: RowProps) => {
     <>
       <td>{name}</td>
       <td>
-        <CodeInline truncate>{proxyConfig.id}</CodeInline>
+        <CodeInline>{proxyConfig.id}</CodeInline>
       </td>
       <td>{url}</td>
       <td>{method}</td>

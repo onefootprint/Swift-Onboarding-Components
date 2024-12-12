@@ -22,11 +22,6 @@ export default {
       description: 'Disabled copy',
       required: false,
     },
-    truncate: {
-      control: 'boolean',
-      description: 'Prevent to break the line',
-      required: false,
-    },
     tooltip: {
       control: 'object',
       description: 'Tooltip configuration',
@@ -41,15 +36,8 @@ export default {
   },
 } as Meta;
 
-const Template: StoryFn<CodeInlineProps> = ({
-  ariaLabel,
-  children,
-  disabled,
-  tooltip,
-  truncate,
-  size,
-}: CodeInlineProps) => (
-  <CodeInline ariaLabel={ariaLabel} disabled={disabled} tooltip={tooltip} truncate={truncate} size={size}>
+const Template: StoryFn<CodeInlineProps> = ({ ariaLabel, children, disabled, tooltip, size }: CodeInlineProps) => (
+  <CodeInline ariaLabel={ariaLabel} disabled={disabled} tooltip={tooltip} size={size}>
     {children}
   </CodeInline>
 );
@@ -63,6 +51,5 @@ Base.args = {
     text: 'Copy to clipboard',
     textConfirmation: 'Copied!',
   },
-  truncate: false,
   size: 'default',
 };

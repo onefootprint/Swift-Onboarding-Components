@@ -16,9 +16,7 @@ const Row = ({ entity }: RowProps) => (
       </Text>
     </td>
     <td>
-      <CodeInline isPrivate truncate>
-        {entity.id}
-      </CodeInline>
+      <CodeInline isPrivate>{entity.id}</CodeInline>
     </td>
     <td aria-label="status badge">
       <StatusBadge status={entity.status} requiresManualReview={entity.requiresManualReview} />

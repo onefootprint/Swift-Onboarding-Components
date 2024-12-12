@@ -6,7 +6,6 @@ export type CodeInlineProps = {
   ariaLabel?: string;
   children: string;
   disabled?: boolean;
-  truncate?: boolean;
   isPrivate?: boolean;
   size?: 'default' | 'compact';
   tooltip?: {
@@ -16,20 +15,12 @@ export type CodeInlineProps = {
   };
 };
 
-const CodeInline = ({
-  ariaLabel,
-  children,
-  disabled,
-  tooltip,
-  truncate,
-  isPrivate,
-  size = 'default',
-}: CodeInlineProps) => {
+const CodeInline = ({ ariaLabel, children, disabled, tooltip, isPrivate, size = 'default' }: CodeInlineProps) => {
   const { t } = useTranslation('ui');
 
   if (disabled) {
     return (
-      <BaseCode size={size} truncate={truncate} disabled={disabled} isPrivate={isPrivate}>
+      <BaseCode size={size} disabled={disabled} isPrivate={isPrivate}>
         {children}
       </BaseCode>
     );
@@ -46,21 +37,22 @@ const CodeInline = ({
           tooltip?.textConfirmation ?? (t('components.code-inline.tooltip-text-confirmation-default') as string),
       }}
     >
-      <BaseCode size={size} truncate={truncate} disabled={disabled} isPrivate={isPrivate}>
+      <BaseCode size={size} disabled={disabled} isPrivate={isPrivate}>
         {children}
       </BaseCode>
     </CopyButton>
   );
 };
 
-const BaseCode = ({ children, size, truncate, disabled, isPrivate }: CodeInlineProps) => {
+const BaseCode = ({ children, size, disabled, isPrivate }: CodeInlineProps) => {
   return (
-    <div
+    <span
       className={cx(
-        'flex flex-wrap max-w-full px-1 py-[2px]',
+        'inline-flex flex-wrap flex-grow-0 px-1 py-[2px]',
         'rounded-sm cursor-pointer',
-        'bg-secondary whitespace-nowrap',
+        'bg-secondary',
         'border border-solid border-tertiary text-primary',
+        'max-w-full w-fit',
         {
           'cursor-default': disabled,
           'hover:text-primary hover:border-primary': !disabled,
@@ -68,15 +60,14 @@ const BaseCode = ({ children, size, truncate, disabled, isPrivate }: CodeInlineP
       )}
     >
       <code
-        className={cx('max-w-full text-snippet-2', {
+        className={cx('max-w-full text-snippet-2 truncate overflow-hidden text-ellipsis', {
           'text-snippet-3': size === 'compact',
-          'truncate overflow-hidden text-ellipsis': truncate,
           'data-dd-privacy': isPrivate ? 'mask' : undefined,
         })}
       >
         {children}
       </code>
-    </div>
+    </span>
   );
 };
 

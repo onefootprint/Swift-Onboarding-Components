@@ -51,7 +51,7 @@ const Row = ({ playbook }: RowProps) => {
         {playbook.kind === 'document' && t('type.document')}
       </td>
       <td>
-        <CodeInline truncate>{key}</CodeInline>
+        <CodeInline>{key}</CodeInline>
       </td>
       <td>
         {status === 'enabled' && <Badge variant="success">{t('status.enabled')}</Badge>}

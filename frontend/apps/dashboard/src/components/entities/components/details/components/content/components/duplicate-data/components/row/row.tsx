@@ -31,12 +31,10 @@ const Row = ({ duplicateDataItem }: RowProps) => {
   return (
     <>
       <td>
-        <Text variant="body-3" truncate>
-          {getTruncatedName(data)}
-        </Text>
+        <Text variant="body-3">{getTruncatedName(data)}</Text>
       </td>
       <td>
-        <CodeInline truncate>{fpId}</CodeInline>
+        <CodeInline>{fpId}</CodeInline>
       </td>
       <td>
         <Box display="flex" gap={2} flexWrap="wrap" paddingTop={4} paddingBottom={4}>
