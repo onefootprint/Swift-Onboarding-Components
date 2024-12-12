@@ -25,7 +25,6 @@ const listDetailsFixture = getListDetails({
   playbooks: [
     {
       id: 'playbook_1',
-      key: 'playbook_1',
       name: 'Playbook 1',
       rules: [
         getRule({
@@ -46,7 +45,6 @@ const listDetailsFixture = getListDetails({
     },
     {
       id: 'playbook_2',
-      key: 'playbook_2',
       name: 'Playbook 2',
       rules: [
         getRule({

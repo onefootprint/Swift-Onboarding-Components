@@ -4195,7 +4195,7 @@ export const dashboard_AuditEventDetailLoginOrgMember: AuditEventDetailLoginOrgM
 };
 export const dashboard_AuditEventDetailManuallyReviewEntity: AuditEventDetailManuallyReviewEntity = {
   data: {
-    decisionStatus: 'step_up',
+    decisionStatus: 'pass',
     fpId: '4a037525-46d5-4bd0-b110-10a334dcd750',
     kind: 'business',
   },
@@ -7961,7 +7961,6 @@ export const dashboard_ListDetails: ListDetails = {
   playbooks: [
     {
       id: 'f2b68018-5bdf-43a2-9d1a-06e87073f670',
-      key: '9480d365-60d6-4a34-ab50-9debeca50d62',
       name: 'Gilbert Kuhlman',
       rules: [
         {
@@ -8055,7 +8054,6 @@ export const dashboard_ListDetails: ListDetails = {
     },
     {
       id: 'f2b68018-5bdf-43a2-9d1a-06e87073f670',
-      key: '9480d365-60d6-4a34-ab50-9debeca50d62',
       name: 'Gilbert Kuhlman',
       rules: [
         {
@@ -8149,7 +8147,6 @@ export const dashboard_ListDetails: ListDetails = {
     },
     {
       id: 'f2b68018-5bdf-43a2-9d1a-06e87073f670',
-      key: '9480d365-60d6-4a34-ab50-9debeca50d62',
       name: 'Gilbert Kuhlman',
       rules: [
         {
@@ -8333,7 +8330,6 @@ export const dashboard_ListEventDetailDeleteListEntry: ListEventDetailDeleteList
 export const dashboard_ListKind: ListKind = 'ip_address';
 export const dashboard_ListPlaybookUsage: ListPlaybookUsage = {
   id: 'bae5b7ec-995e-463d-8e98-9795d18843d3',
-  key: '10f5ca34-343e-47ca-af95-c6e03c95e5ab',
   name: 'Raul Herzog III',
   rules: [
     {
@@ -10888,7 +10884,6 @@ export const dashboard_UpdateObConfigRequest: UpdateObConfigRequest = {
   name: 'Patsy Funk',
   promptForPasskey: false,
   skipConfirm: true,
-  status: 'disabled',
 };
 export const dashboard_UpdatePartnerTenantRequest: UpdatePartnerTenantRequest = {
   allowDomainAccess: false,

@@ -39,6 +39,9 @@ import type {
   GetEntitiesByFpBidBusinessInsightsData,
   GetEntitiesByFpBidBusinessInsightsError,
   GetEntitiesByFpBidBusinessInsightsResponse,
+  GetEntitiesByFpBidOnboardingsByOnboardingIdBusinessInsightsData,
+  GetEntitiesByFpBidOnboardingsByOnboardingIdBusinessInsightsError,
+  GetEntitiesByFpBidOnboardingsByOnboardingIdBusinessInsightsResponse,
   GetEntitiesByFpIdAnnotationsData,
   GetEntitiesByFpIdAnnotationsError,
   GetEntitiesByFpIdAnnotationsResponse,
@@ -640,6 +643,22 @@ export const getEntitiesByFpBidBusinessInsights = <ThrowOnError extends boolean 
   >({
     ...options,
     url: '/entities/{fpBid}/business_insights',
+  });
+};
+
+/**
+ * Retrieve business insights for a given fp_bid and onboarding.
+ */
+export const getEntitiesByFpBidOnboardingsByOnboardingIdBusinessInsights = <ThrowOnError extends boolean = false>(
+  options: Options<GetEntitiesByFpBidOnboardingsByOnboardingIdBusinessInsightsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetEntitiesByFpBidOnboardingsByOnboardingIdBusinessInsightsResponse,
+    GetEntitiesByFpBidOnboardingsByOnboardingIdBusinessInsightsError,
+    ThrowOnError
+  >({
+    ...options,
+    url: '/entities/{fpBid}/onboardings/{onboardingId}/business_insights',
   });
 };
 

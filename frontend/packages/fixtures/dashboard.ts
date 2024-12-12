@@ -1376,7 +1376,7 @@ export const getAuditEventDetailManuallyReviewEntity = (
   deepmerge<AuditEventDetailManuallyReviewEntity>(
     {
       data: {
-        decisionStatus: 'step_up',
+        decisionStatus: 'pass',
         fpId: '4a037525-46d5-4bd0-b110-10a334dcd750',
         kind: 'business',
       },
@@ -6374,7 +6374,6 @@ export const getListDetails = (
       playbooks: [
         {
           id: 'f2b68018-5bdf-43a2-9d1a-06e87073f670',
-          key: '9480d365-60d6-4a34-ab50-9debeca50d62',
           name: 'Gilbert Kuhlman',
           rules: [
             {
@@ -6468,7 +6467,6 @@ export const getListDetails = (
         },
         {
           id: 'f2b68018-5bdf-43a2-9d1a-06e87073f670',
-          key: '9480d365-60d6-4a34-ab50-9debeca50d62',
           name: 'Gilbert Kuhlman',
           rules: [
             {
@@ -6562,7 +6560,6 @@ export const getListDetails = (
         },
         {
           id: 'f2b68018-5bdf-43a2-9d1a-06e87073f670',
-          key: '9480d365-60d6-4a34-ab50-9debeca50d62',
           name: 'Gilbert Kuhlman',
           rules: [
             {
@@ -6809,7 +6806,6 @@ export const getListPlaybookUsage = (
   deepmerge<ListPlaybookUsage>(
     {
       id: 'bae5b7ec-995e-463d-8e98-9795d18843d3',
-      key: '10f5ca34-343e-47ca-af95-c6e03c95e5ab',
       name: 'Raul Herzog III',
       rules: [
         {
@@ -10354,7 +10350,6 @@ export const getUpdateObConfigRequest = (
       name: 'Patsy Funk',
       promptForPasskey: false,
       skipConfirm: true,
-      status: 'disabled',
     },
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },

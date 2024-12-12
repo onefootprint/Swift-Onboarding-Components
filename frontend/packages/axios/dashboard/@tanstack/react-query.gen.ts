@@ -33,6 +33,7 @@ import type {
   DeletePartnerPartnershipsByPartnershipIdRequestsByRequestIdError,
   DeletePartnerPartnershipsByPartnershipIdRequestsByRequestIdResponse,
   GetEntitiesByFpBidBusinessInsightsData,
+  GetEntitiesByFpBidOnboardingsByOnboardingIdBusinessInsightsData,
   GetEntitiesByFpIdAnnotationsData,
   GetEntitiesByFpIdAuthEventsData,
   GetEntitiesByFpIdBusinessOwnersData,
@@ -382,6 +383,7 @@ import {
   deletePartnerPartnershipsByPartnershipIdRequestsByRequestId,
   get,
   getEntitiesByFpBidBusinessInsights,
+  getEntitiesByFpBidOnboardingsByOnboardingIdBusinessInsights,
   getEntitiesByFpId,
   getEntitiesByFpIdAnnotations,
   getEntitiesByFpIdAuthEvents,
@@ -860,6 +862,27 @@ export const getEntitiesByFpBidBusinessInsightsOptions = (options: Options<GetEn
       return data;
     },
     queryKey: getEntitiesByFpBidBusinessInsightsQueryKey(options),
+  });
+};
+
+export const getEntitiesByFpBidOnboardingsByOnboardingIdBusinessInsightsQueryKey = (
+  options: Options<GetEntitiesByFpBidOnboardingsByOnboardingIdBusinessInsightsData>,
+) => [createQueryKey('getEntitiesByFpBidOnboardingsByOnboardingIdBusinessInsights', options)];
+
+export const getEntitiesByFpBidOnboardingsByOnboardingIdBusinessInsightsOptions = (
+  options: Options<GetEntitiesByFpBidOnboardingsByOnboardingIdBusinessInsightsData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getEntitiesByFpBidOnboardingsByOnboardingIdBusinessInsights({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getEntitiesByFpBidOnboardingsByOnboardingIdBusinessInsightsQueryKey(options),
   });
 };
 

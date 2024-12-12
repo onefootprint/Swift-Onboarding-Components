@@ -1080,6 +1080,56 @@
                 ]
             }
         },
+        "/entities/{fp_bid}/onboardings/{onboarding_id}/business_insights": {
+            "get": {
+                "tags": [
+                    "EntityDetails",
+                    "Entities",
+                    "Private"
+                ],
+                "description": "Retrieve business insights for a given fp_bid and onboarding.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_bid",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "path",
+                        "name": "onboarding_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BusinessInsights"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
+                    }
+                ]
+            }
+        },
         "/entities/{fp_id:fp_[_A-Za-z0-9]*}": {
             "get": {
                 "tags": [
@@ -12358,7 +12408,6 @@
                 "type": "string",
                 "enum": [
                     "fail",
-                    "step_up",
                     "pass",
                     "none"
                 ]
@@ -13700,6 +13749,10 @@
                     "visa_expired_or_expiring_soon",
                     "strong_connection_to_labeled_fraud",
                     "medium_connection_to_labeled_fraud",
+                    "strong_connection_to_labeled_active",
+                    "medium_connection_to_labeled_active",
+                    "strong_connection_to_labeled_offboard_other",
+                    "medium_connection_to_labeled_offboard_other",
                     "user_is_labeled_fraud",
                     "business_name_match",
                     "business_name_similar_match",
@@ -15574,9 +15627,6 @@
                     "id": {
                         "type": "string"
                     },
-                    "key": {
-                        "type": "string"
-                    },
                     "name": {
                         "type": "string"
                     },
@@ -15589,7 +15639,6 @@
                 },
                 "required": [
                     "id",
-                    "key",
                     "name",
                     "rules"
                 ]
@@ -19811,9 +19860,6 @@
                     },
                     "skip_confirm": {
                         "type": "boolean"
-                    },
-                    "status": {
-                        "$ref": "#/components/schemas/ApiKeyStatus"
                     }
                 }
             },

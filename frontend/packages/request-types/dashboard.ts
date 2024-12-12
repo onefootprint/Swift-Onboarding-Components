@@ -1346,7 +1346,7 @@ export type DbActorUser = {
   };
   kind: 'user';
 };
-export type DecisionStatus = 'fail' | 'step_up' | 'pass' | 'none';
+export type DecisionStatus = 'fail' | 'pass' | 'none';
 export type DecryptionContext = 'vault_proxy' | 'reflect' | 'api' | 'unknown';
 export type DeleteRequest = {
   /**
@@ -1987,6 +1987,10 @@ export type FootprintReasonCode =
   | 'visa_expired_or_expiring_soon'
   | 'strong_connection_to_labeled_fraud'
   | 'medium_connection_to_labeled_fraud'
+  | 'strong_connection_to_labeled_active'
+  | 'medium_connection_to_labeled_active'
+  | 'strong_connection_to_labeled_offboard_other'
+  | 'medium_connection_to_labeled_offboard_other'
   | 'user_is_labeled_fraud'
   | 'business_name_match'
   | 'business_name_similar_match'
@@ -3528,7 +3532,6 @@ export type ListEventDetailDeleteListEntry = {
 export type ListKind = 'email_address' | 'email_domain' | 'ssn9' | 'phone_number' | 'phone_country_code' | 'ip_address';
 export type ListPlaybookUsage = {
   id: string;
-  key: string;
   name: string;
   rules: Array<Rule>;
 };
@@ -5266,7 +5269,6 @@ export type UpdateObConfigRequest = {
   name?: string;
   promptForPasskey?: boolean;
   skipConfirm?: boolean;
-  status?: ApiKeyStatus;
 };
 export type UpdatePartnerTenantRequest = {
   allowDomainAccess?: boolean;
@@ -7333,6 +7335,20 @@ export type GetEntitiesByFpBidBusinessInsightsData = {
 };
 export type GetEntitiesByFpBidBusinessInsightsResponse = BusinessInsights;
 export type GetEntitiesByFpBidBusinessInsightsError = unknown;
+export type GetEntitiesByFpBidOnboardingsByOnboardingIdBusinessInsightsData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
+  path: {
+    fpBid: string;
+    onboardingId: string;
+  };
+};
+export type GetEntitiesByFpBidOnboardingsByOnboardingIdBusinessInsightsResponse = BusinessInsights;
+export type GetEntitiesByFpBidOnboardingsByOnboardingIdBusinessInsightsError = unknown;
 export type GetEntitiesByFpIdData = {
   headers?: {
     /**
@@ -10046,6 +10062,17 @@ export type $OpenApiTs = {
   '/entities/{fp_bid}/business_insights': {
     get: {
       req: GetEntitiesByFpBidBusinessInsightsData;
+      res: {
+        /**
+         * OK
+         */
+        '200': BusinessInsights;
+      };
+    };
+  };
+  '/entities/{fp_bid}/onboardings/{onboarding_id}/business_insights': {
+    get: {
+      req: GetEntitiesByFpBidOnboardingsByOnboardingIdBusinessInsightsData;
       res: {
         /**
          * OK

@@ -4894,7 +4894,6 @@
                 "type": "string",
                 "enum": [
                     "fail",
-                    "step_up",
                     "pass",
                     "none"
                 ]
@@ -5422,6 +5421,10 @@
                     "visa_expired_or_expiring_soon",
                     "strong_connection_to_labeled_fraud",
                     "medium_connection_to_labeled_fraud",
+                    "strong_connection_to_labeled_active",
+                    "medium_connection_to_labeled_active",
+                    "strong_connection_to_labeled_offboard_other",
+                    "medium_connection_to_labeled_offboard_other",
                     "user_is_labeled_fraud",
                     "business_name_match",
                     "business_name_similar_match",
