@@ -1,5 +1,5 @@
 import { getEntitiesByFpIdBusinessOwnersOptions } from '@onefootprint/axios/dashboard';
-import type { Entity } from '@onefootprint/types';
+import type { Entity } from '@onefootprint/request-types/dashboard';
 import { useQuery } from '@tanstack/react-query';
 import ErrorComponent from 'src/components/error';
 import Content from './components/content';
@@ -16,6 +16,7 @@ const BusinessOwners = ({ entity }: BusinessOwnersProps) => {
     }),
   );
   const explanationMessage = entity.data
+    //@ts-expect-error fix
     .find(item => item.identifier === 'business.beneficial_owner_explanation_message')
     ?.value?.toString();
 

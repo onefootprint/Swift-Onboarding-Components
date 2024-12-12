@@ -34,6 +34,8 @@
     "bos": {
       "title": "Business owners",
       "list-title": "List of business owners",
+      "label": "Beneficial owner",
+      "primary": "Primary",
       "link": "View profile",
       "status": {
         "awaiting-kyc": "Awaiting KYC"

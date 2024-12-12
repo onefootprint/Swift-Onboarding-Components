@@ -16,10 +16,6 @@ type BusinessVaultProps = {
   entity: Entity;
 };
 
-// TODO: Risk signals are not supported yet for KYB
-// Waiting backend to adjust the method that will group the signals
-// https://github.com/onefootprint/monorepo/blob/f4357b95e964248abc155a6b243dec080dbf4d4b/backend/components/newtypes/src/reason_code/signal_attribute.rs
-// https://linear.app/footprint/issue/FP-3412/risk-signals-add-real-risk-signal-attributes
 const BusinessVault = ({ entity }: BusinessVaultProps) => {
   const { t } = useTranslation('business-details', { keyPrefix: 'vault' });
   const { basic, address, custom } = useFieldsets();
@@ -50,6 +46,7 @@ const BusinessVault = ({ entity }: BusinessVaultProps) => {
             title={t('bos.title')}
             footer={<RiskSignalsOverview type="basic" />}
           >
+            {/* @ts-expect-error fix once we migrate to the new entity types */}
             <BusinessOwners entity={entity} />
           </Fieldset>
         </Bos>
