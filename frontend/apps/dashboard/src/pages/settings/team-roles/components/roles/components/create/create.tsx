@@ -1,4 +1,4 @@
-import { RoleKind, RoleScopeKind } from '@onefootprint/types';
+import { RoleKind } from '@onefootprint/types';
 import { Box, Button } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -17,7 +17,7 @@ const Create = () => {
 
   return (
     <Box>
-      <PermissionGate scopeKind={RoleScopeKind.orgSettings} fallbackText={t('not-allowed')}>
+      <PermissionGate scopeKind="org_settings" fallbackText={t('not-allowed')}>
         <Button onClick={handleOpen} variant="secondary">
           {t('title')}
         </Button>

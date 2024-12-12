@@ -1,7 +1,7 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IcoInfo16 } from '@onefootprint/icons';
 import type { EditedRule, ListRuleField, OnboardingConfig, RiskSignalRuleField, Rule } from '@onefootprint/types';
-import { OnboardingConfigKind, RoleScopeKind, RuleAction } from '@onefootprint/types';
+import { OnboardingConfigKind, RuleAction } from '@onefootprint/types';
 import { Button, InlineAlert, Stack, Text, Tooltip, useToast } from '@onefootprint/ui';
 import cloneDeep from 'lodash/cloneDeep';
 import flatten from 'lodash/flatten';
@@ -172,7 +172,7 @@ const Content = ({ hasRules, playbook, shouldAllowEditing, actionRules, toggleDi
           </Stack>
           {shouldAllowEditing && !isEditing && (
             <PermissionGate
-              scopeKind={RoleScopeKind.onboardingConfiguration}
+              scopeKind="onboarding_configuration"
               fallbackText={t('cta-not-allowed')}
               tooltipPosition="left"
             >

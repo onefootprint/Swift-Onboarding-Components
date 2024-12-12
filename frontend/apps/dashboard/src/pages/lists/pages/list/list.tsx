@@ -1,6 +1,5 @@
 import { getOrgListsOptions } from '@onefootprint/axios/dashboard';
 import { getErrorMessage } from '@onefootprint/request';
-import { RoleScopeKind } from '@onefootprint/types';
 import { Button } from '@onefootprint/ui';
 import { useQuery } from '@tanstack/react-query';
 import Head from 'next/head';
@@ -41,12 +40,7 @@ const List = () => {
           <p className="text-body-2 text-secondary">{t('header.subtitle')}</p>
         </div>
         <div className="relative">
-          <PermissionGate
-            fallbackText={t('cta-not-allowed')}
-            // TODO: migrate PermissionGate to use new types
-            scopeKind={RoleScopeKind.writeLists}
-            tooltipPosition="left"
-          >
+          <PermissionGate scopeKind="write_lists" fallbackText={t('cta-not-allowed')}>
             <Button onClick={handleOpen}>{t('create-button')}</Button>
           </PermissionGate>
         </div>

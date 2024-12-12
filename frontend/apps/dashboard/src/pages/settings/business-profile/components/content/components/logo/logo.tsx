@@ -1,5 +1,4 @@
 import type { Organization } from '@onefootprint/request-types/dashboard';
-import { RoleScopeKind } from '@onefootprint/types';
 import { Avatar, createFontStyles } from '@onefootprint/ui';
 import type React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -33,7 +32,7 @@ const Logo = ({ organization }: LogoProps) => {
       <Avatar name={organization.name} size="xlarge" src={organization.logoUrl} />
 
       <ButtonContainer>
-        <PermissionGate scopeKind={RoleScopeKind.orgSettings} fallbackText={t('not-allowed')}>
+        <PermissionGate scopeKind="org_settings" fallbackText={t('not-allowed')}>
           <Label>
             {t('cta')}
             <StyledInput type="file" accept="image/svg+xml, image/png, image/jpeg" onChange={handleChange} />

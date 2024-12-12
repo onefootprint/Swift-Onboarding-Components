@@ -1,5 +1,5 @@
 import { useEntityContext } from '@/entity/hooks/use-entity-context';
-import { type DataIdentifier, EntityKind, EntityStatus, IdDI, ReviewStatus, RoleScopeKind } from '@onefootprint/types';
+import { type DataIdentifier, EntityKind, EntityStatus, IdDI, ReviewStatus } from '@onefootprint/types';
 import { Command } from '@onefootprint/ui';
 import { parseInt as lodashParseInt } from 'lodash';
 import { useEffect, useState } from 'react';
@@ -144,7 +144,7 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
           value: 'failed',
           onSelect: handleOpenFailDialog,
           closeAfterSelect: true,
-          disabled: !hasPermission(RoleScopeKind.manualReview),
+          disabled: !hasPermission('manual_review'),
         },
         {
           label:
@@ -160,7 +160,7 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
           value: 'verified',
           onSelect: handleOpenPassDialog,
           closeAfterSelect: true,
-          disabled: !hasPermission(RoleScopeKind.manualReview),
+          disabled: !hasPermission('manual_review'),
         },
       ],
     },
@@ -173,14 +173,14 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
           value: 'edit',
           onSelect: handleOpenEditVaultDrawer,
           closeAfterSelect: true,
-          disabled: !hasPermission(RoleScopeKind.writeEntities),
+          disabled: !hasPermission('write_entities'),
         },
         {
           label: t('components.cmdk.actions.request'),
           value: 'request',
           onSelect: handleOpenRequestMoreInfoDialog,
           closeAfterSelect: true,
-          disabled: !hasPermission(RoleScopeKind.manualReview) || !hasContactInfo,
+          disabled: !hasPermission('manual_review') || !hasContactInfo,
         },
       ],
     },

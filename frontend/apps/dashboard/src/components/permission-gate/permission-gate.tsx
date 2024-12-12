@@ -1,11 +1,11 @@
-import type { RoleScopeKind } from '@onefootprint/types';
+import type { TenantScope } from '@onefootprint/request-types/dashboard';
 import { Tooltip } from '@onefootprint/ui';
 import React from 'react';
 import usePermissions from 'src/hooks/use-permissions';
 
 export type PermissionGateProps = {
   children: JSX.Element;
-  scopeKind: Exclude<RoleScopeKind, RoleScopeKind.decrypt>;
+  scopeKind: Exclude<TenantScope, 'decrypt_all'>['kind'];
   fallbackText: string;
   tooltipPosition?: 'top' | 'bottom' | 'left' | 'right';
 };

@@ -1,5 +1,4 @@
 import type { Member } from '@onefootprint/types';
-import { RoleScopeKind } from '@onefootprint/types';
 import { Box, Dialog, Dropdown, IconButton, Stack, Text, createFontStyles } from '@onefootprint/ui';
 import { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
@@ -47,7 +46,7 @@ const Actions = ({ member }: ActionsProps) => {
   return (
     <Stack justify="flex-end" onClick={e => e.stopPropagation()}>
       <Dropdown.Root onOpenChange={setDropdownOpen} open={dropdownOpen}>
-        <PermissionGate scopeKind={RoleScopeKind.orgSettings} fallbackText={t('not-allowed')}>
+        <PermissionGate scopeKind="org_settings" fallbackText={t('not-allowed')}>
           <Dropdown.Trigger asChild>
             <IconButton aria-label={t('aria-label', { email })} size="tiny">
               <IcoDotsHorizontal24 testID="nav-dropdown-button" color="primary" />

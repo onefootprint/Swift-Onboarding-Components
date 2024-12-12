@@ -1,5 +1,4 @@
 import { useToggle } from '@onefootprint/hooks';
-import { RoleScopeKind } from '@onefootprint/types';
 import { Box, Button, Stack, Text } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useTranslation } from 'react-i18next';
@@ -26,7 +25,7 @@ const ApiKeys = () => {
               {t('header.subtitle')}
             </Text>
           </Stack>
-          <PermissionGate fallbackText={t('header.cta-not-allowed')} scopeKind={RoleScopeKind.apiKeys}>
+          <PermissionGate fallbackText={t('header.cta-not-allowed')} scopeKind="api_keys">
             <Button onClick={openCreateDialog} variant="primary">
               {t('header.cta')}
             </Button>

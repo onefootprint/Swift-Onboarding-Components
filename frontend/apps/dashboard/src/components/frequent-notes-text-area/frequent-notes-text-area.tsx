@@ -1,6 +1,6 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
-import { type OrgFrequentNoteKind, RoleScopeKind } from '@onefootprint/types';
+import type { OrgFrequentNoteKind } from '@onefootprint/types';
 import { Box, LinkButton, Stack, TextArea as UnstyledTextArea, createText, useToast } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { ParseKeys } from 'i18next';
@@ -63,7 +63,7 @@ const FrequentNotesTextArea = ({ kind, formField, label, placeholder, required }
   }, [notes]);
 
   const isPending = getQuery.isPending || createMutation.isPending || deleteMutation.isPending;
-  const hasEditPermissions = hasPermission(RoleScopeKind.orgSettings);
+  const hasEditPermissions = hasPermission('org_settings');
   const showSave = !notes?.find(n => n.content === value) && value;
 
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);

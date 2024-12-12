@@ -1,5 +1,4 @@
 import type { Member } from '@onefootprint/types';
-import { RoleScopeKind } from '@onefootprint/types';
 import { Badge, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import usePermissions from 'src/hooks/use-permissions';
@@ -33,13 +32,7 @@ const Row = ({ member }: RowProps) => {
         </Text>
       </Td>
       <Td>{lastLoginAt || '-'}</Td>
-      <Td>
-        {shouldShowActions && hasPermission(RoleScopeKind.orgSettings) ? (
-          <EditRole member={member} />
-        ) : (
-          member.role.name
-        )}
-      </Td>
+      <Td>{shouldShowActions && hasPermission('org_settings') ? <EditRole member={member} /> : member.role.name}</Td>
       <Td>{!lastLoginAt && <Badge variant="warning">{t('pending-invite')}</Badge>}</Td>
       <Td>{shouldShowActions && <Actions member={member} />}</Td>
     </>

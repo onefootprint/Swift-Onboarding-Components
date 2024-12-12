@@ -1,4 +1,3 @@
-import { RoleScopeKind } from '@onefootprint/types';
 import { Button, Pagination, Stack, Text } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import Head from 'next/head';
@@ -64,7 +63,7 @@ const Playbooks = () => {
         <Wrapper>
           <Stack position="relative">
             {!hasHadPlaybook && <Highlighter variants={highlighterAnimation} initial="initial" animate="animate" />}
-            <PermissionGate fallbackText={t('cta-not-allowed')} scopeKind={RoleScopeKind.onboardingConfiguration}>
+            <PermissionGate scopeKind="onboarding_configuration" fallbackText={t('cta-not-allowed')}>
               <Button onClick={handleOpen}>{t('create-button')}</Button>
             </PermissionGate>
           </Stack>

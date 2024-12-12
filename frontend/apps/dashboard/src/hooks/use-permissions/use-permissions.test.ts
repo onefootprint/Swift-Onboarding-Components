@@ -9,7 +9,7 @@ describe('usePermissions', () => {
     it('should return true when checking with "admin"', () => {
       asUserWithScope([RoleScopeKind.admin]);
       const { result } = customRenderHook(() => usePermissions());
-      expect(result.current.hasPermission(RoleScopeKind.apiKeys)).toBeTruthy();
+      expect(result.current.hasPermission('api_keys')).toBeTruthy();
     });
   });
 
@@ -25,13 +25,13 @@ describe('usePermissions', () => {
     it('should return true when checking with "api_keys"', () => {
       asUserWithScope([RoleScopeKind.apiKeys]);
       const { result } = customRenderHook(() => usePermissions());
-      expect(result.current.hasPermission(RoleScopeKind.apiKeys)).toBeTruthy();
+      expect(result.current.hasPermission('api_keys')).toBeTruthy();
     });
 
     it('should return falsy when checking with "onboarding_configuration"', () => {
       asUserWithScope([RoleScopeKind.apiKeys]);
       const { result } = customRenderHook(() => usePermissions());
-      expect(result.current.hasPermission(RoleScopeKind.orgSettings)).toBeFalsy();
+      expect(result.current.hasPermission('org_settings')).toBeFalsy();
     });
   });
 });

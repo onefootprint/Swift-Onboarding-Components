@@ -1,6 +1,5 @@
 import { IcoUpdated16 } from '@onefootprint/icons';
 import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
-import { RoleScopeKind } from '@onefootprint/types';
 import { Button, CodeInline } from '@onefootprint/ui';
 import { cx } from 'class-variance-authority';
 import type { ParseKeys } from 'i18next';
@@ -91,7 +90,7 @@ const EditButton = ({ playbook }: { playbook: OnboardingConfiguration }) => {
   return (
     <>
       <PermissionGate
-        scopeKind={RoleScopeKind.onboardingConfiguration}
+        scopeKind="onboarding_configuration"
         fallbackText={t('edit.cta-not-allowed')}
         tooltipPosition="left"
       >

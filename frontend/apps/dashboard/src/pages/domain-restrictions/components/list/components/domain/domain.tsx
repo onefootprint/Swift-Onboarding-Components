@@ -1,5 +1,4 @@
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
-import { RoleScopeKind } from '@onefootprint/types';
 import { Dropdown, Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
@@ -24,7 +23,7 @@ const Domain = ({ domain, onRemove }: DomainProps) => {
     >
       <Text variant="body-2">{domain}</Text>
       <Dropdown.Root>
-        <PermissionGate scopeKind={RoleScopeKind.onboardingConfiguration} fallbackText={t('list.not-allowed')}>
+        <PermissionGate scopeKind="onboarding_configuration" fallbackText={t('list.not-allowed')}>
           <Dropdown.Trigger aria-label={t('list.actions', { domain }) as string}>
             <IcoDotsHorizontal24 />
           </Dropdown.Trigger>

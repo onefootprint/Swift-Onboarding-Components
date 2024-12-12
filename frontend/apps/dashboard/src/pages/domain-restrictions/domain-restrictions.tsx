@@ -1,4 +1,3 @@
-import { RoleScopeKind } from '@onefootprint/types';
 import { Box, Button, Stack, Text } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useState } from 'react';
@@ -35,9 +34,7 @@ const DomainRestrictions = () => {
             </Text>
           </Box>
           <Box>
-            {hasPermission(RoleScopeKind.onboardingConfiguration) && (
-              <Button onClick={handleOpen}>{t('header.cta')}</Button>
-            )}
+            {hasPermission('onboarding_configuration') && <Button onClick={handleOpen}>{t('header.cta')}</Button>}
           </Box>
         </Stack>
         <Stack

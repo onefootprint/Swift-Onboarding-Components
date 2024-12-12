@@ -1,4 +1,3 @@
-import { RoleScopeKind } from '@onefootprint/types';
 import { Button, LinkButton, SearchInput } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
@@ -48,7 +47,7 @@ const Entries = () => {
   return (
     <div className="flex flex-col gap-4">
       <SectionTitle title={t('title')}>
-        <PermissionGate scopeKind={RoleScopeKind.writeLists} fallbackText={t('cta-not-allowed')}>
+        <PermissionGate scopeKind="write_lists" fallbackText={t('cta-not-allowed')}>
           <Button variant="secondary" onClick={handleAddEntry} size="compact">
             {t('add')}
           </Button>
@@ -67,11 +66,7 @@ const Entries = () => {
           )}
           <div className="flex flex-wrap gap-2">
             {displayedEntries.map(entry => (
-              <PermissionGate
-                key={entry.id}
-                scopeKind={RoleScopeKind.writeLists}
-                fallbackText={t('delete-not-allowed')}
-              >
+              <PermissionGate key={entry.id} scopeKind="write_lists" fallbackText={t('delete-not-allowed')}>
                 <EntryChip entry={entry} />
               </PermissionGate>
             ))}

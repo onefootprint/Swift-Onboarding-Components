@@ -1,5 +1,4 @@
 import { getOrgListsByListIdOptions } from '@onefootprint/axios/dashboard';
-import { RoleScopeKind } from '@onefootprint/types';
 import { Button, Shimmer } from '@onefootprint/ui';
 import { useQuery } from '@tanstack/react-query';
 import { capitalize } from 'lodash';
@@ -48,12 +47,12 @@ const Header = () => {
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <PermissionGate fallbackText={t('cta-edit-not-allowed')} scopeKind={RoleScopeKind.writeLists}>
+        <PermissionGate fallbackText={t('cta-edit-not-allowed')} scopeKind="write_lists">
           <Button onClick={launchEditDialog} variant="secondary" size="compact">
             {t('edit')}
           </Button>
         </PermissionGate>
-        <PermissionGate fallbackText={t('cta-delete-not-allowed')} scopeKind={RoleScopeKind.writeLists}>
+        <PermissionGate fallbackText={t('cta-delete-not-allowed')} scopeKind="write_lists">
           <Actions />
         </PermissionGate>
       </div>

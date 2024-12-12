@@ -1,6 +1,5 @@
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import type { Role } from '@onefootprint/types';
-import { RoleScopeKind } from '@onefootprint/types';
 import { Box, IconButton } from '@onefootprint/ui';
 import { Dropdown, Stack } from '@onefootprint/ui';
 import { useRef, useState } from 'react';
@@ -40,7 +39,7 @@ const Actions = ({ role }: ActionsProps) => {
   return (
     <Stack justify="flex-end" onClick={e => e.stopPropagation()}>
       <Dropdown.Root open={openDropdown} onOpenChange={setOpenDropdown}>
-        <PermissionGate scopeKind={RoleScopeKind.orgSettings} fallbackText={t('not-allowed')}>
+        <PermissionGate scopeKind="org_settings" fallbackText={t('not-allowed')}>
           <Dropdown.Trigger asChild>
             <Box>
               <IconButton aria-label={t('aria-label', { name })} size="tiny">

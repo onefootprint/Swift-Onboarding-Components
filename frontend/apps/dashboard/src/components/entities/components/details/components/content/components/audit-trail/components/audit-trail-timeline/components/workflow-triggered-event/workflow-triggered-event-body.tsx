@@ -1,7 +1,7 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IcoInfo16 } from '@onefootprint/icons';
 import type { Annotation, WorkflowTriggeredEventData } from '@onefootprint/types';
-import { RoleScopeKind, TokenKind } from '@onefootprint/types';
+import { TokenKind } from '@onefootprint/types';
 import { Dialog, LinkButton, Stack, Text } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -85,7 +85,7 @@ const WorkflowTriggeredEventBody = ({ data, entityId }: WorkflowTriggeredEventBo
                 ·
               </Stack>
               <PermissionGate
-                scopeKind={RoleScopeKind.manualReview}
+                scopeKind="manual_review"
                 fallbackText={t('create-link.no-permission')}
                 tooltipPosition="left"
               >

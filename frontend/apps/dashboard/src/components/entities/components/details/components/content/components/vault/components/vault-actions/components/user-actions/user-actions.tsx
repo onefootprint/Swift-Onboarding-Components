@@ -1,7 +1,7 @@
 import type { WithEntityProps } from '@/entity/components/with-entity';
 import useTags from '@/entity/hooks/use-entity-tags';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
-import { type DataIdentifier, IdDI, RoleScopeKind } from '@onefootprint/types';
+import { type DataIdentifier, IdDI } from '@onefootprint/types';
 import { Box, Dropdown, IconButton } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -35,7 +35,7 @@ const UserActions = ({ entity }: WithEntityProps) => {
     data: { user },
   } = useSession();
   const { hasPermission } = usePermissions();
-  const hasLabelAndTagPermissions = hasPermission(RoleScopeKind.labelAndTag);
+  const hasLabelAndTagPermissions = hasPermission('label_and_tag');
   const { openDatadog, isEnabled: isOpenDatadogEnabled } = useOpenDatadog();
 
   const hasContactInfo = entity.data.some(d => [IdDI.phoneNumber as DataIdentifier, IdDI.email].includes(d.identifier));
@@ -62,7 +62,7 @@ const UserActions = ({ entity }: WithEntityProps) => {
         <Dropdown.Content align="end" sideOffset={8} minWidth="200px">
           <Dropdown.Group>
             <Dropdown.GroupTitle>{t('management.title')}</Dropdown.GroupTitle>
-            {hasPermission(RoleScopeKind.writeEntities) && (
+            {hasPermission('write_entities') && (
               <DropdownItem onSelect={handleDialogOpen(ActionDialog.EditVault)}>{t('management.edit')}</DropdownItem>
             )}
             {hasLabelAndTagPermissions && (
@@ -70,14 +70,14 @@ const UserActions = ({ entity }: WithEntityProps) => {
                 {tags?.length ? t('management.edit-tags') : t('management.add-tags')}
               </DropdownItem>
             )}
-            {hasPermission(RoleScopeKind.writeEntities) && (
+            {hasPermission('write_entities') && (
               <DropdownItem onSelect={handleDialogOpen(ActionDialog.UploadDoc)}>
                 {t('management.upload-document')}
               </DropdownItem>
             )}
             <DropdownItem onSelect={handleDialogOpen(ActionDialog.Summarize)}>{t('management.summarize')}</DropdownItem>
           </Dropdown.Group>
-          {hasPermission(RoleScopeKind.manualReview) && (
+          {hasPermission('manual_review') && (
             <>
               <Dropdown.Divider />
               <Dropdown.Group>

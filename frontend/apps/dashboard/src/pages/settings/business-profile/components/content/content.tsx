@@ -1,4 +1,3 @@
-import { RoleScopeKind } from '@onefootprint/types';
 import { Button, CopyButton, Form, LinkButton, Stack, Text, TextInput, useToast } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -29,7 +28,7 @@ const Content = ({ organization }: ContentProps) => {
   const toast = useToast();
   const { hasPermission } = usePermissions();
   const [helpDialogOpen, setHelpDialogOpen] = useState(false);
-  const canEdit = hasPermission(RoleScopeKind.orgSettings);
+  const canEdit = hasPermission('org_settings');
   const { register, handleSubmit } = useForm<FormData>({
     defaultValues: {
       name: organization.name || '',

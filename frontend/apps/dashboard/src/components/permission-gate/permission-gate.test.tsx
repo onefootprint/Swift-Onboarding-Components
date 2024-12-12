@@ -9,7 +9,7 @@ describe('<PermissionGate />', () => {
     it('should just render the button', () => {
       asUserWithScope([RoleScopeKind.admin]);
       customRender(
-        <PermissionGate scopeKind={RoleScopeKind.apiKeys} fallbackText="You don't have permission">
+        <PermissionGate scopeKind="api_keys" fallbackText="You don't have permission">
           <button type="button">Create</button>
         </PermissionGate>,
       );
@@ -22,7 +22,7 @@ describe('<PermissionGate />', () => {
     it('should disable the button and show a tooltip', async () => {
       asUserWithScope([RoleScopeKind.read]);
       customRender(
-        <PermissionGate scopeKind={RoleScopeKind.apiKeys} fallbackText="You don't have permission">
+        <PermissionGate scopeKind="api_keys" fallbackText="You don't have permission">
           <button type="button">Create</button>
         </PermissionGate>,
       );

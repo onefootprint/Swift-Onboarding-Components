@@ -1,4 +1,3 @@
-import { RoleScopeKind } from '@onefootprint/types';
 import { Button } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -24,7 +23,7 @@ const AddFreeFormNote = () => {
     <>
       <PermissionGate
         fallbackText={t('add-note-button.cta-not-allowed')}
-        scopeKind={RoleScopeKind.manualReview}
+        scopeKind="manual_review"
         tooltipPosition="bottom"
       >
         <Button onClick={handleOpenDialog} size="compact" variant="secondary">

@@ -1,6 +1,5 @@
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import type { ProxyConfig } from '@onefootprint/types';
-import { RoleScopeKind } from '@onefootprint/types';
 import { Box, Dropdown, IconButton, Stack } from '@onefootprint/ui';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -37,7 +36,7 @@ const Actions = ({ proxyConfig }: ActionsProps) => {
   return (
     <Stack justify="flex-end" onClick={e => e.stopPropagation()}>
       <Dropdown.Root open={dropdownOpen} onOpenChange={setDropdownOpen}>
-        <PermissionGate scopeKind={RoleScopeKind.manageVaultProxy} fallbackText={t('not-allowed')}>
+        <PermissionGate scopeKind="manage_vault_proxy" fallbackText={t('not-allowed')}>
           <Dropdown.Trigger asChild>
             <Box>
               <IconButton aria-label={t('aria-label', { name })} size="tiny">

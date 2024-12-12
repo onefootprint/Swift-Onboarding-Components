@@ -1,13 +1,13 @@
-import { RoleScopeKind } from '@onefootprint/types';
+import type { TenantScope } from '@onefootprint/request-types/dashboard';
 
 import useSession from '../use-session';
 
 const usePermissions = () => {
   const session = useSession();
   const scopes = session.data.user?.scopes || [];
-  const isAdmin = scopes.some(s => s.kind === RoleScopeKind.admin);
+  const isAdmin = scopes.some(s => s.kind === 'admin');
 
-  const hasPermission = (scopeKind: RoleScopeKind) => isAdmin || scopes.some(s => s.kind === scopeKind);
+  const hasPermission = (scopeKind: TenantScope['kind']) => isAdmin || scopes.some(s => s.kind === scopeKind);
 
   return {
     hasPermission,

@@ -8,7 +8,6 @@ import Tags from './components/tags';
 import type { WithEntityProps } from '@/entity/components/with-entity';
 import { HEADER_ACTIONS_ID } from '@/entity/constants';
 import { useEntityContext } from '@/entity/hooks/use-entity-context';
-import { RoleScopeKind } from '@onefootprint/types';
 import usePermissions from 'src/hooks/use-permissions';
 import FraudLabel from './components/fraud-label';
 import IdDropdown from './components/id-dropdown';
@@ -22,7 +21,7 @@ const Header = ({ entity, isDisabled }: HeaderProps) => {
   const { t } = useTranslation('entity-details', { keyPrefix: 'header' });
   const { kind } = useEntityContext();
   const { hasPermission } = usePermissions();
-  const hasLabelAndTagPermissions = hasPermission(RoleScopeKind.labelAndTag);
+  const hasLabelAndTagPermissions = hasPermission('label_and_tag');
 
   return (
     <HeaderContainer

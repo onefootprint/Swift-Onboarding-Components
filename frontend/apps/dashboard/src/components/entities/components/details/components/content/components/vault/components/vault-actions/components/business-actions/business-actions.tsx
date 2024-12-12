@@ -1,7 +1,6 @@
 import useEntityId from '@/entity/hooks/use-entity-id';
 import useTags from '@/entity/hooks/use-entity-tags';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
-import { RoleScopeKind } from '@onefootprint/types';
 import { Dropdown, IconButton } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -53,21 +52,21 @@ const BusinessActions = () => {
           <Dropdown.Content align="end" sideOffset={8} minWidth="200px">
             <Dropdown.Group>
               <Dropdown.GroupTitle>{t('management.title')}</Dropdown.GroupTitle>
-              {hasPermission(RoleScopeKind.writeEntities) && (
+              {hasPermission('write_entities') && (
                 <div className="h-8">
                   <Dropdown.Item onSelect={handleDialogOpen(ActionDialog.EditVault)}>
                     {t('management.edit')}
                   </Dropdown.Item>
                 </div>
               )}
-              {hasPermission(RoleScopeKind.labelAndTag) && tagsQuery.data && (
+              {hasPermission('label_and_tag') && tagsQuery.data && (
                 <div className="h-8">
                   <Dropdown.Item onSelect={handleDialogOpen(ActionDialog.EditTags)}>
                     {tagsQuery.data.length > 0 ? t('management.edit-tags') : t('management.add-tags')}
                   </Dropdown.Item>
                 </div>
               )}
-              {hasPermission(RoleScopeKind.writeEntities) && (
+              {hasPermission('write_entities') && (
                 <div className="h-8">
                   <Dropdown.Item onSelect={handleDialogOpen(ActionDialog.UploadDoc)}>
                     {t('management.upload-document')}
@@ -75,7 +74,7 @@ const BusinessActions = () => {
                 </div>
               )}
             </Dropdown.Group>
-            {hasBusinessOwners && hasPermission(RoleScopeKind.manualReview) && (
+            {hasBusinessOwners && hasPermission('manual_review') && (
               <>
                 <Dropdown.Divider />
                 <Dropdown.Group>
@@ -91,16 +90,16 @@ const BusinessActions = () => {
           </Dropdown.Content>
         </Dropdown.Portal>
       </Dropdown.Root>
-      {hasPermission(RoleScopeKind.writeEntities) && (
+      {hasPermission('write_entities') && (
         <EditVaultDrawer open={openDialog === ActionDialog.EditVault} onClose={handleCloseDialog} />
       )}
-      {hasPermission(RoleScopeKind.manualReview) && (
+      {hasPermission('manual_review') && (
         <RequestMoreInfo open={openDialog === ActionDialog.RequestMoreInfo} onClose={handleCloseDialog} />
       )}
-      {hasPermission(RoleScopeKind.labelAndTag) && (
+      {hasPermission('label_and_tag') && (
         <EditTagsDialog open={openDialog === ActionDialog.EditTags} onClose={handleCloseDialog} />
       )}
-      {hasPermission(RoleScopeKind.writeEntities) && (
+      {hasPermission('write_entities') && (
         <UploadDocDialog open={openDialog === ActionDialog.UploadDoc} onClose={handleCloseDialog} />
       )}
     </>

@@ -1,5 +1,4 @@
 import { useToggle } from '@onefootprint/hooks';
-import { RoleScopeKind } from '@onefootprint/types';
 import { Button, Divider } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
@@ -15,7 +14,7 @@ const Roles = () => {
   return (
     <>
       <SectionHeader title={t('header.title')} subtitle={t('header.subtitle')}>
-        <PermissionGate fallbackText={t('header.cta-not-allowed')} scopeKind={RoleScopeKind.apiKeys}>
+        <PermissionGate fallbackText={t('header.cta-not-allowed')} scopeKind="api_keys">
           <Button variant="secondary" onClick={openCreateDialog}>
             {t('header.cta')}
           </Button>

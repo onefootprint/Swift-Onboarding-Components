@@ -1,7 +1,6 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IcoLock24, IcoLockOpen24 } from '@onefootprint/icons';
 import type { Organization } from '@onefootprint/request-types/dashboard';
-import { RoleScopeKind } from '@onefootprint/types';
 import { Divider, Text, Toggle, Tooltip } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -80,11 +79,7 @@ const DomainAccess = ({ org }: DomainAccessProps) => {
             {toggle}
           </Tooltip>
         ) : (
-          <PermissionGate
-            fallbackText={t('toggle.cta-not-allowed')}
-            scopeKind={RoleScopeKind.orgSettings}
-            tooltipPosition="top"
-          >
+          <PermissionGate fallbackText={t('toggle.cta-not-allowed')} scopeKind="org_settings" tooltipPosition="top">
             {toggle}
           </PermissionGate>
         )}

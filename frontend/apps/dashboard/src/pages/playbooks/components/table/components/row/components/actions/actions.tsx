@@ -1,6 +1,5 @@
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
-import { RoleScopeKind } from '@onefootprint/types';
 import { Box, Dropdown, IconButton, Stack } from '@onefootprint/ui';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -46,7 +45,7 @@ const Actions = ({ playbook }: ActionsProps) => {
   return (
     <Stack justify="flex-end" onClick={e => e.stopPropagation()}>
       <Dropdown.Root open={dropdownOpen} onOpenChange={setDropdownOpen}>
-        <PermissionGate scopeKind={RoleScopeKind.onboardingConfiguration} fallbackText={t('not-allowed')}>
+        <PermissionGate scopeKind="onboarding_configuration" fallbackText={t('not-allowed')}>
           <Dropdown.Trigger asChild>
             <Box>
               <IconButton aria-label={t('aria-label', { name })} size="compact">
@@ -63,7 +62,7 @@ const Actions = ({ playbook }: ActionsProps) => {
                   {t('get-link')}
                 </Dropdown.Item>
               )}
-              <PermissionGate scopeKind={RoleScopeKind.onboardingConfiguration} fallbackText={t('not-allowed')}>
+              <PermissionGate scopeKind="onboarding_configuration" fallbackText={t('not-allowed')}>
                 <Dropdown.Item onSelect={launchCopy} onClick={event => event.stopPropagation()}>
                   {t('copy')}
                 </Dropdown.Item>
