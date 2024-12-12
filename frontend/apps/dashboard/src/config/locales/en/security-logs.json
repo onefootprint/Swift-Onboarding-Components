@@ -48,7 +48,9 @@
       "update_org_api_key_status": "API key status updated",
       "update_org_api_key_role": "API key role updated",
       "manually_review_entity": "Entity manually reviewed",
-      "header": "Events"
+      "header": "Events",
+      "show-all-events": "Show all events",
+      "only-selected-events": "Only show these events"
     },
     "dates": {
       "header": "Dates"

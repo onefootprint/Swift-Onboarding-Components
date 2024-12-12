@@ -1,5 +1,5 @@
 import type { AuditEvent } from '@onefootprint/request-types/dashboard';
-import { Divider, LoadingSpinner, SearchInput, Stack, Text, Toggle } from '@onefootprint/ui';
+import { Divider, SearchInput, Stack, Text, Toggle } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -7,7 +7,7 @@ import { MAIN_PAGE_ID } from 'src/config/constants';
 import useGetAccessEvents from 'src/hooks/use-get-access-events';
 import useSession from 'src/hooks/use-session';
 import useSecurityLogsFilters from '../../hooks/use-security-logs-filters';
-import SecurityLogsFilters from './components/security-logs-filters';
+import Filters from './components/filters';
 import Timeline from './components/timeline';
 
 const SecurityLogs = () => {
@@ -108,8 +108,7 @@ const SecurityLogs = () => {
               size="compact"
               placeholder={t('filters.search')}
             />
-            <SecurityLogsFilters />
-            {/* {isFirmEmployee && <Filters />} */}
+            <Filters />
           </Stack>
           <Stack gap={0} alignItems="center">
             <Toggle
@@ -127,11 +126,6 @@ const SecurityLogs = () => {
           isLoading={getAccessEvents.isLoading}
           showDecryptionReason={showDecryptionReason}
         />
-        {(getAccessEvents.isFetchingNextPage || getAccessEvents.isLoading) && (
-          <Stack justifyContent="center" padding={4}>
-            <LoadingSpinner />
-          </Stack>
-        )}
       </Stack>
     </>
   );
