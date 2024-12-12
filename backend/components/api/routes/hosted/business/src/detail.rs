@@ -2,7 +2,6 @@ use crate::types::ApiResponse;
 use crate::State;
 use api_core::auth::ob_config::BoSessionAuth;
 use api_core::errors::business::BusinessError;
-use api_core::utils::vault_wrapper::BusinessOwnerInfo;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_errors::BadRequest;
 use api_errors::BadRequestWithCode;
@@ -68,7 +67,7 @@ pub async fn get(state: web::Data<State>, bo_auth: BoSessionAuth) -> ApiResponse
     // via the backend
     let invited_data = (invited_bo.data)
         .into_iter()
-        .filter(|(di, _)| BusinessOwnerInfo::USER_DIS.contains(di))
+        .filter(|(di, _)| BDK::BO_USER_DIS.contains(di))
         .collect();
 
     let business_name = bvw

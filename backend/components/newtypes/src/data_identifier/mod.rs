@@ -515,6 +515,7 @@ mod tests {
         .collect_vec();
         let plaintext_types = [
             DataIdentifier::Business(BusinessDataKind::Name),
+            DataIdentifier::Business(BusinessDataKind::BeneficialOwnerStake(BoLinkId::api_example())),
             DataIdentifier::Card(CardInfo {
                 alias: AliasId::fixture(),
                 kind: CardDataKind::Issuer,

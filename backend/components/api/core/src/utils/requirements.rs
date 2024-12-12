@@ -1,5 +1,4 @@
 use super::vault_wrapper::Any;
-use super::vault_wrapper::BusinessOwnerInfo;
 use super::vault_wrapper::TenantVw;
 use crate::auth::session::user::AssociatedAuthEvent;
 use crate::auth::user::load_auth_events;
@@ -243,8 +242,7 @@ fn is_cdo_met<Type>(ctx: RequirementContext, vw: &VaultWrapper<Type>, cdo: &CDO)
         CDO::BusinessKycedBeneficialOwners => {
             let is_not_empty = !ctx.kyb_bo_features.bos.is_empty();
             let are_bos_populated = ctx.kyb_bo_features.bos.iter().all(|bo| {
-                let vd_exists =
-                    (BusinessOwnerInfo::USER_DIS.iter()).all(|i| bo.data.iter().any(|(di, _)| di == i));
+                let vd_exists = (BDK::BO_USER_DIS.iter()).all(|i| bo.data.iter().any(|(di, _)| di == i));
                 let stake_di = DataIdentifier::Business(BDK::BeneficialOwnerStake(bo.bo.link_id.clone()));
                 let ownership_stake_exists = vw.has_field(&stake_di);
 

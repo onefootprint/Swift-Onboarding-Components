@@ -1,6 +1,7 @@
 use crate::BoLinkId;
 use crate::CollectedData;
-use crate::DataIdentifier;
+use crate::DataIdentifier as DI;
+use crate::IdentityDataKind as IDK;
 use crate::IsDataIdentifierDiscriminant;
 use itertools::Itertools;
 use strum::EnumDiscriminants;
@@ -31,25 +32,25 @@ pub enum BusinessDataKind {
     BeneficialOwnerStake(BoLinkId),
     /// Note: this variant has a special serialization.
     /// Serializes any data identifier (mostly just identity data) for a given beneficial owner.
-    BeneficialOwnerData(BoLinkId, Box<DataIdentifier>),
+    BeneficialOwnerData(BoLinkId, Box<DI>),
     BeneficialOwnerExplanationMessage,
     CorporationType,
     FormationState,
     FormationDate,
 }
 
-impl From<BusinessDataKind> for DataIdentifier {
+impl From<BusinessDataKind> for DI {
     fn from(value: BusinessDataKind) -> Self {
         Self::Business(value)
     }
 }
 
-impl TryFrom<DataIdentifier> for BusinessDataKind {
+impl TryFrom<DI> for BusinessDataKind {
     type Error = crate::Error;
 
-    fn try_from(value: DataIdentifier) -> Result<Self, Self::Error> {
+    fn try_from(value: DI) -> Result<Self, Self::Error> {
         match value {
-            DataIdentifier::Business(bdk) => Ok(bdk),
+            DI::Business(bdk) => Ok(bdk),
             _ => Err(crate::Error::Custom("Can't convert into BDK".to_owned())),
         }
     }
@@ -80,6 +81,14 @@ impl IsDataIdentifierDiscriminant for BusinessDataKind {
 }
 
 impl BusinessDataKind {
+    /// The list of DIs required for every beneficial owner
+    pub const BO_USER_DIS: &'static [DI; 4] = &[
+        DI::Id(IDK::FirstName),
+        DI::Id(IDK::LastName),
+        DI::Id(IDK::PhoneNumber),
+        DI::Id(IDK::Email),
+    ];
+
     /// The list of BDKs that are searchable by fingerprint
     pub fn searchable() -> Vec<Self> {
         vec![Self::Name, Self::Dba, Self::Website, Self::PhoneNumber, Self::Tin]
@@ -87,11 +96,26 @@ impl BusinessDataKind {
 
     pub fn api_examples() -> Vec<Self> {
         BusinessDataKindDiscriminant::iter()
-            .filter_map(|i| Self::try_from(i).ok())
-            .collect()
+            .flat_map(|i| {
+                if let Ok(result) = Self::try_from(i) {
+                    return vec![result];
+                };
+
+                match i {
+                    BusinessDataKindDiscriminant::BeneficialOwnerStake => {
+                        vec![Self::BeneficialOwnerStake(BoLinkId::api_example())]
+                    }
+                    BusinessDataKindDiscriminant::BeneficialOwnerData => Self::BO_USER_DIS
+                        .iter()
+                        .map(|di| Self::bo_data(BoLinkId::api_example(), di.clone()))
+                        .collect_vec(),
+                    _ => vec![],
+                }
+            })
+            .collect_vec()
     }
 
-    pub fn bo_data(link_id: BoLinkId, di: impl Into<DataIdentifier>) -> Self {
+    pub fn bo_data(link_id: BoLinkId, di: impl Into<DI>) -> Self {
         Self::BeneficialOwnerData(link_id, Box::new(di.into()))
     }
 }
@@ -112,15 +136,15 @@ impl TryFrom<BusinessDataKindDiscriminant> for BusinessDataKind {
             BusinessDataKindDiscriminant::State => Self::State,
             BusinessDataKindDiscriminant::Zip => Self::Zip,
             BusinessDataKindDiscriminant::Country => Self::Country,
-            BusinessDataKindDiscriminant::BeneficialOwnerStake => {
-                return Err(strum::ParseError::VariantNotFound)
-            }
             BusinessDataKindDiscriminant::BeneficialOwnerExplanationMessage => {
                 Self::BeneficialOwnerExplanationMessage
             }
             BusinessDataKindDiscriminant::CorporationType => Self::CorporationType,
             BusinessDataKindDiscriminant::FormationState => Self::FormationState,
             BusinessDataKindDiscriminant::FormationDate => Self::FormationDate,
+            BusinessDataKindDiscriminant::BeneficialOwnerStake => {
+                return Err(strum::ParseError::VariantNotFound)
+            }
             BusinessDataKindDiscriminant::BeneficialOwnerData => {
                 return Err(strum::ParseError::VariantNotFound)
             }
@@ -152,8 +176,7 @@ impl std::str::FromStr for BusinessDataKind {
             let di = match remaining.as_str() {
                 "ownership_stake" => Self::BeneficialOwnerStake(link_id),
                 remaining => {
-                    let di = DataIdentifier::from_str(remaining)
-                        .map_err(|_| strum::ParseError::VariantNotFound)?;
+                    let di = DI::from_str(remaining).map_err(|_| strum::ParseError::VariantNotFound)?;
                     Self::bo_data(link_id, di)
                 }
             };

@@ -1952,6 +1952,12 @@
                                 "business.state",
                                 "business.zip",
                                 "business.country",
+                                "business.beneficial_owners.*.ownership_stake",
+                                "business.beneficial_owners.*.id.first_name",
+                                "business.beneficial_owners.*.id.last_name",
+                                "business.beneficial_owners.*.id.phone_number",
+                                "business.beneficial_owners.*.id.email",
+                                "business.beneficial_owner_explanation_message",
                                 "business.corporation_type",
                                 "business.formation_state",
                                 "business.formation_date",
@@ -3198,6 +3204,12 @@
                     "business.state",
                     "business.zip",
                     "business.country",
+                    "business.beneficial_owners.*.ownership_stake",
+                    "business.beneficial_owners.*.id.first_name",
+                    "business.beneficial_owners.*.id.last_name",
+                    "business.beneficial_owners.*.id.phone_number",
+                    "business.beneficial_owners.*.id.email",
+                    "business.beneficial_owner_explanation_message",
                     "business.corporation_type",
                     "business.formation_state",
                     "business.formation_date",
@@ -4745,6 +4757,24 @@
                     "business.address_line2": {
                         "type": "string"
                     },
+                    "business.beneficial_owner_explanation_message": {
+                        "type": "string"
+                    },
+                    "business.beneficial_owners.*.id.email": {
+                        "type": "string"
+                    },
+                    "business.beneficial_owners.*.id.first_name": {
+                        "type": "string"
+                    },
+                    "business.beneficial_owners.*.id.last_name": {
+                        "type": "string"
+                    },
+                    "business.beneficial_owners.*.id.phone_number": {
+                        "type": "string"
+                    },
+                    "business.beneficial_owners.*.ownership_stake": {
+                        "type": "string"
+                    },
                     "business.city": {
                         "type": "string"
                     },
@@ -4798,6 +4828,24 @@
                         "type": "string"
                     },
                     "business.address_line2": {
+                        "type": "string"
+                    },
+                    "business.beneficial_owner_explanation_message": {
+                        "type": "string"
+                    },
+                    "business.beneficial_owners.*.id.email": {
+                        "type": "string"
+                    },
+                    "business.beneficial_owners.*.id.first_name": {
+                        "type": "string"
+                    },
+                    "business.beneficial_owners.*.id.last_name": {
+                        "type": "string"
+                    },
+                    "business.beneficial_owners.*.id.phone_number": {
+                        "type": "string"
+                    },
+                    "business.beneficial_owners.*.ownership_stake": {
                         "type": "string"
                     },
                     "business.city": {

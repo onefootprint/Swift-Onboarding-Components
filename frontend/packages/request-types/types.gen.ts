@@ -253,6 +253,12 @@ export type DataIdentifier =
   | 'business.state'
   | 'business.zip'
   | 'business.country'
+  | 'business.beneficial_owners.*.ownership_stake'
+  | 'business.beneficial_owners.*.id.first_name'
+  | 'business.beneficial_owners.*.id.last_name'
+  | 'business.beneficial_owners.*.id.phone_number'
+  | 'business.beneficial_owners.*.id.email'
+  | 'business.beneficial_owner_explanation_message'
   | 'business.corporation_type'
   | 'business.formation_state'
   | 'business.formation_date'
@@ -1182,6 +1188,12 @@ export type LoginChallengeRequest = {
 export type ModernBusinessDecryptResponse = {
   'business.address_line1'?: string;
   'business.address_line2'?: string;
+  'business.beneficial_owner_explanation_message'?: string;
+  'business.beneficial_owners.*.id.email'?: string;
+  'business.beneficial_owners.*.id.first_name'?: string;
+  'business.beneficial_owners.*.id.last_name'?: string;
+  'business.beneficial_owners.*.id.phone_number'?: string;
+  'business.beneficial_owners.*.ownership_stake'?: string;
   'business.city'?: string;
   'business.corporation_type'?: string;
   'business.country'?: string;
@@ -1199,6 +1211,12 @@ export type ModernBusinessDecryptResponse = {
 export type ModernRawBusinessDataRequest = {
   'business.address_line1'?: string;
   'business.address_line2'?: string;
+  'business.beneficial_owner_explanation_message'?: string;
+  'business.beneficial_owners.*.id.email'?: string;
+  'business.beneficial_owners.*.id.first_name'?: string;
+  'business.beneficial_owners.*.id.last_name'?: string;
+  'business.beneficial_owners.*.id.phone_number'?: string;
+  'business.beneficial_owners.*.ownership_stake'?: string;
   'business.city'?: string;
   'business.corporation_type'?: string;
   'business.country'?: string;
@@ -3208,6 +3226,12 @@ export type PostHostedUserUploadByDocumentIdentifierData = {
       | 'business.state'
       | 'business.zip'
       | 'business.country'
+      | 'business.beneficial_owners.*.ownership_stake'
+      | 'business.beneficial_owners.*.id.first_name'
+      | 'business.beneficial_owners.*.id.last_name'
+      | 'business.beneficial_owners.*.id.phone_number'
+      | 'business.beneficial_owners.*.id.email'
+      | 'business.beneficial_owner_explanation_message'
       | 'business.corporation_type'
       | 'business.formation_state'
       | 'business.formation_date'

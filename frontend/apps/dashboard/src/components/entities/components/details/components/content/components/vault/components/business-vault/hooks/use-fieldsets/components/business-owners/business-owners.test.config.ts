@@ -9,7 +9,6 @@ export const entityFixture = getEntity({
       source: 'client_tenant',
       dataKind: 'vault_data',
       transforms: {},
-      // @ts-expect-error fix once we migrate to the new entity types
       identifier: 'business.beneficial_owner_explanation_message',
       isDecryptable: true,
       value:

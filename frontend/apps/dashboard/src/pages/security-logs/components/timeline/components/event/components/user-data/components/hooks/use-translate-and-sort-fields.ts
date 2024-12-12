@@ -27,7 +27,6 @@ const useTranslateAndSortFields = (dis: DataIdentifier[], cdos: CollectedDataOpt
         sortKey: 'custom',
       };
 
-    // @ts-expect-error: Display undocumented DI as "Beneficial owners"
     if (di.startsWith('business.beneficial_owners.') || di === 'business.beneficial_owner_explanation_message')
       return {
         key: di,

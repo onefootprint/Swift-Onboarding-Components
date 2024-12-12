@@ -59,13 +59,6 @@ pub struct BusinessOwnerInfo {
 }
 
 impl BusinessOwnerInfo {
-    pub const USER_DIS: &'static [DI; 4] = &[
-        DI::Id(IDK::FirstName),
-        DI::Id(IDK::LastName),
-        DI::Id(IDK::PhoneNumber),
-        DI::Id(IDK::Email),
-    ];
-
     pub fn name(mut self) -> Option<(PiiString, PiiString)> {
         let first_name = self.data.remove(&IDK::FirstName.into());
         let last_name = self.data.remove(&IDK::LastName.into());
@@ -101,7 +94,7 @@ impl TenantVw<Business> {
             })
             .await?;
 
-        let bo_data_dis = iproduct!(linked_bos.iter(), BusinessOwnerInfo::USER_DIS)
+        let bo_data_dis = iproduct!(linked_bos.iter(), BDK::BO_USER_DIS)
             .map(|((bo, _), di)| BDK::bo_data(bo.link_id.clone(), di.clone()).into());
         let bo_stake_dis = linked_bos
             .iter()
@@ -128,7 +121,7 @@ impl TenantVw<Business> {
 
         let decrypt_futs = bo_vws.into_iter().map(|(sv_id, vw)| async move {
             let decrypted = vw
-                .decrypt_unchecked(&state.enclave_client, BusinessOwnerInfo::USER_DIS)
+                .decrypt_unchecked(&state.enclave_client, BDK::BO_USER_DIS)
                 .await?;
             let results = (decrypted.results)
                 .into_iter()

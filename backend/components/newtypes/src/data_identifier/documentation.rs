@@ -31,7 +31,6 @@ impl DataIdentifier {
                 .collect_vec(),
             DataIdentifierDiscriminant::Business => BDK::api_examples()
                 .into_iter()
-                .filter(|bdk| !matches!(bdk, BDK::BeneficialOwnerExplanationMessage))
                 .map(DataIdentifier::from)
                 .collect_vec(),
             DataIdentifierDiscriminant::InvestorProfile => {

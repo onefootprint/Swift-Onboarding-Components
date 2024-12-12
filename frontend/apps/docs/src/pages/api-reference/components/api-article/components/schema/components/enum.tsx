@@ -12,9 +12,14 @@ const THRESHOLD = 40;
 
 const Enum = ({ enums }: EnumProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.api-reference' });
-  const [expanded, setExpanded] = useState(() => enums.length < THRESHOLD);
-  const shouldShowAllButton = enums.length > THRESHOLD;
-  const items = expanded ? enums : enums.slice(0, THRESHOLD);
+
+  const filteredEnumValues = enums.filter(
+    // Hide beneficial owner data. There are separate APIs for tenants to get BO data
+    v => !v.startsWith('business.beneficial_owners.*.') && v !== 'business.beneficial_owner_explanation_message',
+  );
+  const [expanded, setExpanded] = useState(() => filteredEnumValues.length < THRESHOLD);
+  const shouldShowAllButton = filteredEnumValues.length > THRESHOLD;
+  const items = expanded ? filteredEnumValues : filteredEnumValues.slice(0, THRESHOLD);
 
   const groupedItems = items.reduce((acc: string[][], item: string) => {
     const [first] = item.split('.');

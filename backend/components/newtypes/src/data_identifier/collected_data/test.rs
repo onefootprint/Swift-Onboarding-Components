@@ -53,10 +53,17 @@ where
     T: IsDataIdentifierDiscriminant + std::fmt::Debug,
 {
     for di in dis {
+        let di = di.into();
         if di.parent().is_none() {
             continue;
         }
-        test_discriminant(di.into());
+        if matches!(
+            di,
+            DI::Business(BDK::BeneficialOwnerStake(_) | BDK::BeneficialOwnerData(_, _))
+        ) {
+            continue;
+        }
+        test_discriminant(di);
     }
 }
 

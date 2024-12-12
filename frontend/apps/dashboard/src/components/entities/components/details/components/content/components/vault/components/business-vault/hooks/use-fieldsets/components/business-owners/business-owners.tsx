@@ -16,7 +16,6 @@ const BusinessOwners = ({ entity }: BusinessOwnersProps) => {
     }),
   );
   const explanationMessage = entity.data
-    //@ts-expect-error fix
     .find(item => item.identifier === 'business.beneficial_owner_explanation_message')
     ?.value?.toString();
 

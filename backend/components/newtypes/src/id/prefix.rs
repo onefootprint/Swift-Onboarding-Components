@@ -118,6 +118,10 @@ impl BoLinkId {
             BusinessOwnerKind::Secondary => Self(generate_random_id(Self::PREFIX, Self::LENGTH)),
         }
     }
+
+    pub fn api_example() -> Self {
+        Self("*".to_string())
+    }
 }
 
 impl AuditEventId {
