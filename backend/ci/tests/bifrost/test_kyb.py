@@ -135,7 +135,7 @@ def test_business_owners(sandbox_tenant, beneficial_owners):
     # check biz insights, we only expect to see it if the business has completed onboarding and we
     # got a middesk response
     should_see_biz_insights = expected_business_status == "pass"
-    insights_response = get(
+    insights_response_legacy = get(
         f"/entities/{user.fp_bid}/business_insights",
         None,
         *sandbox_tenant.db_auths,
@@ -143,7 +143,19 @@ def test_business_owners(sandbox_tenant, beneficial_owners):
     )
 
     if should_see_biz_insights:
-        assert insights_response["details"]["entity_type"]
+        assert insights_response_legacy["details"]["entity_type"]
+        # Check the onboarding specific endpoint
+        onboardings = get(
+            f"entities/{user.fp_bid}/onboardings", None, *sandbox_tenant.db_auths
+        )
+        onboarding_id = onboardings["data"][0]["id"]
+
+        insights_response_new = get(
+            f"entities/{user.fp_bid}/onboardings/{onboarding_id}/business_insights",
+            None,
+            *sandbox_tenant.db_auths,
+        )
+        assert insights_response_new["details"]["entity_type"]
 
 
 def test_skip_kyb(sandbox_tenant, must_collect_data):

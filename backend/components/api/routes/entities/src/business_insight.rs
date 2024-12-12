@@ -17,7 +17,8 @@ use idv::middesk::response::business::BusinessResponse;
 use newtypes::vendor_api_struct::MiddeskBusinessUpdateWebhook;
 use newtypes::vendor_api_struct::MiddeskGetBusiness;
 use newtypes::BusinessDataKind as BDK;
-use newtypes::ScopedVaultId;
+use newtypes::FpId;
+use newtypes::WorkflowId;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
 use paperclip::actix::web;
@@ -44,19 +45,45 @@ pub async fn get_business_insights(
         })
         .await?;
 
-    let business_response = get_business_response(&state, sv.id, vw).await?;
+    let business_response = get_business_response(&state, VReqIdentifier::LatestForSv(sv.id), vw).await?;
+    Ok(BusinessInsights::from(business_response))
+}
+
+#[api_v2_operation(
+    description = "Retrieve business insights for a given fp_bid and onboarding.",
+    tags(EntityDetails, Entities, Private)
+)]
+#[get("/entities/{fp_bid}/onboardings/{onboarding_id}/business_insights")]
+pub async fn get_onboarding_business_insights(
+    state: web::Data<State>,
+    request: web::Path<(FpId, WorkflowId)>,
+    auth: TenantSessionAuth,
+) -> ApiResponse<BusinessInsights> {
+    let auth = auth.check_guard(CanDecrypt::new(BDK::api_examples()))?;
+    let tenant_id = auth.tenant().id.clone();
+    let is_live = auth.is_live()?;
+    let (fp_id, wf_id) = request.into_inner();
+    let vw = state
+        .db_query(move |conn| {
+            let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
+            let vw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv.id))?;
+            Ok(vw)
+        })
+        .await?;
+
+    let business_response = get_business_response(&state, VReqIdentifier::WfId(wf_id), vw).await?;
     Ok(BusinessInsights::from(business_response))
 }
 
 #[tracing::instrument(skip(state))]
 async fn get_business_response(
     state: &State,
-    sv_id: ScopedVaultId,
+    vreq_identifier: VReqIdentifier,
     vw: VaultWrapper<Any>,
 ) -> FpResult<BusinessResponse> {
     let webhook_biz_response = load_response_for_vendor_api(
         state,
-        VReqIdentifier::LatestForSv(sv_id.clone()),
+        vreq_identifier.clone(),
         &vw.vault.e_private_key,
         MiddeskBusinessUpdateWebhook,
     )
@@ -68,7 +95,7 @@ async fn get_business_response(
         Some(response) => Some(response),
         None => load_response_for_vendor_api(
             state,
-            VReqIdentifier::LatestForSv(sv_id),
+            vreq_identifier,
             &vw.vault.e_private_key,
             MiddeskGetBusiness,
         )

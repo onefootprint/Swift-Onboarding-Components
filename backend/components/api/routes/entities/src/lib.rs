@@ -55,6 +55,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(businesses::get)
         .service(user_insight::get)
         .service(business_insight::get_business_insights)
+        .service(business_insight::get_onboarding_business_insights)
         .service(dupes::get_dupes)
         .service(tags::get)
         .service(tags::post)
