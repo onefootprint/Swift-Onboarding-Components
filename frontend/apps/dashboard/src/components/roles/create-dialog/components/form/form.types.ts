@@ -1,4 +1,4 @@
-import type { BasicRoleScopeKind } from '@onefootprint/types';
+import type { TenantScope } from '@onefootprint/request-types/dashboard';
 import type { DecryptOption, VaultProxyOption } from 'src/components/roles';
 
 export type VaultProxySelectOption = {
@@ -10,7 +10,7 @@ export type FormData = {
   decryptOptions: { label: string; value: DecryptOption }[];
   vaultProxyConfigs: VaultProxySelectOption[];
   name: string;
-  scopeKinds: BasicRoleScopeKind[];
+  scopeKinds: TenantScope[];
   showDecrypt: boolean;
   showProxyConfigs: boolean;
 };

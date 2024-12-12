@@ -2,6 +2,7 @@ import type { InvokeVaultProxyRoleScope, RoleScope } from '@onefootprint/types';
 import { RoleScopeKind } from '@onefootprint/types';
 import { useTranslation } from 'react-i18next';
 
+import type { TenantScope } from '@onefootprint/request-types/dashboard';
 import useProxyConfigs from './use-proxy-configs';
 
 // These aren't sent to the API - just used to represent all the options of decryptable things in
@@ -13,6 +14,9 @@ export enum VaultProxyOptionKind {
 
 export type VaultProxyOption = VaultProxyOptionKind | string;
 
+/**
+ * @deprecated This function is deprecated and will be removed in future versions.
+ */
 export const vaultProxyOptionFromScope = (scope: RoleScope): VaultProxyOption | undefined => {
   if (scope.kind !== RoleScopeKind.invokeVaultProxy) {
     return undefined;
@@ -23,12 +27,25 @@ export const vaultProxyOptionFromScope = (scope: RoleScope): VaultProxyOption | 
   return scope.data.id;
 };
 
+/**
+ * @deprecated This function is deprecated and will be removed in future versions.
+ */
 export const scopeFromVaultProxyOption = (option: VaultProxyOption): InvokeVaultProxyRoleScope => {
   if (option === VaultProxyOptionKind.all || option === VaultProxyOptionKind.jit) {
     return { kind: RoleScopeKind.invokeVaultProxy, data: { kind: option } };
   }
   return {
     kind: RoleScopeKind.invokeVaultProxy,
+    data: { kind: 'id', id: option },
+  };
+};
+
+export const tenantScopeFromVaultProxyOption = (option: VaultProxyOption): TenantScope => {
+  if (option === VaultProxyOptionKind.all || option === VaultProxyOptionKind.jit) {
+    return { kind: 'invoke_vault_proxy', data: { kind: option } };
+  }
+  return {
+    kind: 'invoke_vault_proxy',
     data: { kind: 'id', id: option },
   };
 };

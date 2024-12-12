@@ -1,13 +1,16 @@
-import type { Role, UpdateRoleRequest } from '@onefootprint/types';
-import { Dialog } from '@onefootprint/ui';
+import { patchOrgRolesByTenantRoleIdMutation } from '@onefootprint/axios/dashboard';
+import type { UpdateTenantRoleRequest } from '@onefootprint/request-types/dashboard';
+import { getErrorMessage } from '@onefootprint/request/src/request';
+import type { Role } from '@onefootprint/types';
+import { Dialog, useToast } from '@onefootprint/ui';
+import { useMutation } from '@tanstack/react-query';
 import { forwardRef, useImperativeHandle, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Form from 'src/components/roles/create-dialog/components/form';
 import type { VaultProxySelectOption } from 'src/components/roles/create-dialog/components/form/form.types';
 import { useVaultProxyOptions } from 'src/components/roles/hooks';
 import groupScopes from 'src/components/roles/utils/group-scopes';
-
-import useEditRole from './hooks/use-edit-role';
+import useInvalidateQueries from 'src/hooks/use-invalidate-queries';
 
 export type EditHandler = {
   edit: () => void;
@@ -25,8 +28,10 @@ const Edit = forwardRef<EditHandler, EditProps>(({ role }, ref) => {
   const { t: scopesT } = useTranslation('roles', {
     keyPrefix: 'scopes',
   });
+  const toast = useToast();
+  const invalidateQueries = useInvalidateQueries();
   const [open, setOpen] = useState(false);
-  const editRoleMutation = useEditRole(role.id);
+  const editRoleMutation = useMutation(patchOrgRolesByTenantRoleIdMutation({ throwOnError: true }));
   const { allOptions: allVaultProxyOptions } = useVaultProxyOptions();
   const { decryptOptions, basicScopes, vaultProxyOptions } = groupScopes(role.scopes);
 
@@ -46,8 +51,30 @@ const Edit = forwardRef<EditHandler, EditProps>(({ role }, ref) => {
     setOpen(false);
   };
 
-  const handleSubmit = (payload: UpdateRoleRequest) => {
-    editRoleMutation.mutate(payload, { onSuccess: handleClose });
+  const handleSubmit = (payload: UpdateTenantRoleRequest) => {
+    editRoleMutation.mutate(
+      {
+        body: payload,
+        path: { tenantRoleId: role.id },
+      },
+      {
+        onSuccess: response => {
+          toast.show({
+            title: t('notifications.success.title'),
+            description: t('notifications.success.description', { name: response?.name }),
+          });
+          invalidateQueries();
+          handleClose();
+        },
+        onError: (error: unknown) => {
+          toast.show({
+            title: t('notifications.error.title'),
+            description: getErrorMessage(error),
+            variant: 'error',
+          });
+        },
+      },
+    );
   };
 
   useImperativeHandle(
@@ -87,7 +114,7 @@ const Edit = forwardRef<EditHandler, EditProps>(({ role }, ref) => {
           vaultProxyConfigs: selectedVaultProxyOptions,
           showProxyConfigs: !!vaultProxyOptions.length,
           name: role.name,
-          scopeKinds: basicScopes.map(s => s.kind),
+          scopeKinds: basicScopes,
         }}
         kind={role.kind}
       />

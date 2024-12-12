@@ -1,18 +1,21 @@
-import type { CreateRoleRequest, RoleKind, RoleScope, UpdateRoleRequest } from '@onefootprint/types';
-import { RoleScopeKind } from '@onefootprint/types';
 import { Box, Form as FormComponent } from '@onefootprint/ui';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { DecryptOptionToRoleScope } from '../../../hooks/use-decrypt-options';
-import { scopeFromVaultProxyOption } from '../../../hooks/use-vault-proxy-options';
+import type {
+  CreateTenantRoleRequest,
+  TenantRoleKindDiscriminant,
+  TenantScope,
+} from '@onefootprint/request-types/dashboard';
+import { DecryptOptionToTenantScope } from '../../../hooks/use-decrypt-options';
+import { tenantScopeFromVaultProxyOption } from '../../../hooks/use-vault-proxy-options';
 import Permissions from './components/permissions';
 import type { FormData } from './form.types';
 
 export type FormProps = {
   defaultValues?: FormData;
-  onSubmit: (payload: CreateRoleRequest | UpdateRoleRequest) => void;
-  kind: RoleKind;
+  onSubmit: (payload: CreateTenantRoleRequest) => void;
+  kind: TenantRoleKindDiscriminant;
 };
 
 const Form = ({
@@ -39,13 +42,14 @@ const Form = ({
 
   const handleAfterSubmit = (formData: FormData) => {
     const { name, scopeKinds, decryptOptions, vaultProxyConfigs } = formData;
-    const decryptScopes = decryptOptions.map(({ value }) => DecryptOptionToRoleScope[value]);
-    const vaultProxyScopes: RoleScope[] = vaultProxyConfigs.map(({ value }) => scopeFromVaultProxyOption(value));
-    if (!scopeKinds.includes(RoleScopeKind.read)) {
-      scopeKinds.push(RoleScopeKind.read);
+    const decryptScopes = decryptOptions.map(({ value }) => DecryptOptionToTenantScope[value]);
+    const vaultProxyScopes: TenantScope[] = vaultProxyConfigs.map(({ value }) =>
+      tenantScopeFromVaultProxyOption(value),
+    );
+    if (!scopeKinds.some(s => s.kind === 'read')) {
+      scopeKinds.push({ kind: 'read' });
     }
-    const scopes = scopeKinds.map(s => ({ kind: s }));
-    const allScopes: RoleScope[] = [...scopes, ...decryptScopes, ...vaultProxyScopes];
+    const allScopes: TenantScope[] = [...scopeKinds, ...decryptScopes, ...vaultProxyScopes];
     onSubmit({
       name,
       scopes: allScopes,

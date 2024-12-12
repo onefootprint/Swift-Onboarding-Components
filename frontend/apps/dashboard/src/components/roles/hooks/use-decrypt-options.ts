@@ -1,3 +1,4 @@
+import type { TenantScope } from '@onefootprint/request-types/dashboard';
 import type { RoleScope } from '@onefootprint/types';
 import { CollectedInvestorProfileDataOption, CollectedKycDataOption, RoleScopeKind } from '@onefootprint/types';
 import { useTranslation } from 'react-i18next';
@@ -21,11 +22,17 @@ export enum DecryptOption {
 }
 
 /// Reverse lookup of DecryptOptionToRoleScope
+/**
+ * @deprecated This function is deprecated and will be removed in future versions.
+ */
 export const decryptOptionFromScope = (scope: RoleScope): DecryptOption | undefined => {
   const result = Object.entries(DecryptOptionToRoleScope).find(opt => scopeEqual(opt[1], scope));
   return result?.[0] as DecryptOption;
 };
 
+/**
+ * @deprecated This function is deprecated and will be removed in future versions.
+ */
 const scopeEqual = (a: RoleScope, b: RoleScope) => {
   // Non-decrypt scopes just need the type to match
   if (a.kind !== RoleScopeKind.decrypt && a.kind === b.kind) {
@@ -38,6 +45,30 @@ const scopeEqual = (a: RoleScope, b: RoleScope) => {
   return false;
 };
 
+export const decryptOptionFromTenantScope = (scope: TenantScope): DecryptOption | undefined => {
+  const result = Object.entries(DecryptOptionToTenantScope).find(opt => scope.kind === opt[1].kind);
+  return result?.[0] as DecryptOption;
+};
+
+export const DecryptOptionToTenantScope: Record<DecryptOption, TenantScope> = {
+  [DecryptOption.all]: { kind: 'decrypt_all' },
+  [DecryptOption.name]: { kind: 'decrypt', data: 'name' },
+  [DecryptOption.email]: { kind: 'decrypt', data: 'email' },
+  [DecryptOption.phoneNumber]: { kind: 'decrypt', data: 'phone_number' },
+  [DecryptOption.ssn9]: { kind: 'decrypt', data: 'ssn9' },
+  [DecryptOption.ssn4]: { kind: 'decrypt', data: 'ssn4' },
+  [DecryptOption.dob]: { kind: 'decrypt', data: 'dob' },
+  [DecryptOption.documents]: { kind: 'decrypt_document' },
+  [DecryptOption.fullAddress]: { kind: 'decrypt', data: 'full_address' },
+  [DecryptOption.usLegalStatus]: { kind: 'decrypt', data: 'us_legal_status' },
+  [DecryptOption.custom]: { kind: 'decrypt_custom' },
+  [DecryptOption.investorProfile]: { kind: 'decrypt', data: 'investor_profile' },
+  [DecryptOption.card]: { kind: 'decrypt', data: 'card' },
+};
+
+/**
+ * @deprecated This function is deprecated and will be removed in future versions.
+ */
 export const DecryptOptionToRoleScope: Record<DecryptOption, RoleScope> = {
   [DecryptOption.all]: { kind: RoleScopeKind.decryptAll },
   [DecryptOption.name]: {

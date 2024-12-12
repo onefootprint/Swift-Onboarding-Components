@@ -1,6 +1,6 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
-import type { RoleKind } from '@onefootprint/types';
-import { RoleScopeKind, supportedRoleKinds } from '@onefootprint/types';
+import type { TenantRoleKindDiscriminant } from '@onefootprint/request-types/dashboard';
+import { type RoleKind, RoleScopeKind, supportedRoleKinds } from '@onefootprint/types';
 import { Box, Checkbox, MultiSelect, Text, createFontStyles } from '@onefootprint/ui';
 import { useEffect } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
@@ -9,7 +9,7 @@ import { useDecryptOptions, useVaultProxyOptions } from 'src/components/roles';
 import styled, { css } from 'styled-components';
 
 export type PermissionsProps = {
-  kind: RoleKind;
+  kind: TenantRoleKindDiscriminant;
 };
 
 const Permissions = ({ kind }: PermissionsProps) => {
@@ -36,13 +36,14 @@ const Permissions = ({ kind }: PermissionsProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showProxySelect]);
 
-  const supportedScopeKinds = Object.values(RoleScopeKind).filter(s => {
+  // TODO: find a good place to do something like supportedRoleKinds with the new types
+  const supportedScopeKinds: RoleScopeKind[] = Object.values(RoleScopeKind).filter(s => {
     // For legacy roles, all scopes are supported
     if (!kind) {
       return true;
     }
 
-    return supportedRoleKinds[s].includes(kind);
+    return supportedRoleKinds[s].includes(kind as RoleKind);
   });
 
   return (

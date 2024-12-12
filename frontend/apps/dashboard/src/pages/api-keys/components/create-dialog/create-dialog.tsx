@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import { postOrgApiKeysMutation } from '@onefootprint/axios/dashboard';
 import { getOrgRolesOptions } from '@onefootprint/axios/dashboard';
-import { useRequestErrorToast } from '@onefootprint/hooks';
+import { getErrorMessage } from '@onefootprint/request';
 import type { OrganizationRole } from '@onefootprint/request-types/dashboard';
 import useInvalidateQueries from 'src/hooks/use-invalidate-queries';
 import Loading from './components/loading';
@@ -27,11 +27,9 @@ const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>();
-  const showErrorToast = useRequestErrorToast();
   const invalidateQueries = useInvalidateQueries();
   const rolesQuery = useQuery(getOrgRolesOptions({ params: { kind: 'api_key' } }));
-
-  const createApiKeyMutation = useMutation(postOrgApiKeysMutation());
+  const createApiKeyMutation = useMutation(postOrgApiKeysMutation({ throwOnError: true }));
 
   const handleClose = () => {
     reset();
@@ -46,15 +44,17 @@ const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
       {
         onSuccess: () => {
           toast.show({
-            title: t('feedback.success.title'),
-            description: t('feedback.success.description'),
+            title: t('notifications.success.title'),
+            description: t('notifications.success.description'),
           });
           invalidateQueries();
           handleClose();
         },
         onError: (e: Error) => {
-          showErrorToast(e);
-          invalidateQueries();
+          toast.show({
+            title: t('notifications.error.title'),
+            description: getErrorMessage(e),
+          });
         },
       },
     );

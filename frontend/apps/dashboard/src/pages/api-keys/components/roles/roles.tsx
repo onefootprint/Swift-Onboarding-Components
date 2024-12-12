@@ -1,6 +1,6 @@
 import { useToggle } from '@onefootprint/hooks';
-import { RoleKind, RoleScopeKind } from '@onefootprint/types';
-import { Box, Button, Divider } from '@onefootprint/ui';
+import { RoleScopeKind } from '@onefootprint/types';
+import { Button, Divider } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
 import CreateDialog from 'src/components/roles/create-dialog';
@@ -21,11 +21,11 @@ const Roles = () => {
           </Button>
         </PermissionGate>
       </SectionHeader>
-      <Box marginTop={5} marginBottom={5}>
+      <div className="mt-4 mb-4">
         <Divider />
-      </Box>
+      </div>
       <Table />
-      <CreateDialog open={isCreateDialogOpen} handleClose={closeCreateDialog} kind={RoleKind.apiKey} />
+      <CreateDialog open={isCreateDialogOpen} handleClose={closeCreateDialog} kind="api_key" />
     </>
   );
 };
