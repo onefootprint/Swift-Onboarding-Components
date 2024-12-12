@@ -6,7 +6,8 @@
       "title": "Management",
       "edit": "Edit business information",
       "edit-tags": "Edit tags",
-      "add-tags": "Add tags"
+      "add-tags": "Add tags",
+      "upload-document": "Upload document"
     },
     "requests": {
       "title": "Requests",

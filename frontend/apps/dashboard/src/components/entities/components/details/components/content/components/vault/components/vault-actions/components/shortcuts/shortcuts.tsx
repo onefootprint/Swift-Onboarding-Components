@@ -12,7 +12,7 @@ import useDecryptControls from '../../hooks/use-decrypt-controls';
 import type { VaultActionsControlsProps } from '../../vault-actions';
 import EditVaultDrawer from '../edit-vault-drawer';
 import ManualReviewDialog from '../manual-review/components/manual-review-dialog';
-import RequestMoreInfoDialog from '../request-more-info-dialog';
+import RequestMoreInfoDialog from '../user-actions/components/request-more-info-dialog';
 import Footer from './components/footer/footer';
 import { ActionType } from './shortcuts.types';
 

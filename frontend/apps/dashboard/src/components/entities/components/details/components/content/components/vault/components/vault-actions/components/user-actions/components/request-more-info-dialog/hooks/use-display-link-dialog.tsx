@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import useEntity from '@/entity/hooks/use-entity';
 
 import hasDataIdentifier from 'src/utils/has-data-identifier';
-import useSendTokenLinkMutation from '../../../hooks/use-send-token-link';
+import useSendTokenLinkMutation from '../../../../../hooks/use-send-token-link';
 import LinkDisplay from '../components/link-display';
 
 type UseDisplayLinkDialogProps = {

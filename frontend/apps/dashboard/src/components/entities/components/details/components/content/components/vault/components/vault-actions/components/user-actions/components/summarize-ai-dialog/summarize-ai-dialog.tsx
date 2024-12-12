@@ -9,7 +9,7 @@ import styled, { css } from 'styled-components';
 
 import useEntityId from '@/entity/hooks/use-entity-id';
 
-import useGenerateAiSummaryRequest from '../../hooks/use-ai-summarize';
+import useGenerateAiSummaryRequest from '../../../../hooks/use-ai-summarize';
 
 export type SummarizeAiDialogProps = {
   open: boolean;

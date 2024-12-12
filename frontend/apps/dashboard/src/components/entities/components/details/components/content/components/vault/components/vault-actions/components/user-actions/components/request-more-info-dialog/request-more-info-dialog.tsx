@@ -8,7 +8,7 @@ import { Dialog } from '@onefootprint/ui';
 import type React from 'react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import useSubmitActions from '../../hooks/use-submit-actions';
+import useSubmitActions from '../../../../hooks/use-submit-actions';
 import RequestMoreInfoForm from './components/request-more-info';
 import type { TriggerFormData } from './components/request-more-info/types';
 import { RequestMoreInfoKind } from './components/request-more-info/types';

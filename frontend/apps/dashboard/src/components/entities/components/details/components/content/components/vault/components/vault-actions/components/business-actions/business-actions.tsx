@@ -2,20 +2,21 @@ import useEntityId from '@/entity/hooks/use-entity-id';
 import useTags from '@/entity/hooks/use-entity-tags';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import { RoleScopeKind } from '@onefootprint/types';
-import { Box, Dropdown, IconButton } from '@onefootprint/ui';
+import { Dropdown, IconButton } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useBusinessOwners from 'src/hooks/use-business-owners';
 import usePermissions from 'src/hooks/use-permissions';
-import styled from 'styled-components';
 import EditTagsDialog from '../edit-tags-dialog';
 import EditVaultDrawer from '../edit-vault-drawer';
+import UploadDocDialog from '../upload-doc-dialog';
 import RequestMoreInfo from './components/request-more-info';
 
 enum ActionDialog {
-  RequestMoreInfo = 'request-more-info',
-  EditVault = 'edit-vault',
   EditTags = 'edit-tags',
+  EditVault = 'edit-vault',
+  RequestMoreInfo = 'request-more-info',
+  UploadDoc = 'upload-doc',
 }
 
 const BusinessActions = () => {
@@ -42,23 +43,36 @@ const BusinessActions = () => {
     <>
       <Dropdown.Root open={dropdownOpen} onOpenChange={setDropdownOpen}>
         <Dropdown.Trigger asChild>
-          <Box>
+          <div>
             <IconButton variant="outline" aria-label={t('trigger')} size="compact" disabled={isPending}>
               <IcoDotsHorizontal24 />
             </IconButton>
-          </Box>
+          </div>
         </Dropdown.Trigger>
         <Dropdown.Portal>
           <Dropdown.Content align="end" sideOffset={8} minWidth="200px">
             <Dropdown.Group>
               <Dropdown.GroupTitle>{t('management.title')}</Dropdown.GroupTitle>
               {hasPermission(RoleScopeKind.writeEntities) && (
-                <DropdownItem onSelect={handleDialogOpen(ActionDialog.EditVault)}>{t('management.edit')}</DropdownItem>
+                <div className="h-8">
+                  <Dropdown.Item onSelect={handleDialogOpen(ActionDialog.EditVault)}>
+                    {t('management.edit')}
+                  </Dropdown.Item>
+                </div>
               )}
               {hasPermission(RoleScopeKind.labelAndTag) && tagsQuery.data && (
-                <DropdownItem onSelect={handleDialogOpen(ActionDialog.EditTags)}>
-                  {tagsQuery.data.length > 0 ? t('management.edit-tags') : t('management.add-tags')}
-                </DropdownItem>
+                <div className="h-8">
+                  <Dropdown.Item onSelect={handleDialogOpen(ActionDialog.EditTags)}>
+                    {tagsQuery.data.length > 0 ? t('management.edit-tags') : t('management.add-tags')}
+                  </Dropdown.Item>
+                </div>
+              )}
+              {hasPermission(RoleScopeKind.writeEntities) && (
+                <div className="h-8">
+                  <Dropdown.Item onSelect={handleDialogOpen(ActionDialog.UploadDoc)}>
+                    {t('management.upload-document')}
+                  </Dropdown.Item>
+                </div>
               )}
             </Dropdown.Group>
             {hasBusinessOwners && hasPermission(RoleScopeKind.manualReview) && (
@@ -66,9 +80,11 @@ const BusinessActions = () => {
                 <Dropdown.Divider />
                 <Dropdown.Group>
                   <Dropdown.GroupTitle>{t('requests.title')}</Dropdown.GroupTitle>
-                  <DropdownItem onSelect={handleDialogOpen(ActionDialog.RequestMoreInfo)}>
-                    {t('requests.request-info')}
-                  </DropdownItem>
+                  <div className="h-8">
+                    <Dropdown.Item onSelect={handleDialogOpen(ActionDialog.RequestMoreInfo)}>
+                      {t('requests.request-info')}
+                    </Dropdown.Item>
+                  </div>
                 </Dropdown.Group>
               </>
             )}
@@ -84,12 +100,11 @@ const BusinessActions = () => {
       {hasPermission(RoleScopeKind.labelAndTag) && (
         <EditTagsDialog open={openDialog === ActionDialog.EditTags} onClose={handleCloseDialog} />
       )}
+      {hasPermission(RoleScopeKind.writeEntities) && (
+        <UploadDocDialog open={openDialog === ActionDialog.UploadDoc} onClose={handleCloseDialog} />
+      )}
     </>
   );
 };
-
-const DropdownItem = styled(Dropdown.Item)`
-  height: 32px;
-`;
 
 export default BusinessActions;

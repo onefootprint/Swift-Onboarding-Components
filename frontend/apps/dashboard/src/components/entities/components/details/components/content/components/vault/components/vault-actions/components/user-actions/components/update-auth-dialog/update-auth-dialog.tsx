@@ -9,8 +9,8 @@ import styled from 'styled-components';
 import useEntityId from '@/entity/hooks/use-entity-id';
 
 import hasDataIdentifier from 'src/utils/has-data-identifier';
-import useGenerateTokenRequest from '../../hooks/use-generate-token';
-import useSendTokenLinkMutation from '../../hooks/use-send-token-link';
+import useGenerateTokenRequest from '../../../../hooks/use-generate-token';
+import useSendTokenLinkMutation from '../../../../hooks/use-send-token-link';
 
 export type UpdateAuthDialogProps = {
   open: boolean;

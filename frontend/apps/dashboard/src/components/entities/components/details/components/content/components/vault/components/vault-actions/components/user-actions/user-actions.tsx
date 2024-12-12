@@ -1,22 +1,21 @@
+import type { WithEntityProps } from '@/entity/components/with-entity';
+import useTags from '@/entity/hooks/use-entity-tags';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import { type DataIdentifier, IdDI, RoleScopeKind } from '@onefootprint/types';
 import { Box, Dropdown, IconButton } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
-
-import type { WithEntityProps } from '@/entity/components/with-entity';
-import useTags from '@/entity/hooks/use-entity-tags';
 import usePermissions from 'src/hooks/use-permissions';
 import useSession from 'src/hooks/use-session';
+import styled from 'styled-components';
 import DecryptMachineProvider from '../../../../../decrypt-machine';
 import { useOpenDatadog } from '../../hooks/use-open-datadog';
 import EditTagsDialog from '../edit-tags-dialog';
 import EditVaultDrawer from '../edit-vault-drawer';
-import RequestMoreInfoDialog from '../request-more-info-dialog';
-import SummarizeAiDialog from '../summarize-ai-dialog';
-import UpdateAuthDialog from '../update-auth-dialog';
 import UploadDocDialog from '../upload-doc-dialog';
+import RequestMoreInfoDialog from './components/request-more-info-dialog';
+import SummarizeAiDialog from './components/summarize-ai-dialog';
+import UpdateAuthDialog from './components/update-auth-dialog';
 
 enum ActionDialog {
   Auth = 'auth',
