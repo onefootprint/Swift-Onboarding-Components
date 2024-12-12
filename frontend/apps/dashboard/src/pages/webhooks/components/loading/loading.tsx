@@ -1,9 +1,9 @@
-import { Box, LoadingSpinner } from '@onefootprint/ui';
+import { LoadingSpinner } from '@onefootprint/ui';
 
 const Loading = () => (
-  <Box marginTop={12} center>
+  <div className="mt-32 flex items-center justify-center">
     <LoadingSpinner />
-  </Box>
+  </div>
 );
 
 export default Loading;

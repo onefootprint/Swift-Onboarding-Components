@@ -1,7 +1,16 @@
+import type { WebhookPortalResponse } from '@onefootprint/request-types/dashboard';
 import { useTheme } from 'next-themes';
 import dynamic from 'next/dynamic';
 
-import type { GetWebhooksPortalResponse } from '../../hooks/use-webhooks-portal';
+export type ContentProps = {
+  data: WebhookPortalResponse;
+};
+
+const Content = ({ data }: ContentProps) => {
+  const { theme } = useTheme();
+
+  return <AppPortal darkMode={theme === 'dark'} fontFamily="DM Sans" fullSize url={data.url} />;
+};
 
 const AppPortal = dynamic(
   {
@@ -11,15 +20,5 @@ const AppPortal = dynamic(
     ssr: false,
   },
 );
-
-export type ContentProps = {
-  data: GetWebhooksPortalResponse;
-};
-
-const Content = ({ data }: ContentProps) => {
-  const { theme } = useTheme();
-
-  return <AppPortal darkMode={theme === 'dark'} fontFamily="DM Sans" fullSize url={data.url} />;
-};
 
 export default Content;

@@ -1,17 +1,17 @@
+import { getOrgWebhookPortalOptions } from '@onefootprint/axios/dashboard';
 import { getErrorMessage } from '@onefootprint/request';
-import { Box, Stack, Text } from '@onefootprint/ui';
+import { useQuery } from '@tanstack/react-query';
+import { cx } from 'class-variance-authority';
 import Head from 'next/head';
 import { useTranslation } from 'react-i18next';
-
 import Content from './components/content';
 import ErrorComponent from './components/error';
 import Loading from './components/loading';
 import useFakeSpinnerTimeout from './hooks/use-fake-spinner-timeout';
-import useWebhookPortal from './hooks/use-webhooks-portal';
 
 const Webhooks = () => {
   const { t } = useTranslation('webhooks');
-  const { data, error, isPending } = useWebhookPortal();
+  const { data, error, isPending } = useQuery(getOrgWebhookPortalOptions());
   const showSpinner = useFakeSpinnerTimeout();
 
   return (
@@ -19,20 +19,23 @@ const Webhooks = () => {
       <Head>
         <title>{t('page-title')}</title>
       </Head>
-      <Box aria-busy={isPending}>
-        <Stack direction="column" gap={2} marginBottom={7}>
-          <Text variant="heading-2">{t('header.title')}</Text>
-          <Text variant="body-2" color="secondary">
-            {t('header.subtitle')}
-          </Text>
-        </Stack>
-        <Box display={showSpinner ? 'none' : 'block'}>
+      <div aria-busy={isPending}>
+        <div className="flex flex-col gap-2 mb-7">
+          <h2 className="text-heading-2 text-primary">{t('header.title')}</h2>
+          <h3 className="text-body-2 text-secondary">{t('header.subtitle')}</h3>
+        </div>
+        <div
+          className={cx({
+            hidden: showSpinner,
+            block: !showSpinner,
+          })}
+        >
           {data && <Content data={data} />}
           {error && <ErrorComponent message={getErrorMessage(error)} />}
           {isPending && <Loading />}
-        </Box>
+        </div>
         {showSpinner && <Loading />}
-      </Box>
+      </div>
     </>
   );
 };
