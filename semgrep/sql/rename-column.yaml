@@ -1,0 +1,14 @@
+rules:
+  - id: rename-column
+    languages:
+      - generic
+    message: Renaming columns can break dependent code. Consider creating a new column and backfilling data.
+    severity: WARNING
+    patterns:
+      - pattern-regex: (?i)ALTER\s+TABLE\s+.*\s+RENAME\s+COLUMN\s+.*\s+TO\s+.*
+    paths:
+      include:
+        - "*.sql"
+      exclude:
+        - "down.sql"
+

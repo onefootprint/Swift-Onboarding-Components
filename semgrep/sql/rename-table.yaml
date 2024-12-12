@@ -1,0 +1,14 @@
+rules:
+  - id: rename-table
+    languages:
+      - generic
+    message: Renaming tables is unsafe unless the table is not being used. Consider creating a new table and migrating data.
+    severity: WARNING
+    patterns:
+      - pattern-regex: (?i)ALTER\s+TABLE\s[^;]+\sRENAME\s+TO\s
+    paths:
+      include:
+        - "*.sql"
+      exclude:
+        - "down.sql"
+

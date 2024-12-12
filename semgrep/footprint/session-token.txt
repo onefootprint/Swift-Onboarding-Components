@@ -1,0 +1,12 @@
+# ok: session-token
+abctok_
+
+# ok: session-token
+dbtok_abc
+
+# ruleid: session-token
+utok_abc12346ABCabcdefghijkl
+
+# ruleid: session-token
+dbtok_abc12346ABCabcdefghijkl0123
+

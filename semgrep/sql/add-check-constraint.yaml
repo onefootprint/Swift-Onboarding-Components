@@ -1,0 +1,14 @@
+rules:
+  - id: add-check-constraint
+    languages:
+      - generic
+    message: Adding CHECK constraint requires an ACCESS EXCLUSIVE lock. If this table already has live reads, create a NOT VALID constraint and then VALIDATE in a different migration.
+    severity: WARNING
+    patterns:
+      - pattern-regex: (?i)ALTER\s+TABLE\s[^;]+\sADD\s+CONSTRAINT\s[^;]+\sCHECK\s(?![^;]*\s+NOT\s+VALID)
+    paths:
+      include:
+        - "*.sql"
+      exclude:
+        - "down.sql"
+

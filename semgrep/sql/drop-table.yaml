@@ -1,0 +1,14 @@
+rules:
+  - id: drop-table
+    languages:
+      - generic
+    message: Dropping tables can lead to data loss. Ensure this is intentional and all dependencies are removed.
+    severity: WARNING
+    patterns:
+      - pattern-regex: (?i)DROP\s+TABLE\s+(?!IF\s+EXISTS\s)
+    paths:
+      include:
+        - "*.sql"
+      exclude:
+        - "down.sql"
+

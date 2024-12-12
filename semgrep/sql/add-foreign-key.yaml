@@ -1,0 +1,14 @@
+rules:
+  - id: add-foreign-key
+    languages:
+      - generic
+    message: Adding a foreign key requires a SHARE ROW EXCLUSIVE lock. Create the foreign key as NOT VALID and VALIDATE in a different migration.
+    severity: WARNING
+    patterns:
+      - pattern-regex: (?i)ALTER\s+TABLE\s+[^;]+\sADD\s+CONSTRAINT\s+\w+\s+FOREIGN\s+KEY(?![^;]*\s+NOT\s+VALID)
+    paths:
+      include:
+        - "*.sql"
+      exclude:
+        - "down.sql"
+

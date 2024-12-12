@@ -1,0 +1,14 @@
+rules:
+  - id: drop-index
+    languages:
+      - generic
+    message: Use DROP INDEX CONCURRENTLY to avoid taking an ACCESS EXCLUSIVE lock on the table.
+    severity: WARNING
+    patterns:
+      - pattern-regex: (?i)DROP\s+INDEX(?!\s+CONCURRENTLY)
+    paths:
+      include:
+        - "*.sql"
+      exclude:
+        - "down.sql"
+

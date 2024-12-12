@@ -1,0 +1,14 @@
+rules:
+  - id: add-not-null-constraint
+    languages:
+      - generic
+    message: Adding a NOT NULL constraint requires a table scan if there is no existing valid CHECK constraint. Ensure you have added a CHECK constraint with NOT VALID and then VALIDATED the constraint.
+    severity: WARNING
+    patterns:
+      - pattern-regex: (?i)ALTER\s+TABLE\s[^;]+\sSET\s+NOT\s+NULL
+    paths:
+      include:
+        - "*.sql"
+      exclude:
+        - "down.sql"
+

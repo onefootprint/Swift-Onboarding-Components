@@ -1,0 +1,135 @@
+name: Semgrep static analysis
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  semgrep:
+    name: Semgrep static analysis
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+    steps:
+      - uses: 'actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b' # ratchet:actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36
+        id: files-changed
+        with:
+          list-files: shell
+          predicate-quantifier: 'every'
+          filters: |
+            semgrep:
+              - 'semgrep/**'
+            src:
+              - added|modified: '**'
+              - '!semgrep/**'
+
+      - name: Test Semgrep rules
+        if: steps.files-changed.outputs.semgrep == 'true'
+        uses: 'docker://index.docker.io/semgrep/semgrep:latest@sha256:ae27024c16f7848cdbfd49c24ed0b78b13f13b85fcd7b87c679aaa8b0c0dce98'
+        with:
+          args: semgrep --test --config=semgrep semgrep/
+
+      - name: Run Semgrep scan
+        if: steps.files-changed.outputs.src == 'true'
+        uses: 'docker://index.docker.io/semgrep/semgrep:latest@sha256:ae27024c16f7848cdbfd49c24ed0b78b13f13b85fcd7b87c679aaa8b0c0dce98'
+        with:
+          args: >-
+            semgrep scan
+            --config=semgrep
+            --config="p/default"
+            --config="p/owasp-top-ten"
+            --config="p/cwe-top-25"
+            --config="p/gitleaks"
+            --config "p/r2c-security-audit"
+            --json-output=semgrep-results.json
+            ${{ steps.files-changed.outputs.src_files }}
+
+      - name: Post results as PR comment
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # ratchet:actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+
+            try {
+              const results = JSON.parse(fs.readFileSync('semgrep-results.json', 'utf8'));
+
+              if (!results.results || results.results.length === 0) {
+                console.log('No Semgrep findings to report');
+                return;
+              }
+
+              // Get the PR diff to find the right commit SHA
+              const { data: pr } = await github.rest.pulls.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.issue.number
+              });
+
+              // Get existing review comments
+              const { data: existingComments } = await github.rest.pulls.listReviewComments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.issue.number
+              });
+
+              // Extract fingerprints from existing comments
+              const existingFingerprints = new Set(
+                existingComments
+                  .map(comment => {
+                    const match = comment.body.match(/fingerprint:([a-f0-9_]+)/);
+                    return match ? match[1] : null;
+                  })
+                  .filter(Boolean)
+              );
+
+              // Filter out findings that already have comments or are ignored with nosemgrep
+              const newFindings = results.results.filter(finding =>
+                !(existingFingerprints.has(finding.extra.fingerprint) || finding.extra.is_ignored)
+              );
+
+              if (newFindings.length === 0) {
+                console.log('No new findings to report');
+                return;
+              }
+
+              const comments = newFindings.map(finding => ({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.issue.number,
+                commit_id: pr.head.sha,
+                path: finding.path,
+                line: finding.start.line,
+                body: [
+                  "### Static Analysis Finding",
+                  `**Rule ID:** \`${finding.check_id}\``,
+                  `**Severity:** ${finding.extra.severity}`,
+                  `**Message:** ${finding.extra.message}`,
+                  '<details>',
+                  '<summary><em>Is this a false positive?</em></summary>',
+                  '<br>Help us keep static analysis findings low noise so we don\'t train ourselves to ignore them.',
+                  '',
+                  `- If the finding can be ignored in this context, you can exempt the line of code with a \`// nosemgrep: ${finding.check_id}\` comment. See [this guide](https://semgrep.dev/docs/ignoring-files-folders-code) for more information. One example of this situation might be a hard-coded dummy secret in a test case.`,
+                  '- If the finding is completely incorrect, it may be a bad rule. Open a thread in [#security](https://semgrep.dev/docs/ignoring-files-folders-code).',
+                  '</details>',
+                  `<!-- fingerprint:${finding.extra.fingerprint} -->`,
+                ].join('\n')
+              }));
+
+              // Create all comments.
+              await Promise.all(
+                comments.map(comment =>
+                  github.rest.pulls.createReviewComment(comment)
+                )
+              );
+
+            } catch (error) {
+              console.error('Error processing Semgrep results:', error);
+              core.setFailed(error.message);
+            }

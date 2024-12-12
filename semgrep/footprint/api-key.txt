@@ -1,0 +1,14 @@
+# ok: api-key
+abc_live_123
+
+# ruleid: api-key
+sk_live_abc12346ABCabcdefghijkl
+
+# ruleid: api-key
+sk_test_abc12346ABCabcdefgh
+
+# ruleid: api-key
+sk_test_abc12346ABCabcdefghijkl
+
+# ruleid: api-key
+sk_test_abc12346ABCabcdefgh

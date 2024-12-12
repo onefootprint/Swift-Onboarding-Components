@@ -1,0 +1,14 @@
+rules:
+  - id: add-exclude-constraint
+    languages:
+      - generic
+    message: Adding EXCLUDE constraint requires an ACCESS EXCLUSIVE lock on the table. There is no workaround, so this is only safe on new tables.
+    severity: WARNING
+    patterns:
+      - pattern-regex: (?i)ALTER\s+TABLE\s[^;]+\sEXCLUDE\s+USING\s
+    paths:
+      include:
+        - "*.sql"
+      exclude:
+        - "down.sql"
+

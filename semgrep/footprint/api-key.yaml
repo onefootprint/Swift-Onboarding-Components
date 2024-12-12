@@ -1,0 +1,9 @@
+rules:
+  - id: api-key
+    languages:
+      - generic
+    message: Do not commit secrets to version control. Please ensure these tokens are expired or rotated.
+    severity: ERROR
+    patterns:
+      - pattern-regex: "sk_(test|live)_[A-Za-z0-9]{16,}"
+

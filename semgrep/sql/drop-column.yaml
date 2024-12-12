@@ -1,0 +1,14 @@
+rules:
+  - id: drop-column
+    languages:
+      - generic
+    message: "Dropping columns requires careful migration. Ensure you're following this guide: https://www.notion.so/onefootprint/How-to-drop-a-database-column-with-Diesel-Postgres-6891729c95d141d9a4101819b7363965."
+    severity: WARNING
+    patterns:
+      - pattern-regex: (?i)ALTER\s+TABLE\s[^;]+\sDROP\s+COLUMN\s+(?!IF\s+EXISTS)
+    paths:
+      include:
+        - "*.sql"
+      exclude:
+        - "down.sql"
+

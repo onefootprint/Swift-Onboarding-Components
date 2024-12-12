@@ -1,0 +1,14 @@
+rules:
+  - id: alter-column-type
+    languages:
+      - generic
+    message: Changing column type requires a table rewrite. Consider adding a new column and backfilling.
+    severity: WARNING
+    patterns:
+      - pattern-regex: (?i)ALTER\s+TABLE\s[^;]+\sALTER\s+COLUMN\s[^;]+\sTYPE\s+\w+
+    paths:
+      include:
+        - "*.sql"
+      exclude:
+        - "down.sql"
+

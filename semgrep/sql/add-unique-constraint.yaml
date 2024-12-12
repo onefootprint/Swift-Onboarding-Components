@@ -1,0 +1,14 @@
+rules:
+  - id: add-unique-constraint
+    languages:
+      - generic
+    message: Adding a UNIQUE constraint requires an ACCESS EXCLUSIVE lock. Create unique index CONCURRENTLY first, and then add the constraint with USING INDEX.
+    severity: WARNING
+    patterns:
+      - pattern-regex: (?i)ALTER\s+TABLE\s[^;]+\sUNIQUE(?!\s+USING\s+INDEX)
+    paths:
+      include:
+        - "*.sql"
+      exclude:
+        - "down.sql"
+
