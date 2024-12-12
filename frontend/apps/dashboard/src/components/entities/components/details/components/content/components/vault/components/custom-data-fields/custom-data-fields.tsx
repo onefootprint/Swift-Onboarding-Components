@@ -35,7 +35,7 @@ const CustomDataFields = ({ entity, iconComponent: IconComponent, title }: Custo
   const selectableFields = customDIs.filter(di => getFieldProps(di).canSelect);
   const allSelected = selectableFields.every(decryptForm.isChecked);
   const shouldShowSelectAll = decrypt.inProgress && selectableFields.length > 0;
-  const [showAll, setShowAll] = useState(false);
+  const [showAllCta, setShowAllCta] = useState(false);
 
   const NUMBER_OF_FIELDS_TO_SHOW = 8;
   const shouldShowShowMore = customDIs.length > NUMBER_OF_FIELDS_TO_SHOW;
@@ -113,13 +113,13 @@ const CustomDataFields = ({ entity, iconComponent: IconComponent, title }: Custo
           </LinkButton>
         )}
       </div>
-      <div className={cx('flex flex-col gap-3 p-5', shouldShowShowMore && 'pb-0')}>
+      <div className={cx('flex flex-col gap-3 p-5', { 'pb-0': shouldShowShowMore })}>
         <motion.div layout className="flex flex-col gap-3">
           {initialFields.map(di => renderField({ di }))}
         </motion.div>
 
         <AnimatePresence mode="wait" initial={false}>
-          {showAll && (
+          {showAllCta && (
             <motion.div
               variants={containerVariants}
               initial="hidden"
@@ -132,15 +132,15 @@ const CustomDataFields = ({ entity, iconComponent: IconComponent, title }: Custo
             </motion.div>
           )}
         </AnimatePresence>
-
-        <ShowMoreButton
-          isVisible={shouldShowShowMore}
-          showingAll={showAll}
-          onClick={() => setShowAll(!showAll)}
-          count={`${t('actions.more-fields', { count: customDIs.length - NUMBER_OF_FIELDS_TO_SHOW })}`}
-        >
-          {showAll ? t('actions.show-less') : t('actions.show-all')}
-        </ShowMoreButton>
+        {shouldShowShowMore && (
+          <ShowMoreButton
+            showAllCta={showAllCta}
+            onClick={() => setShowAllCta(!showAllCta)}
+            count={`${t('actions.more-fields', { count: customDIs.length - NUMBER_OF_FIELDS_TO_SHOW })}`}
+          >
+            {showAllCta ? t('actions.show-less') : t('actions.show-all')}
+          </ShowMoreButton>
+        )}
       </div>
     </div>
   ) : null;

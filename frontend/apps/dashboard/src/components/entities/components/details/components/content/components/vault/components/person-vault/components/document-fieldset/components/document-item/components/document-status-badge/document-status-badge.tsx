@@ -3,6 +3,7 @@ import { Badge } from '@onefootprint/ui';
 import { type VariantProps, cva } from 'class-variance-authority';
 import { useTranslation } from 'react-i18next';
 import getDocumentStatus, { DocumentStatus } from '../../../../utils/get-document-status';
+
 type DocumentStatusBadgeProps = {
   document: Omit<Document, 'uploads'>;
 };
