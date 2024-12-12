@@ -101,7 +101,7 @@ const CustomDataFields = ({ entity, iconComponent: IconComponent, title }: Custo
   };
 
   return vaultData ? (
-    <div className="flex flex-col overflow-hidden border border-solid rounded border-tertiary">
+    <div className="flex flex-col w-full overflow-hidden border border-solid rounded border-tertiary">
       <div className="flex justify-between px-5 py-2 border-b border-solid border-tertiary rounded-t-md bg-secondary">
         <div className="flex items-center gap-2">
           <IconComponent />
