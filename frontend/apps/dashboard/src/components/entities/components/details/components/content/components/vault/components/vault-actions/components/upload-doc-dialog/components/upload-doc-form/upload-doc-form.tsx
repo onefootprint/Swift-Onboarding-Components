@@ -1,13 +1,10 @@
-/* eslint-disable react/jsx-props-no-spreading */
-import { Form, LinkButton, Stack, Text, TextInput } from '@onefootprint/ui';
+import { Form, LinkButton, TextInput } from '@onefootprint/ui';
 import Image from 'next/image';
-import type React from 'react';
 import { useRef, useState } from 'react';
-import type { SubmitHandler } from 'react-hook-form';
+import type React from 'react';
 import { useForm } from 'react-hook-form';
+import type { SubmitHandler } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
-
 import type { FormData } from '../../upload-doc-dialog.types';
 
 export type UploadDocFormProps = {
@@ -27,6 +24,10 @@ const UploadDocForm = ({ onSubmit }: UploadDocFormProps) => {
     formState: { errors },
   } = useForm<FormData>();
 
+  const isPdf = (file: File) => {
+    return file.type === 'application/pdf';
+  };
+
   const handleOpenFile = () => {
     inputFileRef.current?.click();
   };
@@ -38,11 +39,9 @@ const UploadDocForm = ({ onSubmit }: UploadDocFormProps) => {
     setValue('file', file);
   };
 
-  const isPdf = (file: File) => file.type === 'application/pdf';
-
   return (
     <form id="upload-doc-form" onSubmit={handleSubmit(onSubmit)}>
-      <Stack gap={7} direction="column">
+      <div className="flex flex-col gap-6">
         <Form.Field>
           <Form.Label htmlFor="identifier">{t('form.identifier.label')}</Form.Label>
           <Form.Group>
@@ -60,43 +59,44 @@ const UploadDocForm = ({ onSubmit }: UploadDocFormProps) => {
           <Form.Errors>{errors.identifier?.message}</Form.Errors>
         </Form.Field>
         <Form.Field>
-          <Stack justifyContent="space-between" align="center">
+          <div className="flex justify-between items-center">
             <Form.Label htmlFor="title">{t('form.file.label')}</Form.Label>
             {doc && (
-              <LinkButton variant="label-3" onClick={handleOpenFile} $marginBottom={3}>
+              <LinkButton variant="label-3" onClick={handleOpenFile}>
                 {t('form.file.upload-new')}
               </LinkButton>
             )}
-          </Stack>
+          </div>
           {doc ? (
             <>
               {isPdf(doc.file) ? (
-                <DocPreviewContainer>
-                  <DocSheet>
-                    <DocPreview src={`${doc.url}#page=1&view=FitH&toolbar=0&toolbar=0&navpanes=0&scrollbar=0`} />
-                  </DocSheet>
-                </DocPreviewContainer>
+                <div className="flex flex-col gap-2 h-[200px] w-[452px] relative items-center justify-end pt-4 overflow-hidden bg-secondary border border-solid border-primary rounded">
+                  <div className="rounded-t-sm shadow-elevation-1 w-[214px] h-[270px] relative overflow-hidden z-10">
+                    <iframe
+                      title="PDF Preview"
+                      className="w-[calc(100%+4px)] h-[calc(100%+4px)] absolute pointer-events-none -translate-x-[2px] -translate-y-[2px]"
+                      src={`${doc.url}#page=1&view=FitH&toolbar=0&toolbar=0&navpanes=0&scrollbar=0`}
+                    />
+                  </div>
+                </div>
               ) : (
-                <ImagePreviewContainer>
-                  <ImagePreview alt={t('form.file.preview-alt')} fill src={doc.url} />
-                </ImagePreviewContainer>
+                <div className="flex flex-col gap-2 h-[200px] w-[452px] relative items-center justify-center bg-secondary border border-solid border-primary rounded">
+                  <Image alt={t('form.file.preview-alt')} fill src={doc.url} className="object-contain" />
+                </div>
               )}
-              <Text variant="caption-4" marginTop={3} color="tertiary">
-                {doc.file.name}
-              </Text>
+              <p className="text-caption-4 text-tertiary mt-3">{doc.file.name}</p>
             </>
           ) : (
-            <DocUpload>
+            <div className="flex flex-col gap-1 h-[200px] w-[452px] relative items-center justify-center bg-primary border border-dashed border-primary rounded">
               <LinkButton variant="label-3" onClick={handleOpenFile}>
                 {t('form.file.cta')}
               </LinkButton>
-              <Text variant="body-3" color="quaternary">
-                {t('form.file.supported-formats')}
-              </Text>
-            </DocUpload>
+              <p className="text-body-3 text-quaternary">{t('form.file.supported-formats')}</p>
+            </div>
           )}
           <Form.Errors>{errors.file?.message}</Form.Errors>
-          <HiddenInput
+          <input
+            className="hidden"
             accept="image/*, application/pdf"
             type="file"
             {...register('file', {
@@ -106,75 +106,9 @@ const UploadDocForm = ({ onSubmit }: UploadDocFormProps) => {
             ref={inputFileRef}
           />
         </Form.Field>
-      </Stack>
+      </div>
     </form>
   );
 };
-
-const DocSection = styled.div`
-  ${({ theme }) => css`
-    border-radius: ${theme.borderRadius.default};
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[2]};
-    height: 200px;
-    width: 452px;
-    position: relative;
-    align-items: center;
-    justify-content: center;
-  `}
-`;
-
-const DocUpload = styled(DocSection)`
-  ${({ theme }) => css`
-    background: ${theme.backgroundColor.primary};
-    border: 1px dashed ${theme.borderColor.primary};
-  `}
-`;
-
-const ImagePreviewContainer = styled(DocSection)`
-  ${({ theme }) => css`
-    background: ${theme.backgroundColor.secondary};
-    border: 1px solid ${theme.borderColor.primary};
-  `}
-`;
-
-const ImagePreview = styled(Image)`
-  object-fit: contain;
-`;
-
-const DocPreviewContainer = styled(DocSection)`
-  ${({ theme }) => css`
-    background: ${theme.backgroundColor.secondary};
-    border: 1px solid ${theme.borderColor.primary};
-    justify-content: flex-end;
-    padding-top: ${theme.spacing[5]};
-    overflow: hidden;
-  `}
-`;
-
-const DocSheet = styled.div`
-  ${({ theme }) => css`
-    border-radius: ${theme.borderRadius.sm} ${theme.borderRadius.sm} 0 0;
-    box-shadow: ${theme.elevation[1]};
-    width: 214px;
-    height: 270px;
-    position: relative;
-    overflow: hidden;
-    z-index: 1;
-  `}
-`;
-
-const DocPreview = styled.iframe`
-  width: calc(100% + 4px);
-  height: calc(100% + 4px);
-  position: absolute;
-  pointer-events: none;
-  transform: translate(-2px, -2px);
-`;
-
-const HiddenInput = styled.input`
-  display: none;
-`;
 
 export default UploadDocForm;
