@@ -7,7 +7,6 @@ import Banner from '../introduction/banner';
 import SectionCards from '../introduction/section-cards';
 import A from './components/a';
 import Code from './components/code';
-import CustomizationPreview from './components/customization-preview';
 import DemoOcKyc from './components/demo-oc-kyc';
 import DemoReact from './components/demo-react';
 import DocsInlineAlert from './components/docs-inline-alert';
@@ -52,9 +51,6 @@ const OVERRIDES: MarkdownToJSX.Overrides = {
   },
   'inline-alert': {
     component: DocsInlineAlert,
-  },
-  'customization-preview': {
-    component: CustomizationPreview,
   },
   examples: {
     component: Examples,
