@@ -1,18 +1,26 @@
 import SwiftUI
-import SwiftOnboardingComponentsShared
+import Footprint
 
-struct ComposeView: UIViewControllerRepresentable {
-    func makeUIViewController(context: Context) -> UIViewController {
-        TestMainViewControllerKt.TestMainViewController()
-    }
-
-    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
-}
 
 struct ContentView: View {
     var body: some View {
-        ComposeView()
-                .ignoresSafeArea(.keyboard) // Compose has own keyboard handler
+        NavigationStack {
+        VStack  {
+            Button("Hosted flow") {
+                
+                
+                printPlatformInfo()
+                
+                
+                 
+                
+            }
+        }
+        .padding(50)
+//            NavigationLink("Onboarding components - signup", destination: EmailAndPhoneView()).padding(50)
+//            NavigationLink("Onboarding components - authToken", destination: AuthTokenView()).padding(50)
+//            
+        }
     }
+    
 }
-

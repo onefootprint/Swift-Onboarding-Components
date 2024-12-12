@@ -1,6 +1,9 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
+import org.jetbrains.kotlin.incremental.deleteDirectoryContents
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -141,6 +144,23 @@ publishing {
 afterEvaluate {
     tasks.named("publishReleasePublicationToLocalRepository") {
         dependsOn(tasks.named("bundleReleaseAar"))
+    }
+    tasks.register("packForXcode") {
+        dependsOn("assembleSwiftOnboardingComponentsSharedReleaseXCFramework")
+
+        doLast {
+            val task = tasks.findByName("assembleSwiftOnboardingComponentsSharedReleaseXCFramework")
+
+            // Ensure the task exists and has outputs
+            val outputFile = task?.outputs?.files?.singleFile
+                ?: throw IllegalStateException("Output file for assembleSwiftOnboardingComponentsSharedReleaseXCFramework task not found!")
+
+            val targetDirectory = File("${projectDir}/../SwiftOnboardingComponents/Frameworks")
+
+            val targetFile = targetDirectory.resolve(outputFile.name)
+
+            outputFile.copyRecursively(targetFile, overwrite = true)
+        }
     }
 }
 
