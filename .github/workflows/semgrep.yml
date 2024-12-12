@@ -58,6 +58,11 @@ jobs:
             const fs = require('fs');
 
             try {
+              if (!fs.existsSync('semgrep-results.json')) {
+                console.log('No semgrep-results.json file found - skipping comment creation');
+                return;
+              }
+
               const results = JSON.parse(fs.readFileSync('semgrep-results.json', 'utf8'));
 
               if (!results.results || results.results.length === 0) {
