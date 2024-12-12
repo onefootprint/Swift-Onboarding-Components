@@ -50,12 +50,33 @@ jobs:
             --json-output=semgrep-results.json
             ${{ steps.files-changed.outputs.src_files }}
 
-      - name: Post results as PR comment
+      - name: Post results as PR comments
         if: github.event_name == 'pull_request'
         uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # ratchet:actions/github-script@v6
         with:
           script: |
             const fs = require('fs');
+
+            const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+            async function retryWithBackoff(fn, maxRetries = 6, initialDelay = 1000) {
+              let retries = 0;
+              while (true) {
+                try {
+                  return await fn();
+                } catch (error) {
+                  retries++;
+                  if (retries >= maxRetries) throw error;
+
+                  // GitHub uses 422 for rate limit errors
+                  if (error.status !== 422 && error.status !== 429) throw error;
+
+                  const delay = initialDelay * Math.pow(2, retries - 1);
+                  console.log(`Rate limited, waiting ${delay}ms before retry ${retries}/${maxRetries}`);
+                  await sleep(delay);
+                }
+              }
+            }
 
             try {
               if (!fs.existsSync('semgrep-results.json')) {
@@ -127,10 +148,9 @@ jobs:
                 ].join('\n')
               }));
 
-              // Create all comments.
               await Promise.all(
                 comments.map(comment =>
-                  github.rest.pulls.createReviewComment(comment)
+                  retryWithBackoff(() => github.rest.pulls.createReviewComment(comment))
                 )
               );
 
