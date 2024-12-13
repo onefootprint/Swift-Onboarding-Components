@@ -49,13 +49,13 @@ const BaseCode = ({ children, size, disabled, isPrivate }: CodeInlineProps) => {
     <span
       className={cx(
         'inline-flex flex-wrap flex-grow-0 px-1 py-[2px]',
-        'rounded-sm cursor-pointer',
+        'rounded-sm',
         'bg-secondary',
         'border border-solid border-tertiary text-primary',
         'max-w-full w-fit',
         {
-          'cursor-default': disabled,
-          'hover:text-primary hover:border-primary': !disabled,
+          'cursor-default select-none pointer-events-none': disabled,
+          'cursor-pointer hover:text-primary hover:border-primary': !disabled,
         },
       )}
     >
