@@ -11,11 +11,13 @@ use db_schema::schema::document_data;
 use diesel::prelude::*;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeId;
+use newtypes::DataLifetimeSeqno;
 use newtypes::DataLifetimeSource;
 use newtypes::DbActor;
 use newtypes::DocumentDataId;
 use newtypes::PiiString;
 use newtypes::S3Url;
+use newtypes::ScopedVaultId;
 use newtypes::SealedVaultDataKey;
 use std::collections::HashMap;
 
@@ -110,5 +112,27 @@ impl HasLifetime for DocumentData {
 
     fn data(&self) -> VaultedData {
         VaultedData::LargeSealed(&self.s3_url, &self.e_data_key)
+    }
+}
+
+impl DocumentData {
+    /// Really special-purpose method for fetching all documents, including historical deactivated
+    /// documents, ever uploaded to the vault.
+    /// The results will be duplicative of the results stored in the `Document` table.
+    #[tracing::instrument("DocumentData::get_created_before", skip_all)]
+    pub fn get_created_before(
+        conn: &mut PgConn,
+        sv_id: &ScopedVaultId,
+        seqno: DataLifetimeSeqno,
+    ) -> FpResult<Vec<(Self, DataLifetime)>> {
+        use db_schema::schema::data_lifetime;
+        // NOTE: we deliberately fetch deactivated DLs here.
+        let results = document_data::table
+            .inner_join(data_lifetime::table)
+            .filter(data_lifetime::scoped_vault_id.eq(sv_id))
+            .filter(data_lifetime::created_seqno.le(seqno))
+            .get_results(conn)?;
+
+        Ok(results)
     }
 }

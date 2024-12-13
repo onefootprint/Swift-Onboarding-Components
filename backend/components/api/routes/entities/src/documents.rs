@@ -6,22 +6,19 @@ use crate::State;
 use api_core::types::ApiListResponse;
 use api_core::utils::db2api::TryDbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
-use api_core::utils::vault_wrapper::Any;
-use api_core::utils::vault_wrapper::TenantVw;
-use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::FpResult;
+use db::models::data_lifetime::DataLifetime;
 use db::models::document::Document;
 use db::models::document::DocumentImageArgs;
+use db::models::document_data::DocumentData;
 use db::models::samba_report::SambaReport;
 use db::models::scoped_vault::ScopedVault;
 use itertools::chain;
 use itertools::Itertools;
 use newtypes::samba::SambaOrderKind;
-use newtypes::CustomDocumentConfig;
 use newtypes::DataIdentifier;
 use newtypes::DocumentDiKind;
 use newtypes::DocumentKind;
-use newtypes::DocumentRequestConfig;
 use newtypes::DocumentSide;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
@@ -74,61 +71,38 @@ pub async fn get(
                 })
                 .collect_vec();
 
-            let custom_dis = id_docs
-                .iter()
-                .filter_map(|(_, dr, _, _)| match dr.config {
-                    DocumentRequestConfig::Custom(CustomDocumentConfig { ref identifier, .. }) => {
-                        Some(identifier)
+            // Documents can also be uploaded via tenant-facing API or via the dashboard.
+            // So we have to add these in here...
+            let current_seqno = DataLifetime::get_current_seqno(conn)?;
+            let reconstruction_seqno = seqno.unwrap_or(current_seqno);
+            let docs = DocumentData::get_created_before(conn, &sv.id, reconstruction_seqno)?;
+
+            // Add all DocumentData rows that aren't already represented by ID docs
+            let api_docs = docs
+                .into_iter()
+                .filter(|(dd, _)| !id_docs.iter().flat_map(|d| &d.2).any(|u| u.s3_url == dd.s3_url))
+                .filter_map(|(_, dl)| match dl.kind {
+                    DataIdentifier::Document(DocumentDiKind::LatestUpload(kind, side)) => {
+                        Some((kind.into(), side, dl))
+                    }
+                    DataIdentifier::Document(DocumentDiKind::ProofOfAddress) => {
+                        Some((DocumentKind::ProofOfAddress, DocumentSide::Front, dl))
+                    }
+                    DataIdentifier::Document(DocumentDiKind::SsnCard) => {
+                        Some((DocumentKind::SsnCard, DocumentSide::Front, dl))
+                    }
+                    DataIdentifier::Document(DocumentDiKind::Custom(_)) => {
+                        Some((DocumentKind::Custom, DocumentSide::Front, dl))
                     }
                     _ => None,
                 })
                 .collect_vec();
 
-            // Documents can also be uploaded via tenant-facing API or via the dashboard.
-            // So we have to add these in here...
-            // TODO we won't show historical versions of documents uploaded here, even though we
-            // show multiple ID document sessions.
-            // We'd need to support fetching even deactivated DLs from the database
-            let vw: TenantVw<Any> = VaultWrapper::build_for_tenant_maybe_version(conn, &sv.id, seqno)?;
-            let api_docs = vw
-                .populated_dis()
-                .into_iter()
-                .filter_map(|di| {
-                    let dl = vw.get_lifetime(&di)?.clone();
-                    // Only take document DIs that don't have a corresponding IdDoc in the DB.
-                    // This will be a little derpy if an API-uploaded document is replaced by a
-                    // bifrost-uploaded document...
-                    match di {
-                        DataIdentifier::Document(DocumentDiKind::LatestUpload(kind, side)) => {
-                            let already_contains = id_docs.iter().any(|d| d.0.document_type == kind.into());
-                            (!already_contains).then_some((kind.into(), (side, dl)))
-                        }
-                        DataIdentifier::Document(DocumentDiKind::ProofOfAddress) => {
-                            let already_contains = id_docs
-                                .iter()
-                                .any(|d| d.0.document_type == DocumentKind::ProofOfAddress);
-                            (!already_contains)
-                                .then_some((DocumentKind::ProofOfAddress, (DocumentSide::Front, dl)))
-                        }
-                        DataIdentifier::Document(DocumentDiKind::SsnCard) => {
-                            let already_contains =
-                                id_docs.iter().any(|d| d.0.document_type == DocumentKind::SsnCard);
-                            (!already_contains).then_some((DocumentKind::SsnCard, (DocumentSide::Front, dl)))
-                        }
-                        DataIdentifier::Document(DocumentDiKind::Custom(_)) => {
-                            let already_contains = custom_dis.iter().any(|i| **i == di);
-                            (!already_contains).then_some((DocumentKind::Custom, (DocumentSide::Front, dl)))
-                        }
-                        _ => None,
-                    }
-                })
-                .into_group_map();
-
             Ok((id_docs, api_docs))
         })
         .await?;
 
-    let response = chain(
+    let response = chain!(
         id_docs
             .into_iter()
             .map(api_wire_types::Document::try_from_db)

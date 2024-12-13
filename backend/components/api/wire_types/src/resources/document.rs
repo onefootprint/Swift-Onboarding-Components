@@ -30,7 +30,7 @@ impl From<DeviceType> for UploadSource {
 #[derive(Debug, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct Document {
     pub kind: DocumentKind,
-    pub started_at: Option<DateTime<Utc>>,
+    pub started_at: DateTime<Utc>,
     /// Non-null for images uploaded via bifrost
     pub status: Option<DocumentStatus>,
     pub status_description: Option<String>,

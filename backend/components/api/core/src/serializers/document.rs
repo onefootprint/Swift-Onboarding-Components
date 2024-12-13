@@ -20,7 +20,7 @@ pub type DocumentInfo = (
     Option<DataLifetimeSeqno>,
 );
 /// Document info from the vault, created via API
-pub type DocumentVaultInfo = (DocumentKind, Vec<(DocumentSide, DataLifetime)>);
+pub type DocumentVaultInfo = (DocumentKind, DocumentSide, DataLifetime);
 
 impl TryDbToApi<DocumentInfo> for api_wire_types::Document {
     fn try_from_db((doc, dr, uploads, activity_history_seqno): DocumentInfo) -> FpResult<Self> {
@@ -47,7 +47,7 @@ impl TryDbToApi<DocumentInfo> for api_wire_types::Document {
 
         let result = Self {
             kind: vaulted_document_type.unwrap_or(document_type),
-            started_at: Some(created_at),
+            started_at: created_at,
             status_description: Some(status.description()),
             status: Some(status),
             review_status: Some(review_status),
@@ -93,12 +93,9 @@ impl<'a> TryDbToApi<(&'a Document, &'a DocumentRequest, DocumentUpload)> for api
 }
 
 impl DbToApi<DocumentVaultInfo> for api_wire_types::Document {
-    fn from_db((kind, uploads): DocumentVaultInfo) -> Self {
-        let started_at = uploads.iter().map(|(_, dl)| dl.created_at).min();
-        let uploads = uploads
-            .into_iter()
-            .map(api_wire_types::DocumentUpload::from_db)
-            .collect();
+    fn from_db((kind, side, dl): DocumentVaultInfo) -> Self {
+        let started_at = dl.created_at;
+        let upload = api_wire_types::DocumentUpload::from_db((side, dl));
 
         Self {
             kind,
@@ -109,7 +106,7 @@ impl DbToApi<DocumentVaultInfo> for api_wire_types::Document {
             completed_version: None,
             curp_completed_version: None,
             samba_activity_history_completed_version: None,
-            uploads,
+            uploads: vec![upload],
             document_score: None,
             selfie_score: None,
             ocr_confidence_score: None,

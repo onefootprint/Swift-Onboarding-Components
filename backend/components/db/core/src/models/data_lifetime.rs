@@ -10,15 +10,11 @@ use api_errors::FpResult;
 use api_errors::ServerErrInto;
 use chrono::DateTime;
 use chrono::Utc;
-use db_schema::schema::data_lifetime::{
-    self,
-};
+use db_schema::schema::data_lifetime;
 use diesel::pg::Pg;
 use diesel::prelude::*;
+use diesel::sql_types;
 use diesel::sql_types::Int8;
-use diesel::sql_types::{
-    self,
-};
 use itertools::Itertools;
 use newtypes::BorrowedOrOwned;
 use newtypes::DataIdentifier;

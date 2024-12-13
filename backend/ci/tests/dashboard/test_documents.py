@@ -167,16 +167,73 @@ def test_get_entity_documents_with_lots_of_docs(sandbox_tenant, must_collect_dat
         files=open_multipart_file("drivers_license.front.jpg", "image/jpg")(),
     )
     post(
+        f"users/{user.fp_id}/vault/document.id_card.back.image/upload",
+        None,
+        sandbox_tenant.sk.key,
+        files=open_multipart_file("drivers_license.back.jpg", "image/jpg")(),
+    )
+    post(
         f"users/{user.fp_id}/vault/document.custom.my_special_doc/upload",
+        None,
+        *sandbox_tenant.db_auths,
+        files=open_multipart_file("example_pdf.pdf", "application/pdf")(),
+    )
+    post(
+        f"users/{user.fp_id}/vault/document.ssn_card.image/upload",
         None,
         *sandbox_tenant.db_auths,
         files=open_multipart_file("example_pdf.pdf", "application/pdf")(),
     )
 
     body = get(f"entities/{user.fp_id}/documents", None, *sandbox_tenant.db_auths)
+    docs = iter(body)
 
-    # Test voter ID with curp
-    voter_id = next(i for i in body if i["kind"] == "voter_identification")
+    # Test ssn_card uploaded via api, even though there was one already uploaded via bifrost
+    ssn_card = next(docs)
+    assert ssn_card["uploads"][0]["identifier"] == "document.ssn_card.image"
+    assert ssn_card["kind"] == "ssn_card"
+    assert ssn_card["upload_source"] == "api"
+    assert ssn_card["status"] is None
+    assert ssn_card["review_status"] is None
+
+    # Test custom doc uploaded via API
+    special_doc = next(docs)
+    assert special_doc["kind"] == "custom"
+    assert special_doc["uploads"][0]["identifier"] == "document.custom.my_special_doc"
+    assert special_doc["upload_source"] == "api"
+
+    # Test identity doc uploaded via API. Note, the front and back will be represented as separate documents
+    # when uploaded via API
+    id_card_back = next(docs)
+    assert id_card_back["kind"] == "id_card"
+    assert id_card_back["uploads"][0]["side"] == "back"
+    assert id_card_back["upload_source"] == "api"
+
+    id_card_front = next(docs)
+    assert id_card_front["kind"] == "id_card"
+    assert id_card_front["uploads"][0]["side"] == "front"
+    assert id_card_front["upload_source"] == "api"
+
+    # Test custom doc uploaded via bifrost
+    utility_bill = next(docs)
+    assert utility_bill["uploads"][0]["identifier"] == "document.custom.utility_bill"
+    assert utility_bill["kind"] == "custom"
+    assert utility_bill["upload_source"] == "mobile"
+    assert utility_bill["status"] == "complete"
+    assert utility_bill["review_status"] == "pending_human_review"
+
+    # Test ssn_card uploaded via bifrost
+    ssn_card = next(docs)
+    assert ssn_card["uploads"][0]["identifier"] == "document.ssn_card.image"
+    assert ssn_card["kind"] == "ssn_card"
+    assert ssn_card["upload_source"] == "mobile"
+    assert ssn_card["status"] == "complete"
+    assert ssn_card["review_status"] == "pending_human_review"
+
+    # Test voter ID with curp uploaded via bifrost
+    voter_id = next(docs)
+    assert voter_id["kind"] == "voter_identification"
+    assert voter_id["upload_source"] == "mobile"
     assert voter_id["status"] == "complete"
     assert voter_id["review_status"] == "reviewed_by_machine"
     assert all(u["failure_reasons"] == [] for u in voter_id["uploads"])
@@ -188,35 +245,7 @@ def test_get_entity_documents_with_lots_of_docs(sandbox_tenant, must_collect_dat
     assert back["version"] < curp_version
     assert voter_id["completed_version"] < curp_version
 
-    # Test custom doc uploaded via bifrost
-    utility_bill = next(
-        i
-        for i in body
-        if i["uploads"][0]["identifier"] == "document.custom.utility_bill"
-    )
-    assert utility_bill["kind"] == "custom"
-    assert utility_bill["status"] == "complete"
-    assert utility_bill["review_status"] == "pending_human_review"
-
-    # Test custom doc uploaded via API
-    special_doc = next(
-        i
-        for i in body
-        if i["uploads"][0]["identifier"] == "document.custom.my_special_doc"
-    )
-    assert special_doc["kind"] == "custom"
-    assert special_doc["status"] is None
-    assert special_doc["review_status"] is None
-
-    # Test identity doc uploaded via API
-    id_card = next(i for i in body if i["kind"] == "id_card")
-    assert not id_card["status"]
-    assert id_card["started_at"]
-    assert id_card["upload_source"] == "api"
-    assert all(u["failure_reasons"] == [] for u in id_card["uploads"])
-    assert any(u["side"] == "front" for u in id_card["uploads"])
-    assert id_card["status"] is None
-    assert id_card["review_status"] is None
+    assert len(list(docs)) == 0, "Iterator should be exhausted"
 
 
 def test_decrypt_historical(user_with_documents):
@@ -325,7 +354,7 @@ def test_review_documents(sandbox_tenant):
 
 
 @pytest.mark.parametrize("doc_type", ["proof_of_address", "ssn_card"])
-def test_proof_of_address(sandbox_tenant, doc_type):
+def test_ssn_card_poa(sandbox_tenant, doc_type):
     """
     Test that we can upload a proof of address and a ssn card and that they are both uploaded
     """
