@@ -90,7 +90,7 @@ const REGION_CODES: Record<CountryCode, string> = {
   GP: '+590',
   GQ: '+240',
   GR: '+30',
-  GS: '+500',
+  GS: '+82',
   GT: '+502',
   GU: '+1671',
   GW: '+245',
