@@ -22,6 +22,8 @@ services:
     environment:
       - DATABASE_URL=postgres://postgres:postgres@localhost:5432/footprint_db
 
+  # Writeable filesystem is accepted risk for devenvs.
+  # nosemgrep: yaml.docker-compose.security.writable-filesystem-service.writable-filesystem-service
   db:
     image: postgres:latest
     restart: unless-stopped
@@ -31,6 +33,8 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
       POSTGRES_DB: footprint_db
+    security_opt:
+      - no-new-privileges:true
 
 # Persist database information after your VM shuts down (just these two lines!)
 volumes:
