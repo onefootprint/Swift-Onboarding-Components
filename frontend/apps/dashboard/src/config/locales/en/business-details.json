@@ -16,8 +16,9 @@
   },
   "vault": {
     "basic": {
-      "select-corporation-type": "Select corporation type",
       "title": "Basic data",
+      "select-corporation-type": "Select corporation type",
+      "select-country": "Select country",
       "corporation-type": {
         "agent": "Agent",
         "c_corporation": "C Corporation",

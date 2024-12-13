@@ -609,13 +609,7 @@ const useFieldProps = (entity: Entity, di: DataIdentifier): FieldProps => {
   if (di === IdDI.country || di === BusinessDI.country) {
     return {
       selectOptions: {
-        options: COUNTRIES as Option[],
-        validate: (value: string) => {
-          if (!value) {
-            return previousValue ? entityT('errors.country.required') : true;
-          }
-          return true;
-        },
+        options: [{ value: EMPTY_SELECT_VALUE, label: t('select-country') }, ...COUNTRIES] as Option[],
       },
     };
   }
