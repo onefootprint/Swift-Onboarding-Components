@@ -34,7 +34,7 @@ const ContactForm = ({ children }: ContactFormProps) => {
         {children}
       </Trigger>
       <PopupModal
-        url="https://calendly.com/footprinteli"
+        url="https://calendly.com/mhreben"
         onModalClose={handleClose}
         open={showDialog}
         rootElement={document.body}
