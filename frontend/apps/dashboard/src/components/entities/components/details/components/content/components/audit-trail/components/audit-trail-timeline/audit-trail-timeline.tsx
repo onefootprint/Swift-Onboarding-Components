@@ -94,7 +94,7 @@ const AuditTrailTimeline = ({ entity }: AuditTrailTimelineProps) => {
       });
     } else if (kind === TimelineEventKind.dataCollected) {
       const eventData = data as DataCollectedInfo;
-      const { visibleDis, visibleAttributes } = getVisibleDis(eventData.targets || [], eventData.attributes);
+      const { visibleDis, visibleAttributes } = getVisibleDis(eventData);
       if (visibleAttributes.length || visibleDis.length) {
         items.push({
           timestamp,

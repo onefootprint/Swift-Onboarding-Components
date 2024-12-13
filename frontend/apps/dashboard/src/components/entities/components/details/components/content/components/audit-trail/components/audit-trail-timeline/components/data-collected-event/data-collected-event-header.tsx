@@ -16,7 +16,6 @@ const DataCollectedEventHeader = ({ data }: DataCollectedEventHeaderProps) => {
   const { t } = useTranslation('entity-details', {
     keyPrefix: 'audit-trail.timeline.data-collected-event',
   });
-  const { attributes, targets } = data;
 
   let title = <TertiaryColor>{data.isPrefill ? t('title-prefill') : t('title')}</TertiaryColor>;
   if (data.actor) {
@@ -28,7 +27,7 @@ const DataCollectedEventHeader = ({ data }: DataCollectedEventHeaderProps) => {
     );
   }
 
-  const { visibleDis, visibleAttributes } = getVisibleDis(targets || [], attributes);
+  const { visibleDis, visibleAttributes } = getVisibleDis(data);
 
   return (
     <Container aria-label={t('aria-label')}>
