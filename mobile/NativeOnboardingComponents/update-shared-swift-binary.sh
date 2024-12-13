@@ -20,7 +20,7 @@ fi
 
 # Step 2: Assemble the Swift XCFramework using Gradle
 echo "Assembling SwiftOnboardingComponentsShared XCFramework..."
-./gradlew :shared:assembleSwiftOnboardingComponentsSharedXCFramework
+./gradlew :shared:assembleSwiftOnboardingComponentsSharedReleaseXCFramework
 
 # Step 3: Copy the generated XCFramework to the binaries directory
 echo "Copying the XCFramework to $BINARY_DIR..."

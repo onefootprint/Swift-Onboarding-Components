@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "Footprint",
     platforms: [
-        .iOS(.v16) // Specify the minimum platform version
+        .iOS(.v14) // Specify the minimum platform version
     ],
     products: [
         // Expose the library as "Footprint" to consumers.

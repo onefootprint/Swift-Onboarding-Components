@@ -19,12 +19,14 @@ import com.onefootprint.native_onboarding_components.utils.VaultUtils
 import com.onefootprint.native_onboarding_components.utils.generateRandomString
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.header
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.openapitools.client.models.DataIdentifier
 import org.openapitools.client.models.IdentifyChallengeResponse
 import org.openapitools.client.models.ObConfigurationKind
 import org.openapitools.client.models.PublicOnboardingConfiguration
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -43,7 +45,7 @@ object Footprint {
     internal var sandboxId: String? = null
     internal var sandboxOutcome: SandboxOutcome? = null
     private var isReady: Boolean = false
-    internal var l10n: FootprintL10n = FootprintL10n(
+    var l10n: FootprintL10n = FootprintL10n(
         locale = FootprintSupportedLocale.EN_US,
         language = FootprintSupportedLanguage.ENGLISH
     )
@@ -72,6 +74,7 @@ object Footprint {
         sessionId = null
     }
 
+    @Throws(FootprintException::class, CancellationException::class)
     @OptIn(ExperimentalUuidApi::class)
     suspend fun initialize(
         publicKey: String? = null,
@@ -79,7 +82,7 @@ object Footprint {
         sandboxId: String? = null,
         sandboxOutcome: SandboxOutcome? = null,
         l10n: FootprintL10n? = null,
-        sessionId: String = Uuid.random().toString(),
+        sessionId: String? = Uuid.random().toString(),
     ): FootprintAuthRequirement {
         mutex.withLock {
             reset()
@@ -179,7 +182,7 @@ object Footprint {
             }
         }
     }
-
+    @Throws(FootprintException::class, CancellationException::class)
     suspend fun createChallenge(email: String? = null, phoneNumber: String? = null): String {
         mutex.withLock {
             challenge = AuthUtils.createChallenge(
@@ -194,6 +197,7 @@ object Footprint {
         }
     }
 
+    @Throws(FootprintException::class, CancellationException::class)
     suspend fun verify(
         verificationCode: String
     ): VerificationResponse {
@@ -213,25 +217,28 @@ object Footprint {
             )
         }
     }
-
+    @Throws(FootprintException::class, CancellationException::class)
     suspend fun getRequirements(): Requirements {
         mutex.withLock {
             return RequirementUtil.getRequirements(authToken = verifiedAuthToken)
         }
     }
 
+    @Throws(FootprintException::class, CancellationException::class)
     suspend fun vault(data: VaultData) {
         mutex.withLock {
             VaultUtils.vaultData(data = data, authToken = vaultingToken)
         }
     }
 
+    @Throws(FootprintException::class, CancellationException::class)
     suspend fun getVaultData(fields: List<DataIdentifier>): VaultData {
         mutex.withLock {
             return VaultUtils.decryptVaultData(authToken = verifiedAuthToken, fields = fields)
         }
     }
 
+    @Throws(FootprintException::class, CancellationException::class)
     suspend fun process(): String {
         mutex.withLock {
             val authToken = verifiedAuthToken

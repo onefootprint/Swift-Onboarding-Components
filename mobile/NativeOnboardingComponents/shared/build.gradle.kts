@@ -1,9 +1,6 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
-import org.jetbrains.kotlin.incremental.deleteDirectoryContents
-import java.util.zip.ZipEntry
-import java.util.zip.ZipOutputStream
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -17,6 +14,7 @@ plugins {
 version = "1.0.0-beta"
 group = "com.onefootprint.native_onboarding_components"
 
+
 kotlin {
     androidTarget {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
@@ -29,14 +27,22 @@ kotlin {
     val xcframeworkName = "SwiftOnboardingComponentsShared"
     val xcf = XCFramework(xcframeworkName)
 
-    listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64(),
-    ).forEach {
+
+    val isEmulatorOnly = project.findProperty("runIOSOnEmulatorOnly")?.toString()?.toBoolean() ?: false
+
+    println("isEmulatorOnly: "+isEmulatorOnly)
+
+    val list = if (isEmulatorOnly) {
+        listOf(iosSimulatorArm64())
+    } else {
+        listOf(iosX64(), iosArm64(), iosSimulatorArm64())
+    }
+
+    println("list: "+list)
+
+    list.forEach {
         it.binaries.framework {
             baseName = xcframeworkName
-
             binaryOption("bundleId", "com.onefootprint.${xcframeworkName}")
             xcf.add(this)
             isStatic = true
@@ -146,8 +152,7 @@ afterEvaluate {
         dependsOn(tasks.named("bundleReleaseAar"))
     }
     tasks.register("packForXcode") {
-        dependsOn("assembleSwiftOnboardingComponentsSharedReleaseXCFramework")
-
+        dependsOn("assembleSwiftOnboardingComponentsSharedXCFramework")
         doLast {
             val task = tasks.findByName("assembleSwiftOnboardingComponentsSharedReleaseXCFramework")
 
