@@ -38,4 +38,11 @@ COPY --from=builder /usr/local/bin/enclave_proxy /usr/local/bin/enclave_proxy
 
 EXPOSE 3668
 
+# In prod, the enclave_proxy binary is copied out of the container and run
+# directly on the host machine. Writing to the output directory requires root.
+# This is kind of an intentional container escape anyway, so using a non-root
+# user doesn't matter for security.
+# nosemgrep: dockerfile.security.last-user-is-root.last-user-is-root
+USER root:root
+
 ENTRYPOINT ["/usr/local/bin/enclave_proxy"]

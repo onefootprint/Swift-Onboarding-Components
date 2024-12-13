@@ -40,9 +40,10 @@ jobs:
       - name: Extract Constants
         id: constants
         shell: bash
+        env:
+          BRANCH_RAW: ${{ github.event.inputs.branchName || github.head_ref }}
         run: |
-          branch_raw="${{ github.head_ref }}"
-          branch="$(echo ${branch_raw} | sed -r 's/\//-/g' | sed -r 's/_/-/g')"
+          branch="$(echo ${BRANCH_RAW} | sed -r 's/\//-/g' | sed -r 's/_/-/g')"
           echo "friendly branch name is ${branch}"
           echo "branch=${branch}" >> $GITHUB_OUTPUT
 

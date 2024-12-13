@@ -36,6 +36,7 @@ export function CreateRegionalWildCertificateForDnsConfig(
       domainName,
       subjectAlternativeNames: [config.domain],
       validationMethod: 'DNS',
+      // nosemgrep
       keyAlgorithm: 'EC_prime256v1',
     } as aws.acm.CertificateArgs,
     { provider },

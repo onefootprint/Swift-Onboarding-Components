@@ -46,11 +46,12 @@ jobs:
 
       - name: Extract stack name
         shell: bash
+        env:
+          BRANCH_RAW: ${{ github.event.inputs.branchName || github.head_ref }}
         run: |
-          branch_raw="${{ github.event.inputs.branchName || github.head_ref }}"
-          branch="$(echo ${branch_raw} | sed -r 's/\//-/g' | sed -r 's/_/-/g')"
+          branch="$(echo ${BRANCH_RAW} | sed -r 's/\//-/g' | sed -r 's/_/-/g')"
           stack="dev-${branch}"
-          echo "##[set-output name=stack;]$(echo ${stack})"
+          echo "stack=${stack}" >> $GITHUB_OUTPUT
         id: get_stack_name
 
       # create our temp stack

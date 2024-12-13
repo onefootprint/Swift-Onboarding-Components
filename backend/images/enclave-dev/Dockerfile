@@ -26,4 +26,5 @@ COPY --from=builder /usr/local/bin/enclave /usr/local/bin/enclave
 
 EXPOSE 5001
 
+USER nobody:nobody
 ENTRYPOINT ["/usr/local/bin/enclave"]

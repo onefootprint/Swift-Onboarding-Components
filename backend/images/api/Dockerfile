@@ -31,4 +31,5 @@ COPY --from=builder /usr/local/bin/api_server /usr/local/bin/api_server
 
 EXPOSE 8000
 
+USER nobody:nobody
 ENTRYPOINT ["/usr/local/bin/api_server"]

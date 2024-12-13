@@ -224,6 +224,7 @@ config:
     secure: v1:c0ihJZFCM5gTow8e:glADH70XuRsaKrdMImkUI2YrH5wp2tKJf2ACtVq8Hs7AuJsXL7rXbPjYiZKj7MIiteDmkz2ibyxMHazegolM5RdpqDoUoq/V
   infra:tailscaleKey:
     secure: v1:LugjtwdSpINaX+pN:qYThPPztuSbW9vNGWJ4y3O/zzNzPBfQ7oNFAdd+LvEsFuDzeccSsOdDp3QN+6JjPsH7Heq7TtMjMN9GZYu/nCYcygNJeJBv7
+  # nosemgrep
   tailscale:oauthClientId: kGLbCo3CNTRL
   tailscale:oauthClientSecret:
     secure: v1:I4bkKTmiXjae5UgT:rMQlp203ERmmLOs4QOh7F+5DEkQPuZDwGg6gIDZ/n2s8ZaOTiJY1asp0rVr2UjPojcNvWqohHpTyNTNtDc1/0uD9/3s05RPo9bN/

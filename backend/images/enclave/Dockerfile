@@ -184,6 +184,7 @@ RUN git clone https://github.com/json-c/json-c.git \
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain $RUST_TOOLCHAIN
 
 # NSM LIB
+# nosemgrep
 ENV AWS_NE_NSM_API_VER="f9422662d02ad089b5132cfcdbe3496365ab4818"
 RUN git clone "https://github.com/aws/aws-nitro-enclaves-nsm-api" \
     && cd aws-nitro-enclaves-nsm-api \
@@ -260,5 +261,7 @@ COPY --from=builder /rootfs /
 
 ENV RUST_LOG=info
 
+# Not sure if this actually does anything once turned into an EIF.
+USER nobody:nobody
 CMD ["/bin/enclave"]
 

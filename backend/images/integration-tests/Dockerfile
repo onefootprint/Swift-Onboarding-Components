@@ -51,4 +51,7 @@ COPY images/integration-tests/localstack-aws-credentials.toml /root/.aws/credent
 
 COPY images/integration-tests/entrypoint.sh /usr/local/bin/entrypoint.sh
 
+# Tests need to run as root to access gnome-keyring
+# nosemgrep: dockerfile.security.last-user-is-root.last-user-is-root
+USER root:root
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
