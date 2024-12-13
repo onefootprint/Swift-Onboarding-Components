@@ -27,7 +27,7 @@ jobs:
 
       # Ensure gradlew has execute permissions
       - name: Give gradlew execute permission
-        run: chmod +x ./gradlew
+        run: chmod +x ./mobile/NativeOnboardingComponents/gradlew
 
       # Publish to Maven Central using the specific Gradle task
       - name: Publish to Maven Central
