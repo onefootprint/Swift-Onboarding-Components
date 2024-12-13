@@ -38,6 +38,7 @@ def test_large_objects(sandbox_tenant):
     assert json.loads(obj_out)["some_key"] == obj["some_key"]
 
     # test the integrity hash
+    # nosemgrep
     signing_key = "a1f928d87278290bf9dece075d0e46330a01d21b346073f4f193739078dca458"
 
     resp = post(

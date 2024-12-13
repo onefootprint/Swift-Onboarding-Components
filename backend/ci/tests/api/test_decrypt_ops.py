@@ -121,6 +121,7 @@ def test_data_integrity_check(sandbox_tenant):
     }
     body = patch(f"users/{fp_id}/vault", data, sandbox_tenant.sk.key)
 
+    # nosemgrep
     signing_key = "a1f928d87278290bf9dece075d0e46330a01d21b346073f4f193739078dca458"
 
     def check(resp):

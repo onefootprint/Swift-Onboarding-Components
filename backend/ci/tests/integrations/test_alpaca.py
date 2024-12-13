@@ -8,6 +8,7 @@ import datetime
 from enum import Enum, auto
 
 ALPACA_SANDBOX_API_KEY = "CK9ANXZG595Q7CHXAXX3"
+# nosemgrep
 ALPACA_SANDBOX_API_SECRET = "WBJf7VgZmE0oFBdFFCItK49p41jwpdLX9tcg9gsV"
 
 

@@ -582,6 +582,7 @@ mod tests {
                 serde_json::json!({
                     "success": true,
                     "uuid": "6633fd78db92f2f14debb563",
+                    // nosemgrep
                     "token": "eyJhbGciOiJIUzI1NiJ9.eyJleHRlcm5hbFVzZXJJZCI326IjY2MzNmZDc4ZGI5MmYyZjE0ZGViYjU2MyIsInJvbGUiOiJBQ0NFU1MiLCJUIjoiQyIsImtleVJlZiI6IjY0OWRjNzRkNGQzOTQxOWUzYmRiNmZlOSIsImV4cCI6MTcyMjYzMjA1NywiaWF0IjoxNzE0NjgzMjU3fQ.V7hpZs4jpUZrCh2IjKblhbYr5-dL1MTqtQRukY74-3o44",
                     "totalScore": "OK",
                     "existingCustomer": false

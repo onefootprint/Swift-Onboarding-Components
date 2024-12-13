@@ -114,6 +114,8 @@ PDF_DIR = os.path.join(os.path.dirname(__file__), "pdf")
 
 
 def str_hash(s):
+    # Not a security sensitive hash.
+    # nosemgrep: python.lang.security.insecure-hash-algorithms-md5.insecure-hash-algorithm-md5
     return int(hashlib.md5(s.encode()).hexdigest(), 16)
 
 

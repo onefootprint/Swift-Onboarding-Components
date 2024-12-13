@@ -136,6 +136,7 @@ async fn test_fetch_receipt() {
             "5F264K8AG4.com.onefootprint.my.Clip",
             "5F264K8AG4.com.onefootprint.demo-swift",
         ],
+        // nosemgrep
         "-----BEGIN PRIVATE KEY-----
 MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQg5dQK1vD+J6BPctWQ
 OnQ3z58zG0IrWakPqw6J0Es8k+igCgYIKoZIzj0DAQehRANCAAS/QUqu/nzVEoi/

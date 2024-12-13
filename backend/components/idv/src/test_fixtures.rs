@@ -3684,6 +3684,7 @@ pub fn cross_core_response_with_error() -> serde_json::Value {
           "recommendedNextActions": []
         },
         "responseMessage": "Workflow Complete.",
+        // nosemgrep
         "clientReferenceId": "vreq_lWimW2PqVkq1LAPskZizP"
       },
       "originalRequestData": {

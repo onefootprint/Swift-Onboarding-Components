@@ -66,6 +66,7 @@ impl WebauthnConfig {
             rp_id,
             vec![
                 #[allow(clippy::unwrap_used)]
+                // nosemgrep
                 url::Url::parse("android:apk-key-hash:D_woKFaP1yeRthdVOKrD03l1Dx6xKjgv7cCoE13UXcg").unwrap(),
             ],
             Some(120 * 1000),

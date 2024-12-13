@@ -727,3 +727,7 @@ backend/components/db/schema/migrations/2024-07-19-231133_backfill_is_billable/u
 
 # This has a number of keys and we can't use comments to filter them out.
 frontend/apps/docs/src/content/default/2-integrating/5-migrate-existing-users.mdx
+
+# Dummy credentials
+backend/external_tools/ditto/src/dummy_cert/server.key
+backend/external_tools/ditto/src/dummy_cert/client.key
