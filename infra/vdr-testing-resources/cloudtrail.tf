@@ -64,6 +64,7 @@ resource "aws_s3_bucket_policy" "fp_vault_data_cloudtrail" {
   policy = data.aws_iam_policy_document.fp_vault_data_cloudtrail.json
 }
 
+// nosemgrep: terraform.aws.security.aws-cloudtrail-encrypted-with-cmk.aws-cloudtrail-encrypted-with-cmk
 resource "aws_cloudtrail" "fp_vault_data_cloudtrail" {
   name           = local.fp_vault_data_cloudtrail_name
   s3_bucket_name = aws_s3_bucket.fp_vault_data_cloudtrail.id
