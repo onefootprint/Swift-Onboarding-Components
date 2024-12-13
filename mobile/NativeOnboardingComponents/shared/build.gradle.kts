@@ -1,3 +1,4 @@
+import com.vanniktech.maven.publish.SonatypeHost
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
@@ -8,12 +9,8 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
-    id("maven-publish") // Add maven-publish plugin
+    id("com.vanniktech.maven.publish") version "0.28.0"
 }
-
-version = "1.0.0-beta"
-group = "com.onefootprint.native_onboarding_components"
-
 
 kotlin {
     androidTarget {
@@ -95,11 +92,6 @@ android {
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
     }
-    publishing {
-        singleVariant("release") {
-            withSourcesJar()
-        }
-    }
 }
 
 dependencies {
@@ -108,49 +100,53 @@ dependencies {
     implementation(libs.androidx.activity)
 }
 
-// Configure publishing for Android AAR
-publishing {
-    repositories {
-        maven {
-            name = "local"
-            url = uri("$buildDir/repo")
-        }
-    }
-    publications {
-        create<MavenPublication>("release") {
-            groupId = group.toString()
-            artifactId = "native-onboarding-components"
-            version = project.version.toString()
+mavenPublishing {
+    coordinates(
+        groupId = project.findProperty("groupId") as String, // Retrieve groupId from gradle.properties
+        artifactId = project.findProperty("artifactId") as String, // Retrieve artifactId from gradle.properties
+        version = project.findProperty("version") as String // Retrieve version from gradle.properties
+    )
 
-            // Publish AAR file
-            artifact("$buildDir/outputs/aar/${project.name}-release.aar")
+    pom {
+        name.set(project.findProperty("projectName") as String) // Retrieve projectName from gradle.properties
+        description.set(project.findProperty("projectDescription") as String) // Retrieve projectDescription from gradle.properties
 
-            // Sources JAR
-            artifact(tasks.register<Jar>("sourceJar") {
-                from(android.sourceSets["main"].java.srcDirs)
-                archiveClassifier.set("sources")
-            })
-
-            // Customize the POM
-            pom {
-                withXml {
-                    val dependenciesNode = asNode().appendNode("dependencies")
-                    configurations["api"].allDependencies.forEach {
-                        val dependencyNode = dependenciesNode.appendNode("dependency")
-                        dependencyNode.appendNode("groupId", it.group)
-                        dependencyNode.appendNode("artifactId", it.name)
-                        dependencyNode.appendNode("version", it.version)
-                    }
-                }
+        licenses {
+            license {
+                name.set("The Apache Software License, Version 2.0")
+                url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
             }
         }
+
+        developers {
+            developer {
+                id.set(project.findProperty("ahsanId") as String) // Developer ID from gradle.properties
+                name.set(project.findProperty("ahsanName") as String) // Developer name from gradle.properties
+                email.set(project.findProperty("ahsanEmail") as String) // Developer email from gradle.properties
+            }
+            developer {
+                id.set(project.findProperty("rodrigoId") as String) // Developer ID from gradle.properties
+                name.set(project.findProperty("rodrigoName") as String) // Developer name from gradle.properties
+                email.set(project.findProperty("rodrigoEmail") as String) // Developer email from gradle.properties
+            }
+        }
+
+        url.set(project.findProperty("projectUrl") as String) // Retrieve projectUrl from gradle.properties
+        scm {
+            url.set(project.findProperty("scmUrl") as String) // Retrieve scmUrl from gradle.properties
+        }
+    }
+
+    // Configure publishing to Maven Central
+    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+
+    if (gradle.startParameter.taskNames.contains("shared:publishAndroidReleasePublicationToMavenCentralRepository")) {
+        signAllPublications()
     }
 }
 
+
 afterEvaluate {
-    tasks.named("publishReleasePublicationToLocalRepository") {
-        dependsOn(tasks.named("bundleReleaseAar"))
-    }
     tasks.register("packForXcode") {
         dependsOn("assembleSwiftOnboardingComponentsSharedXCFramework")
         doLast {
@@ -165,18 +161,6 @@ afterEvaluate {
             val targetFile = targetDirectory.resolve(outputFile.name)
 
             outputFile.copyRecursively(targetFile, overwrite = true)
-        }
-    }
-}
-
-afterEvaluate {
-    configure<PublishingExtension> {
-        publications.all {
-            val mavenPublication = this as? MavenPublication
-            // Rename artifactId from the default one if needed
-            if (mavenPublication?.artifactId == "shared-android") {
-                mavenPublication.artifactId = "android"
-            }
         }
     }
 }
