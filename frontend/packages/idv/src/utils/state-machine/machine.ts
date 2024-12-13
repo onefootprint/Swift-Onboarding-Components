@@ -214,6 +214,7 @@ const createIdvMachine = (args: IdvMachineArgs) =>
         assignIdentifyResult: assign((context, event) => {
           // Pass the phone and email collected in the identify machine into the requirements
           // machine. In very few cases, the phone and email are needed in the requirements machine
+          // TODO: why do we actually need this? is it in case they're bootstrap but we're logging into an existing user?
           if (event.payload.email) {
             context.bootstrapData[IdDI.email] = event.payload.email;
           }

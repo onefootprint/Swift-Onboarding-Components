@@ -1,21 +1,13 @@
-'use client';
+import { IdentifyLogin } from './components/identify-login';
+import type { DoneArgs, InitArgs } from './identify.types';
 
-import Router from './components/router';
-import SandboxFooter from './components/sandbox-footer';
-import { IdentifyMachineProvider } from './state';
-import type { IdentifyMachineArgs } from './state/types';
-import type { DoneArgs } from './types';
-
-type IdentifyProps = IdentifyMachineArgs & {
+type IdentifyProps = {
   onDone: (args: DoneArgs) => void;
+  initArgs: InitArgs;
 };
 
-// TODO move this to its own package
-const Identify = ({ onDone, ...args }: IdentifyProps): JSX.Element | null => (
-  <IdentifyMachineProvider args={args}>
-    <Router onDone={onDone} />
-    <SandboxFooter />
-  </IdentifyMachineProvider>
-);
+const Identify = ({ onDone, initArgs }: IdentifyProps) => {
+  return <IdentifyLogin initialArgs={initArgs} onDone={onDone} />;
+};
 
 export default Identify;

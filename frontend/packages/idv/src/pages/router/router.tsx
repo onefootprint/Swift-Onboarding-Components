@@ -3,11 +3,12 @@ import { IdDI, SessionStatus } from '@onefootprint/types';
 import { useEffect } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
+import { type DoneArgs, Identify } from '@/idv/components/identify';
+import { IdentifyVariant } from '@/idv/components/identify/identify.types';
 import { getErrorMessage } from '@onefootprint/request';
 import GenericErrorPage from '../../../src/components/gerenic-error-page/generic-error-page';
 import { IDV_SESSION_RETRY_LIMIT } from '../../../src/config/constants';
 import { AppErrorBoundary, SessionExpired } from '../../components';
-import { Identify, IdentifyVariant } from '../../components/identify';
 import { L10nContextProvider } from '../../components/l10n-provider';
 import LoadNeuroId from '../../components/load-neuro-id';
 import { useIdvMachine, useLogStateMachine } from '../../hooks';
@@ -103,6 +104,16 @@ const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
     };
   });
 
+  const handleIdentifyDone = (payload: DoneArgs) => {
+    send({ type: 'identifyCompleted', payload });
+
+    if (onIdentifyDone && payload) {
+      onIdentifyDone(payload);
+    }
+
+    trackAction('identify:completed');
+  };
+
   return (
     <AppErrorBoundary onReset={() => send({ type: 'reset' })}>
       {!isTransfer && <LoadNeuroId config={config} />}
@@ -111,36 +122,28 @@ const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
       {state.matches('identify') && config && device ? (
         <L10nContextProvider l10n={l10n}>
           <Identify
-            variant={IdentifyVariant.verify}
-            device={device}
-            config={config}
-            isLive={config.isLive}
-            overallOutcome={overallOutcome}
-            sandboxId={sandboxId}
-            initialAuthToken={authToken}
-            obConfigAuth={obConfigAuth}
-            isComponentsSdk={!!componentsSdkContext}
-            bootstrapData={{
-              email: bootstrapData?.[IdDI.email]?.value,
-              phoneNumber: bootstrapData?.[IdDI.phoneNumber]?.value,
-            }}
-            logoConfig={
-              showLogo
+            initArgs={{
+              variant: IdentifyVariant.verify,
+              device,
+              config,
+              isLive: config.isLive,
+              overallOutcome,
+              sandboxId,
+              initialAuthToken: authToken,
+              obConfigAuth: obConfigAuth,
+              isComponentsSdk: !!componentsSdkContext,
+              bootstrapData: {
+                email: bootstrapData?.[IdDI.email]?.value,
+                phoneNumber: bootstrapData?.[IdDI.phoneNumber]?.value,
+              },
+              logoConfig: showLogo
                 ? {
                     orgName: config.orgName,
                     logoUrl: config.logoUrl || undefined,
                   }
-                : undefined
-            }
-            onDone={payload => {
-              send({ type: 'identifyCompleted', payload });
-
-              if (onIdentifyDone && payload) {
-                onIdentifyDone(payload);
-              }
-
-              trackAction('identify:completed');
+                : undefined,
             }}
+            onDone={handleIdentifyDone}
           />
         </L10nContextProvider>
       ) : null}

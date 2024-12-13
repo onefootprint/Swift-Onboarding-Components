@@ -1,4 +1,4 @@
-import useEffectOnceStrict from '@/idv/components/identify/hooks/use-effect-once-strict';
+import useEffectOnceStrict from '@/idv/components/identify/components/identify-login/hooks/use-effect-once-strict';
 import { useDecryptUser } from '@/idv/queries';
 import type { InvestorProfileDI, InvestorProfileData } from '@onefootprint/types';
 import type React from 'react';

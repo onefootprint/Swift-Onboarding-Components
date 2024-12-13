@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { getLogger, trackAction } from '@/idv/utils';
-import { UpdateVerify } from '../../../../components/identify';
+import { UpdateVerify } from '../../../../components/identify/components/identify-login';
 import StepHeader from '../../../../components/step-header';
 import { useLogStateMachine } from '../../../../hooks';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';

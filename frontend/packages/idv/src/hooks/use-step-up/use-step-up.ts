@@ -9,7 +9,11 @@ import { ChallengeKind, IdentifyTokenScope, UserTokenScope } from '@onefootprint
 import { useState } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
-import { useIdentify, useIdentifyVerify, useLoginChallenge } from '../../components/identify/queries';
+import {
+  useIdentify,
+  useIdentifyVerify,
+  useLoginChallenge,
+} from '../../components/identify/components/identify-login/queries';
 import type { DeviceInfo } from '../../hooks';
 import { useUserToken } from '../../queries';
 import getBiometricChallengeResponse from './utils/get-biometric-challenge-response';

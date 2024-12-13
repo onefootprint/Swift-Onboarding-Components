@@ -3,7 +3,7 @@
 import type { DeviceInfo } from '@onefootprint/idv';
 import { trackAction } from '@onefootprint/idv';
 import { Identify, IdentifyVariant } from '@onefootprint/idv/src/components/identify';
-import type { ObKeyHeader } from '@onefootprint/idv/src/components/identify/types';
+import type { ObKeyHeader } from '@onefootprint/idv/src/components/identify/identify.types';
 import { CLIENT_PUBLIC_KEY_HEADER, ChallengeKind, type PublicOnboardingConfig } from '@onefootprint/types';
 import type { AuthDataPropsWithToken } from '../../state';
 
@@ -28,21 +28,21 @@ const IdentifyAuthPage = () => {
 
   return (
     <Identify
-      variant={IdentifyVariant.auth}
-      device={device}
-      obConfigAuth={getOnboardConfigurationKey(publicKey)}
-      initialAuthToken={initialAuthToken}
-      config={config}
-      isLive={!!config?.isLive}
-      bootstrapData={getAuthBootstrapData(state.context.props || voidObj)}
-      logoConfig={
-        options.showLogo
+      initArgs={{
+        variant: IdentifyVariant.auth,
+        device,
+        obConfigAuth: getOnboardConfigurationKey(publicKey),
+        initialAuthToken: initialAuthToken,
+        config,
+        isLive: !!config?.isLive,
+        bootstrapData: getAuthBootstrapData(state.context.props || voidObj),
+        logoConfig: options.showLogo
           ? {
               logoUrl: config?.logoUrl ?? undefined,
               orgName: config?.orgName,
             }
-          : undefined
-      }
+          : undefined,
+      }}
       onDone={args => {
         const isPasskeyAlreadyRegistered = args.availableChallengeKinds?.includes(ChallengeKind.biometric);
         trackAction('auth:identify-completed');

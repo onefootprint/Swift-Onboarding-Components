@@ -1,6 +1,6 @@
 import { type BusinessDIData, CollectedKybDataOption } from '@onefootprint/types';
 import type React from 'react';
-import useEffectOnceStrict from '../../../../components/identify/hooks/use-effect-once-strict';
+import useEffectOnceStrict from '../../../../components/identify/components/identify-login/hooks/use-effect-once-strict';
 import { useDecryptBusiness } from '../../../../queries';
 import { useCollectKybDataMachine } from '../../components/machine-provider';
 import { BusinessFields } from '../../utils/constants';

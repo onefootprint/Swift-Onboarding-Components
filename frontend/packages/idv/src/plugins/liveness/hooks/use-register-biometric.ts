@@ -3,7 +3,10 @@ import { AuthMethodKind } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 import base64url from 'base64url';
 
-import { useUserChallenge, useUserChallengeVerify } from '../../../components/identify/queries';
+import {
+  useUserChallenge,
+  useUserChallengeVerify,
+} from '../../../components/identify/components/identify-login/queries';
 
 const registerPasskeyOnDevice = async (challenge: string) => {
   const challengeJson = JSON.parse(challenge) as BiometricRegisterChallengeJson;

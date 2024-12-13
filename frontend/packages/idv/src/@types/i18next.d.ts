@@ -7,7 +7,6 @@ import type idvResource from '../config/locales/en/idv.json';
 declare module 'i18next' {
   interface CustomTypeOptions {
     defaultNS: 'idv';
-    fallbackNS: 'idv';
     resources: {
       identify: typeof identifyResource;
       idv: typeof idvResource;

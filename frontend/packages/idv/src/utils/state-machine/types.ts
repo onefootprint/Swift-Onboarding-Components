@@ -1,6 +1,6 @@
 import type { IdDocOutcome, ObConfigAuth, OverallOutcome, PublicOnboardingConfig } from '@onefootprint/types';
 
-import type { DoneArgs } from '../../components/identify';
+import type { DoneArgs } from '@/idv/components/identify';
 import type { DeviceInfo } from '../../hooks';
 import type { BusinessData, UserData } from '../../types';
 import type { AuthTokenPayload, DeviceResponseJsonPayload } from './utils/custom-listener';

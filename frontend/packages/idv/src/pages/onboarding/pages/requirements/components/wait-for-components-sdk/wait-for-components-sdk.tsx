@@ -1,6 +1,6 @@
 import { CreateUserTokenScope } from '@onefootprint/types/src/api/create-user-token';
 
-import useEffectOnceStrict from '@/idv/components/identify/hooks/use-effect-once-strict';
+import useEffectOnceStrict from '@/idv/components/identify/components/identify-login/hooks/use-effect-once-strict';
 import { Logger } from '@/idv/utils';
 import { useOnboardingRequirementsMachine } from '../machine-provider';
 import useCreateToken from './hooks/use-create-token';
