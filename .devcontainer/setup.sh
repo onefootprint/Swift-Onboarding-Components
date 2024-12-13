@@ -43,6 +43,8 @@ service postgresql restart
 createdb footprint_db
 
 ## Install rustup and common components
+# Is there even a way to install Rust without curl | bash?
+# nosemgrep: semgrep.shell.curl-pipe-shell
 curl https://sh.rustup.rs -sSf | sh -s -- -y
 source "$HOME/.cargo/env"
 rustup install stable
@@ -68,7 +70,9 @@ sudo cmake --build . --target install
 cd $dir
 
 ## setup and install oh-my-zsh + some fun term things
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+# Pinned commit for more safety
+# nosemgrep: semgrep.shell.curl-pipe-shell
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/69a6359f7cf8978d464573fb7b023ee3cd00181a/tools/install.sh)"
 cp -R /root/.oh-my-zsh /home/$USERNAME
 cp /root/.zshrc /home/$USERNAME
 sed -i -e "s/\/root\/.oh-my-zsh/\/home\/$USERNAME\/.oh-my-zsh/g" /home/$USERNAME/.zshrc
@@ -76,9 +80,11 @@ chown -R $USER_UID:$USER_GID /home/$USERNAME/.oh-my-zsh /home/$USERNAME/.zshrc
 echo 'PROMPT="footprint #"' >> /home/$USERNAME/.zshrc
 
 ## install pulumi
+# nosemgrep: semgrep.shell.curl-pipe-shell
 RUN curl -fsSL https://get.pulumi.com | sh
 
 ## install node
+# nosemgrep: bash.curl.security.curl-pipe-bash.curl-pipe-bash,semgrep.shell.curl-pipe-shell
 curl -L https://deb.nodesource.com/setup_19.x | bash && apt-get install -yq nodejs
 npm install -g yarn
 

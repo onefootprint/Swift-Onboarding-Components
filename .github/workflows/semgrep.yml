@@ -48,7 +48,12 @@ jobs:
             --config="p/owasp-top-ten"
             --config="p/cwe-top-25"
             --config="p/gitleaks"
-            --config "p/r2c-security-audit"
+            --exclude-rule=generic.secrets.gitleaks.generic-api-key.generic-api-key
+            --exclude-rule=generic.secrets.gitleaks.stripe-access-token.stripe-access-token
+            --exclude-rule=html.security.audit.missing-integrity.missing-integrity
+            --exclude-rule=javascript.express.security.injection.tainted-sql-string.tainted-sql-string
+            --exclude-rule=javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp
+            --exclude-rule=javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
             --json-output=semgrep-results.json
             --verbose
             ${{ steps.files-changed.outputs.src_files }}

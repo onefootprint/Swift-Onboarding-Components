@@ -1,0 +1,43 @@
+# Same as https://semgrep.dev/r?q=bash.curl.security.curl-pipe-bash.curl-pipe-bash
+# but supporting wget and more shells
+rules:
+  - id: curl-pipe-shell
+    languages:
+      - bash
+    severity: WARNING
+    message: Data is being piped into a shell from a `curl`/`wget` command. An attacker with
+      control of the server in the `curl`/`wget` command could inject malicious code
+      into the pipe, resulting in a system compromise. Avoid piping untrusted
+      data into `sh` or any other shell if you can. If you must do this,
+      consider checking the SHA sum of the content returned by the server to
+      verify its integrity.
+    patterns:
+      - pattern-either:
+          # Dupes of bash.curl.security.curl-pipe-bash.curl-pipe-bash
+          # - pattern: curl ... | ... bash ...
+          # - pattern: curl ... | ... /bin/bash ...
+          # - pattern: ... bash <(curl ...)
+          # - pattern: ... /bin/bash <(curl ...)
+          # - pattern: ... bash -c "$(curl ...)"
+          # - pattern: ... /bin/bash -c "$(curl ...)"
+
+          - pattern: curl ... | ... sh ...
+          - pattern: curl ... | ... /bin/sh ...
+          - pattern: ... sh <(curl ...)
+          - pattern: ... /bin/sh <(curl ...)
+          - pattern: ... sh -c "$(curl ...)"
+          - pattern: ... /bin/sh -c "$(curl ...)"
+
+          - pattern: wget ... | ... bash ...
+          - pattern: wget ... | ... /bin/bash ...
+          - pattern: ... bash <(wget ...)
+          - pattern: ... /bin/bash <(wget ...)
+          - pattern: ... bash -c "$(wget ...)"
+          - pattern: ... /bin/bash -c "$(wget ...)"
+
+          - pattern: wget ... | ... sh ...
+          - pattern: wget ... | ... /bin/sh ...
+          - pattern: ... sh <(wget ...)
+          - pattern: ... /bin/sh <(wget ...)
+          - pattern: ... sh -c "$(wget ...)"
+          - pattern: ... /bin/sh -c "$(wget ...)"
