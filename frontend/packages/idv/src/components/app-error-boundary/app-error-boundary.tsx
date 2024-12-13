@@ -24,7 +24,7 @@ const AppErrorBoundary = ({ children, onReset }: AppErrorBoundaryProps) => {
     const stackTrace = String(stack.componentStack).slice(0, 100);
     const contextMessage = `AppErrorBoundary, stack: ${stackTrace}`;
 
-    console.error(contextMessage, error);
+    console.error('%s', contextMessage, error);
 
     logError(contextMessage, error);
 

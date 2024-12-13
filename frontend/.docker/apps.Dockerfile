@@ -30,6 +30,9 @@ COPY --link package.json /frontend
 COPY --link pnpm-lock.yaml /frontend
 COPY --link pnpm-workspace.yaml /frontend
 
+RUN chown -R node:node /frontend
+USER node:node
+
 RUN for app in demos components hosted handoff auth bifrost; do \
     sed -i 's/"build": "next build"/"build": "next build --no-lint"/g' /frontend/apps/$app/package.json; \
 done

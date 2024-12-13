@@ -69,7 +69,7 @@ const processIcoPath = async icoPath => {
     }
     await createIcoComponent(icoPath);
   } catch (error) {
-    console.error(`Error processing ${icoPath}:`, error);
+    console.error('Error processing %s', icoPath, error);
   }
 };
 

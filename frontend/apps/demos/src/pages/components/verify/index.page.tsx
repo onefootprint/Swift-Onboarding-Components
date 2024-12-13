@@ -3,8 +3,8 @@ import { FootprintComponentKind } from '@onefootprint/footprint-js';
 import { Button } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import styled, { css } from 'styled-components';
 
+import styled, { css } from 'styled-components';
 import fakeSdk from '../../../helpers/fake-sdk';
 import getQueryArgs, { isString } from '../../../helpers/get-query-args';
 
@@ -39,9 +39,9 @@ const VerifyDemo = () => {
       bootstrapData,
       kind: FootprintComponentKind.Verify,
       l10n: { locale: locale as SupportedLocale },
-      onAuth: (s: string) => console.log(`${FootprintComponentKind.Verify} onAuth`, s),
-      onCancel: () => console.log(`${FootprintComponentKind.Verify} onCancel`),
-      onClose: () => console.log(`${FootprintComponentKind.Verify} onClose`),
+      onAuth: (s: string) => console.log('%s onAuth', FootprintComponentKind.Verify, s),
+      onCancel: () => console.log('%s onCancel', FootprintComponentKind.Verify),
+      onClose: () => console.log('%s onClose', FootprintComponentKind.Verify),
       onComplete,
       options: { showLogo: false },
       ...(authToken ? { authToken } : { publicKey }),

@@ -731,3 +731,14 @@ frontend/apps/docs/src/content/default/2-integrating/5-migrate-existing-users.md
 # Dummy credentials
 backend/external_tools/ditto/src/dummy_cert/server.key
 backend/external_tools/ditto/src/dummy_cert/client.key
+
+# Generated files that may have placeholder secrets
+frontend/apps/docs/src/pages/api-reference/assets/*.json
+frontend/packages/request-types/dashboard.ts
+frontend/packages/fixtures/dashboard.ts
+frontend/packages/fixtures/index.ts
+frontend/packages/fixtures/config/persisted-values.ts
+frontend/packages/axios/index.ts
+frontend/packages/fetch/index.ts
+**/*.gen.ts
+mobile/NativeOnboardingComponents/shared/src/commonMain/kotlin/com/onefootprint/native_onboarding_components/client/models/*.kt

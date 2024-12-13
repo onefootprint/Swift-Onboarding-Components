@@ -16,7 +16,7 @@ type AccountCreationPayload = {
 
 const submitHubspotOnboardingForm = async (payload: AccountCreationPayload) => {
   const HUBSPOT_PORTAL_ID = '44814407';
-  const HUBSPOT_FORM_ID = 'e018a6b8-616f-4f74-99f7-d7004ca8e63b';
+  const HUBSPOT_FORM_ID = 'e018a6b8-616f-4f74-99f7-d7004ca8e63b'; // nosemgrep
   const HUBSPOT_FORM_URL = 'https://api.hsforms.com/submissions/v3/integration/submit';
   const HUBSPOT_TOKEN = process.env.NEXT_PUBLIC_HUBSPOT_TOKEN;
 
