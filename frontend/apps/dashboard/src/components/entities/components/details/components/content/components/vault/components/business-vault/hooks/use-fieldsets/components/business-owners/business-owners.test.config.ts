@@ -39,7 +39,6 @@ export const withBusinessOwners = (entity = entityFixture) => {
         fpId: 'fp_id_test_4Cuir5AKf9Hdaxyjay3fMZ',
         status: 'incomplete',
         ownershipStake: 24,
-        // @ts-expect-error fix once we migrate to the new entity types
         ownershipStakeDi: 'business.beneficial_owners.bo_link_primary.ownership_stake',
         kind: 'primary',
         source: 'hosted',
@@ -49,7 +48,6 @@ export const withBusinessOwners = (entity = entityFixture) => {
         fpId: 'fp_id_test_5Duir6BLg0Iebxzkbz4gNa',
         status: 'incomplete',
         ownershipStake: 35,
-        // @ts-expect-error fix once we migrate to the new entity types
         ownershipStakeDi: 'business.beneficial_owners.bo_link_primary.ownership_stake',
         kind: 'secondary',
         source: 'hosted',
@@ -59,7 +57,6 @@ export const withBusinessOwners = (entity = entityFixture) => {
         fpId: 'fp_id_test_6Euir7CMh1Jfcyalc05hOb',
         status: 'incomplete',
         ownershipStake: 41,
-        // @ts-expect-error fix once we migrate to the new entity types
         ownershipStakeDi: 'business.beneficial_owners.bo_link_primary.ownership_stake',
         kind: 'secondary',
         source: 'hosted',

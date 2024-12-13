@@ -401,6 +401,24 @@ open class DocumentApi : ApiClient {
         @SerialName(value = "business.country")
         businessPeriodCountry("business.country"),
         
+        @SerialName(value = "business.beneficial_owners.*.ownership_stake")
+        businessPeriodBeneficial_ownersPeriodStarPeriodOwnership_stake("business.beneficial_owners.*.ownership_stake"),
+        
+        @SerialName(value = "business.beneficial_owners.*.id.first_name")
+        businessPeriodBeneficial_ownersPeriodStarPeriodIdPeriodFirst_name("business.beneficial_owners.*.id.first_name"),
+        
+        @SerialName(value = "business.beneficial_owners.*.id.last_name")
+        businessPeriodBeneficial_ownersPeriodStarPeriodIdPeriodLast_name("business.beneficial_owners.*.id.last_name"),
+        
+        @SerialName(value = "business.beneficial_owners.*.id.phone_number")
+        businessPeriodBeneficial_ownersPeriodStarPeriodIdPeriodPhone_number("business.beneficial_owners.*.id.phone_number"),
+        
+        @SerialName(value = "business.beneficial_owners.*.id.email")
+        businessPeriodBeneficial_ownersPeriodStarPeriodIdPeriodEmail("business.beneficial_owners.*.id.email"),
+        
+        @SerialName(value = "business.beneficial_owner_explanation_message")
+        businessPeriodBeneficial_owner_explanation_message("business.beneficial_owner_explanation_message"),
+        
         @SerialName(value = "business.corporation_type")
         businessPeriodCorporation_type("business.corporation_type"),
         

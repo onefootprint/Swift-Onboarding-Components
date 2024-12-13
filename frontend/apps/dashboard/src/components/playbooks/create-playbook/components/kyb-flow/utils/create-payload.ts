@@ -115,7 +115,6 @@ const createBusinessDocumentsPayload = (businessForm: BusinessFormData) => {
       kind: 'custom',
       data: {
         description: doc.description,
-        // @ts-expect-error: fix once we support template literals
         identifier: `document.custom.${doc.identifier}`,
         name: doc.name,
         requiresHumanReview: true,

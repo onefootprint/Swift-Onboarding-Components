@@ -25,6 +25,12 @@ import kotlinx.serialization.encoding.*
  *
  * @param businessAddressLine1 
  * @param businessAddressLine2 
+ * @param businessBeneficialOwnerExplanationMessage 
+ * @param businessBeneficialOwnersStarIdEmail 
+ * @param businessBeneficialOwnersStarIdFirstName 
+ * @param businessBeneficialOwnersStarIdLastName 
+ * @param businessBeneficialOwnersStarIdPhoneNumber 
+ * @param businessBeneficialOwnersStarOwnershipStake 
  * @param businessCity 
  * @param businessCorporationType 
  * @param businessCountry 
@@ -46,6 +52,18 @@ data class ModernRawBusinessDataRequest (
     @SerialName(value = "business.address_line1") val businessAddressLine1: kotlin.String? = null,
 
     @SerialName(value = "business.address_line2") val businessAddressLine2: kotlin.String? = null,
+
+    @SerialName(value = "business.beneficial_owner_explanation_message") val businessBeneficialOwnerExplanationMessage: kotlin.String? = null,
+
+    @SerialName(value = "business.beneficial_owners.*.id.email") val businessBeneficialOwnersStarIdEmail: kotlin.String? = null,
+
+    @SerialName(value = "business.beneficial_owners.*.id.first_name") val businessBeneficialOwnersStarIdFirstName: kotlin.String? = null,
+
+    @SerialName(value = "business.beneficial_owners.*.id.last_name") val businessBeneficialOwnersStarIdLastName: kotlin.String? = null,
+
+    @SerialName(value = "business.beneficial_owners.*.id.phone_number") val businessBeneficialOwnersStarIdPhoneNumber: kotlin.String? = null,
+
+    @SerialName(value = "business.beneficial_owners.*.ownership_stake") val businessBeneficialOwnersStarOwnershipStake: kotlin.String? = null,
 
     @SerialName(value = "business.city") val businessCity: kotlin.String? = null,
 

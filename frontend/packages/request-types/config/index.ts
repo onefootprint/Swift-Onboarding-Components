@@ -3,6 +3,7 @@ import path from 'path';
 import { createClient } from '@hey-api/openapi-ts';
 import fs from 'fs/promises';
 import { keyTypestoCamelCase } from './key-types-to-camel-case';
+import { replaceAsteriskData } from './replace-asterisk-data';
 import { runBiome } from './run-biome';
 import { updateKotlin } from './update-kotlin';
 import { updateOpenApi } from './update-openapi';
@@ -20,6 +21,8 @@ const createSDKTypes = async () => {
   });
 
   await keyTypestoCamelCase(path.resolve(clientDir, 'types.gen.ts'));
+  runBiome(path.resolve(clientDir, 'types.gen.ts'));
+  await replaceAsteriskData(path.resolve(clientDir, 'types.gen.ts'));
 
   runBiome(path.resolve(clientDir, 'types.gen.ts'));
   runBiome(path.resolve(clientDir, 'index.ts'));
@@ -43,6 +46,8 @@ const createDashboardTypes = async () => {
   const dashboardTypesPath = path.resolve('dashboard.ts');
 
   await keyTypestoCamelCase(generatedTypesPath);
+  runBiome(generatedTypesPath);
+  await replaceAsteriskData(generatedTypesPath);
 
   await fs.writeFile(dashboardTypesPath, '');
 
