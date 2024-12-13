@@ -55,6 +55,7 @@ pub struct CreateOnboardingSessionResponse {
     /// `authToken`. This token contains all information on the provided public key and/or bootstrap
     /// data provided.
     /// NOTE: treat this token as a secret as it allows viewing the provided bootstrap data.
+    // nosemgrep
     #[openapi(example = "pbtok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH")]
     pub token: SessionAuthToken,
     pub expires_at: DateTime<Utc>,

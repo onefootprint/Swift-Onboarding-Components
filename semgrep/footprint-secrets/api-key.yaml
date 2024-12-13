@@ -2,8 +2,17 @@ rules:
   - id: api-key
     languages:
       - generic
-    message: Do not commit secrets to version control. Please ensure these tokens are expired or rotated.
+    message: Do not commit secrets to version control. Please ensure these tokens are expired or rotated. If this is a verified fake token used in public documentation, you can add it to the exception list in https://github.com/onefootprint/monorepo/blob/master/semgrep/footprint-secrets/api-key.yaml.
     severity: ERROR
     patterns:
-      - pattern-regex: "sk_(test|live)_[A-Za-z0-9]{16,}"
+      - pattern-regex: "(sk_(test|live)_[A-Za-z0-9]{16,})"
+      - metavariable-pattern:
+          metavariable: $1
+          language: generic
+          patterns:
+            # Fake keys used for public documentation.
+            - pattern-not: sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv
+            - pattern-not: sk_test_CJvsN1kaZH3GGtYkaZH3GGtY
+            - pattern-not: sk_test_0Te2YtSveZpWLMjQgNRkCv6siiC86iMIkZ
+            - pattern-not: sk_live_Zlkert4344in3Gerfere
 

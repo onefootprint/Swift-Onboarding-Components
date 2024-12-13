@@ -46,7 +46,7 @@ describe('onboarding session mergeData', () => {
     // Take bootstrap and public key from onboardingSessionData
     {
       sdkArgsData: {
-        authToken: 'pbtok_ARttvedCJJMQSpJUrjXarQypre6iTE0b9m',
+        authToken: 'pbtok_xyz',
         isComponentsSdk: false,
       },
       onboardingSessionData: {
@@ -66,7 +66,7 @@ describe('onboarding session mergeData', () => {
     // Take bootstrap from sdkArgsData and public key from onboardingSessionData
     {
       sdkArgsData: {
-        authToken: 'pbtok_ARttvedCJJMQSpJUrjXarQypre6iTE0b9m',
+        authToken: 'pbtok_xyz',
         isComponentsSdk: false,
         bootstrapData: {
           'id.first_name': 'Piip',
@@ -85,7 +85,7 @@ describe('onboarding session mergeData', () => {
     // Complex example
     {
       sdkArgsData: {
-        authToken: 'pbtok_ARttvedCJJMQSpJUrjXarQypre6iTE0b9m',
+        authToken: 'pbtok_xyz',
         options: {
           showCompletionPage: true,
         },
@@ -130,7 +130,7 @@ describe('onboarding session mergeData errors', () => {
     // Conflicting boostrapData
     {
       sdkArgsData: {
-        authToken: 'pbtok_ARttvedCJJMQSpJUrjXarQypre6iTE0b9m',
+        authToken: 'pbtok_xyz',
         publicKey: 'pb_test_6x058TxMoRD7ajDKEeZ6t9',
         bootstrapData: {
           'id.first_name': 'Percy',
@@ -147,7 +147,7 @@ describe('onboarding session mergeData errors', () => {
     // Conflicting boostrapData (with legacy userData key)
     {
       sdkArgsData: {
-        authToken: 'pbtok_ARttvedCJJMQSpJUrjXarQypre6iTE0b9m',
+        authToken: 'pbtok_xyz',
         publicKey: 'pb_test_6x058TxMoRD7ajDKEeZ6t9',
         userData: {
           'id.first_name': 'Percy',

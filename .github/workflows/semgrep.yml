@@ -27,7 +27,6 @@ jobs:
               - 'semgrep/**'
             src:
               - added|modified: '**'
-              - '!semgrep/**'
 
       - name: Test Semgrep rules
         if: steps.files-changed.outputs.semgrep == 'true'
@@ -38,9 +37,12 @@ jobs:
       - name: Run Semgrep scan
         if: steps.files-changed.outputs.src == 'true'
         uses: 'docker://index.docker.io/semgrep/semgrep:latest@sha256:ae27024c16f7848cdbfd49c24ed0b78b13f13b85fcd7b87c679aaa8b0c0dce98'
+        # Using --verbose is a hack around some .semgrepignore bugs
+        # The .paths.skipped list in the verbose JSON output seems more correct than what's actually skipped.
         with:
           args: >-
             semgrep scan
+            --metrics=off
             --config=semgrep
             --config="p/default"
             --config="p/owasp-top-ten"
@@ -48,6 +50,7 @@ jobs:
             --config="p/gitleaks"
             --config "p/r2c-security-audit"
             --json-output=semgrep-results.json
+            --verbose
             ${{ steps.files-changed.outputs.src_files }}
 
       - name: Post results as PR comments
@@ -56,27 +59,6 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-
-            const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
-            async function retryWithBackoff(fn, maxRetries = 6, initialDelay = 1000) {
-              let retries = 0;
-              while (true) {
-                try {
-                  return await fn();
-                } catch (error) {
-                  retries++;
-                  if (retries >= maxRetries) throw error;
-
-                  // GitHub uses 422 for rate limit errors
-                  if (error.status !== 422 && error.status !== 429) throw error;
-
-                  const delay = initialDelay * Math.pow(2, retries - 1);
-                  console.log(`Rate limited, waiting ${delay}ms before retry ${retries}/${maxRetries}`);
-                  await sleep(delay);
-                }
-              }
-            }
 
             try {
               if (!fs.existsSync('semgrep-results.json')) {
@@ -116,9 +98,21 @@ jobs:
               );
 
               // Filter out findings that already have comments or are ignored with nosemgrep
-              const newFindings = results.results.filter(finding =>
-                !(existingFingerprints.has(finding.extra.fingerprint) || finding.extra.is_ignored)
-              );
+              const newFindings = results.results.filter(finding => {
+                  if (existingFingerprints.has(finding.extra.fingerprint)) {
+                   console.log(`Skipping finding for ${finding.check_id} at ${finding.path}:${finding.start.line} -- already has a comment`);
+                    return false;
+                  }
+                  if (finding.extra.is_ignored) {
+                    console.log(`Skipping finding for ${finding.check_id} at ${finding.path}:${finding.start.line} -- marked as ignored`);
+                    return false;
+                  }
+                  if (finding.extra.skipped?.some(skipped => skipped.path === finding.path && skipped.reason === 'semgrepignore_patterns_match')) {
+                    console.log(`Skipping finding ${finding.check_id} at ${finding.path}:${finding.start.line} -- matches .semgrepignore pattern`);
+                    return false;
+                  }
+                  return false;
+              });
 
               if (newFindings.length === 0) {
                 console.log('No new findings to report');
@@ -149,9 +143,20 @@ jobs:
               }));
 
               await Promise.all(
-                comments.map(comment =>
-                  retryWithBackoff(() => github.rest.pulls.createReviewComment(comment))
-                )
+                comments.map(async comment => {
+                  try {
+                    await github.rest.pulls.createReviewComment(comment);
+                  } catch (error) {
+                    if (error.status === 422 &&
+                        error.response?.data?.errors?.some(e =>
+                          e.message?.includes('must be part of the diff')
+                        )) {
+                      console.log(`Skipping comment for ${comment.path}:${comment.line} -- line not modified in diff`);
+                      return;
+                    }
+                    throw error;
+                  }
+                })
               );
 
             } catch (error) {

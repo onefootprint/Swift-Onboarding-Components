@@ -85,6 +85,7 @@ pub struct CreateKycLinksRequest {
     /// Will generate and return links for all BOs regardless.
     #[serde(default)]
     #[openapi(optional)]
+    // nosemgrep
     #[openapi(example = r#"["bo_EBYciq9X2bkIPMMqnL4R9P"]"#)]
     pub send_to_bo_ids: Vec<BoId>,
 }
@@ -96,9 +97,11 @@ pub struct PrivateBusinessOwnerKycLink {
     #[openapi(example = "Jane D.")]
     pub name: Option<PiiString>,
     #[openapi(
+        // nosemgrep
         example = "https://api.onefootprint.com?type=bo&r=380#botok_2dpe8Wye1ZJLsx6KoppVGdcxGzh2HUwjwR"
     )]
     pub link: PiiString,
+    // nosemgrep
     #[openapi(example = "botok_2dpe8Wye1ZJLsx6KoppVGdcxGzh2HUwjwR")]
     pub token: SessionAuthToken,
 }

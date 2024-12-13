@@ -9,4 +9,3 @@ utok_abc12346ABCabcdefghijkl
 
 # ruleid: session-token
 dbtok_abc12346ABCabcdefghijkl0123
-

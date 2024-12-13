@@ -79,7 +79,7 @@ export const authRolesFixture: GetAuthRoleResponse = [
 ];
 
 export const orgAssumeRoleFixture: OrgAssumeRoleResponse = {
-  token: 'dbtok_AiOqOM04E6wX3jM2Dd97IbSMbfpqdKoT8o',
+  token: 'dbtok_fake',
   user: {
     id: 'orguser_k0yUYuO2fFCwMHFPShuK77',
     email: 'jane@onefootprint.com',

@@ -112,6 +112,7 @@ mod tests {
 
         assert!(test_json.contains(test.key.0.as_str()));
 
+        // nosemgrep
         let fake_key = "sk_live_testkey123456789012345678901234567";
         let json = serde_json::json!({ "key": fake_key });
 

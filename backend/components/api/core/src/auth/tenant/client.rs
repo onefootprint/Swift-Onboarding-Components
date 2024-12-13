@@ -60,6 +60,7 @@ impl paperclip::v2::schema::Apiv2Schema for ParsedClientTenantData {
                 "Short-lived client token issued by the `POST /users/{fp_id}/client_token` API.".to_string(),
             ),
             example: Some(serde_json::Value::String(
+                // nosemgrep
                 "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH".to_owned(),
             )),
             ..Default::default()

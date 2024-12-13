@@ -22,12 +22,12 @@ const meta: Meta<typeof AwaitingBosEvent> = {
               getPrivateBusinessOwnerKycLink({
                 id: 'bo_LCG6lhG5P44H4RrXffoxlA',
                 name: 'Jane D.',
-                link: 'http://hosted.onefootprint.com?type=bo&r=713#botok_zCHOLmqnX97FlggJa1IUQVxPxRAwo4twad',
+                link: 'http://hosted.onefootprint.com?type=bo&r=713#botok_fake',
               }),
               getPrivateBusinessOwnerKycLink({
                 id: 'bo_KDH7miH6Q55I5SsYggpymB',
                 name: 'John S.',
-                link: 'http://hosted.onefootprint.com?type=bo&r=714#botok_aDIPMnroY98GmhhKb2JVRWyQySBxp5uxbe',
+                link: 'http://hosted.onefootprint.com?type=bo&r=714#botok_fake',
               }),
             ]);
           },

@@ -2,8 +2,25 @@ rules:
   - id: session-token
     languages:
       - generic
-    message: Do not commit secrets to version control. Please ensure these tokens are expired or rotated.
+    message: Do not commit secrets to version control. Please ensure these tokens are expired or rotated. If this is a verified fake token used in public documentation, you can add it to the exception list in https://github.com/onefootprint/monorepo/blob/master/semgrep/footprint-secrets/session-token.yaml.
     severity: ERROR
     patterns:
-      - pattern-regex: "[a-z]+tok_[A-Za-z0-9]{16,}"
-
+      - pattern-regex: "([a-z]+tok_[A-Za-z0-9]{16,})"
+      - metavariable-pattern:
+          metavariable: $1
+          language: generic
+          patterns:
+            # Fake/invalid tokens used for public documentation.
+            - pattern-not: cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH
+            - pattern-not: vtok_udLaWUxPBo3fss603v8kY8k9ssjboxfwI
+            - pattern-not: cttok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit
+            - pattern-not: utok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0
+            - pattern-not: ctok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0
+            - pattern-not: utok_ssPvNRjNGdk8Iq9qgf6lsO2iTVhALuR4Nt
+            - pattern-not: botok_2dpe8Wye1ZJLsx6KoppVGdcxGzh2HUwjwR
+            - pattern-not: vtok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH
+            - pattern-not: dbtok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH
+            - pattern-not: utok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH
+            - pattern-not: pbtok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH
+            - pattern-not: utok_MhyAZwlmbZVLaxH6Kr7aeBe564fi13buhp
+            - pattern-not: utok_0DcG15SEkP4YAuMwOoEsBGrjrFK0OTuUei

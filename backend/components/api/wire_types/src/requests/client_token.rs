@@ -61,6 +61,7 @@ pub struct CreateClientTokenRequest {
 #[serde(rename_all = "snake_case")]
 pub struct CreateClientTokenResponse {
     /// The short-lived token that gives temporary access to perform operations for this user
+    // nosemgrep
     #[openapi(example = "cttok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH")]
     pub token: SessionAuthToken,
     /// The time at which the token expires

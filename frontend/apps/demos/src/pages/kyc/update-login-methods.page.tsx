@@ -7,7 +7,7 @@ const Footprint = () => {
   const launchFootprint = () => {
     const component = footprint.init({
       kind: 'update_login_methods',
-      authToken: 'utok_G4FNhWET6VqejqOXnPovLuLIbkmS8uxp72',
+      authToken: 'utok_fake',
     });
 
     component.render();

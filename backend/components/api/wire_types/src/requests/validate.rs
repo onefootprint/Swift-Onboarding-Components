@@ -10,6 +10,7 @@ use newtypes::SessionAuthToken;
 pub struct ValidateRequest {
     /// The validation token given from either the `onComplete` or `onAuth` callback of the
     /// Footprint SDK.
+    // nosemgrep
     #[openapi(example = "vtok_UxM6Vbvk2Rcy1gzcSuXgk3sj3L9I0pAnNH")]
     pub validation_token: SessionAuthToken,
 }
