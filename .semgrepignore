@@ -724,3 +724,6 @@ backend/components/db/schema/migrations/2024-10-02-004829_backfill_bwfl/up.sql
 backend/components/db/schema/migrations/2024-03-05-002522_deactivate_non_latest_dls_by_sv_and_kind/up.sql
 backend/components/db/schema/migrations/2023-09-19-222605_ivs_ignored_failure_reasons/up.sql
 backend/components/db/schema/migrations/2024-07-19-231133_backfill_is_billable/up.sql
+
+# This has a number of keys and we can't use comments to filter them out.
+frontend/apps/docs/src/content/default/2-integrating/5-migrate-existing-users.mdx
