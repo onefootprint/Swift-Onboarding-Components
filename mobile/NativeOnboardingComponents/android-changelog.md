@@ -2,4 +2,4 @@
 *Updating this file in one of the requirements for GitHub CI/CD for mavenCentral release*
 
 # v0.0.1
-Test publish to mavenCentral
+Test publish version to mavenCentral
