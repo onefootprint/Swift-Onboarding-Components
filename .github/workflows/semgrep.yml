@@ -141,7 +141,7 @@ jobs:
                   '<br>Help us keep static analysis findings low noise so we don\'t train ourselves to ignore them.',
                   '',
                   `- If the finding can be ignored in this context, you can exempt the line of code with a \`// nosemgrep: ${finding.check_id}\` comment. See [this guide](https://semgrep.dev/docs/ignoring-files-folders-code) for more information. One example of this situation might be a hard-coded dummy secret in a test case.`,
-                  '- If the finding is completely incorrect, it may be a bad rule. Open a thread in [#security](https://semgrep.dev/docs/ignoring-files-folders-code).',
+                  '- If the finding is completely incorrect, it may be a bad rule. Open a thread in [#security](https://onefootprint.slack.com/archives/C06JFAPHC9W).',
                   '</details>',
                   `<!-- fingerprint:${finding.extra.fingerprint} -->`,
                 ].join('\n')
