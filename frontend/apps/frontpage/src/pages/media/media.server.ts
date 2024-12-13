@@ -5,6 +5,17 @@ import type { Article } from './media.types';
 const getStaticProps: GetStaticProps = () => {
   const articles: Article[] = [
     {
+      id: '17',
+      url: 'https://fintechtakes.com/articles/2024-12-10/digital-identity-tomorrow/',
+      website: 'Fintech Takes',
+      imageUrl: '/media/fintech-takes.png',
+      imageAlt: 'Digital Identity Tomorrow',
+      publishedAt: 'December 10, 2024',
+      title: 'Digital Identity Tomorrow',
+      excerpt:
+        'The future of digital identity is here. Footprint simplifies onboarding with a unified solution, building trust and persistent digital identity.',
+    },
+    {
       id: '16',
       url: 'https://www.businesswire.com/news/home/20241030764010/en/Money2020-USA-Unveils-Seven-Incredible-Fintech-Startups-And-Industry-Disruptors',
       website: 'Businesswire',
