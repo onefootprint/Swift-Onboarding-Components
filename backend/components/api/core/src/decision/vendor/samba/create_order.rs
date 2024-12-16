@@ -359,7 +359,8 @@ async fn build_request_from_data_identifiers(
             .ok_or(ServerErr("missing last name"))?,
         license_number: decrypted_values
             .remove(&dl_di(&ODK::DocumentNumber).into())
-            .ok_or(ServerErr("missing license number"))?,
+            .ok_or(ServerErr("missing license number"))?
+            .map(|s| s.replace(' ', "").trim().into()),
         license_state: decrypted_values
             .remove(&dl_di(&ODK::UsIssuingState).into())
             .ok_or(ServerErr("missing license state"))?,
