@@ -13,7 +13,7 @@ const entityVaultWithJustIDCardDIs: EntityVault = {
   [`${DocumentDI.idCardIssuingCountry}:123`]: 'test id card issuing country',
   [`${DocumentDI.idCardRefNumber}:123`]: 'test id card ref number',
   [`${DocumentDI.idCardDOB}:123`]: '1990-04-15',
-  [`${DocumentDI.idCardIssuedAt}:123`]: '04/23/2020',
+  [`${DocumentDI.idCardIssuedAt}:123`]: '2020-04-23',
   [`${DocumentDI.idCardExpiresAt}:123`]: '2025-12-31',
 };
 
@@ -31,9 +31,9 @@ export const driversLicenseExtractedDIs: EntityVault = {
   [`${DocumentDI.driversLicenseIssuingState}:456`]: 'test drivers license issuing state',
   [`${DocumentDI.driversLicenseIssuingCountry}:456`]: 'test drivers license issuing country',
   [`${DocumentDI.driversLicenseRefNumber}:456`]: 'test drivers license ref number',
-  [`${DocumentDI.driversLicenseDOB}:456`]: '15 Jun 1992',
+  [`${DocumentDI.driversLicenseDOB}:456`]: '1992-06-15',
   [`${DocumentDI.driversLicenseIssuedAt}:456`]: '2021-01-15',
-  [`${DocumentDI.driversLicenseExpiresAt}:456`]: '01/15/2026',
+  [`${DocumentDI.driversLicenseExpiresAt}:456`]: '2026-01-15',
 };
 
 export const entityVaultWithJustDriverseLicenseDIs: EntityVault = {
@@ -53,9 +53,9 @@ const entityVaultWithJustPassportDIs: EntityVault = {
   [`${DocumentDI.passportIssuingState}:679`]: 'test passport issuing state',
   [`${DocumentDI.passportIssuingCountry}:679`]: 'test passport issuing country',
   [`${DocumentDI.passportRefNumber}:679`]: 'test passport ref number',
-  [`${DocumentDI.passportDOB}:679`]: '03/03/1988',
+  [`${DocumentDI.passportDOB}:679`]: '1988-03-03',
   [`${DocumentDI.passportIssuedAt}:679`]: '2019-08-20',
-  [`${DocumentDI.passportExpiresAt}:679`]: '08/20/2029',
+  [`${DocumentDI.passportExpiresAt}:679`]: '2029-08-20',
 };
 
 export const entityVaultWithAllDocumentDIs: EntityVault = {

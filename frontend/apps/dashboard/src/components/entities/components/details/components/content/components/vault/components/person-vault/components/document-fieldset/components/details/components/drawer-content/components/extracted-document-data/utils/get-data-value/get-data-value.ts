@@ -1,6 +1,6 @@
 import type { DocumentDI, VaultValue } from '@onefootprint/types';
 import { isVaultDataText } from '@onefootprint/types';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import startCase from 'lodash/startCase';
 import getDataLabel from '../get-data-label';
 
@@ -25,7 +25,7 @@ const getDataValueString = (vaultValue: VaultValue, key: DocumentDI, activeDocum
     return startCase(valueString.toLowerCase()).replace(/\b[a-zA-Z]{2}\b/g, match => match.toUpperCase());
   }
   if (dateFields.includes(field)) {
-    return format(new Date(valueString), 'MM/dd/yyyy');
+    return format(parseISO(valueString), 'MM/dd/yyyy');
   }
   return valueString;
 };
