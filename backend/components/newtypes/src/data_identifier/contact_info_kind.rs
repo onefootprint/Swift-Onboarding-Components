@@ -75,8 +75,9 @@ pub enum ContactInfoKind {
 }
 
 impl AuthMethodKind {
-    pub fn supported_challenge_kinds(&self) -> Vec<ChallengeKind> {
+    pub fn supported_challenge_kinds(&self, support_sms_link: bool) -> Vec<ChallengeKind> {
         ChallengeKind::iter()
+            .filter(|ck| ck != &ChallengeKind::SmsLink || support_sms_link)
             .filter(|ck| Self::from(*ck) == *self)
             .collect()
     }

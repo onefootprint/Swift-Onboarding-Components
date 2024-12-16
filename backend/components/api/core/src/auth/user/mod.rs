@@ -14,6 +14,8 @@ mod user_biz_wf;
 pub use user_biz_wf::*;
 mod contact_info_verify;
 pub use contact_info_verify::*;
+mod identify;
+pub use identify::*;
 
 /// Computes the list of scopes to be granted to an auth token for a user.
 /// - `auth_events`: the auths that this user has performed

@@ -39,6 +39,7 @@ pub enum SessionKind {
     TenantRb,
     FirmEmployee,
     ClientTenant,
+    Identify,
     User,
     EmailVerify,
     ValidateUserToken,

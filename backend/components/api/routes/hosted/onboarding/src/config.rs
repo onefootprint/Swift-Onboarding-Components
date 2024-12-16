@@ -1,6 +1,7 @@
 use crate::auth::ob_config::ObConfigAuth;
 use crate::utils::db2api::DbToApi;
 use crate::State;
+use api_core::auth::ob_config::ObConfigAuthTrait;
 use api_core::auth::ob_config::PublicOnboardingContext;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::user::UserSessionContext;

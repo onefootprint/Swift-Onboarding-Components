@@ -1,4 +1,5 @@
 use crate::GetIdentifyChallengeArgs;
+use crate::IdentifyLookupId;
 use api_core::auth::ob_config::ObConfigAuth;
 use api_core::telemetry::RootSpan;
 use api_core::types::ApiResponse;
@@ -34,11 +35,11 @@ pub async fn post(
     .flatten()
     .collect_vec();
     let args = GetIdentifyChallengeArgs {
-        user_auth: None,
-        identifiers,
+        identifier: IdentifyLookupId::Pii(identifiers),
         sandbox_id: None,
-        obc: ob_context.clone(),
+        playbook: ob_context.map(|obc| obc.playbook().clone()),
         root_span,
+        kba_dis: &[],
     };
     let user_found = crate::get_identify_challenge_context(&state, args)
         .await?

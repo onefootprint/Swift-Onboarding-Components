@@ -12592,6 +12592,7 @@
                 },
                 "required": [
                     "kind",
+                    "started_at",
                     "upload_source",
                     "uploads"
                 ]

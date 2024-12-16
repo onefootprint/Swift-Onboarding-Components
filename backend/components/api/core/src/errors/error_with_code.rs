@@ -47,7 +47,7 @@ pub enum ErrorWithCode {
     #[error("Session invalid")]
     CouldNotParseSession,
     #[error("Please log into your existing account")]
-    ExistingVault(SessionAuthToken),
+    ExistingVault(Option<SessionAuthToken>),
     #[error("File upload exceeded time limit")]
     FileUploadTimeout,
     #[error("Image too small")]
@@ -118,7 +118,7 @@ impl api_errors::FpErrorTrait for ErrorWithCode {
             Self::UnsupportedChallengeKind(challenge_kind) => json!({ "challenge_kind": challenge_kind }),
             Self::InvalidMimeType(file_type) => json!({ "file_type": file_type }),
             Self::FileTooLarge(max_size) => json!({ "max_size": max_size }),
-            Self::ExistingVault(token) => json!({ "token": token }),
+            Self::ExistingVault(token) => return token.as_ref().map(|t| json!({ "token": t })),
             _ => return None,
         };
         Some(context)

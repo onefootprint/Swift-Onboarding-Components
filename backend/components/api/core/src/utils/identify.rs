@@ -1,5 +1,4 @@
 use super::vault_wrapper::Person;
-use crate::auth::user::CheckedUserAuthContext;
 use crate::auth::user::UserIdentifier;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
@@ -89,9 +88,10 @@ impl AuthMethod {
 #[tracing::instrument(skip_all, fields(identifier))]
 pub async fn get_user_auth_methods(
     state: &State,
-    identifier: UserIdentifier,
-    user_auth: Option<CheckedUserAuthContext>,
+    identifier: impl Into<UserIdentifier>,
+    kba_dis: &[DI],
 ) -> FpResult<UserAuthMethodsContext> {
+    let identifier = identifier.into();
     let (uvw, cis, passkeys) = state
         .db_query(move |conn| {
             let uvw = VaultWrapper::build(conn, VwArgs::from(&identifier))?;
@@ -148,9 +148,8 @@ pub async fn get_user_auth_methods(
     // Allow initiating challenges to unverified methods that are either permitted by
     // KBA or because the vault is "not yet" portable
 
-    let mut allowed_unverified_methods = user_auth
+    let mut allowed_unverified_methods = kba_dis
         .iter()
-        .flat_map(|ua| &ua.data.kba)
         .flat_map(allowed_unverified_methods_for_kba)
         .collect_vec();
     let is_vault_unverified = is_all_ci_unverified && uvw.vault.is_created_via_api;

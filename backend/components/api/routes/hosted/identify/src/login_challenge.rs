@@ -2,6 +2,7 @@ use crate::utils::initiate_challenge;
 use crate::utils::InitiateChallengeArgs;
 use crate::GetIdentifyChallengeArgs;
 use crate::IdentifyChallengeContext;
+use crate::IdentifyLookupId;
 use crate::State;
 use api_core::auth::session::GetSessionForUpdate;
 use api_core::auth::user::UserAuthContext;
@@ -40,10 +41,10 @@ pub async fn post(
 
     // Look up existing user vault by identifier
     let args = GetIdentifyChallengeArgs {
-        user_auth: Some(user_auth),
-        identifiers: vec![],
+        identifier: IdentifyLookupId::User(user_auth.user_vault_id.clone(), user_auth.su_id.clone()),
+        kba_dis: &user_auth.kba,
         sandbox_id: None,
-        obc: None,
+        playbook: user_auth.playbook.clone(),
         root_span: root_span.clone(),
     };
     let Some(ctx) = crate::get_identify_challenge_context(&state, args).await? else {
@@ -55,8 +56,7 @@ pub async fn post(
     let args = InitiateChallengeArgs {
         challenge_kind,
         tenant: tenant.as_ref(),
-        token,
-        session,
+        user_session: Some((token, session)),
         insight_headers,
     };
     let response = initiate_challenge(&state, ctx, args).await?;

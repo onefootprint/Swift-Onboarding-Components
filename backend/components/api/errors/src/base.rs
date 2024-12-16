@@ -20,6 +20,7 @@ macro_rules! define_err_type {
     // https://www.reddit.com/r/rust/comments/dtrmmg/help_macro_rules_inside_of_macro_rules/
     (($d: tt), $name:ident, $status_code:tt) => {
         paste!(
+            #[track_caller]
             #[allow(non_snake_case)]
             #[doc = "Shorthand to return an HTTP "]
             #[doc = stringify!($status_code)]
@@ -31,6 +32,7 @@ macro_rules! define_err_type {
                 [< $name Into >]::<_, FpError>(err)
             }
 
+            #[track_caller]
             #[allow(non_snake_case)]
             #[doc = "Shorthand to return an HTTP "]
             #[doc = stringify!($status_code)]

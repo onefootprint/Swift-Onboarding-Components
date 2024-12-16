@@ -1,8 +1,10 @@
 use crate::*;
 use newtypes::email::Email;
+use newtypes::put_data_request::ModernRawUserDataRequest;
 use newtypes::AuthMethodKind;
 use newtypes::ChallengeKind;
 use newtypes::ChallengeToken;
+use newtypes::CollectedDataOption;
 use newtypes::DataIdentifier;
 use newtypes::IdentifyScope;
 use newtypes::PhoneNumber;
@@ -39,7 +41,7 @@ pub struct IdentifyResponse {
     pub user: Option<IdentifiedUser>,
 }
 
-#[derive(Apiv2Schema, serde::Serialize, Clone)]
+#[derive(Debug, Apiv2Schema, serde::Serialize, Clone)]
 pub struct IdentifiedUser {
     pub token: SessionAuthToken,
     /// The scopes of the returned token
@@ -75,7 +77,7 @@ pub struct LiteIdentifyResponse {
     pub user_found: bool,
 }
 
-#[derive(Apiv2Schema, serde::Serialize, Clone)]
+#[derive(Debug, Apiv2Schema, serde::Serialize, Clone)]
 pub struct IdentifyAuthMethod {
     pub kind: AuthMethodKind,
     pub is_verified: bool,
@@ -85,7 +87,7 @@ pub struct IdentifyAuthMethod {
 #[serde(rename_all = "snake_case")]
 pub struct UserChallengeData {
     /// Auth token to pass to the verify call
-    pub token: SessionAuthToken,
+    pub token: Option<SessionAuthToken>,
     pub challenge_kind: ChallengeKind,
     pub challenge_token: ChallengeToken,
     pub biometric_challenge_json: Option<String>,
@@ -143,4 +145,57 @@ pub struct GetVerifyContactInfoResponse {
     pub origin_insight_event: InsightEvent,
     pub tenant_name: String,
     pub is_verified: bool,
+}
+
+#[derive(Apiv2Schema, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub struct IdentifySessionRequest {
+    pub data: ModernRawUserDataRequest,
+    pub scope: IdentifyScope,
+}
+
+#[derive(Apiv2Response, serde::Serialize, Default, macros::JsonResponder)]
+pub struct IdentifySessionResponse {
+    pub token: SessionAuthToken,
+}
+
+#[derive(Apiv2Response, serde::Serialize, Default, macros::JsonResponder)]
+pub struct IdentifyRequirementsResponse {
+    pub requirements: Vec<IdentifyRequirement>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, Apiv2Schema, EnumDiscriminants, derive_more::IsVariant)]
+#[strum_discriminants(name(IdentifyRequirementKind), vis(pub))]
+#[strum_discriminants(derive(Display))]
+#[strum_discriminants(strum(serialize_all = "snake_case"))]
+#[serde(tag = "kind")]
+#[serde(rename_all = "snake_case")]
+pub enum IdentifyRequirement {
+    CollectData {
+        cdo: CollectedDataOption,
+    },
+    /// A user has been identified via the phone or email on this identify session. You should
+    /// proceed by logging into that vault.
+    Login {
+        user: IdentifiedUser,
+    },
+    /// A challenge is required by the playbook in order to create the user.
+    Challenge {
+        /// List of challenge kinds that can meet this requirement
+        auth_method: AuthMethodKind,
+        challenge_kinds: Vec<ChallengeKind>,
+    },
+}
+
+#[derive(Apiv2Schema, serde::Deserialize)]
+pub struct ChallengeRequest {
+    pub challenge_kind: ChallengeKind,
+}
+
+#[derive(Apiv2Schema, serde::Deserialize)]
+pub struct ChallengeVerifyRequest {
+    /// Opaque challenge state token
+    pub challenge_token: ChallengeToken,
+    /// Required for challenges other than SMS link
+    pub challenge_response: Option<String>,
 }

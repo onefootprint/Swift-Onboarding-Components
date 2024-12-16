@@ -18,6 +18,9 @@ import type {
   GetHostedCheckSessionData,
   GetHostedCheckSessionError,
   GetHostedCheckSessionResponse,
+  GetHostedIdentifySessionRequirementsData,
+  GetHostedIdentifySessionRequirementsError,
+  GetHostedIdentifySessionRequirementsResponse,
   GetHostedIdentifyVerifyContactInfoData,
   GetHostedIdentifyVerifyContactInfoError,
   GetHostedIdentifyVerifyContactInfoResponse,
@@ -68,6 +71,9 @@ import type {
   PatchHostedBusinessVaultData,
   PatchHostedBusinessVaultError,
   PatchHostedBusinessVaultResponse,
+  PatchHostedIdentifySessionVaultData,
+  PatchHostedIdentifySessionVaultError,
+  PatchHostedIdentifySessionVaultResponse,
   PatchHostedUserVaultData,
   PatchHostedUserVaultError,
   PatchHostedUserVaultResponse,
@@ -101,6 +107,18 @@ import type {
   PostHostedIdentifyLoginChallengeError,
   PostHostedIdentifyLoginChallengeResponse,
   PostHostedIdentifyResponse,
+  PostHostedIdentifySessionChallengeData,
+  PostHostedIdentifySessionChallengeError,
+  PostHostedIdentifySessionChallengeResponse,
+  PostHostedIdentifySessionChallengeVerifyData,
+  PostHostedIdentifySessionChallengeVerifyError,
+  PostHostedIdentifySessionChallengeVerifyResponse,
+  PostHostedIdentifySessionData,
+  PostHostedIdentifySessionError,
+  PostHostedIdentifySessionResponse,
+  PostHostedIdentifySessionVerifyData,
+  PostHostedIdentifySessionVerifyError,
+  PostHostedIdentifySessionVerifyResponse,
   PostHostedIdentifySignupChallengeData,
   PostHostedIdentifySignupChallengeError,
   PostHostedIdentifySignupChallengeResponse,
@@ -421,6 +439,102 @@ export const postHostedIdentifyLoginChallenge = <ThrowOnError extends boolean = 
   >({
     ...options,
     url: '/hosted/identify/login_challenge',
+  });
+};
+
+/**
+ * Creates an identify session token.
+ */
+export const postHostedIdentifySession = <ThrowOnError extends boolean = false>(
+  options: Options<PostHostedIdentifySessionData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    PostHostedIdentifySessionResponse,
+    PostHostedIdentifySessionError,
+    ThrowOnError
+  >({
+    ...options,
+    url: '/hosted/identify/session',
+  });
+};
+
+/**
+ * Sends a challenge to the phone number or email saved in this identify session and returns an HTTP 200
+ */
+export const postHostedIdentifySessionChallenge = <ThrowOnError extends boolean = false>(
+  options: Options<PostHostedIdentifySessionChallengeData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    PostHostedIdentifySessionChallengeResponse,
+    PostHostedIdentifySessionChallengeError,
+    ThrowOnError
+  >({
+    ...options,
+    url: '/hosted/identify/session/challenge',
+  });
+};
+
+/**
+ * Verifies the response to a challenge
+ */
+export const postHostedIdentifySessionChallengeVerify = <ThrowOnError extends boolean = false>(
+  options: Options<PostHostedIdentifySessionChallengeVerifyData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    PostHostedIdentifySessionChallengeVerifyResponse,
+    PostHostedIdentifySessionChallengeVerifyError,
+    ThrowOnError
+  >({
+    ...options,
+    url: '/hosted/identify/session/challenge/verify',
+  });
+};
+
+/**
+ * Returns the list of requirements for an identify session.
+ */
+export const getHostedIdentifySessionRequirements = <ThrowOnError extends boolean = false>(
+  options?: Options<GetHostedIdentifySessionRequirementsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetHostedIdentifySessionRequirementsResponse,
+    GetHostedIdentifySessionRequirementsError,
+    ThrowOnError
+  >({
+    ...options,
+    url: '/hosted/identify/session/requirements',
+  });
+};
+
+/**
+ * Updates the data stored in this identify session.
+ */
+export const patchHostedIdentifySessionVault = <ThrowOnError extends boolean = false>(
+  options: Options<PatchHostedIdentifySessionVaultData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).patch<
+    PatchHostedIdentifySessionVaultResponse,
+    PatchHostedIdentifySessionVaultError,
+    ThrowOnError
+  >({
+    ...options,
+    url: '/hosted/identify/session/vault',
+  });
+};
+
+/**
+ * Verifies that all identify requirements have been met.
+ */
+export const postHostedIdentifySessionVerify = <ThrowOnError extends boolean = false>(
+  options?: Options<PostHostedIdentifySessionVerifyData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    PostHostedIdentifySessionVerifyResponse,
+    PostHostedIdentifySessionVerifyError,
+    ThrowOnError
+  >({
+    ...options,
+    url: '/hosted/identify/session/verify',
   });
 };
 

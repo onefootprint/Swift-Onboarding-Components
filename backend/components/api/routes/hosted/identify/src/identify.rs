@@ -1,16 +1,22 @@
 use crate::GetIdentifyChallengeArgs;
 use crate::IdentifyChallengeContext;
+use crate::IdentifyLookupId;
 use crate::UserAuthMethodsContext;
 use api_core::auth::ob_config::ObConfigAuth;
+use api_core::auth::ob_config::ObConfigAuthTrait;
+use api_core::auth::session::user::AssociatedAuthEvent;
 use api_core::auth::session::user::NewUserSessionArgs;
 use api_core::auth::session::user::NewUserSessionContext;
 use api_core::auth::session::user::TokenCreationPurpose;
 use api_core::auth::session::user::UserSession;
+use api_core::auth::user::allowed_user_scopes;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
+use api_core::errors::error_with_code::ErrorWithCode;
 use api_core::telemetry::RootSpan;
 use api_core::types::ApiResponse;
 use api_core::utils::headers::SandboxId;
+use api_core::utils::identify::AuthMethod;
 use api_core::utils::session::AuthSession;
 use api_core::FpResult;
 use api_core::State;
@@ -19,7 +25,9 @@ use api_wire_types::IdentifiedUser;
 use api_wire_types::IdentifyId;
 use api_wire_types::IdentifyRequest;
 use api_wire_types::IdentifyResponse;
+use db::models::auth_event::AuthEvent;
 use db::models::scoped_vault::ScopedVault;
+use db::models::tenant::Tenant;
 use itertools::chain;
 use itertools::Itertools;
 use newtypes::ChallengeKind;
@@ -81,12 +89,26 @@ pub async fn post(
     .into_iter()
     .flatten()
     .collect_vec();
+
+    // Get the Playbook from either user auth or obc auth, preferring to extract from the auth token
+    let playbook = (user_auth.as_ref().and_then(|ua| ua.playbook.as_ref()))
+        .or(ob_context.as_ref().map(|ob| ob.playbook()))
+        .cloned();
+
+    let identifier = match (user_auth.as_ref(), identifiers) {
+        (Some(user_auth), _) => {
+            IdentifyLookupId::User(user_auth.user_vault_id.clone(), user_auth.su_id.clone())
+        }
+        (None, identifiers) if !identifiers.is_empty() => IdentifyLookupId::Pii(identifiers),
+        _ => return Err(ErrorWithCode::OnlyOneIdentifier.into()),
+    };
+
     let args = GetIdentifyChallengeArgs {
-        user_auth: user_auth.clone(),
-        identifiers,
+        identifier,
+        playbook,
         sandbox_id: sandbox_id.0,
-        obc: ob_context.clone(),
         root_span,
+        kba_dis: user_auth.as_ref().map(|ua| ua.data.kba.as_ref()).unwrap_or(&[]),
     };
     let Some(ctx) = crate::get_identify_challenge_context(&state, args).await? else {
         // The user vault doesn't exist. Just return that the user wasn't found
@@ -100,20 +122,17 @@ pub async fn post(
         can_initiate_signup_challenge,
         matching_fps,
     } = ctx;
+
     let UserAuthMethodsContext {
         is_vault_unverified,
         auth_methods: ams,
         vw,
     } = ctx;
 
-    let v_id = vw.vault.id.clone();
-
     let (token, token_scopes) = if let Some(user_auth) = user_auth {
         // If the user was identified by an auth token, mutate the existing auth token with any metadata
         // from the onboarding session token
-        let metadata = (ob_context.as_ref())
-            .and_then(|obc| obc.ob_session())
-            .map(|obs| obs.trusted_metadata.clone());
+        let metadata = ob_context.as_ref().and_then(|obc| obc.trusted_metadata());
         let args = NewUserSessionContext {
             metadata,
             ..Default::default()
@@ -127,7 +146,8 @@ pub async fn post(
         (auth_token, scopes)
     } else {
         // Otherwise, make a new identified token
-        let (token, _, scopes) = create_identified_token(&state, v_id, scope, sv, ob_context).await?;
+        let (token, _, scopes) =
+            create_identified_token(&state, vw.vault.id, sv, scope, vec![], ob_context).await?;
         (token, scopes)
     };
 
@@ -139,24 +159,8 @@ pub async fn post(
         None
     };
 
-    let has_syncable_passkey = ams
-        .iter()
-        .flat_map(|am| am.passkeys())
-        .any(|cred| cred.backup_state);
-    let tenant_supports_sms_link = tenant.is_some_and(|t| t.can_access_preview(&SmsLinkAuthentication));
-    let available_challenge_kinds = ams
-        .iter()
-        .filter(|m| m.can_initiate_login_challenge)
-        .flat_map(|m| m.kind().supported_challenge_kinds())
-        .filter(|k| k != &ChallengeKind::SmsLink || tenant_supports_sms_link)
-        .collect_vec();
-    let auth_methods = ams
-        .into_iter()
-        .map(|m| api_wire_types::IdentifyAuthMethod {
-            kind: m.kind(),
-            is_verified: m.is_verified,
-        })
-        .collect();
+    let tenant = tenant.as_ref();
+    let (has_syncable_passkey, available_challenge_kinds, auth_methods) = serialize_auth_methods(ams, tenant);
 
     let user = IdentifiedUser {
         token,
@@ -176,6 +180,30 @@ pub async fn post(
     Ok(response)
 }
 
+pub(super) fn serialize_auth_methods(
+    ams: Vec<AuthMethod>,
+    tenant: Option<&Tenant>,
+) -> (bool, Vec<ChallengeKind>, Vec<api_wire_types::IdentifyAuthMethod>) {
+    let has_syncable_passkey = ams
+        .iter()
+        .flat_map(|am| am.passkeys())
+        .any(|cred| cred.backup_state);
+    let tenant_supports_sms_link = tenant.is_some_and(|t| t.can_access_preview(&SmsLinkAuthentication));
+    let available_challenge_kinds = ams
+        .iter()
+        .filter(|m| m.can_initiate_login_challenge)
+        .flat_map(|m| m.kind().supported_challenge_kinds(tenant_supports_sms_link))
+        .collect_vec();
+    let auth_methods = ams
+        .into_iter()
+        .map(|m| api_wire_types::IdentifyAuthMethod {
+            kind: m.kind(),
+            is_verified: m.is_verified,
+        })
+        .collect();
+    (has_syncable_passkey, available_challenge_kinds, auth_methods)
+}
+
 /// Creates an identified, unauthed token for the provided vault ID.
 /// The token may either explicitly specify a sv_id when vault has already onboarded onto the
 /// tenant, or it may specify a playbook id onto which the vault will be onboarded after they
@@ -183,24 +211,21 @@ pub async fn post(
 pub(super) async fn create_identified_token(
     state: &State,
     v_id: VaultId,
-    scope: IdentifyScope,
     sv: Option<ScopedVault>,
-    ob_context: Option<ObConfigAuth>,
+    scope: IdentifyScope,
+    explicit_auth_events: Vec<AuthEvent>,
+    ob_context: Option<impl ObConfigAuthTrait>,
 ) -> FpResult<(SessionAuthToken, AuthSession, Vec<UserAuthScope>)> {
     let session_key = state.session_sealing_key.clone();
     // Add metadata from the onboarding session token
-    let metadata = (ob_context.as_ref())
-        .and_then(|obc| obc.ob_session())
-        .map(|obs| obs.trusted_metadata.clone());
+    let metadata = ob_context.as_ref().and_then(|obc| obc.trusted_metadata());
     let token = state
         .db_query(move |conn| {
-            let scopes = vec![];
-            let biz_info = ob_context
-                .as_ref()
-                .and_then(|obc| obc.business_info().map(|bo| (bo, obc.tenant())));
-            let (bo_id, sb_id, biz_wf_id) = if let Some(((bo, biz_wf_id), tenant)) = biz_info {
-                let sb = ScopedVault::get(conn, (&bo.business_vault_id, &tenant.id))?;
-                (Some(bo.id.clone()), Some(sb.id), Some(biz_wf_id.clone()))
+            let biz_info = ob_context.as_ref().and_then(|obc| obc.business_info());
+            let t = ob_context.as_ref().map(|obc| obc.tenant());
+            let (bo_id, sb_id, biz_wf_id) = if let Some((biz_info, t)) = biz_info.zip(t) {
+                let sb = ScopedVault::get(conn, (&biz_info.bv_id, &t.id))?;
+                (Some(biz_info.bo_id), Some(sb.id), Some(biz_info.biz_wf_id))
             } else {
                 (None, None, None)
             };
@@ -221,12 +246,19 @@ pub(super) async fn create_identified_token(
                 metadata,
                 ..Default::default()
             };
+            let ae_kinds = explicit_auth_events.iter().map(|ae| ae.kind).collect_vec();
+            let explicit_auth = !explicit_auth_events.is_empty();
+            let scopes = allowed_user_scopes(ae_kinds, scope.into(), explicit_auth);
+            let auth_events = explicit_auth_events
+                .into_iter()
+                .map(|ae| AssociatedAuthEvent::explicit(ae.id))
+                .collect_vec();
             let args = NewUserSessionArgs {
                 user_vault_id: v_id,
                 purposes,
                 context,
                 scopes: scopes.clone(),
-                auth_events: vec![],
+                auth_events,
             };
             let data = UserSession::make(args)?;
             let duration = scope.token_ttl();

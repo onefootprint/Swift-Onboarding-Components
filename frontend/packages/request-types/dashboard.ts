@@ -1396,7 +1396,7 @@ export type Document = {
   reviewStatus?: DocumentReviewStatus;
   sambaActivityHistoryCompletedVersion?: number;
   selfieScore?: number;
-  startedAt?: string;
+  startedAt: string;
   /**
    * Non-null for images uploaded via bifrost
    */

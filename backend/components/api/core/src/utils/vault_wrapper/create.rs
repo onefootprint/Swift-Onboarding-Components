@@ -20,7 +20,6 @@ use db::models::vault::Vault;
 use db::TxnPgConn;
 use newtypes::email::Email;
 use newtypes::DataIdentifier as DI;
-use newtypes::DataLifetimeSource;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::Locked;
 use newtypes::ObConfigurationKind;
@@ -29,12 +28,11 @@ use newtypes::PhoneNumber;
 use newtypes::SandboxId;
 use newtypes::VaultId;
 use newtypes::VaultKind;
-use std::collections::HashMap;
 use std::str::FromStr;
 
 pub struct VaultContext {
     pub data: FingerprintedDataRequest,
-    pub sources: HashMap<DI, DataLifetimeSource>,
+    pub sources: DlSourceWithOverrides,
     pub keypair: VaultKeyPair,
     pub sandbox_id: Option<SandboxId>,
     pub playbook: Playbook,
@@ -128,10 +126,6 @@ impl VaultWrapper<Person> {
         let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &su.id)?;
 
         // Add the phone number and/or email to the vault
-        let sources = DlSourceWithOverrides {
-            default: DataLifetimeSource::LikelyHosted,
-            overrides: sources,
-        };
         let request = uvw.validate_request(conn, data, &DataRequestSource::SignupChallenge(sources))?;
         let result = WriteableVw::<Any>::internal_save_data(uvw, conn, request, None)?;
 

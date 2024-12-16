@@ -73,6 +73,16 @@ export type BusinessOnboardingResponse = {
   isNewBusiness: boolean;
 };
 export type ChallengeKind = 'sms' | 'sms_link' | 'biometric' | 'email';
+export type ChallengeRequest = {
+  challengeKind: ChallengeKind;
+};
+export type ChallengeVerifyRequest = {
+  challengeResponse?: string;
+  /**
+   * Opaque challenge state token
+   */
+  challengeToken: string;
+};
 export type CheckSessionResponse = 'active' | 'expired' | 'unknown';
 export type CollectDocumentConfig =
   | CollectDocumentConfigIdentity
@@ -839,6 +849,39 @@ export type IdentifyRequest = {
    */
   scope: IdentifyScope;
 };
+export type IdentifyRequirement =
+  | IdentifyRequirementCollectData
+  | IdentifyRequirementLogin
+  | IdentifyRequirementChallenge;
+/**
+ * A challenge is required by the playbook in order to create the user.
+ */
+export type IdentifyRequirementChallenge = {
+  /**
+   * List of challenge kinds that can meet this requirement
+   */
+  authMethod: AuthMethodKind;
+  challengeKinds: Array<ChallengeKind>;
+  kind: 'challenge';
+};
+export type kind5 = 'challenge';
+export type IdentifyRequirementCollectData = {
+  cdo: CollectedDataOption;
+  kind: 'collect_data';
+};
+export type kind6 = 'collect_data';
+/**
+ * A user has been identified via the phone or email on this identify session. You should
+ * proceed by logging into that vault.
+ */
+export type IdentifyRequirementLogin = {
+  kind: 'login';
+  user: IdentifiedUser;
+};
+export type kind7 = 'login';
+export type IdentifyRequirementsResponse = {
+  requirements: Array<IdentifyRequirement>;
+};
 export type IdentifyResponse = {
   /**
    * All of the context on the identified user, if found
@@ -846,6 +889,13 @@ export type IdentifyResponse = {
   user?: IdentifiedUser;
 };
 export type IdentifyScope = 'my1fp' | 'onboarding' | 'auth';
+export type IdentifySessionRequest = {
+  data: ModernRawUserDataRequest;
+  scope: IdentifyScope;
+};
+export type IdentifySessionResponse = {
+  token: string;
+};
 export type IdentifyVerifyRequest = {
   challengeResponse?: string;
   /**
@@ -1864,7 +1914,7 @@ export type OnboardingRequirementAuthorize = {
   fieldsToAuthorize: AuthorizeFields;
   kind: 'authorize';
 };
-export type kind5 = 'authorize';
+export type kind8 = 'authorize';
 /**
  * There is missing business data that must be collected
  */
@@ -1874,7 +1924,7 @@ export type OnboardingRequirementCollectBusinessData = {
   populatedAttributes: Array<CollectedDataOption>;
   recollectAttributes: Array<CollectedDataOption>;
 };
-export type kind6 = 'collect_business_data';
+export type kind9 = 'collect_business_data';
 /**
  * There is missing identity data that must be collected
  */
@@ -1885,7 +1935,6 @@ export type OnboardingRequirementCollectData = {
   populatedAttributes: Array<CollectedDataOption>;
   recollectAttributes: Array<CollectedDataOption>;
 };
-export type kind7 = 'collect_data';
 /**
  * A document needs to be collected
  */
@@ -1895,7 +1944,7 @@ export type OnboardingRequirementCollectDocument = {
   kind: 'collect_document';
   uploadSettings: DocumentUploadSettings;
 };
-export type kind8 = 'collect_document';
+export type kind10 = 'collect_document';
 /**
  * There is missing investor profile data that must be collected
  */
@@ -1905,7 +1954,7 @@ export type OnboardingRequirementCollectInvestorProfile = {
   missingDocument: boolean;
   populatedAttributes: Array<CollectedDataOption>;
 };
-export type kind9 = 'collect_investor_profile';
+export type kind11 = 'collect_investor_profile';
 /**
  * The flow requires a business, and one hasn't yet been created / selected
  */
@@ -1919,26 +1968,26 @@ export type OnboardingRequirementCreateBusinessOnboarding = {
    */
   requiresBusinessSelection: boolean;
 };
-export type kind10 = 'create_business_onboarding';
+export type kind12 = 'create_business_onboarding';
 /**
  * The client needs to tell us when user input is done in order for us to continue processing
  */
 export type OnboardingRequirementProcess = {
   kind: 'process';
 };
-export type kind11 = 'process';
+export type kind13 = 'process';
 export type OnboardingRequirementRegisterAuthMethod = {
   authMethodKind: AuthMethodKind;
   kind: 'register_auth_method';
 };
-export type kind12 = 'register_auth_method';
+export type kind14 = 'register_auth_method';
 /**
  * Register a passkey
  */
 export type OnboardingRequirementRegisterPasskey = {
   kind: 'liveness';
 };
-export type kind13 = 'liveness';
+export type kind15 = 'liveness';
 export type OnboardingResponse = {
   authToken: string;
 };
@@ -2047,32 +2096,32 @@ export type SdkArgsAuthV1 = {
   data: AuthV1SdkArgs;
   kind: 'auth_v1';
 };
-export type kind14 = 'auth_v1';
+export type kind16 = 'auth_v1';
 export type SdkArgsFormV1 = {
   data: FormV1SdkArgs;
   kind: 'form_v1';
 };
-export type kind15 = 'form_v1';
+export type kind17 = 'form_v1';
 export type SdkArgsRenderV1 = {
   data: RenderV1SdkArgs;
   kind: 'render_v1';
 };
-export type kind16 = 'render_v1';
+export type kind18 = 'render_v1';
 export type SdkArgsUpdateAuthMethodsV1 = {
   data: UpdateAuthMethodsV1SdkArgs;
   kind: 'update_auth_methods_v1';
 };
-export type kind17 = 'update_auth_methods_v1';
+export type kind19 = 'update_auth_methods_v1';
 export type SdkArgsVerifyResultV1 = {
   data: VerifyResultV1SdkArgs;
   kind: 'verify_result_v1';
 };
-export type kind18 = 'verify_result_v1';
+export type kind20 = 'verify_result_v1';
 export type SdkArgsVerifyV1 = {
   data: VerifyV1SdkArgs;
   kind: 'verify_v1';
 };
-export type kind19 = 'verify_v1';
+export type kind21 = 'verify_v1';
 export type SignupChallengeRequest = {
   challengeKind: ChallengeKind;
   email?: {
@@ -2122,7 +2171,7 @@ export type UserChallengeData = {
   /**
    * Auth token to pass to the verify call
    */
-  token: string;
+  token?: string;
 };
 export type UserChallengeRequest = {
   /**
@@ -2529,7 +2578,7 @@ export type WorkflowRequestConfigDocument = {
 /**
  * Upload a new document and re-run the decision engine
  */
-export type kind20 = 'document';
+export type kind22 = 'document';
 export type WorkflowRequestConfigOnboard = {
   /**
    * Allow onboarding onto the specific playbook.
@@ -2555,7 +2604,7 @@ export type WorkflowRequestConfigOnboard = {
  * Allow onboarding onto the specific playbook.
  * This allows editing data, re-verifies data, and then re-triggers decision engine
  */
-export type kind21 = 'onboard';
+export type kind23 = 'onboard';
 export type GetHostedBusinessData = {
   headers?: {
     /**
@@ -2767,6 +2816,90 @@ export type PostHostedIdentifyLoginChallengeData = {
 };
 export type PostHostedIdentifyLoginChallengeResponse = IdentifyChallengeResponse;
 export type PostHostedIdentifyLoginChallengeError = unknown;
+export type PostHostedIdentifySessionData = {
+  body: IdentifySessionRequest;
+  headers?: {
+    /**
+     * Provide `true` if the data in the request is bootstrap data.
+     */
+    'X-Fp-Is-Bootstrap'?: boolean;
+    /**
+     * When a non-empty value is provided, indicates that the request is originating from the components SDK
+     */
+    'X-Fp-Is-Components-Sdk'?: boolean;
+    /**
+     * Token to initialize KYC of a business owner. Uniquely identifies a business and beneficial owner.
+     */
+    'X-Kyb-Bo-Token'?: string;
+    /**
+     * Long-lived, publishable key representing an onboarding configuration. You can create and view your credentials in the dashboard.
+     */
+    'X-Onboarding-Config-Key'?: string;
+    /**
+     * When provided, creates a sandbox user with the provided sandbox ID. Sandbox IDs allow you to create multiple users with the same contact info. In order to log in using an existing sandbox user, you can provide its Sandbox ID in the Footprint flow.
+     *
+     */
+    'X-Sandbox-Id'?: string;
+  };
+};
+export type PostHostedIdentifySessionResponse = IdentifySessionResponse;
+export type PostHostedIdentifySessionError = unknown;
+export type PostHostedIdentifySessionChallengeData = {
+  body: ChallengeRequest;
+  headers?: {
+    /**
+     * Short-lived auth token for an identify session.
+     */
+    'X-Fp-Authorization'?: string;
+  };
+};
+export type PostHostedIdentifySessionChallengeResponse = IdentifyChallengeResponse;
+export type PostHostedIdentifySessionChallengeError = unknown;
+export type PostHostedIdentifySessionChallengeVerifyData = {
+  body: ChallengeVerifyRequest;
+  headers?: {
+    /**
+     * Short-lived auth token for an identify session.
+     */
+    'X-Fp-Authorization'?: string;
+  };
+};
+export type PostHostedIdentifySessionChallengeVerifyResponse = Empty;
+export type PostHostedIdentifySessionChallengeVerifyError = unknown;
+export type GetHostedIdentifySessionRequirementsData = {
+  headers?: {
+    /**
+     * Short-lived auth token for an identify session.
+     */
+    'X-Fp-Authorization'?: string;
+  };
+};
+export type GetHostedIdentifySessionRequirementsResponse = IdentifyRequirementsResponse;
+export type GetHostedIdentifySessionRequirementsError = unknown;
+export type PatchHostedIdentifySessionVaultData = {
+  /**
+   * Key-value map of data to add to the user's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).
+   */
+  body: ModernRawUserDataRequest;
+  headers?: {
+    /**
+     * Short-lived auth token for an identify session.
+     */
+    'X-Fp-Authorization'?: string;
+  };
+};
+export type PatchHostedIdentifySessionVaultResponse = Empty;
+export type PatchHostedIdentifySessionVaultError = unknown;
+export type PostHostedIdentifySessionVerifyData = {
+  headers?: {
+    /**
+     * Short-lived auth token for an identify session.
+     */
+    'X-Fp-Authorization'?: string;
+  };
+};
+export type PostHostedIdentifySessionVerifyResponse = IdentifyVerifyResponse;
+export type PostHostedIdentifySessionVerifyError = unknown;
 export type PostHostedIdentifySignupChallengeData = {
   body: SignupChallengeRequest;
   headers?: {
@@ -3761,6 +3894,72 @@ export type $OpenApiTs = {
          * OK
          */
         '200': IdentifyChallengeResponse;
+      };
+    };
+  };
+  '/hosted/identify/session': {
+    post: {
+      req: PostHostedIdentifySessionData;
+      res: {
+        /**
+         * OK
+         */
+        '200': IdentifySessionResponse;
+      };
+    };
+  };
+  '/hosted/identify/session/challenge': {
+    post: {
+      req: PostHostedIdentifySessionChallengeData;
+      res: {
+        /**
+         * OK
+         */
+        '200': IdentifyChallengeResponse;
+      };
+    };
+  };
+  '/hosted/identify/session/challenge/verify': {
+    post: {
+      req: PostHostedIdentifySessionChallengeVerifyData;
+      res: {
+        /**
+         * OK
+         */
+        '200': Empty;
+      };
+    };
+  };
+  '/hosted/identify/session/requirements': {
+    get: {
+      req: GetHostedIdentifySessionRequirementsData;
+      res: {
+        /**
+         * OK
+         */
+        '200': IdentifyRequirementsResponse;
+      };
+    };
+  };
+  '/hosted/identify/session/vault': {
+    patch: {
+      req: PatchHostedIdentifySessionVaultData;
+      res: {
+        /**
+         * OK
+         */
+        '200': Empty;
+      };
+    };
+  };
+  '/hosted/identify/session/verify': {
+    post: {
+      req: PostHostedIdentifySessionVerifyData;
+      res: {
+        /**
+         * OK
+         */
+        '200': IdentifyVerifyResponse;
       };
     };
   };

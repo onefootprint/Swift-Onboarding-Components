@@ -1,9 +1,7 @@
 #![recursion_limit = "256"]
 
-use api_core::auth::ob_config::ObConfigAuth;
 use api_core::auth::session::user::ContactInfoVerifySessionData;
 use api_core::auth::session::AuthSessionData;
-use api_core::auth::user::CheckedUserAuthContext;
 use api_core::auth::user::UserIdentifier;
 use api_core::errors::error_with_code::ErrorWithCode;
 use api_core::telemetry::RootSpan;
@@ -16,16 +14,20 @@ use api_errors::FpDbOptionalExtension;
 use api_wire_types::IdentifyId;
 use api_wire_types::IdentifyIdKind;
 use crypto::sha256;
+use db::models::playbook::Playbook;
 use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::vault::LocatedVault;
 use newtypes::output::Csv;
 use newtypes::AuthEventId;
+use newtypes::DataIdentifier as DI;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeId;
 use newtypes::PiiString;
 use newtypes::SandboxId;
+use newtypes::ScopedVaultId;
 use newtypes::SessionAuthToken;
+use newtypes::VaultId;
 use paperclip::actix::web;
 use strum::EnumDiscriminants;
 use webauthn_rs_core::proto::AuthenticationState;
@@ -36,6 +38,7 @@ pub mod identify;
 mod identify_lite;
 mod kba;
 pub mod login_challenge;
+mod session;
 pub mod signup_challenge;
 mod utils;
 mod validation_token;
@@ -52,6 +55,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(contact_info_verify::post)
         .service(contact_info_verify::get)
         .service(validation_token::post);
+    session::routes(config);
 }
 
 // TODO unnecessary wrapper
@@ -117,12 +121,20 @@ impl PhoneEmailChallengeState {
     }
 }
 
-pub struct GetIdentifyChallengeArgs {
-    pub user_auth: Option<CheckedUserAuthContext>,
-    pub identifiers: Vec<IdentifyId>,
+pub enum IdentifyLookupId {
+    /// The user has already been identified. We have an existing vault_id and optionally a
+    /// scoped_vault_id, if the user already has an account at this tenant
+    User(VaultId, Option<ScopedVaultId>),
+    /// The user has not been identified yet. We have a list of PII to look up by fingerprint
+    Pii(Vec<IdentifyId>),
+}
+
+pub struct GetIdentifyChallengeArgs<'a> {
+    pub identifier: IdentifyLookupId,
+    pub playbook: Option<Playbook>,
     pub sandbox_id: Option<SandboxId>,
-    pub obc: Option<ObConfigAuth>,
     pub root_span: RootSpan,
+    pub kba_dis: &'a [DI],
 }
 
 pub struct IdentifyChallengeContext {
@@ -139,38 +151,33 @@ pub struct IdentifyChallengeContext {
 }
 
 #[tracing::instrument(skip_all)]
-async fn get_identify_challenge_context(
+async fn get_identify_challenge_context<'a>(
     state: &State,
-    args: GetIdentifyChallengeArgs,
+    args: GetIdentifyChallengeArgs<'a>,
 ) -> FpResult<Option<IdentifyChallengeContext>> {
     let GetIdentifyChallengeArgs {
-        user_auth,
-        identifiers,
+        identifier,
+        playbook,
         sandbox_id,
-        obc,
         root_span,
+        kba_dis,
     } = args;
-    tracing::info!(identifiers=?Csv(identifiers.iter().map(IdentifyIdKind::from).collect()), has_user_auth=%user_auth.is_some(), has_ob_context=%obc.is_some(), has_sandbox_id=%sandbox_id.is_some(), "Getting identify challenge context");
 
-    // Get the Playbook from either user auth or obc auth, preferring to extract from the auth token
-    let playbook = (user_auth.as_ref().and_then(|ua| ua.playbook.as_ref()))
-        .or(obc.as_ref().map(|ob| ob.playbook()))
-        .cloned();
     let t_id = playbook.as_ref().map(|playbook| &playbook.tenant_id);
     // Look up existing user vault by identifier
-    let (existing_user_id, sv_id, matching_fps) = match (user_auth.as_ref(), identifiers) {
-        // Identified via phone or email
-        (None, ids) if !ids.is_empty() => {
-            let Some((existing, sv_id)) = state.find_vault(ids, sandbox_id, t_id).await? else {
+    let (existing_user_id, sv_id, matching_fps) = match identifier {
+        IdentifyLookupId::Pii(identifiers) => {
+            tracing::info!(identifiers=?Csv(identifiers.iter().map(IdentifyIdKind::from).collect()), has_uv_id=%false, has_su_id=%false, has_playbook=%playbook.is_some(), has_sandbox_id=%sandbox_id.is_some(), "Getting identify challenge context");
+            let Some((existing, sv_id)) = state.find_vault(identifiers, sandbox_id, t_id).await? else {
                 return Ok(None);
             };
             let LocatedVault { vault, matching_fps } = existing;
             (vault.id, sv_id, matching_fps)
         }
-        // Identified via auth token
-        (Some(auth), ids) if ids.is_empty() => (auth.user.clone().id, auth.su_id.clone(), vec![]),
-        // Require one of user_auth or identifier
-        (_, _) => return Err(ErrorWithCode::OnlyOneIdentifier.into()),
+        IdentifyLookupId::User(uv_id, su_id) => {
+            tracing::info!(has_uv_id=%true, has_su_id=%su_id.is_some(), has_playbook=%playbook.is_some(), has_sandbox_id=%sandbox_id.is_some(), "Getting identify challenge context");
+            (uv_id, su_id, vec![])
+        }
     };
 
     // Record some properties on the root span
@@ -209,7 +216,7 @@ async fn get_identify_challenge_context(
         // new tenant
         UserIdentifier::Vault(existing_user_id)
     };
-    let ctx = get_user_auth_methods(state, identifier, user_auth).await?;
+    let ctx = get_user_auth_methods(state, identifier, kba_dis).await?;
     let can_initiate_signup_challenge = tenant.is_some() && sv.is_none();
     let ctx = IdentifyChallengeContext {
         ctx,

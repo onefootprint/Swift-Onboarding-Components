@@ -31,7 +31,7 @@ pub async fn get(
             _ => None,
         })
         .reduce(|a, b| a.into_iter().filter(|i| b.contains(i)).collect_vec());
-    let ctx = get_user_auth_methods(&state, user_auth.user_identifier(), Some(user_auth)).await?;
+    let ctx = get_user_auth_methods(&state, user_auth.user_identifier(), &user_auth.kba).await?;
     let auth_methods = ctx
         .auth_methods
         .into_iter()

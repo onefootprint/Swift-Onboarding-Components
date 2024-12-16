@@ -6,6 +6,7 @@ import type {
   GetHostedBusinessOwnersData,
   GetHostedBusinessesData,
   GetHostedCheckSessionData,
+  GetHostedIdentifySessionRequirementsData,
   GetHostedIdentifyVerifyContactInfoData,
   GetHostedOnboardingConfigData,
   GetHostedOnboardingNidData,
@@ -34,6 +35,9 @@ import type {
   PatchHostedBusinessVaultData,
   PatchHostedBusinessVaultError,
   PatchHostedBusinessVaultResponse,
+  PatchHostedIdentifySessionVaultData,
+  PatchHostedIdentifySessionVaultError,
+  PatchHostedIdentifySessionVaultResponse,
   PatchHostedUserVaultData,
   PatchHostedUserVaultError,
   PatchHostedUserVaultResponse,
@@ -67,6 +71,18 @@ import type {
   PostHostedIdentifyLoginChallengeError,
   PostHostedIdentifyLoginChallengeResponse,
   PostHostedIdentifyResponse,
+  PostHostedIdentifySessionChallengeData,
+  PostHostedIdentifySessionChallengeError,
+  PostHostedIdentifySessionChallengeResponse,
+  PostHostedIdentifySessionChallengeVerifyData,
+  PostHostedIdentifySessionChallengeVerifyError,
+  PostHostedIdentifySessionChallengeVerifyResponse,
+  PostHostedIdentifySessionData,
+  PostHostedIdentifySessionError,
+  PostHostedIdentifySessionResponse,
+  PostHostedIdentifySessionVerifyData,
+  PostHostedIdentifySessionVerifyError,
+  PostHostedIdentifySessionVerifyResponse,
   PostHostedIdentifySignupChallengeData,
   PostHostedIdentifySignupChallengeError,
   PostHostedIdentifySignupChallengeResponse,
@@ -163,6 +179,7 @@ import {
   getHostedBusinessOwners,
   getHostedBusinesses,
   getHostedCheckSession,
+  getHostedIdentifySessionRequirements,
   getHostedIdentifyVerifyContactInfo,
   getHostedOnboardingConfig,
   getHostedOnboardingNid,
@@ -181,6 +198,7 @@ import {
   hostedOnboardingD2pStatusPost,
   patchHostedBusinessOwners,
   patchHostedBusinessVault,
+  patchHostedIdentifySessionVault,
   patchHostedUserVault,
   postHostedBusinessOnboarding,
   postHostedBusinessVaultDecrypt,
@@ -192,6 +210,10 @@ import {
   postHostedIdentifyKba,
   postHostedIdentifyLite,
   postHostedIdentifyLoginChallenge,
+  postHostedIdentifySession,
+  postHostedIdentifySessionChallenge,
+  postHostedIdentifySessionChallengeVerify,
+  postHostedIdentifySessionVerify,
   postHostedIdentifySignupChallenge,
   postHostedIdentifyValidationToken,
   postHostedIdentifyVerify,
@@ -741,6 +763,203 @@ export const postHostedIdentifyLoginChallengeMutation = (
   > = {
     mutationFn: async localOptions => {
       const { data } = await postHostedIdentifyLoginChallenge({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const postHostedIdentifySessionQueryKey = (options: Options<PostHostedIdentifySessionData>) => [
+  createQueryKey('postHostedIdentifySession', options),
+];
+
+export const postHostedIdentifySessionOptions = (options: Options<PostHostedIdentifySessionData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await postHostedIdentifySession({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: postHostedIdentifySessionQueryKey(options),
+  });
+};
+
+export const postHostedIdentifySessionMutation = (options?: Partial<Options<PostHostedIdentifySessionData>>) => {
+  const mutationOptions: UseMutationOptions<
+    PostHostedIdentifySessionResponse,
+    AxiosError<PostHostedIdentifySessionError>,
+    Options<PostHostedIdentifySessionData>
+  > = {
+    mutationFn: async localOptions => {
+      const { data } = await postHostedIdentifySession({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const postHostedIdentifySessionChallengeQueryKey = (
+  options: Options<PostHostedIdentifySessionChallengeData>,
+) => [createQueryKey('postHostedIdentifySessionChallenge', options)];
+
+export const postHostedIdentifySessionChallengeOptions = (options: Options<PostHostedIdentifySessionChallengeData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await postHostedIdentifySessionChallenge({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: postHostedIdentifySessionChallengeQueryKey(options),
+  });
+};
+
+export const postHostedIdentifySessionChallengeMutation = (
+  options?: Partial<Options<PostHostedIdentifySessionChallengeData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    PostHostedIdentifySessionChallengeResponse,
+    AxiosError<PostHostedIdentifySessionChallengeError>,
+    Options<PostHostedIdentifySessionChallengeData>
+  > = {
+    mutationFn: async localOptions => {
+      const { data } = await postHostedIdentifySessionChallenge({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const postHostedIdentifySessionChallengeVerifyQueryKey = (
+  options: Options<PostHostedIdentifySessionChallengeVerifyData>,
+) => [createQueryKey('postHostedIdentifySessionChallengeVerify', options)];
+
+export const postHostedIdentifySessionChallengeVerifyOptions = (
+  options: Options<PostHostedIdentifySessionChallengeVerifyData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await postHostedIdentifySessionChallengeVerify({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: postHostedIdentifySessionChallengeVerifyQueryKey(options),
+  });
+};
+
+export const postHostedIdentifySessionChallengeVerifyMutation = (
+  options?: Partial<Options<PostHostedIdentifySessionChallengeVerifyData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    PostHostedIdentifySessionChallengeVerifyResponse,
+    AxiosError<PostHostedIdentifySessionChallengeVerifyError>,
+    Options<PostHostedIdentifySessionChallengeVerifyData>
+  > = {
+    mutationFn: async localOptions => {
+      const { data } = await postHostedIdentifySessionChallengeVerify({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const getHostedIdentifySessionRequirementsQueryKey = (
+  options?: Options<GetHostedIdentifySessionRequirementsData>,
+) => [createQueryKey('getHostedIdentifySessionRequirements', options)];
+
+export const getHostedIdentifySessionRequirementsOptions = (
+  options?: Options<GetHostedIdentifySessionRequirementsData>,
+) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getHostedIdentifySessionRequirements({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getHostedIdentifySessionRequirementsQueryKey(options),
+  });
+};
+
+export const patchHostedIdentifySessionVaultMutation = (
+  options?: Partial<Options<PatchHostedIdentifySessionVaultData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    PatchHostedIdentifySessionVaultResponse,
+    AxiosError<PatchHostedIdentifySessionVaultError>,
+    Options<PatchHostedIdentifySessionVaultData>
+  > = {
+    mutationFn: async localOptions => {
+      const { data } = await patchHostedIdentifySessionVault({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const postHostedIdentifySessionVerifyQueryKey = (options?: Options<PostHostedIdentifySessionVerifyData>) => [
+  createQueryKey('postHostedIdentifySessionVerify', options),
+];
+
+export const postHostedIdentifySessionVerifyOptions = (options?: Options<PostHostedIdentifySessionVerifyData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await postHostedIdentifySessionVerify({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: postHostedIdentifySessionVerifyQueryKey(options),
+  });
+};
+
+export const postHostedIdentifySessionVerifyMutation = (
+  options?: Partial<Options<PostHostedIdentifySessionVerifyData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    PostHostedIdentifySessionVerifyResponse,
+    AxiosError<PostHostedIdentifySessionVerifyError>,
+    Options<PostHostedIdentifySessionVerifyData>
+  > = {
+    mutationFn: async localOptions => {
+      const { data } = await postHostedIdentifySessionVerify({
         ...options,
         ...localOptions,
         throwOnError: true,

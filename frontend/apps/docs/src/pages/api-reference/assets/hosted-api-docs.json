@@ -624,6 +624,238 @@
                 ]
             }
         },
+        "/hosted/identify/session": {
+            "post": {
+                "tags": [
+                    "Identify",
+                    "Hosted"
+                ],
+                "description": "Creates an identify session token.",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "x-sandbox-id",
+                        "description": "When provided, creates a sandbox user with the provided sandbox ID. Sandbox IDs allow you to create multiple users with the same contact info. In order to log in using an existing sandbox user, you can provide its Sandbox ID in the Footprint flow.\n            ",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-fp-is-bootstrap",
+                        "description": "Provide `true` if the data in the request is bootstrap data.",
+                        "schema": {
+                            "type": "boolean"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-fp-is-components-sdk",
+                        "description": "When a non-empty value is provided, indicates that the request is originating from the components SDK",
+                        "schema": {
+                            "type": "boolean"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/IdentifySessionRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/IdentifySessionResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Onboarding Config Publishable Key": []
+                    },
+                    {
+                        "Onboarding Config Token": []
+                    },
+                    {
+                        "Business Owner Token": []
+                    }
+                ]
+            }
+        },
+        "/hosted/identify/session/challenge": {
+            "post": {
+                "tags": [
+                    "Identify",
+                    "Hosted"
+                ],
+                "description": "Sends a challenge to the phone number or email saved in this identify session and returns an HTTP 200",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ChallengeRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/IdentifyChallengeResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Identify Token": []
+                    }
+                ]
+            }
+        },
+        "/hosted/identify/session/challenge/verify": {
+            "post": {
+                "tags": [
+                    "Identify",
+                    "Hosted"
+                ],
+                "description": "Verifies the response to a challenge",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ChallengeVerifyRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Empty"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Identify Token": []
+                    }
+                ]
+            }
+        },
+        "/hosted/identify/session/requirements": {
+            "get": {
+                "tags": [
+                    "Identify",
+                    "Hosted"
+                ],
+                "description": "Returns the list of requirements for an identify session.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/IdentifyRequirementsResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Identify Token": []
+                    }
+                ]
+            }
+        },
+        "/hosted/identify/session/vault": {
+            "patch": {
+                "tags": [
+                    "Identify",
+                    "Hosted"
+                ],
+                "description": "Updates the data stored in this identify session.",
+                "requestBody": {
+                    "description": "Key-value map of data to add to the user's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ModernRawUserDataRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Empty"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Identify Token": []
+                    }
+                ]
+            }
+        },
+        "/hosted/identify/session/verify": {
+            "post": {
+                "tags": [
+                    "Identify",
+                    "Hosted"
+                ],
+                "description": "Verifies that all identify requirements have been met.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/IdentifyVerifyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Identify Token": []
+                    }
+                ]
+            }
+        },
         "/hosted/identify/signup_challenge": {
             "post": {
                 "tags": [
@@ -2479,6 +2711,12 @@
                 "name": "X-Kyb-Bo-Token",
                 "description": "Token to initialize KYC of a business owner. Uniquely identifies a business and beneficial owner."
             },
+            "Identify Token": {
+                "type": "apiKey",
+                "in": "header",
+                "name": "X-Fp-Authorization",
+                "description": "Short-lived auth token for an identify session."
+            },
             "Integration Testing User Onboarding Token": {
                 "type": "apiKey",
                 "in": "header",
@@ -2778,6 +3016,32 @@
                     "sms_link",
                     "biometric",
                     "email"
+                ]
+            },
+            "ChallengeRequest": {
+                "type": "object",
+                "properties": {
+                    "challenge_kind": {
+                        "$ref": "#/components/schemas/ChallengeKind"
+                    }
+                },
+                "required": [
+                    "challenge_kind"
+                ]
+            },
+            "ChallengeVerifyRequest": {
+                "type": "object",
+                "properties": {
+                    "challenge_response": {
+                        "type": "string"
+                    },
+                    "challenge_token": {
+                        "description": "Opaque challenge state token",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "challenge_token"
                 ]
             },
             "CheckSessionResponse": {
@@ -4236,6 +4500,104 @@
                     "scope"
                 ]
             },
+            "IdentifyRequirement": {
+                "anyOf": [
+                    {
+                        "$ref": "#/components/schemas/IdentifyRequirementCollectData"
+                    },
+                    {
+                        "$ref": "#/components/schemas/IdentifyRequirementLogin"
+                    },
+                    {
+                        "$ref": "#/components/schemas/IdentifyRequirementChallenge"
+                    }
+                ]
+            },
+            "IdentifyRequirementChallenge": {
+                "description": "A challenge is required by the playbook in order to create the user.",
+                "type": "object",
+                "properties": {
+                    "auth_method": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/AuthMethodKind"
+                            },
+                            {
+                                "description": "List of challenge kinds that can meet this requirement",
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "challenge_kinds": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ChallengeKind"
+                        }
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "challenge"
+                        ]
+                    }
+                },
+                "required": [
+                    "auth_method",
+                    "challenge_kinds",
+                    "kind"
+                ]
+            },
+            "IdentifyRequirementCollectData": {
+                "type": "object",
+                "properties": {
+                    "cdo": {
+                        "$ref": "#/components/schemas/CollectedDataOption"
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "collect_data"
+                        ]
+                    }
+                },
+                "required": [
+                    "cdo",
+                    "kind"
+                ]
+            },
+            "IdentifyRequirementLogin": {
+                "description": "A user has been identified via the phone or email on this identify session. You should\n proceed by logging into that vault.",
+                "type": "object",
+                "properties": {
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "login"
+                        ]
+                    },
+                    "user": {
+                        "$ref": "#/components/schemas/IdentifiedUser"
+                    }
+                },
+                "required": [
+                    "kind",
+                    "user"
+                ]
+            },
+            "IdentifyRequirementsResponse": {
+                "type": "object",
+                "properties": {
+                    "requirements": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/IdentifyRequirement"
+                        }
+                    }
+                },
+                "required": [
+                    "requirements"
+                ]
+            },
             "IdentifyResponse": {
                 "type": "object",
                 "properties": {
@@ -4258,6 +4620,32 @@
                     "my1fp",
                     "onboarding",
                     "auth"
+                ]
+            },
+            "IdentifySessionRequest": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/ModernRawUserDataRequest"
+                    },
+                    "scope": {
+                        "$ref": "#/components/schemas/IdentifyScope"
+                    }
+                },
+                "required": [
+                    "data",
+                    "scope"
+                ]
+            },
+            "IdentifySessionResponse": {
+                "type": "object",
+                "properties": {
+                    "token": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "token"
                 ]
             },
             "IdentifyVerifyRequest": {
@@ -7509,8 +7897,7 @@
                 "required": [
                     "challenge_kind",
                     "challenge_token",
-                    "time_before_retry_s",
-                    "token"
+                    "time_before_retry_s"
                 ]
             },
             "UserChallengeRequest": {

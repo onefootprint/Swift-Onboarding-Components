@@ -104,8 +104,6 @@ pub async fn patch(
                 default: source,
                 overrides,
             };
-            // Even though this accepts id.phone_number, it will always error at runtime if we
-            // provide id.phone_number since we only allow a vault to have one phone number
             uvw.patch_data(conn, updates, DataRequestSource::HostedPatchVault(sources))?;
             Ok(())
         })

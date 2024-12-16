@@ -1,3 +1,4 @@
+pub mod identify;
 pub mod onboarding;
 pub mod sdk_args;
 pub mod tenant;
@@ -35,6 +36,9 @@ pub enum AuthSessionData {
     /// Proxy permissions of a tenant into a short-lived token
     ClientTenant(tenant::ClientTenantAuth),
 
+    /// Identify sessions
+    Identify(identify::IdentifySession),
+
     /// User-specific sessions
     User(user::UserSession),
 
@@ -65,6 +69,7 @@ impl AuthSessionData {
     pub fn token_prefix(&self) -> &str {
         match self {
             Self::ClientTenant(_) => "ct",
+            Self::Identify(_) => "i",
             Self::User(_) => "u",
             Self::EmailVerify(_) => "ev",
             Self::ValidateUserToken(_) => "v",
@@ -88,6 +93,7 @@ impl HasSessionKind for AuthSessionData {
             Self::TenantRb(_) => SessionKind::TenantRb,
             Self::FirmEmployee(_) => SessionKind::FirmEmployee,
             Self::ClientTenant(_) => SessionKind::ClientTenant,
+            Self::Identify(_) => SessionKind::Identify,
             Self::User(_) => SessionKind::User,
             Self::EmailVerify(_) => SessionKind::EmailVerify,
             Self::ValidateUserToken(_) => SessionKind::ValidateUserToken,

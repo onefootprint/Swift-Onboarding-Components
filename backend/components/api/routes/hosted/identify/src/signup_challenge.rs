@@ -3,8 +3,10 @@ use crate::utils::initiate_challenge;
 use crate::utils::InitiateChallengeArgs;
 use crate::GetIdentifyChallengeArgs;
 use crate::IdentifyChallengeContext;
+use crate::IdentifyLookupId;
 use crate::State;
 use api_core::auth::ob_config::ObConfigAuth;
+use api_core::auth::ob_config::ObConfigAuthTrait;
 use api_core::errors::error_with_code::ErrorWithCode;
 use api_core::errors::user::UserError;
 use api_core::telemetry::RootSpan;
@@ -14,6 +16,7 @@ use api_core::utils::headers::IsComponentsSdk;
 use api_core::utils::headers::SandboxId;
 use api_core::utils::identify::get_user_auth_methods;
 use api_core::utils::identify::UserAuthMethodsContext;
+use api_core::utils::vault_wrapper::DlSourceWithOverrides;
 use api_core::utils::vault_wrapper::FingerprintedDataRequest;
 use api_core::utils::vault_wrapper::VaultContext;
 use api_core::utils::vault_wrapper::VaultWrapper;
@@ -77,10 +80,10 @@ pub async fn post(
     .flatten()
     .collect_vec();
     let args = GetIdentifyChallengeArgs {
-        user_auth: None,
-        identifiers: identifiers.clone(),
+        identifier: IdentifyLookupId::Pii(identifiers),
+        kba_dis: &[],
         sandbox_id: sandbox_id.clone(),
-        obc: Some(ob_context.clone()),
+        playbook: Some(ob_context.playbook().clone()),
         root_span: root_span.clone(),
     };
     let ctx = crate::get_identify_challenge_context(&state, args).await?;
@@ -97,10 +100,10 @@ pub async fn post(
         if !can_initiate_signup_challenge {
             // There's already a duplicate vault. Create the auth token that allows sending a
             // login challenge
+            let uv_id = vw.vault.id.clone();
             let (token, _, _) =
-                create_identified_token(&state, vw.vault.id.clone(), scope, sv, Some(ob_context.clone()))
-                    .await?;
-            return Err(ErrorWithCode::ExistingVault(token).into());
+                create_identified_token(&state, uv_id, sv, scope, vec![], Some(ob_context.clone())).await?;
+            return Err(ErrorWithCode::ExistingVault(Some(token)).into());
         }
     }
 
@@ -115,20 +118,21 @@ pub async fn post(
     )
     .await?;
     let (uv, sv, root_span) = state
+        // TODO: what was this duplicate_of_id? we won't be saving it properly in the new flow
         .db_transaction(move |conn| {
             let (uv, sv, _) = VaultWrapper::create_unverified(conn, ctx, &root_span, duplicate_of_id)?;
             Ok((uv.into_inner(), sv.into_inner(), root_span))
         })
         .await?;
-    let ctx = get_user_auth_methods(&state, sv.id.clone().into(), None).await?;
+    let ctx = get_user_auth_methods(&state, sv.id.clone(), &[]).await?;
+    let uv_id = uv.id.clone();
     let (token, session, _) =
-        create_identified_token(&state, uv.id.clone(), scope, Some(sv), Some(ob_context.clone())).await?;
+        create_identified_token(&state, uv_id, Some(sv), scope, vec![], Some(ob_context.clone())).await?;
     let tenant = Some(ob_context.tenant());
     let args = InitiateChallengeArgs {
         challenge_kind,
         tenant,
-        token,
-        session,
+        user_session: Some((token, session)),
         insight_headers,
     };
     let response = initiate_challenge(&state, ctx, args).await?;
@@ -153,7 +157,7 @@ async fn make_vault_context(
         return BadRequestInto("Sandbox ID must be provided if and only if using a sandbox playbook");
     }
 
-    let sources = chain(
+    let overrides = chain(
         email.as_ref().map(|e| (IDK::Email.into(), e.is_bootstrap)),
         phone.as_ref().map(|p| (IDK::PhoneNumber.into(), p.is_bootstrap)),
     )
@@ -168,6 +172,10 @@ async fn make_vault_context(
         (di, source)
     })
     .collect();
+    let sources = DlSourceWithOverrides {
+        default: DataLifetimeSource::LikelyHosted,
+        overrides,
+    };
 
     let data = chain(
         email.map(|e| (IDK::Email.into(), e.value.email)),
