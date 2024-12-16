@@ -2,7 +2,27 @@ use idv::neuro_id::response::Model;
 use idv::neuro_id::response::NeuroIdAnalyticsResponse;
 use itertools::Itertools;
 use newtypes::FootprintReasonCode as FRC;
-pub fn footprint_reason_codes(res: &NeuroIdAnalyticsResponse) -> Vec<FRC> {
+use newtypes::TenantId;
+
+
+#[derive(Default)]
+pub struct NeuroFeatureConfig {
+    pub excluded_models: Vec<Model>,
+}
+
+impl NeuroFeatureConfig {
+    pub fn new(tenant_id: &TenantId) -> Self {
+        let excluded_models = if tenant_id.is_triumph() {
+            vec![Model::Incognito]
+        } else {
+            vec![]
+        };
+
+        Self { excluded_models }
+    }
+}
+
+pub fn footprint_reason_codes(res: &NeuroIdAnalyticsResponse, config: &NeuroFeatureConfig) -> Vec<FRC> {
     let mut frcs = vec![];
 
     // Overall behavior decision
@@ -56,6 +76,7 @@ pub fn footprint_reason_codes(res: &NeuroIdAnalyticsResponse) -> Vec<FRC> {
     // Add individual model FRCS
     res.flagged_signals()
         .iter()
+        .filter(|signal| !config.excluded_models.contains(&signal.model()))
         .flat_map(|signal| model_to_frc(&signal.model()))
         .for_each(|frc| frcs.push(frc));
 
@@ -195,8 +216,28 @@ mod tests {
 
         let raw = test_fixtures::neuro_id_success_response(opts);
         let parsed: NeuroIdAnalyticsResponse = serde_json::from_value(raw).unwrap();
-        let frcs = footprint_reason_codes(&parsed);
+        let config = NeuroFeatureConfig::default();
+        let frcs = footprint_reason_codes(&parsed, &config);
 
         assert_have_same_elements(frcs, expected);
+    }
+
+    #[test]
+    fn test_footprint_reason_codes_exempt() {
+        let raw = test_fixtures::neuro_id_success_response(NeuroTestOpts {
+            incognito: true,
+            ..Default::default()
+        });
+        let parsed: NeuroIdAnalyticsResponse = serde_json::from_value(raw).unwrap();
+        let non_triumph_id = TenantId::test_data("t_not_triumph".into());
+
+        let triumph_id = TenantId::test_data(TenantId::TRIUMPH.into());
+        let config = NeuroFeatureConfig::new(&non_triumph_id);
+        let config_triumph = NeuroFeatureConfig::new(&triumph_id);
+        let frcs = footprint_reason_codes(&parsed, &config);
+        let frcs_triumph = footprint_reason_codes(&parsed, &config_triumph);
+
+        assert!(frcs.contains(&FRC::BrowserIncognito));
+        assert!(!frcs_triumph.contains(&FRC::BrowserIncognito));
     }
 }

@@ -327,6 +327,7 @@ pub async fn save_fixture_neuro_result(
                 bot_framework: true,
                 device_id: None,
                 cookie_id: None,
+                incognito: true,
             };
             idv::test_fixtures::neuro_id_success_response(opts)
         }

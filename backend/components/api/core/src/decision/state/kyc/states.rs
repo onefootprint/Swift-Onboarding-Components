@@ -9,6 +9,7 @@ use super::MakeVendorCalls;
 use crate::decision::duplicates::DuplicateData;
 use crate::decision::features::duplicates;
 use crate::decision::features::misc::MiscReasonCodeConfig;
+use crate::decision::features::neuro_id::NeuroFeatureConfig;
 use crate::decision::features::risk_signals::parse_reason_codes;
 use crate::decision::features::risk_signals::parse_reason_codes_from_vendor_result;
 use crate::decision::features::risk_signals::UserSubmittedInfoForFRC;
@@ -395,8 +396,9 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         }
 
         if let Some((neuro_res, vres_id)) = neuro_result {
+            let config = NeuroFeatureConfig::new(&self.t_id);
             let vendor_api: VendorAPI = VendorAPI::NeuroIdAnalytics;
-            let neuro_frc = features::neuro_id::footprint_reason_codes(&neuro_res)
+            let neuro_frc = features::neuro_id::footprint_reason_codes(&neuro_res, &config)
                 .into_iter()
                 .map(|frc| (frc, vendor_api, vres_id.clone()))
                 .collect();

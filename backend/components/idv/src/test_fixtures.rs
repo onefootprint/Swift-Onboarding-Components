@@ -3843,6 +3843,7 @@ pub struct NeuroTestOpts {
     pub fraud_ring_indicator: bool,
     pub device_id: Option<String>,
     pub cookie_id: Option<String>,
+    pub incognito: bool,
 }
 pub fn neuro_id_success_response(opts: NeuroTestOpts) -> serde_json::Value {
     serde_json::json!({
@@ -3960,7 +3961,7 @@ pub fn neuro_id_success_response(opts: NeuroTestOpts) -> serde_json::Value {
                 {
                     "version": "1.0",
                     "model": "incognito",
-                    "label": "false",
+                    "label": opts.incognito.to_string(),
                     "attributes": {}
                 },
                 {
