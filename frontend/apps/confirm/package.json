@@ -17,6 +17,7 @@
     "@onefootprint/axios": "workspace:*",
     "@onefootprint/design-tokens": "workspace:*",
     "@onefootprint/icons": "workspace:*",
+    "@onefootprint/request": "workspace:*",
     "@onefootprint/request-types": "workspace:*",
     "@onefootprint/ui": "workspace:*",
     "@tanstack/react-query": "^5.56.2",

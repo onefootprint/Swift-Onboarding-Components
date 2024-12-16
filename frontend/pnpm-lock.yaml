@@ -444,6 +444,9 @@ importers:
       '@onefootprint/icons':
         specifier: workspace:*
         version: link:../../packages/icons
+      '@onefootprint/request':
+        specifier: workspace:*
+        version: link:../../packages/request
       '@onefootprint/request-types':
         specifier: workspace:*
         version: link:../../packages/request-types

@@ -29,7 +29,7 @@ const WaitingConfirmation = ({ tokens, onCancel, onDone }: WaitingConfirmationPr
       mutation.mutate(
         {
           body: {
-            challengeResponse: null,
+            challengeResponse: '',
             challengeToken: tokens.challengeToken,
             scope: 'onboarding',
           },
@@ -43,15 +43,8 @@ const WaitingConfirmation = ({ tokens, onCancel, onDone }: WaitingConfirmationPr
         },
       );
     };
-
-    // Initial check
-    pollVerification();
-
-    // // Set up polling interval
-    // const interval = setInterval(pollVerification, 2000);
-
-    // // Cleanup interval on unmount
-    // return () => clearInterval(interval);
+    const interval = setInterval(pollVerification, 2000);
+    return () => clearInterval(interval);
   }, []);
 
   return (

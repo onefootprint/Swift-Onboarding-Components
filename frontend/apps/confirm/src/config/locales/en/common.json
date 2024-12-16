@@ -1,20 +1,13 @@
 {
   "pages": {
-    "confirm": {
-      "success": {
-        "title": "Email verified!",
-        "description": "Thanks for verifying your email. You're all set!"
-      },
-      "error": {
-        "title": "Email verification failed.",
-        "description": "Please open the link we've originally sent to your email to try again."
-      }
-    },
     "verify": {
-      "title": "Are you trying to verify your phone number with Avis?",
-      "location": "Montgomery, Alabama",
+      "title": "Are you trying to verify your phone number with {{tenantName}}?",
       "confirm": "Yes, it's me",
-      "cancel": "No, it's not me"
+      "error": "Ops, something happened"
+    },
+    "success": {
+      "title": "Phone number verified!",
+      "description": "Your agent will now proceed with verifying your identity."
     }
   }
 }
