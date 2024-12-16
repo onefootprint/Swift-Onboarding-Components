@@ -761,6 +761,66 @@ def test_config_create(sandbox_tenant):
             ),
             None,
         ),
+        (
+            dict(
+                must_collect_data=[
+                "business_name",
+                "business_tin",
+                "business_address",
+                "business_phone_number",
+                "business_website",
+            ],
+                kind="kyb",
+                verification_checks=[{"kind": "kyb", "data": {"ein_only": False}}],
+                allow_us_territory_residents=True,
+            ),
+            None,
+        ),
+        (
+            dict(
+                must_collect_data=[
+                "business_name",
+                "business_tin",
+                "business_address",
+                "business_phone_number",
+                "business_website",
+            ],
+                kind="kyb",
+                verification_checks=[{"kind": "kyb", "data": {"ein_only": False}}],
+                allow_international_residents=True,
+            ),
+            "Validation error: Cannot collect address and run KYB with allow_international_residents or allow_us_territory_residents",
+        ),
+        (
+            dict(
+                must_collect_data=[
+                "business_name",
+                "business_tin",
+                "business_address",
+                "business_phone_number",
+                "business_website",
+            ],
+                kind="kyb",
+                verification_checks=[{"kind": "kyb", "data": {"ein_only": False}}],
+                allow_us_territories=True,
+            ),
+            "Validation error: Cannot collect address and run KYB with allow_international_residents or allow_us_territory_residents",
+        ),
+        (
+            dict(
+                must_collect_data=[
+                "business_name",
+                "business_tin",
+                "business_address",
+                "business_phone_number",
+                "business_website",
+            ],
+                kind="kyb",
+                verification_checks=[],
+                allow_international_residents=True
+            ),
+            None
+        ),
     ],
 )
 def test_config_create_validation(sandbox_tenant, config_data, expected_error):

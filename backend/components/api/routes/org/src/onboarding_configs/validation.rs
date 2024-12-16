@@ -511,10 +511,19 @@ impl ObConfigurationArgsToValidate {
             .iter()
             .try_for_each(|c| -> FpResult<()> {
                 match c {
-                    VerificationCheck::Kyb { .. } => {
+                    VerificationCheck::Kyb { ein_only } => {
                         if !matches!(&self.kind, &ObConfigurationKind::Kyb) {
                             return Err(TenantError::ValidationError(
                                 "Cannot run KYB for non-KYB Playbooks".to_owned(),
+                            )
+                            .into());
+                        }
+
+                        let collecting_address = self.must_collect_data.iter().any(|f| f == &CDO::BusinessAddress);
+                        // We do not at this time support running full KYB on non-US business addresses
+                        if !ein_only && collecting_address && (self.allow_international_residents || self.allow_us_territory_residents) {
+                            return Err(TenantError::ValidationError(
+                                "Cannot collect address and run KYB with allow_international_residents or allow_us_territory_residents".to_owned(),
                             )
                             .into());
                         }

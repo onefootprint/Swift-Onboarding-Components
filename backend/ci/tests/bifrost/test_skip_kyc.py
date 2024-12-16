@@ -10,7 +10,6 @@ def skip_kyc_playbook(sandbox_tenant, must_collect_data):
         "skip kyc (happens to be kyb)",
         ["business_name", "business_address"],
         skip_kyc=True,
-        allow_international_residents=True,
         # For now, we don't support collection-only KYC playbooks, but we should.
         # Instead, we'll model this as a KYB playbook that has skip_kyc
         kind="kyb",
@@ -23,7 +22,6 @@ def skip_kyc_playbook_with_verification_checks(sandbox_tenant):
         sandbox_tenant,
         "skip kyc (happens to be kyb)",
         ["business_name", "business_address"],
-        allow_international_residents=True,
         # For now, we don't support collection-only KYC playbooks, but we should.
         # Instead, we'll model this as a KYB playbook that has skip_kyc
         kind="kyb",
