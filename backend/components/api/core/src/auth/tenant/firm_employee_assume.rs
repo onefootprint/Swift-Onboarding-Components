@@ -136,8 +136,9 @@ impl FirmEmployeeAssumeAuth {
         let extra_permissions_for_user = if self.requested_allow_writes {
             // To receive an extra permissions, the dashboard must send an explicit header that
             // shows the user has enabled write mode on the dashboard
-            if !self.is_live {
+            if !self.is_live && self.tenant.sandbox_restricted {
                 // In sandbox mode, all firm employees are allowed to have write access
+                // as long as the tenant is not prod-live
                 vec![TenantScope::Admin]
             } else if self.tenant_user.is_risk_ops {
                 // Outside of sandbox, "risk ops" employees have extended permissions
@@ -159,8 +160,7 @@ impl FirmEmployeeAssumeAuth {
                     TenantScope::ManageComplianceDocSubmission,
                 ]
             } else {
-                // But, firm employees are always allowed to edit org settings
-                vec![TenantScope::OrgSettings]
+                vec![]
             }
         } else {
             vec![]
@@ -240,14 +240,32 @@ mod test {
     use newtypes::TenantSessionPurpose;
     use newtypes::WorkosAuthMethod;
 
-    #[db_test_case(false, false, false => vec![TenantScope::Read])]
-    #[db_test_case(false, true, false => vec![TenantScope::Read])]
-    #[db_test_case(true, false, false => vec![TenantScope::Read])]
-    #[db_test_case(true, true, false => vec![TenantScope::Read])]
-    #[db_test_case(false, false, true => vec![TenantScope::Read, TenantScope::Admin]; "always have admin in sandbox")]
-    #[db_test_case(false, true, true => vec![TenantScope::Read, TenantScope::Admin]; "always have admin in sandbox, even risk ops")]
-    #[db_test_case(true, false, true => vec![TenantScope::Read, TenantScope::OrgSettings]; "always have org settings in live mode")]
-    #[db_test_case(true, true, true => vec![
+    #[db_test_case(false, false, false, false => vec![TenantScope::Read])]
+    #[db_test_case(false, true, false, false => vec![TenantScope::Read])]
+    #[db_test_case(true, false, false, false => vec![TenantScope::Read])]
+    #[db_test_case(true, true, false, false => vec![TenantScope::Read])]
+    #[db_test_case(false, false, true, false => vec![TenantScope::Read]; "only have read in sandbox when non-restricted")]
+    #[db_test_case(false, false, true, true => vec![TenantScope::Read, TenantScope::Admin]; "always have admin in sandbox when restricted")]
+    #[db_test_case(false, true, true, true => vec![TenantScope::Read, TenantScope::Admin]; "always have admin in sandbox when restricted as risk ops")]
+    #[db_test_case(false, true, true, false => vec![
+        TenantScope::Read,
+        TenantScope::OrgSettings,
+        TenantScope::DecryptAllExceptPciData,
+        TenantScope::ManualReview,
+        TenantScope::WriteEntities,
+        TenantScope::OnboardingConfiguration,
+        TenantScope::ApiKeys,
+        TenantScope::ManageWebhooks,
+        TenantScope::CipIntegration,
+        TenantScope::InvokeVaultProxy {
+            data: InvokeVaultProxyPermission::Any,
+        },
+        TenantScope::AuthToken,
+        TenantScope::Onboarding,
+        TenantScope::LabelAndTag,
+        TenantScope::ManageComplianceDocSubmission,]; "always have decrypt and org settings etc in sandbox, even risk ops if non restricted")]
+    #[db_test_case(true, false, true, false => vec![TenantScope::Read]; "only read in live mode")]
+    #[db_test_case(true, true, true, false => vec![
         TenantScope::Read,
         TenantScope::OrgSettings,
         TenantScope::DecryptAllExceptPciData,
@@ -271,8 +289,10 @@ mod test {
         is_risk_ops: bool,
         // If requested_allow_writes is ever false, we shouldn't have any permissions beyond Read
         requested_allow_writes: bool,
+        is_sandbox_restricted: bool,
     ) -> Vec<TenantScope> {
-        let tenant = db::tests::fixtures::tenant::create(conn);
+        let mut tenant = db::tests::fixtures::tenant::create(conn);
+        tenant.sandbox_restricted = is_sandbox_restricted;
         let role_kind = TenantRoleKind::DashboardUser;
         let role =
             TenantRole::get_immutable(conn, &tenant.id, ImmutableRoleKind::ReadOnly, role_kind).unwrap();
