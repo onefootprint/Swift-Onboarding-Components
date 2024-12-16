@@ -108,12 +108,8 @@ pub fn footprint_reason_codes(res: FlexIdResponse, user_info: UserSubmittedInfoF
         misc_codes.push(pl_frc);
     }
 
-    if res
-        .comprehensive_verification_index()
-        .map(|s| s <= COMPREHENSIVE_VERIFICATION_INDEX_THRESHOLD)
-        .unwrap_or(false)
-    {
-        misc_codes.push(FRC::IdFlagged);
+    if let Some(frc) = res.comprehensive_verification_index().and_then(cvi_frc) {
+        misc_codes.push(frc);
     }
 
     let risk_indicator_codes = risk_indicator_codes
@@ -121,7 +117,7 @@ pub fn footprint_reason_codes(res: FlexIdResponse, user_info: UserSubmittedInfoF
         .filter_map(|ric| Into::<Option<FRC>>::into(&ric))
         .collect_vec();
 
-    match_frcs
+    let reason_codes = match_frcs
         .into_reason_codes()
         .into_iter()
         .chain(valid_element_summary_codes)
@@ -129,7 +125,44 @@ pub fn footprint_reason_codes(res: FlexIdResponse, user_info: UserSubmittedInfoF
         .chain(risk_indicator_codes)
         .chain(email_codes)
         .unique()
-        .collect()
+        .collect();
+
+    // TEMP: I'm trying to see if we should continue to map CVI = 20 and 30 to ID flagged or if we can
+    // dispense with this and keep IdFlagged == 10, IdNotLocated == 0 and then let tenants decide
+    // how to handle partial verification. See comment in `cvi_frc` for more info
+    if let Some(cvi) = res
+        .comprehensive_verification_index()
+        .filter(|cvi| *cvi > 0 && *cvi <= COMPREHENSIVE_VERIFICATION_INDEX_THRESHOLD)
+    {
+        tracing::info!(?cvi, ?reason_codes, "cvi_reason_code_update");
+    }
+
+    reason_codes
+}
+
+
+fn cvi_frc(cvi: i32) -> Option<FRC> {
+    //CVI Definitions
+
+    // 00 = Nothing verified, or a single element may be verified in isolation within SSN or Phone
+    // sources but not in combination with other PII elements
+    // 10 = Critical ID elements not verified or are associated with different person(s); High risk
+    // analysis overrides
+    // 20 = Minimal verification, critical ID elements not verified across both NAP-level and NAS-level
+    // sources
+    // 30 = Partial verification; Typically the SSN or address is the verification failure
+    // 40 = Last name, address & SSN or Last name, address & phone verified in most scenarios
+    // 50 = Name, Address, SSN verified; Phone and DOB may or may not be verified
+    //
+    // From: https://groups.google.com/a/onefootprint.com/g/vendor-archive/c/p3anhiBjnyQ/m/yzN2QqS6BAAJ
+    if cvi == 0 {
+        Some(FRC::IdNotLocated)
+    } else if cvi <= COMPREHENSIVE_VERIFICATION_INDEX_THRESHOLD {
+        // TODO: consider removing 20/30 here.
+        Some(FRC::IdFlagged)
+    } else {
+        None
+    }
 }
 
 #[derive(Clone, Serialize)]
@@ -557,7 +590,7 @@ mod tests {
             PhoneLocatedDoesNotMatch,
             DobCouldNotMatch,
             DriversLicenseNumberIsValid,
-            IdFlagged,
+            IdNotLocated,
             DobNotOnFile,
             PhoneNumberInputInvalid,
             PhoneLocatedAddressDoesNotMatch,
