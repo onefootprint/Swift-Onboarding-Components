@@ -66,12 +66,11 @@ const Intro = ({ onDone }: IntroStepProps) => {
 
   return (
     <Layout>
+      <img src={logo} alt="Avis Logo" className="mx-auto mb-6" width={92} height={30} />
       <Header
         title="Let's verify your customer's identity!"
         subtitle="Enter their email and phone number to begin the identity verification process."
-      >
-        <img src={logo} alt="Avis Logo" className="mx-auto mb-6" width={92} height={30} />
-      </Header>
+      />
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="block w-full mb-6">
           <FormLabel htmlFor="email">Email</FormLabel>
@@ -129,7 +128,7 @@ const Intro = ({ onDone }: IntroStepProps) => {
         </div>
         <div className="mt-3 mb-4">
           <Button variant="primary" type="submit" disabled={mutation.isPending}>
-            {mutation.isPending ? 'Verifying...' : 'Continue'}
+            {mutation.isPending ? 'Loading...' : 'Continue'}
           </Button>
         </div>
         <div>

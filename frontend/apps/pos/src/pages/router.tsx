@@ -8,14 +8,7 @@ type RouterProps = {
 };
 
 const Router = ({ onboardingConfig }: RouterProps) => {
-  const [state, setContext] = useState(() => ({
-    step: 'intro',
-    onboardingConfig,
-    userData: {
-      phoneNumber: '',
-      email: '',
-    },
-  }));
+  const [state, setContext] = useState(() => getInitialState(onboardingConfig));
 
   return (
     <>
@@ -30,9 +23,26 @@ const Router = ({ onboardingConfig }: RouterProps) => {
           }}
         />
       )}
-      {state.step === 'waiting-confirmation' && <WaitingConfirmation />}
+      {state.step === 'waiting-confirmation' && (
+        <WaitingConfirmation
+          onCancel={() => {
+            setContext(getInitialState(onboardingConfig));
+          }}
+        />
+      )}
     </>
   );
+};
+
+const getInitialState = (onboardingConfig: PublicOnboardingConfiguration) => {
+  return {
+    step: 'intro',
+    onboardingConfig,
+    userData: {
+      phoneNumber: '',
+      email: '',
+    },
+  };
 };
 
 export default Router;

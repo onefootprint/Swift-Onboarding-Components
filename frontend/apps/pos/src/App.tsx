@@ -5,7 +5,7 @@ import Router from './pages/router';
 const App = () => {
   const { data, isPending } = useQuery(getHostedOnboardingConfigOptions());
   if (isPending) {
-    return <div>Loading...</div>;
+    return null;
   }
 
   if (data) {

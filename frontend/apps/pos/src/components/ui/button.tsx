@@ -12,7 +12,7 @@ const Button = ({ children, className, variant, ...props }: ButtonProps) => {
 };
 
 const button = cva(
-  'w-full h-10 flex items-center justify-center cursor-pointer text-label-3 text-center disabled:cursor-not-allowed',
+  'w-full h-10 flex items-center justify-center cursor-pointer text-label-3 text-center disabled:cursor-not-allowed disabled:opacity-20',
   {
     variants: {
       variant: {
