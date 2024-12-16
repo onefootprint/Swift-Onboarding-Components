@@ -101,8 +101,8 @@ export const createChallenge = async (payload: CreateChallengeRequestPayload, op
         const loginResponse = await loginChallenge({ kind: 'email' }, { token: identifyResponse.user.token });
         return loginResponse;
       }
-      throw new InlineOtpNotSupported('Cannot verify inline');
     }
+    throw new InlineOtpNotSupported('Cannot verify inline');
   }
   const signupResponse = await signupChallenge(payload, options);
   return signupResponse;
