@@ -1,5 +1,8 @@
 import type { PublicOnboardingConfiguration } from '@onefootprint/request-types';
 import { useState } from 'react';
+import AddressDataStep from './address-data-step';
+import BasicDataStep from './basic-data-step';
+import CustomDataStep from './custom-data-step';
 import IntroStep from './intro-step';
 import WaitingConfirmation from './waiting-confirmation';
 
@@ -45,6 +48,47 @@ const Router = ({ onboardingConfig }: RouterProps) => {
           }}
         />
       )}
+      {state.step === 'basic-data' && (
+        <BasicDataStep
+          authToken={state.tokens.authToken}
+          defaultValues={state.userData}
+          onSubmit={data => {
+            setContext(prev => ({
+              ...prev,
+              step: 'address-data',
+              userData: {
+                ...prev.userData,
+                ...data,
+              },
+            }));
+          }}
+        />
+      )}
+      {state.step === 'address-data' && (
+        <AddressDataStep
+          authToken={state.tokens.authToken}
+          defaultValues={state.userData}
+          onSubmit={data => {
+            setContext(prev => ({
+              ...prev,
+              step: 'next-step',
+              userData: {
+                ...prev.userData,
+                ...data,
+              },
+            }));
+          }}
+        />
+      )}
+      {state.step === 'custom-data' && (
+        <CustomDataStep
+          authToken={state.tokens.authToken}
+          defaultValues={state.userData}
+          onSubmit={data => {
+            console.log(data);
+          }}
+        />
+      )}
     </>
   );
 };
@@ -60,6 +104,24 @@ const getInitialState = (onboardingConfig: PublicOnboardingConfiguration) => {
     userData: {
       phoneNumber: '',
       email: '',
+      firstName: '',
+      middleName: '',
+      lastName: '',
+      dob: '',
+      addressLine1: '',
+      addressLine2: '',
+      city: '',
+      state: '',
+      zipcode: '',
+      category: '',
+      awd: '',
+      reservedCarClass: '',
+      elor: 0,
+      rentalZone: '',
+      under24hRental: false,
+      businessLeisure: false,
+      localMarketIndicator: false,
+      distributionChannel: '',
     },
   };
 };

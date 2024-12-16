@@ -11,11 +11,12 @@ import type { FormData } from '../../types/form-data';
 import transformDataBeforeVault from '../../utils/transform-data-before-vault';
 
 type BasicDataStepProps = {
+  authToken: string;
   defaultValues: FormData;
   onSubmit: (data: FormData) => void;
 };
 
-const BasicDataStep = ({ defaultValues, onSubmit }: BasicDataStepProps) => {
+const BasicDataStep = ({ authToken, defaultValues, onSubmit }: BasicDataStepProps) => {
   const {
     register,
     handleSubmit,
@@ -28,7 +29,13 @@ const BasicDataStep = ({ defaultValues, onSubmit }: BasicDataStepProps) => {
       dob: defaultValues.dob || '',
     },
   });
-  const mutation = useMutation(patchHostedUserVaultMutation({}));
+  const mutation = useMutation(
+    patchHostedUserVaultMutation({
+      headers: {
+        'X-Fp-Authorization': authToken,
+      },
+    }),
+  );
 
   const onFormSubmit = async (formData: FormData) => {
     const transformedData = transformDataBeforeVault(formData);

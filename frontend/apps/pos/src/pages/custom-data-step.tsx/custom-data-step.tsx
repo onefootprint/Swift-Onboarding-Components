@@ -13,12 +13,12 @@ import transformDataBeforeVault from '../../utils/transform-data-before-vault';
 import { awd, carClasses, distributedChannels, prestigeCategory, rentalZones } from './custom-data-step.constants';
 
 type CustomDataStepProps = {
+  authToken: string;
   defaultValues: FormData;
   onSubmit: (data: FormData) => void;
-  onGoBack: () => void;
 };
 
-const CustomDataStep = ({ defaultValues, onSubmit }: CustomDataStepProps) => {
+const CustomDataStep = ({ authToken, defaultValues, onSubmit }: CustomDataStepProps) => {
   const {
     register,
     handleSubmit,
@@ -36,7 +36,11 @@ const CustomDataStep = ({ defaultValues, onSubmit }: CustomDataStepProps) => {
       distributionChannel: defaultValues.distributionChannel || '',
     },
   });
-  const mutation = useMutation(patchHostedUserVaultMutation({}));
+  const mutation = useMutation(
+    patchHostedUserVaultMutation({
+      headers: { 'X-Fp-Authorization': authToken },
+    }),
+  );
 
   const onFormSubmit = async (formData: FormData) => {
     const data = transformDataBeforeVault(formData);

@@ -13,11 +13,12 @@ import transformDataBeforeVault from '../../utils/transform-data-before-vault';
 import countryStates from './address-data-step.constants';
 
 type AddressDataStepProps = {
+  authToken: string;
   defaultValues: FormData;
   onSubmit: (data: FormData) => void;
 };
 
-const AddressDataStep = ({ defaultValues, onSubmit }: AddressDataStepProps) => {
+const AddressDataStep = ({ authToken, defaultValues, onSubmit }: AddressDataStepProps) => {
   const {
     register,
     handleSubmit,
@@ -33,11 +34,15 @@ const AddressDataStep = ({ defaultValues, onSubmit }: AddressDataStepProps) => {
       zipcode: defaultValues.zipcode || '',
     },
   });
-  const mutation = useMutation(patchHostedUserVaultMutation({}));
   const country = useWatch({
     control,
     name: 'country',
   });
+  const mutation = useMutation(
+    patchHostedUserVaultMutation({
+      headers: { 'X-Fp-Authorization': authToken },
+    }),
+  );
   const states = countryStates[country as keyof typeof countryStates] || [];
 
   const onFormSubmit = async (formData: FormData) => {
