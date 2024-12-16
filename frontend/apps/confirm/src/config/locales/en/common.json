@@ -1,6 +1,6 @@
 {
   "pages": {
-    "verify": {
+    "confirm": {
       "success": {
         "title": "Email verified!",
         "description": "Thanks for verifying your email. You're all set!"
@@ -9,6 +9,12 @@
         "title": "Email verification failed.",
         "description": "Please open the link we've originally sent to your email to try again."
       }
+    },
+    "verify": {
+      "title": "Are you trying to verify your phone number with Avis?",
+      "location": "Montgomery, Alabama",
+      "confirm": "Yes, it's me",
+      "cancel": "No, it's not me"
     }
   }
 }

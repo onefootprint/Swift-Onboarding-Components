@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const Verify = () => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.verify' });
+  const { t } = useTranslation('common', { keyPrefix: 'pages.confirm' });
   const mutation = useMutation(postHostedUserEmailVerifyMutation());
   const [challenge, setChallenge] = useState('');
 

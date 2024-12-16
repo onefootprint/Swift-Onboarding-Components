@@ -36,16 +36,12 @@ const Intro = ({ onDone }: IntroStepProps) => {
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
-      countryCode: '+1',
+      countryCode: '+55',
+      email: 'rafael@onefootprint.com',
+      phoneNumber: '48988124050',
     },
   });
-  const mutation = useMutation(
-    postHostedIdentifySignupChallengeMutation({
-      headers: {
-        'X-Fp-Is-Components-Sdk': true,
-      },
-    }),
-  );
+  const mutation = useMutation(postHostedIdentifySignupChallengeMutation({}));
   const classNames = getClassNames(focusedField);
 
   const onSubmit = (formData: FormData) => {
@@ -112,8 +108,8 @@ const Intro = ({ onDone }: IntroStepProps) => {
               required: 'Country code is required',
             })}
           >
-            {COUNTRY_CODES.map(countryCode => (
-              <option key={countryCode.value} value={countryCode.value}>
+            {COUNTRY_CODES.map((countryCode, index) => (
+              <option key={`${countryCode.value}-${index}`} value={countryCode.value}>
                 {countryCode.label}
               </option>
             ))}
@@ -127,10 +123,6 @@ const Intro = ({ onDone }: IntroStepProps) => {
             onBlur={() => setFocusedField(null)}
             {...register('phoneNumber', {
               required: 'Phone number is required',
-              validate: (value: string) => {
-                const cleanedNumber = value.replace(/\D/g, '');
-                return cleanedNumber.length === 10 || 'Please enter a valid 10-digit phone number';
-              },
             })}
           />
           <FormError>{errors.phoneNumber?.message}</FormError>

@@ -6,7 +6,7 @@ type FormErrorProps = {
 
 const FormError = ({ children }: FormErrorProps) => {
   if (!children) return null;
-  return <p className="mt-1.5 text-sm text-error">{children}</p>;
+  return <p className="mt-1.5 text-sm text-left text-error">{children}</p>;
 };
 
 export default FormError;

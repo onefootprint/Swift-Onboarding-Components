@@ -1,4 +1,5 @@
 'use client';
+
 import themes from '@onefootprint/design-tokens';
 import { DesignSystemProvider } from '@onefootprint/ui';
 import { QueryClientProvider } from '@tanstack/react-query';

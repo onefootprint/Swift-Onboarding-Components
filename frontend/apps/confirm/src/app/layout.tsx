@@ -4,6 +4,7 @@ import { DM_Mono, DM_Sans } from 'next/font/google';
 import type React from 'react';
 import Providers from '../components/providers';
 import { COMMIT_SHA, DEPLOYMENT_URL } from '../config/constants';
+import '../styles/globals.css';
 
 export const metadata: Metadata = {
   title: 'Footprint - Confirm',
