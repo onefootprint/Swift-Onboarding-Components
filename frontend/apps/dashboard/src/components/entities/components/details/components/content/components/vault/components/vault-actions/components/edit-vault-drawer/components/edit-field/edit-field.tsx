@@ -30,7 +30,7 @@ const EditField = ({ di, entity }: EditFieldProps) => {
       return canEdit ? (
         <Editable entity={entity} value={value} fieldName={di} />
       ) : (
-        <Tooltip text={t('not-allowed')} position="bottom">
+        <Tooltip text={t('not-allowed')} position="left">
           <TextInput
             size="compact"
             placeholder=""

@@ -49,7 +49,7 @@ const TooltipContent = ({ children, side }: TooltipContentProps) => {
 
   return (
     <motion.div
-      className="min-w-fit w-fit max-w-[300px] px-2 py-1 text-caption-3 text-quinary text-left rounded-sm bg-tertiary shadow-elevation-2 z-tooltip will-change-opacity"
+      className="min-w-fit w-fit max-w-[300px] px-2 py-1 text-caption-3 text-quinary text-left rounded-sm bg-tertiary shadow-md will-change-opacity"
       initial={animation.initial}
       animate={animation.animate}
       transition={{ duration: 0.15, ease: 'easeOut' }}
