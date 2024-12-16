@@ -4,6 +4,7 @@ import AddressDataStep from './address-data-step';
 import BasicDataStep from './basic-data-step';
 import CustomDataStep from './custom-data-step';
 import IntroStep from './intro-step';
+import SuccessStep from './success-step';
 import WaitingConfirmation from './waiting-confirmation';
 
 type RouterProps = {
@@ -71,7 +72,7 @@ const Router = ({ onboardingConfig }: RouterProps) => {
           onSubmit={data => {
             setContext(prev => ({
               ...prev,
-              step: 'next-step',
+              step: 'custom-data',
               userData: {
                 ...prev.userData,
                 ...data,
@@ -85,10 +86,18 @@ const Router = ({ onboardingConfig }: RouterProps) => {
           authToken={state.tokens.authToken}
           defaultValues={state.userData}
           onSubmit={data => {
-            console.log(data);
+            setContext(prev => ({
+              ...prev,
+              step: 'success-step',
+              userData: {
+                ...prev.userData,
+                ...data,
+              },
+            }));
           }}
         />
       )}
+      {state.step === 'success-step' && <SuccessStep />}
     </>
   );
 };
@@ -116,11 +125,11 @@ const getInitialState = (onboardingConfig: PublicOnboardingConfiguration) => {
       category: '',
       awd: '',
       reservedCarClass: '',
-      elor: 0,
+      elor: '0',
       rentalZone: '',
-      under24hRental: false,
-      businessLeisure: false,
-      localMarketIndicator: false,
+      under24hRental: 'N',
+      businessLeisure: 'L',
+      localMarketIndicator: 'N',
       distributionChannel: '',
     },
   };

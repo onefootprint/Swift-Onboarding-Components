@@ -38,14 +38,14 @@ const BasicDataStep = ({ authToken, defaultValues, onSubmit }: BasicDataStepProp
   );
 
   const onFormSubmit = async (formData: FormData) => {
-    const transformedData = transformDataBeforeVault(formData);
+    const data = transformDataBeforeVault(formData);
     mutation.mutateAsync(
       {
         body: {
-          'id.first_name': transformedData.firstName,
-          'id.middle_name': transformedData.middleName,
-          'id.last_name': transformedData.lastName,
-          'id.dob': transformedData.dob,
+          'id.first_name': data.firstName,
+          'id.middle_name': data.middleName,
+          'id.last_name': data.lastName,
+          'id.dob': data.dob,
         },
       },
       {

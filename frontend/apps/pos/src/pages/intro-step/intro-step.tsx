@@ -53,6 +53,10 @@ const Intro = ({ onDone }: IntroStepProps) => {
             value: phoneNumber,
             isBootstrap: false,
           },
+          email: {
+            value: formData.email,
+            isBootstrap: false,
+          },
           challengeKind: 'sms_link',
           scope: 'onboarding',
         },

@@ -1,4 +1,4 @@
-import { patchHostedUserVaultMutation } from '@onefootprint/axios';
+import { patchHostedUserVaultMutation, postHostedOnboardingProcessMutation } from '@onefootprint/axios';
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import Header from '../../components/header';
@@ -9,7 +9,6 @@ import FormInput from '../../components/ui/form-input';
 import FormLabel from '../../components/ui/form-label';
 import FormSelect from '../../components/ui/form-select';
 import type { FormData } from '../../types/form-data';
-import transformDataBeforeVault from '../../utils/transform-data-before-vault';
 import { awd, carClasses, distributedChannels, prestigeCategory, rentalZones } from './custom-data-step.constants';
 
 type CustomDataStepProps = {
@@ -28,42 +27,46 @@ const CustomDataStep = ({ authToken, defaultValues, onSubmit }: CustomDataStepPr
       category: defaultValues.category || '',
       awd: defaultValues.awd || '',
       reservedCarClass: defaultValues.reservedCarClass || '',
-      elor: defaultValues.elor || 0,
+      elor: defaultValues.elor || '0',
       rentalZone: defaultValues.rentalZone || '',
-      under24hRental: defaultValues.under24hRental || false,
-      businessLeisure: defaultValues.businessLeisure || false,
-      localMarketIndicator: defaultValues.localMarketIndicator || false,
+      under24hRental: defaultValues.under24hRental || 'N',
+      businessLeisure: defaultValues.businessLeisure || 'N',
+      localMarketIndicator: defaultValues.localMarketIndicator || 'N',
       distributionChannel: defaultValues.distributionChannel || '',
     },
   });
-  const mutation = useMutation(
+  const patchMutation = useMutation(
     patchHostedUserVaultMutation({
       headers: { 'X-Fp-Authorization': authToken },
     }),
   );
+  const processMutation = useMutation(
+    postHostedOnboardingProcessMutation({
+      headers: { 'X-Fp-Authorization': authToken },
+    }),
+  );
+  const isPending = patchMutation.isPending || processMutation.isPending;
 
   const onFormSubmit = async (formData: FormData) => {
-    const data = transformDataBeforeVault(formData);
-    mutation.mutateAsync(
-      {
+    try {
+      await patchMutation.mutateAsync({
         body: {
-          'custom.category': data.category,
-          'custom.awd': data.awd,
-          'custom.reserved_car_class': data.reservedCarClass,
-          'custom.elor': data.elor,
-          'custom.rental_state': data.rentalZone,
-          'custom.under_24h_rental': data.under24hRental,
-          'custom.business_leisure': data.businessLeisure,
-          'custom.local_market_indicator': data.localMarketIndicator,
-          'custom.distribution_channel': data.distributionChannel,
+          'custom.category': formData.category,
+          'custom.awd': formData.awd,
+          'custom.reserved_car_class': formData.reservedCarClass,
+          'custom.elor': formData.elor,
+          'custom.rental_state': formData.rentalZone,
+          'custom.under_24h_rental': formData.under24hRental,
+          'custom.business_leisure': formData.businessLeisure,
+          'custom.local_market_indicator': formData.localMarketIndicator,
+          'custom.distribution_channel': formData.distributionChannel,
         },
-      },
-      {
-        onSuccess: () => {
-          onSubmit(formData);
-        },
-      },
-    );
+      });
+      await processMutation.mutateAsync({});
+      onSubmit(formData);
+    } catch (error) {
+      console.error('Error updating user vault:', error);
+    }
   };
 
   return (
@@ -114,8 +117,6 @@ const CustomDataStep = ({ authToken, defaultValues, onSubmit }: CustomDataStepPr
           <FormInput
             {...register('elor', {
               required: 'Estimated Length of Rental is required',
-              valueAsNumber: true,
-              validate: value => value > 0 || 'ELOR must be a positive number',
             })}
             id="elor"
             type="number"
@@ -137,7 +138,7 @@ const CustomDataStep = ({ authToken, defaultValues, onSubmit }: CustomDataStepPr
         </div>
         <div className="block w-full mb-6">
           <FormLabel htmlFor="under24hRental">Under 24h rental *</FormLabel>
-          <div className="radio-group">
+          <div className="flex flex-col text-left">
             <label className="radio-label">
               <input
                 type="radio"
@@ -161,7 +162,7 @@ const CustomDataStep = ({ authToken, defaultValues, onSubmit }: CustomDataStepPr
         </div>
         <div className="block w-full mb-6">
           <FormLabel htmlFor="businessLeisure">Business Leisure Indicator *</FormLabel>
-          <div className="radio-group">
+          <div className="flex flex-col text-left">
             <label className="radio-label">
               <input
                 type="radio"
@@ -185,7 +186,7 @@ const CustomDataStep = ({ authToken, defaultValues, onSubmit }: CustomDataStepPr
         </div>
         <div className="block w-full mb-6">
           <FormLabel htmlFor="localMarketIndicator">Local Market Indicator *</FormLabel>
-          <div className="radio-group">
+          <div className="flex flex-col text-left">
             <label className="radio-label">
               <input
                 type="radio"
@@ -222,10 +223,10 @@ const CustomDataStep = ({ authToken, defaultValues, onSubmit }: CustomDataStepPr
           </FormSelect>
           <FormError>{errors.distributionChannel?.message}</FormError>
         </div>
-        <FormError>{mutation.error?.message}</FormError>
+        <FormError>{patchMutation.error?.message}</FormError>
         <div className="mt-3 mb-4">
-          <Button variant="primary" type="submit" disabled={mutation.isPending}>
-            {mutation.isPending ? 'Saving...' : 'Continue'}
+          <Button variant="primary" type="submit" disabled={isPending}>
+            {isPending ? 'Saving...' : 'Continue'}
           </Button>
         </div>
       </form>

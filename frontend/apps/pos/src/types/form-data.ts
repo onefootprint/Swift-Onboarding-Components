@@ -16,10 +16,10 @@ export type FormData = Partial<{
   category: string;
   awd: string;
   reservedCarClass: string;
-  elor: number;
+  elor: string;
   rentalZone: string;
-  under24hRental: boolean;
-  businessLeisure: boolean;
-  localMarketIndicator: boolean;
+  under24hRental: string;
+  businessLeisure: string;
+  localMarketIndicator: string;
   distributionChannel: string;
 }>;

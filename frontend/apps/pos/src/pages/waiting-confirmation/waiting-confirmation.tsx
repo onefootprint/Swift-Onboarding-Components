@@ -1,4 +1,4 @@
-import { postHostedIdentifyVerifyMutation } from '@onefootprint/axios';
+import { postHostedIdentifyVerifyMutation, postHostedOnboardingMutation } from '@onefootprint/axios';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import Header from '../../components/header';
@@ -24,25 +24,17 @@ const WaitingConfirmation = ({ tokens, onCancel, onDone }: WaitingConfirmationPr
     }),
   );
 
+  const pollVerification = () => {
+    mutation.mutate({
+      body: {
+        challengeResponse: '',
+        challengeToken: tokens.challengeToken,
+        scope: 'onboarding',
+      },
+    });
+  };
+
   useEffect(() => {
-    const pollVerification = () => {
-      mutation.mutate(
-        {
-          body: {
-            challengeResponse: '',
-            challengeToken: tokens.challengeToken,
-            scope: 'onboarding',
-          },
-        },
-        {
-          onSuccess: data => {
-            if (data.authToken) {
-              onDone(data.authToken);
-            }
-          },
-        },
-      );
-    };
     const interval = setInterval(pollVerification, 2000);
     return () => clearInterval(interval);
   }, []);
@@ -55,8 +47,36 @@ const WaitingConfirmation = ({ tokens, onCancel, onDone }: WaitingConfirmationPr
         subtitle="Text message sent to customer's phone number. Ask them to continue from their phone."
       />
       <LoadingSpinner className="mx-auto mb-4" />
+      {mutation.data && <StartOnboarding authToken={mutation.data.authToken} onDone={onDone} />}
     </Layout>
   );
+};
+
+const StartOnboarding = ({ authToken, onDone }: { authToken: string; onDone: (authToken: string) => void }) => {
+  const startOnboardingMutation = useMutation(
+    postHostedOnboardingMutation({
+      headers: {
+        'X-Fp-Authorization': authToken,
+      },
+    }),
+  );
+
+  useEffect(() => {
+    startOnboardingMutation.mutate(
+      {
+        body: {
+          fixtureResult: 'pass',
+        },
+      },
+      {
+        onSuccess: response => {
+          onDone(response.authToken);
+        },
+      },
+    );
+  }, []);
+
+  return null;
 };
 
 export default WaitingConfirmation;

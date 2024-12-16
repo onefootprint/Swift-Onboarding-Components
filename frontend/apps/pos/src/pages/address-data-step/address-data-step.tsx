@@ -46,16 +46,16 @@ const AddressDataStep = ({ authToken, defaultValues, onSubmit }: AddressDataStep
   const states = countryStates[country as keyof typeof countryStates] || [];
 
   const onFormSubmit = async (formData: FormData) => {
-    const transformedData = transformDataBeforeVault(formData);
+    const data = transformDataBeforeVault(formData);
     mutation.mutateAsync(
       {
         body: {
-          'id.country': transformedData.country,
-          'id.address_line1': transformedData.addressLine1,
-          'id.address_line2': transformedData.addressLine2,
-          'id.city': transformedData.city,
-          'id.state': transformedData.state,
-          'id.zip': transformedData.zipcode,
+          'id.country': data.country,
+          'id.address_line1': data.addressLine1,
+          'id.address_line2': data.addressLine2,
+          'id.city': data.city,
+          'id.state': data.state,
+          'id.zip': data.zipcode,
         },
       },
       {
