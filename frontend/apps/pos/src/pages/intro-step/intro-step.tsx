@@ -14,7 +14,12 @@ import { COUNTRY_CODES } from './intro-steps.constants';
 import { getClassNames } from './intro-steps.utils';
 
 type IntroStepProps = {
-  onDone: (data: FormData) => void;
+  onDone: ({
+    token,
+    challengeToken,
+    email,
+    phoneNumber,
+  }: { token: string; challengeToken: string; email: string; phoneNumber: string }) => void;
 };
 
 type FormData = {
@@ -57,8 +62,13 @@ const Intro = ({ onDone }: IntroStepProps) => {
         },
       },
       {
-        onSuccess: () => {
-          onDone(formData);
+        onSuccess: data => {
+          onDone({
+            challengeToken: data.challengeData.challengeToken,
+            token: data.challengeData.token,
+            email: formData.email,
+            phoneNumber: phoneNumber,
+          });
         },
       },
     );

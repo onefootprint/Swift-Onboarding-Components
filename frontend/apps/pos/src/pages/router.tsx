@@ -19,12 +19,27 @@ const Router = ({ onboardingConfig }: RouterProps) => {
               ...prev,
               step: 'waiting-confirmation',
               data: { phoneNumber: data.phoneNumber, email: data.email },
+              tokens: {
+                challengeToken: data.challengeToken,
+                authToken: data.token,
+              },
             }));
           }}
         />
       )}
       {state.step === 'waiting-confirmation' && (
         <WaitingConfirmation
+          tokens={state.tokens}
+          onDone={authToken => {
+            setContext(prev => ({
+              ...prev,
+              step: 'basic-data',
+              tokens: {
+                ...prev.tokens,
+                authToken,
+              },
+            }));
+          }}
           onCancel={() => {
             setContext(getInitialState(onboardingConfig));
           }}
@@ -38,6 +53,10 @@ const getInitialState = (onboardingConfig: PublicOnboardingConfiguration) => {
   return {
     step: 'intro',
     onboardingConfig,
+    tokens: {
+      challengeToken: '',
+      authToken: '',
+    },
     userData: {
       phoneNumber: '',
       email: '',
