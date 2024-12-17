@@ -39,7 +39,7 @@ const Init = ({ context, onDone }: InitProps) => {
           ...initArgs.obConfigAuth,
           'X-Fp-Is-Bootstrap': state.email?.isBootstrap || state.phoneNumber?.isBootstrap,
           'X-Fp-Is-Components-Sdk': initArgs.isComponentsSdk,
-          'X-Sandbox-Id': initArgs.sandboxId,
+          'X-Sandbox-Id': initArgs.isLive ? undefined : initArgs.sandboxId,
         },
         throwOnError: true,
       });
