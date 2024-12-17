@@ -14,7 +14,7 @@ use newtypes::TenantId;
 use newtypes::TenantScope;
 use newtypes::TenantUserId;
 
-#[derive(Queryable, Selectable, Identifiable, Debug)]
+#[derive(Queryable, Selectable, Identifiable, Debug, Clone)]
 #[diesel(table_name = super_admin_request)]
 pub struct SuperAdminRequest {
     pub id: SuperAdminAccessRequestId,
@@ -59,6 +59,22 @@ impl SuperAdminRequest {
         let res: SuperAdminRequest = diesel::insert_into(super_admin_request::table)
             .values(request)
             .get_result(conn.conn())?;
+
+        Ok(res)
+    }
+
+    #[tracing::instrument("SuperAdminRequest::list_approved", skip(conn))]
+    pub fn list_approved(
+        conn: &mut PgConn,
+        tenant_user_id: &TenantUserId,
+        tenant_id: &TenantId,
+    ) -> FpResult<Vec<Self>> {
+        let res = super_admin_request::table
+            .filter(super_admin_request::tenant_user_id.eq(tenant_user_id))
+            .filter(super_admin_request::tenant_id.eq(tenant_id))
+            .filter(super_admin_request::approved.eq(true))
+            .filter(super_admin_request::expires_at.gt(Utc::now()))
+            .get_results(conn)?;
 
         Ok(res)
     }

@@ -12,6 +12,8 @@ use crate::auth::AuthError;
 use crate::auth::SessionContext;
 use crate::utils::headers::get_bool_header;
 use crate::FpResult;
+use chrono::Utc;
+use db::models::super_admin_request::SuperAdminRequest;
 use db::models::tenant::Tenant;
 use db::models::tenant_role::ImmutableRoleKind;
 use db::models::tenant_role::TenantRole;
@@ -37,6 +39,10 @@ pub struct FirmEmployeeAssumeAuth {
     /// a tenant.
     requested_allow_writes: bool,
     pub(super) data: FirmEmployeeSession,
+
+    /// Access requests that this firm employee has made for the assumed tenant
+    /// These are used to determine risk ops/super admin scopes
+    pub granted_access_requests: Vec<SuperAdminRequest>,
 }
 
 /// Nests a private FirmEmployeeAssumeAuth and implements traits required to extract this session
@@ -101,6 +107,7 @@ impl<const IS_SECONDARY: bool> ExtractableAuthSession for ParsedFirmEmployeeAssu
 
         let is_live = get_is_live(&ctx.req).unwrap_or(!tenant.sandbox_restricted);
         let allow_writes = get_bool_header("x-allow-assumed-writes", &ctx.req.headers).unwrap_or(false);
+        let granted_access_requests = SuperAdminRequest::list_approved(conn, &tenant_user.id, &tenant.id)?;
 
         tracing::info!(tenant_id=%tenant.id, tenant_user_id=%tenant_user.id, "Authenticated as firm employee in assume session");
         Ok(Self(FirmEmployeeAssumeAuth {
@@ -110,6 +117,7 @@ impl<const IS_SECONDARY: bool> ExtractableAuthSession for ParsedFirmEmployeeAssu
             is_live,
             data,
             requested_allow_writes: allow_writes,
+            granted_access_requests,
         }))
     }
 
@@ -160,7 +168,13 @@ impl FirmEmployeeAssumeAuth {
                     TenantScope::ManageComplianceDocSubmission,
                 ]
             } else {
-                vec![]
+                self
+                    .granted_access_requests
+                    .iter()
+                    .filter(|r| r.approved == Some(true)) // just to be safe check this again
+                    .filter(|r| r.expires_at > Utc::now()) // ensure that expired grants are always filtered in each evaluation
+                    .flat_map(|r| r.scopes.clone())
+                    .collect()
             }
         } else {
             vec![]
@@ -311,6 +325,7 @@ mod test {
             is_live,
             data: session_data.clone(),
             requested_allow_writes,
+            granted_access_requests: vec![],
         };
         let data = ParsedFirmEmployeeAssumeAuth::<false>(data);
         let auth = SessionContext::create_fixture(data, AuthSessionData::FirmEmployee(session_data));
