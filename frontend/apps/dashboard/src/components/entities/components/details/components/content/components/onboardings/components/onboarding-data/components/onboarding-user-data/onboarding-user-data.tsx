@@ -47,7 +47,7 @@ const OnboardingUserData = ({ onboardingId, seqno }: OnboardingUserDataProps) =>
         )
       }
     >
-      <div className="grid grid-cols-2 gap-y-6 gap-x-10">
+      <div className="flex flex-col gap-4">
         <Fieldset fields={basic.fields} title={basic.title} useField={getFieldProps} />
         <Fieldset fields={address.fields} title={address.title} useField={getFieldProps} />
         <Fieldset fields={identity.fields} title={identity.title} useField={getFieldProps} />

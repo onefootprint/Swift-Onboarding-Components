@@ -16,7 +16,7 @@ const OnboardingRiskSignals = ({ riskSignals }: OnboardingRiskSignalsProps) => {
   return (
     <Subsection title={t('title')}>
       {hasRiskSignals ? (
-        <div className="flex flex-col gap-6 mt-1">
+        <div className="flex flex-col gap-6">
           {Object.entries(riskSignals).map(([group, signals]) => (
             <div key={group} className="flex flex-col gap-2">
               <span className="text-label-3">

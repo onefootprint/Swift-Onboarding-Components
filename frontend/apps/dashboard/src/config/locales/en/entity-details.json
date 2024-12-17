@@ -1254,6 +1254,21 @@
     "user-data": {
       "title": "User data",
       "decrypt-all": "Decrypt all"
+    },
+    "business-details": {
+      "title": "Business details"
+    },
+    "people": {
+      "title": "People"
+    },
+    "sos-filings": {
+      "title": "Sec. of State filings"
+    },
+    "watchlists": {
+      "title": "Watchlists"
+    },
+    "offices": {
+      "title": "Offices"
     }
   },
   "business-insights": {

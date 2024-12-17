@@ -13,7 +13,7 @@ const Subsection = ({ title, rightComponent, children }: SubsectionProps) => (
       <span className="text-heading-5">{title}</span>
       {rightComponent}
     </div>
-    <Divider variant="secondary" />
+    <Divider variant="secondary" className="mb-1" />
     {children}
   </>
 );
