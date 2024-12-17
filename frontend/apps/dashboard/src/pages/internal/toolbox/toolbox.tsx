@@ -1,5 +1,5 @@
 import type { Icon } from '@onefootprint/icons';
-import { IcoDatabase24, IcoStore24, IcoUser24, IcoWriting24 } from '@onefootprint/icons';
+import { IcoDatabase24, IcoFileText24, IcoStore24, IcoUser24, IcoWriting24 } from '@onefootprint/icons';
 import { Dialog, useToast } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -12,6 +12,7 @@ import useSession from 'src/hooks/use-session';
 import Button from './components/button';
 import useCleanUpUserForm from './hooks/clean-up-user-form';
 import useCreateSandboxTenantForm from './hooks/create-sandbox-tenant-form';
+import useSeeEmployeesWithEditRightsForm from './hooks/employees-with-edit-rights-form';
 import useGrantEditRightsForm from './hooks/grant-edit-rights-form';
 
 export type ToolFormProps = {
@@ -82,6 +83,12 @@ const Tenants = () => {
       subtitle: 'Grant Footprint employees specific edit rights when impersonating a tenant',
       icon: IcoWriting24,
       useDialogComponent: useGrantEditRightsForm,
+    },
+    {
+      title: 'See employees with edit rights [WIP]',
+      subtitle: 'View a list of employees and their assigned edit rights',
+      icon: IcoFileText24,
+      useDialogComponent: useSeeEmployeesWithEditRightsForm,
     },
   ];
 
