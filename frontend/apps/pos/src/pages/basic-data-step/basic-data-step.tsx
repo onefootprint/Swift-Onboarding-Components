@@ -60,8 +60,8 @@ const BasicDataStep = ({ authToken, defaultValues, onSubmit }: BasicDataStepProp
     <Layout>
       <Header title="Basic data" subtitle="We're legally required to collect this information." />
       <form onSubmit={handleSubmit(onFormSubmit)}>
-        <div className="flex gap-4 mb-6">
-          <div className="flex-1">
+        <div className="flex mb-6">
+          <div className="flex-1 mr-4">
             <FormLabel htmlFor="firstName">First name *</FormLabel>
             <FormInput
               id="firstName"
