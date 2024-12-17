@@ -23,6 +23,7 @@ pub async fn get(
     state: web::Data<State>,
     user_auth: UserAuthContext,
 ) -> ApiResponse<AuthRequirementsResponse> {
+    // TODO: is this even used?
     let user_auth = user_auth.check_guard(api_core::auth::Any)?;
     let obc = (user_auth.obc.clone()).ok_or(BadRequest("No playbook associated with this session"))?;
     let sv_id = (user_auth.su_id.clone()).ok_or(BadRequest("No scoped user associated with session"))?;

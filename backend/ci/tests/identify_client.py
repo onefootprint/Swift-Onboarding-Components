@@ -56,37 +56,6 @@ class IdentifyClient:
         self.headers = args
         return self
 
-    def _signup_challenge(self, scope):
-        # Select the challenge kind based on the auth methods required by the playbook
-        if (
-            not self.playbook.required_auth_methods
-            or "phone" in self.playbook.required_auth_methods
-        ):
-            kind = "sms"
-        elif "email" in self.playbook.required_auth_methods:
-            kind = "email"
-        else:
-            assert False, f"Unsupported required auth methods: {self.playbook.required_auth_methods}"
-
-        data = dict(
-            phone_number=dict(value=self.phone_number),
-            email=dict(value=self.email),
-        )
-        if self.playbook.is_no_phone_flow:
-            # For backcompat, don't send phone when in the no phone flow
-            data.pop("phone_number")
-        data = dict(**data, scope=scope, challenge_kind=kind)
-
-        assert (
-            self.playbook_auth_h
-        ), "Cannot issue signup challenge without playbook auth"
-        headers = [*self.headers, self.playbook_auth_h]
-        if self.sandbox_id:
-            headers.append(SandboxId(self.sandbox_id))
-        body = post("hosted/identify/signup_challenge", data, *headers)
-        self.challenge_kind = kind
-        self.challenge_data = body["challenge_data"]
-
     def _login_challenge(self, kind, scope):
         data = dict(scope=scope)
         if not self.auth_token:
@@ -143,8 +112,40 @@ class IdentifyClient:
         return auth_token
 
     def create_user(self, scope="onboarding"):
-        self._signup_challenge(scope)
-        return self._verify(scope)
+        data = {
+            "id.phone_number": self.phone_number,
+            "id.email": self.email,
+        }
+        if self.playbook.is_no_phone_flow:
+            data.pop("id.phone_number")
+        assert (
+            self.playbook_auth_h
+        ), "Cannot issue signup challenge without playbook auth"
+        headers = [*self.headers, self.playbook_auth_h]
+        if self.sandbox_id:
+            headers.append(SandboxId(self.sandbox_id))
+
+        # Create the session with vault data and sandbox ID provided
+        data = dict(data=data, scope=scope)
+        body = post("hosted/identify/session", data, *headers)
+        token = FpAuth(body["token"])
+
+        # Make sure the challenge kind is in the requirements
+        body = get("hosted/identify/session/requirements", None, token)
+        assert all(i["kind"] == "challenge" for i in body["requirements"])
+
+        for req in body["requirements"]:
+            # Run every challenge requirement
+            kind = next(i for i in req["challenge_kinds"] if i != "sms_link")
+            data = dict(challenge_kind=kind)
+            body = post("hosted/identify/session/challenge", data, token)
+            challenge_token = body["challenge_data"]["challenge_token"]
+            data = dict(challenge_token=challenge_token, challenge_response="000000")
+            post("hosted/identify/session/challenge/verify", data, token)
+
+        # Verify the identify session
+        body = post("hosted/identify/session/verify", None, token)
+        return FpAuth(body["auth_token"])
 
     def login(self, kind="sms", scope="onboarding"):
         self._login_challenge(kind, scope)
