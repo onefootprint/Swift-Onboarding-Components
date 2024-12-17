@@ -1,8 +1,5 @@
 import type { List, RuleExpressionCondition } from '@onefootprint/request-types/dashboard';
-import { Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
-
-import styled, { css } from 'styled-components';
 
 type RuleChipProps = {
   ruleExpression: RuleExpressionCondition;
@@ -22,34 +19,16 @@ const RuleChip = ({ ruleExpression, lists }: RuleChipProps) => {
   };
 
   return (
-    <ExpressionContainer>
-      <Text variant="caption-1" minWidth="fit-content">
-        {ruleExpression.field}
-      </Text>
-      <Text variant="caption-1" minWidth="fit-content">
-        {getOperator()}
-      </Text>
-      <Text variant="caption-1" color="tertiary" minWidth="fit-content">
+    <div className="h-fit min-w-fit flex items-center gap-2 py-0.5 px-3 bg-primary rounded-full border border-solid border-tertiary overflow-hidden">
+      <span className="text-caption-1 min-w-fit">{ruleExpression.field}</span>
+      <span className="text-caption-1 min-w-fit">{getOperator()}</span>
+      <span className="text-caption-1 text-tertiary min-w-fit">
         {isListRule
           ? (listName ?? t('value.list-fallback-value', { value: ruleExpression.value }))
           : t('value.risk-signal-value')}
-      </Text>
-    </ExpressionContainer>
+      </span>
+    </div>
   );
 };
-
-const ExpressionContainer = styled(Stack)`
-  ${({ theme }) => css`
-    height: fit-content;
-    min-width: fit-content;
-    align-items: center;
-    gap: ${theme.spacing[3]};
-    padding: ${theme.spacing[1]} ${theme.spacing[4]};
-    background-color: ${theme.backgroundColor.primary};
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    border-radius: ${theme.borderRadius.full};
-    overflow: hidden;
-  `}
-`;
 
 export default RuleChip;

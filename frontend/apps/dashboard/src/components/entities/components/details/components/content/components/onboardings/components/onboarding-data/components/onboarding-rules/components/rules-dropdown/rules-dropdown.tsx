@@ -1,17 +1,15 @@
 import { IcoCheck16, IcoChevronDown16 } from '@onefootprint/icons';
-import { Dropdown, Stack, Text } from '@onefootprint/ui';
+import { Dropdown } from '@onefootprint/ui';
+import { cx } from 'class-variance-authority';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
 
 type OnboardingDataProps = {
   onClick: (isTriggered: boolean) => void;
 };
 
 const RulesDropdown = ({ onClick }: OnboardingDataProps) => {
-  const { t } = useTranslation('entity-details', {
-    keyPrefix: 'onboardings.rules.dropdown',
-  });
+  const { t } = useTranslation('entity-details', { keyPrefix: 'onboardings.rules.dropdown' });
   const [isOpen, setIsOpen] = useState(false);
   const [isTriggeredSelected, setIsTriggeredSelected] = useState(true);
 
@@ -27,66 +25,38 @@ const RulesDropdown = ({ onClick }: OnboardingDataProps) => {
   return (
     <Dropdown.Root open={isOpen} onOpenChange={toggleDropdown}>
       <Dropdown.Trigger asChild>
-        <TriggerContainer tag="button">
-          <Text variant="label-3">{isTriggeredSelected ? t('triggered') : t('not-triggered')}</Text>
-          <IconContainer align="center" data-is-open={isOpen} justify="center">
+        <button className="flex items-center gap-3" type="button">
+          <span className="text-label-3">{isTriggeredSelected ? t('triggered') : t('not-triggered')}</span>
+          <div
+            className={cx('flex items-center justify-center transition-transform duration-100 ease-in', {
+              'rotate-180': isOpen,
+            })}
+          >
             <IcoChevronDown16 />
-          </IconContainer>
-        </TriggerContainer>
+          </div>
+        </button>
       </Dropdown.Trigger>
       <Dropdown.Portal>
-        <ContentContainer align="end">
-          <ItemContainer
+        <Dropdown.Content className="w-[150px] py-1" align="end">
+          <Dropdown.Item
+            className="h-fit flex justify-between items-start py-2 px-4"
             onClick={() => handleClick(true)}
             checked={isTriggeredSelected}
             iconRight={isTriggeredSelected ? IcoCheck16 : undefined}
           >
-            <Text variant="caption-2">{t('triggered')}</Text>
-          </ItemContainer>
-          <ItemContainer
+            <span className="text-caption-2">{t('triggered')}</span>
+          </Dropdown.Item>
+          <Dropdown.Item
             onClick={() => handleClick(false)}
             checked={!isTriggeredSelected}
             iconRight={isTriggeredSelected ? undefined : IcoCheck16}
           >
-            <Text variant="caption-2">{t('not-triggered')}</Text>
-          </ItemContainer>
-        </ContentContainer>
+            <span className="text-caption-2">{t('not-triggered')}</span>
+          </Dropdown.Item>
+        </Dropdown.Content>
       </Dropdown.Portal>
     </Dropdown.Root>
   );
 };
-
-const ContentContainer = styled(Dropdown.Content)`
-  ${({ theme }) => css`
-    width: 150px;
-    padding: ${theme.spacing[2]} 0;
-  `};
-`;
-
-const ItemContainer = styled(Dropdown.Item)`
-  ${({ theme }) => css`
-    height: fit-content;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    padding: ${theme.spacing[3]} ${theme.spacing[5]};
-  `};
-`;
-
-const TriggerContainer = styled(Stack)`
-  ${({ theme }) => css`
-    display: flex;
-    align-items: center;
-    gap: ${theme.spacing[3]};
-  `}
-`;
-
-const IconContainer = styled(Stack)`
-  transition: transform 0.1s ease;
-
-  &[data-is-open='true'] {
-    transform: rotate(180deg);
-  }
-`;
 
 export default RulesDropdown;

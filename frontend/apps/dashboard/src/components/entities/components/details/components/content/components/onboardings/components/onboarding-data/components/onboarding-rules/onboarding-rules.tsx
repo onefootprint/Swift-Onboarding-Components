@@ -15,7 +15,7 @@ type OnboardingRulesProps = {
 };
 
 const OnboardingRules = ({ ruleSetResultId }: OnboardingRulesProps) => {
-  const { t } = useTranslation('entity-details', { keyPrefix: 'onboardings.data.rules' });
+  const { t } = useTranslation('entity-details', { keyPrefix: 'onboardings.rules' });
   const entityId = useEntityId();
   const { data, isPending, error } = useQuery({
     ...getEntitiesByFpIdRuleSetResultByRuleSetResultIdOptions({

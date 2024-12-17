@@ -1,5 +1,4 @@
 import type { Rule, RuleAction } from '@onefootprint/request-types/dashboard';
-import { Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import RuleRow from '../rule-row';
 
@@ -35,40 +34,36 @@ const Content = ({ ruleResults, showTriggered }: ContentProps) => {
 
   const renderRuleAction = (action: RuleAction) => {
     const actionText = (
-      <Text variant="label-3" color={getRuleActionColor(action)}>
-        {getRuleActionText(action)}
-      </Text>
+      <span className={`text-label-3 text-${getRuleActionColor(action)}`}>{getRuleActionText(action)}</span>
     );
     if (action.includes('step_up')) {
       return (
-        <Stack gap={2} align="center">
+        <div className="flex gap-1 items-center">
           {actionText}
-          <Text variant="label-3" color="secondary">
-            {getStepUpActionText(action)}
-          </Text>
-        </Stack>
+          <span className="text-label-3 text-secondary">{getStepUpActionText(action)}</span>
+        </div>
       );
     }
     return actionText;
   };
 
   if (Object.keys(ruleResults).length === 0) {
-    return <Text variant="body-3">{showTriggered ? t('no-triggered-rules') : t('no-not-triggered-rules')}</Text>;
+    return <span className="text-body-3">{showTriggered ? t('no-triggered-rules') : t('no-not-triggered-rules')}</span>;
   }
 
   return (
-    <Stack direction="column" gap={7}>
+    <div className="flex flex-col gap-6">
       {Object.entries(ruleResults).map(([action, rules]) => (
-        <Stack direction="column" gap={4}>
+        <div className="flex flex-col gap-3">
           {renderRuleAction(action as RuleAction)}
-          <Stack direction="column" gap={3}>
+          <div className="flex flex-col gap-2">
             {rules.map(({ ruleExpression }) => (
               <RuleRow ruleExpression={ruleExpression} />
             ))}
-          </Stack>
-        </Stack>
+          </div>
+        </div>
       ))}
-    </Stack>
+    </div>
   );
 };
 

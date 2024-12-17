@@ -1,5 +1,4 @@
 import type { DataIdentifier } from '@onefootprint/request-types/dashboard';
-import { Stack, Text } from '@onefootprint/ui';
 import EncryptedCell from 'src/components/encrypted-cell';
 import type { UseFieldProps } from '../../hooks/use-field';
 
@@ -13,18 +12,16 @@ const Field = ({ di, useField }: FieldProps) => {
 
   const renderValue = () => {
     if (isDecrypted || isEmpty) {
-      return <Text variant="body-3">{value ? (value as string) : '-'}</Text>;
+      return <span className="text-body-3">{typeof value === 'string' ? value : '-'}</span>;
     }
     return <EncryptedCell />;
   };
 
   return (
-    <Stack justify="space-between" align="center" gap={3}>
-      <Text variant="body-3" color="tertiary">
-        {label}
-      </Text>
+    <div className="flex justify-between items-center gap-2">
+      <span className="text-body-3 text-tertiary">{label}</span>
       {renderValue()}
-    </Stack>
+    </div>
   );
 };
 

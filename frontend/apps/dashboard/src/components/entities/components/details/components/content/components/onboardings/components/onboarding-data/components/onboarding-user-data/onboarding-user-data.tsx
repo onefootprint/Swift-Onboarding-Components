@@ -1,9 +1,7 @@
 import useEntityId from '@/entities/components/details/hooks/use-entity-id';
 import { getEntitiesByFpIdDataOptions } from '@onefootprint/axios/dashboard';
-import { Box } from '@onefootprint/ui';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
 import hasLegalStatus from '../../utils/has-legal-status';
 import hasNationality from '../../utils/has-nationality';
 import Subsection from '../subsection';
@@ -49,22 +47,14 @@ const OnboardingUserData = ({ onboardingId, seqno }: OnboardingUserDataProps) =>
         )
       }
     >
-      <Container>
+      <div className="grid grid-cols-2 gap-y-6 gap-x-10">
         <Fieldset fields={basic.fields} title={basic.title} useField={getFieldProps} />
         <Fieldset fields={address.fields} title={address.title} useField={getFieldProps} />
         <Fieldset fields={identity.fields} title={identity.title} useField={getFieldProps} />
         {hasCustomData && <Fieldset fields={custom.fields} title={custom.title} useField={getFieldProps} />}
-      </Container>
+      </div>
     </Subsection>
   );
 };
-
-const Container = styled(Box)`
-  ${({ theme }) => css`
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: ${theme.spacing[7]} ${theme.spacing[9]};
-  `};
-`;
 
 export default OnboardingUserData;

@@ -26,7 +26,7 @@ const Content = ({ onboardings }: ContentProps) => {
   };
 
   return (
-    <fieldset className="flex flex-col justify-between w-full h-full border border-solid rounded border-tertiary">
+    <fieldset className="flex flex-col justify-between w-full h-[540px] border border-solid rounded border-tertiary">
       <header className="flex justify-between px-5 py-2 border-b border-solid rounded-t bg-secondary border-tertiary max-h-40px">
         <div className="flex items-center gap-2">
           <p className="text-primary text-label-3">

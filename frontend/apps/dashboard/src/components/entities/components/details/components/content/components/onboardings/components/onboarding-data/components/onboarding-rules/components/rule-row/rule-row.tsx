@@ -1,6 +1,5 @@
 import { getOrgListsOptions } from '@onefootprint/axios/dashboard';
 import type { RuleExpression } from '@onefootprint/request-types/dashboard';
-import { Stack, Text } from '@onefootprint/ui';
 import { useQuery } from '@tanstack/react-query';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -15,20 +14,16 @@ const RuleRow = ({ ruleExpression }: RuleRowProps) => {
   const { data: lists } = useQuery(getOrgListsOptions());
 
   return (
-    <Stack align="center" gap={3} flexWrap="wrap">
-      <Text variant="body-3">{t('if')}</Text>
+    <div className="flex items-center gap-2 flex-wrap">
+      <span className="text-body-3">{t('if')}</span>
       {ruleExpression.map((expression, index) => (
         // eslint-disable-next-line react/no-array-index-key
         <React.Fragment key={`${index}-${expression.field}`}>
-          {index > 0 && (
-            <Text variant="body-3" paddingLeft={2} paddingRight={2}>
-              {t('and')}
-            </Text>
-          )}
+          {index > 0 && <span className="text-body-3 px-1">{t('and')}</span>}
           <RuleChip ruleExpression={expression} lists={lists?.data} />
         </React.Fragment>
       ))}
-    </Stack>
+    </div>
   );
 };
 

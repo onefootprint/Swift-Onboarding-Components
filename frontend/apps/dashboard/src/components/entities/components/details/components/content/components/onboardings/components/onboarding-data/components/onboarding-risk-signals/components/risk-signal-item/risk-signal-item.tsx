@@ -1,7 +1,6 @@
 import useRiskSignalsFilters from '@/entities/components/details/hooks/use-risk-signals-filters';
 import type { RiskSignal } from '@onefootprint/request-types/dashboard';
-import { Divider, Stack, Text } from '@onefootprint/ui';
-import styled, { css } from 'styled-components';
+import { Divider } from '@onefootprint/ui';
 import isSentilinkSignal from '../../../../../../../risk-signals/utils/is-sentilink-signal';
 import useRiskSignalSeverityText from '../../../../hooks/use-risk-signal-severity-text';
 
@@ -32,36 +31,16 @@ const RiskSignalItem = ({ riskSignal }: RiskSignalItemProps) => {
   };
 
   return (
-    <Container gap={3} align="flex-end" paddingTop={2} paddingBottom={2} cursor="pointer" onClick={handleRowClick}>
-      <Text variant="snippet-1" color="secondary">
-        {reasonCode}
-      </Text>
+    <button
+      className="relative flex items-end gap-2 py-1 hover:after:content-[''] hover:after:absolute hover:after:top-0 hover:after:left-[-12px] hover:after:w-[calc(100%+24px)] hover:after:h-full hover:after:bg-secondary hover:after:rounded-[2px] hover:after:-z-10"
+      onClick={handleRowClick}
+      type="button"
+    >
+      <span className="text-snippet-1 text-secondary">{reasonCode}</span>
       <Divider variant="secondary" marginBottom={2} />
-      <Text variant="caption-1" color={getSeverityColor()} marginBottom={1}>
-        {riskSignalSeverityT(severity)}
-      </Text>
-    </Container>
+      <span className={`text-caption-1 text-${getSeverityColor()}`}>{riskSignalSeverityT(severity)}</span>
+    </button>
   );
 };
-
-const Container = styled(Stack)`
-  ${({ theme }) => css`
-    position: relative;
-
-    &:hover {
-      &:after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: calc(-${theme.spacing[3]});
-        width: calc(100% + 2 * ${theme.spacing[3]});
-        height: 100%;
-        background-color: ${theme.backgroundColor.secondary};
-        border-radius: 2px;
-        z-index: -1;
-      }
-    }
-  `};
-`;
 
 export default RiskSignalItem;
