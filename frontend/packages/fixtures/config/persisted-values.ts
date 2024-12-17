@@ -128,6 +128,7 @@ import type {
   WorkflowFixtureResult,
 } from '@onefootprint/request-types';
 import type {
+  AccessRequest,
   ActionKind,
   Actor,
   ActorApiKey,
@@ -227,6 +228,7 @@ import type {
   ContactInfoKind,
   CopyPlaybookRequest,
   CountrySpecificDocumentMapping,
+  CreateAccessRequestRequest,
   CreateAnnotationRequest,
   CreateApiKeyRequest,
   CreateComplianceDocRequest,
@@ -398,6 +400,7 @@ import type {
   ParentOrganization,
   PartnerLoginRequest,
   PartnerOrganization,
+  PatchAccessRequestRequest,
   PatchProxyConfigRequest,
   PhoneLookupAttributes,
   PlainCustomHeader,
@@ -4022,6 +4025,27 @@ export const hosted_WorkflowRequestConfigOnboard: WorkflowRequestConfigOnboard =
   },
   kind: 'onboard',
 };
+export const dashboard_AccessRequest: AccessRequest = {
+  approved: false,
+  createdAt: '1908-12-10T06:09:17.0Z',
+  expiresAt: '1897-07-01T04:09:49.0Z',
+  id: 'ffde6153-5b39-4d01-8913-61415287e7e5',
+  reason: 'enim minim',
+  requester: 'elit amet anim',
+  respondedAt: '1917-11-13T11:27:35.0Z',
+  responder: 'velit pariatur',
+  scopes: [
+    {
+      kind: 'read',
+    },
+    {
+      kind: 'read',
+    },
+    {
+      kind: 'read',
+    },
+  ],
+};
 export const dashboard_ActionKind: ActionKind = 'add_primary';
 export const dashboard_Actor: Actor = {
   id: '790e0e91-7999-45b8-92d6-2c9b6115af8e',
@@ -5634,6 +5658,22 @@ export const dashboard_CopyPlaybookRequest: CopyPlaybookRequest = {
   name: 'Elsa Pfeffer',
 };
 export const dashboard_CountrySpecificDocumentMapping: CountrySpecificDocumentMapping = {};
+export const dashboard_CreateAccessRequestRequest: CreateAccessRequestRequest = {
+  durationHours: -94774508,
+  reason: 'aliqua in',
+  scopes: [
+    {
+      kind: 'read',
+    },
+    {
+      kind: 'read',
+    },
+    {
+      kind: 'read',
+    },
+  ],
+  tenantId: '665ea396-b6d3-4d55-9ab8-45e78af8896c',
+};
 export const dashboard_CreateAnnotationRequest: CreateAnnotationRequest = {
   isPinned: false,
   note: 'culpa occaecat',
@@ -10462,6 +10502,9 @@ export const dashboard_PartnerOrganization: PartnerOrganization = {
   logoUrl: 'https://minor-precedent.name',
   name: 'Freddie Orn',
   websiteUrl: 'https://terrible-deduction.org',
+};
+export const dashboard_PatchAccessRequestRequest: PatchAccessRequestRequest = {
+  approved: false,
 };
 export const dashboard_PatchProxyConfigRequest: PatchProxyConfigRequest = {
   accessReason: 'culpa',

@@ -229,6 +229,9 @@ import type {
   GetPartnerRolesData,
   GetPartnerRolesError,
   GetPartnerRolesResponse,
+  GetPrivateAccessRequestsData,
+  GetPrivateAccessRequestsError,
+  GetPrivateAccessRequestsResponse,
   GetResponse,
   PatchEntitiesByFpIdAnnotationsByAnnotationIdData,
   PatchEntitiesByFpIdAnnotationsByAnnotationIdError,
@@ -287,6 +290,9 @@ import type {
   PatchPartnerRolesByTenantRoleIdData,
   PatchPartnerRolesByTenantRoleIdError,
   PatchPartnerRolesByTenantRoleIdResponse,
+  PatchPrivateAccessRequestsByRequestIdData,
+  PatchPrivateAccessRequestsByRequestIdError,
+  PatchPrivateAccessRequestsByRequestIdResponse,
   PostBusinessesByFpBidVaultByIdentifierUploadData,
   PostBusinessesByFpBidVaultByIdentifierUploadError,
   PostBusinessesByFpBidVaultByIdentifierUploadResponse,
@@ -479,6 +485,9 @@ import type {
   PostPartnerRolesData,
   PostPartnerRolesError,
   PostPartnerRolesResponse,
+  PostPrivateAccessRequestsData,
+  PostPrivateAccessRequestsError,
+  PostPrivateAccessRequestsResponse,
   PostWebhooksMiddeskHandleWebhookError,
   PostWebhooksMiddeskHandleWebhookResponse,
   PostWebhooksSambaHandleWebhookData,
@@ -2840,6 +2849,52 @@ export const postPartnerRolesByTenantRoleIdDeactivate = <ThrowOnError extends bo
   >({
     ...options,
     url: '/partner/roles/{tenantRoleId}/deactivate',
+  });
+};
+
+/**
+ * Lists all access requests for the tenant
+ */
+export const getPrivateAccessRequests = <ThrowOnError extends boolean = false>(
+  options?: Options<GetPrivateAccessRequestsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<GetPrivateAccessRequestsResponse, GetPrivateAccessRequestsError, ThrowOnError>(
+    {
+      ...options,
+      url: '/private/access_requests',
+    },
+  );
+};
+
+/**
+ * Creates a new access request
+ */
+export const postPrivateAccessRequests = <ThrowOnError extends boolean = false>(
+  options: Options<PostPrivateAccessRequestsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    PostPrivateAccessRequestsResponse,
+    PostPrivateAccessRequestsError,
+    ThrowOnError
+  >({
+    ...options,
+    url: '/private/access_requests',
+  });
+};
+
+/**
+ * Updates an access request (e.g. to approve it or extend it's expiration time)
+ */
+export const patchPrivateAccessRequestsByRequestId = <ThrowOnError extends boolean = false>(
+  options: Options<PatchPrivateAccessRequestsByRequestIdData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).patch<
+    PatchPrivateAccessRequestsByRequestIdResponse,
+    PatchPrivateAccessRequestsByRequestIdError,
+    ThrowOnError
+  >({
+    ...options,
+    url: '/private/access_requests/{requestId}',
   });
 };
 

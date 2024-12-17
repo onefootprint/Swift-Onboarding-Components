@@ -98,6 +98,7 @@ import type {
   GetPartnerPartnershipsByPartnershipIdSubmissionsBySubmissionIdData,
   GetPartnerPartnershipsData,
   GetPartnerRolesData,
+  GetPrivateAccessRequestsData,
   PatchEntitiesByFpIdAnnotationsByAnnotationIdData,
   PatchEntitiesByFpIdAnnotationsByAnnotationIdError,
   PatchEntitiesByFpIdAnnotationsByAnnotationIdResponse,
@@ -155,6 +156,9 @@ import type {
   PatchPartnerRolesByTenantRoleIdData,
   PatchPartnerRolesByTenantRoleIdError,
   PatchPartnerRolesByTenantRoleIdResponse,
+  PatchPrivateAccessRequestsByRequestIdData,
+  PatchPrivateAccessRequestsByRequestIdError,
+  PatchPrivateAccessRequestsByRequestIdResponse,
   PostBusinessesByFpBidVaultByIdentifierUploadData,
   PostBusinessesByFpBidVaultByIdentifierUploadError,
   PostBusinessesByFpBidVaultByIdentifierUploadResponse,
@@ -347,6 +351,9 @@ import type {
   PostPartnerRolesData,
   PostPartnerRolesError,
   PostPartnerRolesResponse,
+  PostPrivateAccessRequestsData,
+  PostPrivateAccessRequestsError,
+  PostPrivateAccessRequestsResponse,
   PostWebhooksMiddeskHandleWebhookError,
   PostWebhooksMiddeskHandleWebhookResponse,
   PostWebhooksSambaHandleWebhookData,
@@ -451,6 +458,7 @@ import {
   getPartnerPartnershipsByPartnershipIdDocumentsByDocumentIdEvents,
   getPartnerPartnershipsByPartnershipIdSubmissionsBySubmissionId,
   getPartnerRoles,
+  getPrivateAccessRequests,
   getRoStatus,
   getStatus,
   getStatus2,
@@ -473,6 +481,7 @@ import {
   patchPartner,
   patchPartnerMembersByTenantUserId,
   patchPartnerRolesByTenantRoleId,
+  patchPrivateAccessRequestsByRequestId,
   postBusinessesByFpBidVaultByIdentifierUpload,
   postEntitiesByFpIdActions,
   postEntitiesByFpIdAiSummarize,
@@ -537,6 +546,7 @@ import {
   postPartnerPartnershipsByPartnershipIdDocumentsByDocumentIdReviews,
   postPartnerRoles,
   postPartnerRolesByTenantRoleIdDeactivate,
+  postPrivateAccessRequests,
   postWebhooksMiddeskHandleWebhook,
   postWebhooksSambaHandleWebhook,
   postWebhooksTwilioStatusCallback,
@@ -4984,6 +4994,82 @@ export const postPartnerRolesByTenantRoleIdDeactivateMutation = (
   > = {
     mutationFn: async localOptions => {
       const { data } = await postPartnerRolesByTenantRoleIdDeactivate({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const getPrivateAccessRequestsQueryKey = (options?: Options<GetPrivateAccessRequestsData>) => [
+  createQueryKey('getPrivateAccessRequests', options),
+];
+
+export const getPrivateAccessRequestsOptions = (options?: Options<GetPrivateAccessRequestsData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getPrivateAccessRequests({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getPrivateAccessRequestsQueryKey(options),
+  });
+};
+
+export const postPrivateAccessRequestsQueryKey = (options: Options<PostPrivateAccessRequestsData>) => [
+  createQueryKey('postPrivateAccessRequests', options),
+];
+
+export const postPrivateAccessRequestsOptions = (options: Options<PostPrivateAccessRequestsData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await postPrivateAccessRequests({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: postPrivateAccessRequestsQueryKey(options),
+  });
+};
+
+export const postPrivateAccessRequestsMutation = (options?: Partial<Options<PostPrivateAccessRequestsData>>) => {
+  const mutationOptions: UseMutationOptions<
+    PostPrivateAccessRequestsResponse,
+    AxiosError<PostPrivateAccessRequestsError>,
+    Options<PostPrivateAccessRequestsData>
+  > = {
+    mutationFn: async localOptions => {
+      const { data } = await postPrivateAccessRequests({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const patchPrivateAccessRequestsByRequestIdMutation = (
+  options?: Partial<Options<PatchPrivateAccessRequestsByRequestIdData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    PatchPrivateAccessRequestsByRequestIdResponse,
+    AxiosError<PatchPrivateAccessRequestsByRequestIdError>,
+    Options<PatchPrivateAccessRequestsByRequestIdData>
+  > = {
+    mutationFn: async localOptions => {
+      const { data } = await patchPrivateAccessRequestsByRequestId({
         ...options,
         ...localOptions,
         throwOnError: true,

@@ -1,4 +1,5 @@
 import type {
+  AccessRequest,
   ActionKind,
   Actor,
   ActorApiKey,
@@ -98,6 +99,7 @@ import type {
   ContactInfoKind,
   CopyPlaybookRequest,
   CountrySpecificDocumentMapping,
+  CreateAccessRequestRequest,
   CreateAnnotationRequest,
   CreateApiKeyRequest,
   CreateComplianceDocRequest,
@@ -269,6 +271,7 @@ import type {
   ParentOrganization,
   PartnerLoginRequest,
   PartnerOrganization,
+  PatchAccessRequestRequest,
   PatchProxyConfigRequest,
   PhoneLookupAttributes,
   PlainCustomHeader,
@@ -438,6 +441,35 @@ import type {
 } from '@onefootprint/request-types/dashboard';
 import deepmerge from 'deepmerge';
 
+export const getAccessRequest = (
+  props: Partial<AccessRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): AccessRequest =>
+  deepmerge<AccessRequest>(
+    {
+      approved: false,
+      createdAt: '1908-12-10T06:09:17.0Z',
+      expiresAt: '1897-07-01T04:09:49.0Z',
+      id: 'ffde6153-5b39-4d01-8913-61415287e7e5',
+      reason: 'enim minim',
+      requester: 'elit amet anim',
+      respondedAt: '1917-11-13T11:27:35.0Z',
+      responder: 'velit pariatur',
+      scopes: [
+        {
+          kind: 'read',
+        },
+        {
+          kind: 'read',
+        },
+        {
+          kind: 'read',
+        },
+      ],
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
 export const getActionKind = (props: ActionKind): ActionKind => props ?? 'add_primary';
 
 export const getActor = (
@@ -2787,6 +2819,31 @@ export const getCountrySpecificDocumentMapping = (
   deepmerge<CountrySpecificDocumentMapping>({}, props, {
     ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}),
   });
+
+export const getCreateAccessRequestRequest = (
+  props: Partial<CreateAccessRequestRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): CreateAccessRequestRequest =>
+  deepmerge<CreateAccessRequestRequest>(
+    {
+      durationHours: -94774508,
+      reason: 'aliqua in',
+      scopes: [
+        {
+          kind: 'read',
+        },
+        {
+          kind: 'read',
+        },
+        {
+          kind: 'read',
+        },
+      ],
+      tenantId: '665ea396-b6d3-4d55-9ab8-45e78af8896c',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
 
 export const getCreateAnnotationRequest = (
   props: Partial<CreateAnnotationRequest>,
@@ -8822,6 +8879,18 @@ export const getPartnerOrganization = (
       logoUrl: 'https://minor-precedent.name',
       name: 'Freddie Orn',
       websiteUrl: 'https://terrible-deduction.org',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getPatchAccessRequestRequest = (
+  props: Partial<PatchAccessRequestRequest>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): PatchAccessRequestRequest =>
+  deepmerge<PatchAccessRequestRequest>(
+    {
+      approved: false,
     },
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
