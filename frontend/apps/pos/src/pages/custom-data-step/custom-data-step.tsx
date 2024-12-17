@@ -146,7 +146,7 @@ const CustomDataStep = ({ authToken, defaultValues, onSubmit }: CustomDataStepPr
                 value="Y"
                 className="radio-input w-4 h-4"
               />
-              <span className="ml-2">Yes</span>
+              <span className="ml-2 text-body-3">Yes</span>
             </label>
             <label className="radio-label flex items-center">
               <input
@@ -155,7 +155,7 @@ const CustomDataStep = ({ authToken, defaultValues, onSubmit }: CustomDataStepPr
                 value="N"
                 className="radio-input w-4 h-4"
               />
-              <span className="ml-2">No</span>
+              <span className="ml-2 text-body-3">No</span>
             </label>
           </div>
           <FormError>{errors.under24hRental?.message}</FormError>
@@ -170,7 +170,7 @@ const CustomDataStep = ({ authToken, defaultValues, onSubmit }: CustomDataStepPr
                 value="L"
                 className="radio-input w-4 h-4"
               />
-              <span className="ml-2">Leisure</span>
+              <span className="ml-2 text-body-3">Leisure</span>
             </label>
             <label className="radio-label flex items-center">
               <input
@@ -179,7 +179,7 @@ const CustomDataStep = ({ authToken, defaultValues, onSubmit }: CustomDataStepPr
                 value="B"
                 className="radio-input w-4 h-4"
               />
-              <span className="ml-2">Business</span>
+              <span className="ml-2 text-body-3">Business</span>
             </label>
           </div>
           <FormError>{errors.businessLeisure?.message}</FormError>
@@ -194,7 +194,7 @@ const CustomDataStep = ({ authToken, defaultValues, onSubmit }: CustomDataStepPr
                 value="Y"
                 className="radio-input w-4 h-4"
               />
-              <span className="ml-2">Yes</span>
+              <span className="ml-2 text-body-3">Yes</span>
             </label>
             <label className="radio-label flex items-center">
               <input
@@ -203,7 +203,7 @@ const CustomDataStep = ({ authToken, defaultValues, onSubmit }: CustomDataStepPr
                 value="N"
                 className="radio-input w-4 h-4"
               />
-              <span className="ml-2">No</span>
+              <span className="ml-2 text-body-3">No</span>
             </label>
           </div>
           <FormError>{errors.localMarketIndicator?.message}</FormError>
