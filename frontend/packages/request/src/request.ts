@@ -183,7 +183,10 @@ export const getRequestOptions = (
 // https://github.com/mpyw/axios-case-converter#preservedkeys-string--function
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
 export const preservedKeys = (input: any) =>
-  [...DataIdentifierKeys].includes(input) || input.startsWith('card') || isCountryCode(input);
+  [...DataIdentifierKeys].includes(input) ||
+  input.startsWith('card') ||
+  input.startsWith('custom') ||
+  isCountryCode(input);
 
 const request = <Response = unknown>(
   requestConfig: AxiosRequestConfig = {},
