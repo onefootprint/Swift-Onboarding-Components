@@ -1,6 +1,6 @@
 import type { Icon } from '@onefootprint/icons';
 import { IcoDatabase24, IcoFileText24, IcoStore24, IcoUser24, IcoWriting24 } from '@onefootprint/icons';
-import { Dialog, useToast } from '@onefootprint/ui';
+import { Dialog, type DialogSize, useToast } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import type React from 'react';
@@ -33,6 +33,7 @@ type Tool = {
   // When specified, selecting this tool performs the provided operation
   onClick?: () => void;
   icon: Icon;
+  size?: DialogSize;
 };
 
 const Tenants = () => {
@@ -89,6 +90,7 @@ const Tenants = () => {
       subtitle: 'View a list of employees and their assigned edit rights',
       icon: IcoFileText24,
       useDialogComponent: useSeeEmployeesWithEditRightsForm,
+      size: 'full-screen',
     },
   ];
 
@@ -142,7 +144,7 @@ const SelectedToolDialog = ({
 
   return (
     <Dialog
-      size="compact"
+      size={selectedTool.size || 'compact'}
       title={selectedTool?.title}
       onClose={handleDialogClose}
       open={!!selectedTool}
