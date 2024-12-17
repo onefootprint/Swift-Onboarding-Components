@@ -125,6 +125,7 @@
     "decrypt_all": "Everything",
     "decrypt_custom": "Custom attributes",
     "decrypt_documents": "Documents",
+    "decrypt_document": "Document",
     "decrypt_document_and_selfie": "Documents and selfie",
     "onboarding": "Onboarding",
     "manage_webhooks": "Manage webhook configuration",

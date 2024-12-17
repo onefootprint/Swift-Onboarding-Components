@@ -1,18 +1,34 @@
 import type { AccessRequest } from '@onefootprint/request-types/dashboard';
+import { Tooltip } from '@onefootprint/ui';
 import { format, formatDistance } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 const Row = ({ accessRequest }: { accessRequest: AccessRequest }) => {
+  const { t } = useTranslation('roles', { keyPrefix: 'scopes' });
   const duration = formatDistance(new Date(accessRequest.createdAt), new Date(accessRequest.expiresAt), {
     addSuffix: false,
   });
   const expiresAt = format(new Date(accessRequest.expiresAt), 'MM/dd/yyyy');
+  const permissibleAttributes = accessRequest.scopes.map(scope => scope.kind);
+  const firstThree = permissibleAttributes.slice(0, 3).map(attr => t(attr));
+  const remainingAttrs = permissibleAttributes.slice(3).map(attr => t(attr));
+  const remaining = remainingAttrs.length;
 
   return (
     <>
-      <p className="text-body-3 text-primary">{accessRequest.requester}</p>
-      <p className="text-body-3 text-primary">PLACEHOLDER</p>
-      <p className="text-body-3 text-primary">{`${duration} (Until ${expiresAt})`}</p>
-      <p className="text-body-3 text-primary">PLACEHOLDER</p>
+      <td className="text-body-3 text-primary">{accessRequest.requester}</td>
+      <td className="text-body-3 text-primary">
+        {firstThree.join(', ')}{' '}
+        {remaining > 0 ? (
+          <Tooltip text={remainingAttrs.join(', ')}>
+            <span className="underline cursor-help">{`and ${remaining} more`}</span>
+          </Tooltip>
+        ) : (
+          ''
+        )}
+      </td>
+      <td className="text-body-3 text-primary">{`${duration} (Until ${expiresAt})`}</td>
+      <td className="text-body-3 text-primary">PLACEHOLDER</td>
     </>
   );
 };
