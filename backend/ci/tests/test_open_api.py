@@ -1,7 +1,13 @@
+import pytest
+from tests.constants import ENVIRONMENT
 from tests.utils import get
 from scripts.update_open_api import get_apis
 
 
+@pytest.mark.skipif(
+    ENVIRONMENT in ("ephemeral", "dev", "production"),
+    reason="API does not exist in dev or prod deployments",
+)
 def test_open_api():
     # Validate that the public APIs we expose are sane
     open_api_spec = get("docs-spec-v3")

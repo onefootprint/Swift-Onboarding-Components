@@ -1,11 +1,10 @@
 import pytest
 import requests
 from requests.auth import HTTPBasicAuth
-from tests.utils import post, get, patch, url
+from tests.utils import post, get, url
 from tests.constants import CUSTODIAN_AUTH
 from tests.bifrost_client import BifrostClient
 from tests.constants import ENVIRONMENT
-from tests.utils import _gen_random_n_digit_number
 
 
 def test_environment():
