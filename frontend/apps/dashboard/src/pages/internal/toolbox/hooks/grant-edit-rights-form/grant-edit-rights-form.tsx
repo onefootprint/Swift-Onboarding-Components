@@ -36,7 +36,7 @@ const useGrantEditRightsForm = ({ formId, onClose }: ToolFormProps) => {
       {
         body: {
           scopes: data.scopes,
-          durationHours: Number(data.duration),
+          durationHours: Number(data.duration * 24),
           reason: data.reason,
           tenantId: tenantId,
         },

@@ -2,6 +2,7 @@ import type { AccessRequest } from '@onefootprint/request-types/dashboard';
 import { Tooltip } from '@onefootprint/ui';
 import { format, formatDistance } from 'date-fns';
 import { useTranslation } from 'react-i18next';
+import Actions from './components/actions';
 
 const Row = ({ accessRequest }: { accessRequest: AccessRequest }) => {
   const { t } = useTranslation('roles', { keyPrefix: 'scopes' });
@@ -16,8 +17,10 @@ const Row = ({ accessRequest }: { accessRequest: AccessRequest }) => {
 
   return (
     <>
-      <td className="text-body-3 text-primary">{accessRequest.requester}</td>
-      <td className="text-body-3 text-primary">
+      <td key="requester" className="text-body-3 text-primary">
+        {accessRequest.requester}
+      </td>
+      <td key="scopes" className="text-body-3 text-primary">
         {firstThree.join(', ')}{' '}
         {remaining > 0 ? (
           <Tooltip text={remainingAttrs.join(', ')}>
@@ -27,8 +30,10 @@ const Row = ({ accessRequest }: { accessRequest: AccessRequest }) => {
           ''
         )}
       </td>
-      <td className="text-body-3 text-primary">{`${duration} (Until ${expiresAt})`}</td>
-      <td className="text-body-3 text-primary">PLACEHOLDER</td>
+      <td key="duration" className="text-body-3 text-primary">{`${duration} (Until ${expiresAt})`}</td>
+      <td key="actions">
+        <Actions id={accessRequest.id} />
+      </td>
     </>
   );
 };

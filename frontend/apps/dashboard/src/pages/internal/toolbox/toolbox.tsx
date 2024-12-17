@@ -86,7 +86,7 @@ const Tenants = () => {
       useDialogComponent: useGrantEditRightsForm,
     },
     {
-      title: 'See employees with edit rights [WIP]',
+      title: 'See employees with edit rights',
       subtitle: 'View a list of employees and their assigned edit rights',
       icon: IcoFileText24,
       useDialogComponent: useSeeEmployeesWithEditRightsForm,
