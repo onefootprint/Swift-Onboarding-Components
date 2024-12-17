@@ -64,13 +64,6 @@ describe('<Identify />', () => {
     device?: Device;
     onDone?: () => void;
   }) => {
-    const bootstrapData: Record<string, unknown> = {};
-    if (bootstrapEmail) {
-      bootstrapData.email = bootstrapEmail;
-    }
-    if (bootstrapPhone) {
-      bootstrapData.phoneNumber = bootstrapPhone;
-    }
     return customRender(
       <Layout onClose={() => undefined}>
         <Identify
@@ -80,7 +73,8 @@ describe('<Identify />', () => {
             isLive: Boolean(config?.isLive),
             isComponentsSdk,
             obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: 'pk' },
-            bootstrapData: bootstrapEmail || bootstrapPhone ? bootstrapData : undefined,
+            email: bootstrapEmail ? { value: bootstrapEmail, isBootstrap: true } : undefined,
+            phoneNumber: bootstrapPhone ? { value: bootstrapPhone, isBootstrap: true } : undefined,
             initialAuthToken,
             device: device || {
               type: 'mobile',
@@ -827,89 +821,7 @@ describe('<Identify />', () => {
       withIdentifyVerify();
     });
 
-    it('invalid bootstrap email, email is recollected', async () => {
-      const onDone = jest.fn();
-      renderIdentify({
-        bootstrapEmail: 'flarp',
-        config: liveOnboardingConfigFixture,
-        onDone,
-      });
-
-      await fillIdentifyEmail();
-      await fillIdentifyPhone();
-      await fillChallengePin();
-
-      await waitFor(() => {
-        expect(onDone).toHaveBeenCalledWith({
-          authToken: 'new-token',
-          email: {
-            value: 'piip@onefootprint.com',
-            isBootstrap: false,
-          },
-          phoneNumber: {
-            value: '+1 (650) 460-0799',
-            isBootstrap: false,
-          },
-        });
-      });
-    });
-
-    it('invalid bootstrap phone, phone is recollected', async () => {
-      const onDone = jest.fn();
-      renderIdentify({
-        bootstrapEmail: 'piip@onefootprint.com',
-        bootstrapPhone: 'flarp',
-        config: liveOnboardingConfigFixture,
-        onDone,
-      });
-
-      await fillIdentifyPhone();
-      await fillChallengePin();
-
-      await waitFor(() => {
-        expect(onDone).toHaveBeenCalledWith({
-          authToken: 'new-token',
-          email: {
-            value: 'piip@onefootprint.com',
-            isBootstrap: true,
-          },
-          phoneNumber: {
-            value: '+1 (650) 460-0799',
-            isBootstrap: false,
-          },
-        });
-      });
-    });
-
-    it('invalid bootstrap email and phone, both recollected', async () => {
-      const onDone = jest.fn();
-      renderIdentify({
-        bootstrapEmail: 'flarp',
-        bootstrapPhone: 'flarp',
-        config: liveOnboardingConfigFixture,
-        onDone,
-      });
-
-      await fillIdentifyEmail();
-      await fillIdentifyPhone();
-      await fillChallengePin();
-
-      await waitFor(() => {
-        expect(onDone).toHaveBeenCalledWith({
-          authToken: 'new-token',
-          email: {
-            value: 'piip@onefootprint.com',
-            isBootstrap: false,
-          },
-          phoneNumber: {
-            value: '+1 (650) 460-0799',
-            isBootstrap: false,
-          },
-        });
-      });
-    });
-
-    it('valid bootstrap phone and email, goes to SMS challenge', async () => {
+    it('bootstrap phone and email, goes to SMS challenge', async () => {
       const onDone = jest.fn();
       renderIdentify({
         bootstrapEmail: 'piip@onefootprint.com',

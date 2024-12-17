@@ -4,30 +4,38 @@ import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { getLogger } from '@/idv/utils';
-import LegalFooter from '../../../../../legal-footer';
-import { useIdentifyMachine } from '../../state';
+import LegalFooter from '../../../legal-footer';
 
 const { logInfo } = getLogger();
+
+type DifferentAccountOptionProps = {
+  onLoginWithDifferentAccount: () => void;
+  orgId: string;
+  isComponentsSdk: boolean;
+  hasBootstrapData: boolean;
+};
 
 /**
  * If data was bootstrapped, show the option to provide different contact info directly to us
  * in case the bootstrap data is incorrect.
  */
-const DifferentAccountOption = () => {
-  const [state, send] = useIdentifyMachine();
+const DifferentAccountOption = ({
+  onLoginWithDifferentAccount,
+  orgId,
+  isComponentsSdk,
+  hasBootstrapData,
+}: DifferentAccountOptionProps) => {
   const { t } = useTranslation('identify', {
     keyPrefix: 'log-in-different-account',
   });
   const handleLoginWithDifferent = () => {
     logInfo('Login with different account');
-    send({ type: 'loginWithDifferentAccount' });
+    onLoginWithDifferentAccount();
   };
 
-  const { config, bootstrapData, isComponentsSdk } = state.context;
-  const isBootstrap = !!(bootstrapData?.email || bootstrapData?.phoneNumber);
   const { ShouldHideBootstrappedLoginWithDifferent } = useFlags();
   const orgIds = new Set<string>(ShouldHideBootstrappedLoginWithDifferent);
-  const showLoginWithDifferentOption = config && !orgIds.has(config.orgId) && isBootstrap && !isComponentsSdk;
+  const showLoginWithDifferentOption = !orgIds.has(orgId) && hasBootstrapData && !isComponentsSdk;
 
   if (!showLoginWithDifferentOption) {
     return null;

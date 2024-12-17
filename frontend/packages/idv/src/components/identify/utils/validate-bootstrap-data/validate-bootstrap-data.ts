@@ -1,6 +1,6 @@
 import { isEmail, isPhoneNumber } from '@onefootprint/core';
 
-import type { IdentifyBootstrapData } from '../../state/types';
+import type { IdentifyBootstrapData } from '../../components/identify-login/state/types';
 
 const validateBootstrapData = (bootstrapData?: IdentifyBootstrapData) => {
   const { email = '', phoneNumber = '' } = bootstrapData || {};

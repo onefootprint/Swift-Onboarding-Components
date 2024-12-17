@@ -4,9 +4,9 @@ import { AuthMethodKind } from '@onefootprint/types';
 
 import type { DeviceInfo as Device } from '../../../../../hooks';
 import { getRandomID } from '../../../../../utils';
-import validateBootstrapData from '../utils/validate-bootstrap-data';
+import type { LoginInitialArgs } from '../identify';
 import type { IdentifyMachineContext as Context, IdentifyContext } from './types';
-import { type IdentifyMachineArgs, IdentifyVariant } from './types';
+import { IdentifyVariant } from './types';
 
 type User = IdentifyContext['user'];
 
@@ -65,7 +65,6 @@ export const isRequiredAuthMethodsPending = (kind: `${AuthMethodKind}`, ctx: Con
 };
 
 export const getMachineArgs = ({
-  bootstrapData,
   config,
   device,
   initialAuthToken,
@@ -76,10 +75,15 @@ export const getMachineArgs = ({
   overallOutcome,
   sandboxId,
   variant,
-}: IdentifyMachineArgs): Context => {
-  const { email, phoneNumber } = validateBootstrapData(bootstrapData);
+  email,
+  phoneNumber,
+}: LoginInitialArgs): Context => {
+  const bootstrapData = {
+    email: email?.isBootstrap ? email?.value : undefined,
+    phoneNumber: phoneNumber?.isBootstrap ? phoneNumber?.value : undefined,
+  };
   return {
-    bootstrapData: bootstrapData ?? {},
+    bootstrapData,
     challenge: {},
     config,
     device,

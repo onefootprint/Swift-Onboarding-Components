@@ -11,7 +11,6 @@ import { interpret } from 'xstate';
 
 import type { DeviceInfo } from '../../../../../hooks';
 import createIdentifyMachine from './machine';
-import type { IdentifyBootstrapData } from './types';
 import { IdentifyVariant, SuccessfulIdentifier } from './types';
 
 const challengeKindToAuthMethod: Record<ChallengeKind, AuthMethodKind> = {
@@ -67,19 +66,22 @@ const getDevice = (): DeviceInfo => ({
 });
 
 const createMachine = ({
-  bootstrapData,
   initialAuthToken,
   config,
   variant = IdentifyVariant.auth,
+  bootstrapEmail,
+  bootstrapPhoneNumber,
 }: {
-  bootstrapData?: IdentifyBootstrapData;
+  bootstrapEmail?: string;
+  bootstrapPhoneNumber?: string;
   initialAuthToken?: string;
   config?: PublicOnboardingConfig;
   variant?: IdentifyVariant;
 }) => {
   const machine = interpret(
     createIdentifyMachine({
-      bootstrapData,
+      email: bootstrapEmail ? { value: bootstrapEmail, isBootstrap: true } : undefined,
+      phoneNumber: bootstrapPhoneNumber ? { value: bootstrapPhoneNumber, isBootstrap: true } : undefined,
       initialAuthToken,
       config,
       obConfigAuth: config && { [CLIENT_PUBLIC_KEY_HEADER]: 'token' },
@@ -393,27 +395,10 @@ describe('Identify Machine Tests', () => {
   });
 
   describe('with bootstrap data', () => {
-    it('invalid bootstrap data goes to emailIdentification', () => {
-      const machine = createMachine({
-        config: getOnboardingConfig(),
-        bootstrapData: {
-          phoneNumber: 'blah',
-          email: 'flerp',
-        },
-      });
-      const { state } = machine;
-      expect(state.context.email).toEqual(undefined);
-      expect(state.context.phoneNumber).toEqual(undefined);
-
-      expect(state.value).toEqual('emailIdentification');
-    });
-
     it('identify failed collects remaining phone number', () => {
       const machine = createMachine({
         config: getOnboardingConfig(),
-        bootstrapData: {
-          email: 'sandbox@onefootprint.com',
-        },
+        bootstrapEmail: 'sandbox@onefootprint.com',
       });
 
       let { state } = machine;
@@ -462,9 +447,7 @@ describe('Identify Machine Tests', () => {
     it('identify failed collects remaining email', () => {
       const machine = createMachine({
         config: getOnboardingConfig(),
-        bootstrapData: {
-          phoneNumber: '+15555550100',
-        },
+        bootstrapPhoneNumber: '+15555550100',
       });
 
       let { state } = machine;
@@ -513,10 +496,8 @@ describe('Identify Machine Tests', () => {
     it('identify failed with phone and email goes straight to sms signup challenge', () => {
       const machine = createMachine({
         config: getOnboardingConfig(),
-        bootstrapData: {
-          email: 'sandbox@onefootprint.com',
-          phoneNumber: '+15555550100',
-        },
+        bootstrapEmail: 'sandbox@onefootprint.com',
+        bootstrapPhoneNumber: '+15555550100',
       });
 
       let { state } = machine;
@@ -560,10 +541,8 @@ describe('Identify Machine Tests', () => {
     it('identify failed with phone and email goes straight to email signup challenge when in no phone', () => {
       const machine = createMachine({
         config: getOnboardingConfig(true, true),
-        bootstrapData: {
-          email: 'sandbox@onefootprint.com',
-          phoneNumber: '+15555550100',
-        },
+        bootstrapEmail: 'sandbox@onefootprint.com',
+        bootstrapPhoneNumber: '+15555550100',
       });
 
       let { state } = machine;
@@ -589,10 +568,8 @@ describe('Identify Machine Tests', () => {
     it('identify succeeded with only SMS available goes to sms challenge', () => {
       const machine = createMachine({
         config: getOnboardingConfig(),
-        bootstrapData: {
-          email: 'sandbox@onefootprint.com',
-          phoneNumber: '+15555550100',
-        },
+        bootstrapEmail: 'sandbox@onefootprint.com',
+        bootstrapPhoneNumber: '+15555550100',
       });
 
       let { state } = machine;
@@ -616,10 +593,8 @@ describe('Identify Machine Tests', () => {
     it('identify succeeded with multi challenge goes to challenge selector', () => {
       const machine = createMachine({
         config: getOnboardingConfig(),
-        bootstrapData: {
-          email: 'sandbox@onefootprint.com',
-          phoneNumber: '+15555550100',
-        },
+        bootstrapEmail: 'sandbox@onefootprint.com',
+        bootstrapPhoneNumber: '+15555550100',
       });
 
       let { state } = machine;

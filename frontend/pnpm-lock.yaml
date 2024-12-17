@@ -2288,6 +2288,9 @@ importers:
       '@hey-api/openapi-ts':
         specifier: ^0.53.11
         version: 0.53.12(typescript@5.6.3)
+      '@onefootprint/fixtures':
+        specifier: workspace:*
+        version: link:../fixtures
       '@onefootprint/storybook-utils':
         specifier: workspace:*
         version: link:../storybook-utils
@@ -2357,6 +2360,9 @@ importers:
       jest-canvas-mock:
         specifier: ^2.5.0
         version: 2.5.0
+      jest-launchdarkly-mock:
+        specifier: ^2.1.0
+        version: 2.1.0(launchdarkly-react-client-sdk@3.0.9)(react@18.3.1)
       next-router-mock:
         specifier: ^0.9.13
         version: 0.9.13(next@14.2.12)(react@18.3.1)
@@ -11260,7 +11266,7 @@ packages:
       '@storybook/preset-react-webpack': 8.4.2(@storybook/test@8.4.2)(@swc/core@1.7.21)(esbuild@0.23.1)(react-dom@18.3.1)(react@18.3.1)(storybook@8.4.2)(typescript@5.6.3)
       '@storybook/react': 8.4.2(@storybook/test@8.4.2)(react-dom@18.3.1)(react@18.3.1)(storybook@8.4.2)(typescript@5.6.3)
       '@storybook/test': 8.4.2(storybook@8.4.2)
-      '@types/node': 22.10.1
+      '@types/node': 22.5.4
       '@types/semver': 7.5.8
       babel-loader: 9.1.3(@babel/core@7.25.2)(webpack@5.94.0)
       css-loader: 6.11.0(webpack@5.94.0)
@@ -11342,7 +11348,7 @@ packages:
       '@storybook/preset-react-webpack': 8.4.2(@storybook/test@8.4.2)(@swc/core@1.7.21)(esbuild@0.23.1)(react-dom@18.3.1)(react@18.3.1)(storybook@8.4.2)(typescript@5.6.3)
       '@storybook/react': 8.4.2(@storybook/test@8.4.2)(react-dom@18.3.1)(react@18.3.1)(storybook@8.4.2)(typescript@5.6.3)
       '@storybook/test': 8.4.2(storybook@8.4.2)
-      '@types/node': 22.10.1
+      '@types/node': 22.5.4
       '@types/semver': 7.5.8
       babel-loader: 9.1.3(@babel/core@7.25.2)(webpack@5.94.0)
       css-loader: 6.11.0(webpack@5.94.0)
@@ -16986,7 +16992,6 @@ packages:
 
   /fast-deep-equal@2.0.1:
     resolution: {integrity: sha512-bCK/2Z4zLidyB4ReuIsvALH6w31YfAQDmXMqMx6FyfHqvBxtjC0eRumeSu4Bs3XtXwpyIywtSTrVT99BxY1f9w==}
-    dev: false
 
   /fast-deep-equal@3.1.3:
     resolution: {integrity: sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==}
@@ -19677,6 +19682,19 @@ packages:
       xml: 1.0.1
     dev: true
 
+  /jest-launchdarkly-mock@2.1.0(launchdarkly-react-client-sdk@3.0.9)(react@18.3.1):
+    resolution: {integrity: sha512-gCLp72emdWqdC27/hwkD2Y6lb7zgculY4EZ5xKQEC7X1z54qwUBTWu8uKCK+8cJPEeqO+kddicwgsJbJflMMYQ==}
+    peerDependencies:
+      launchdarkly-react-client-sdk: ^3.0.0
+      react: '>=17.0.2'
+    dependencies:
+      launchdarkly-react-client-sdk: 3.0.9(react-dom@18.3.1)(react@18.3.1)
+      lodash.camelcase: 4.3.0
+      lodash.kebabcase: 4.1.1
+      lodash.snakecase: 4.1.1
+      react: 18.3.1
+    dev: true
+
   /jest-leak-detector@27.5.1:
     resolution: {integrity: sha512-POXfWAMvfU6WMUXftV4HolnJfnPOGEu10fscNCA76KBpRRhcMN2c8d3iT2pxQS3HLbA+5X4sOUPzYO2NUyIlHQ==}
     engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
@@ -20674,7 +20692,6 @@ packages:
     dependencies:
       escape-string-regexp: 4.0.0
       launchdarkly-js-sdk-common: 5.0.3
-    dev: false
 
   /launchdarkly-js-sdk-common@5.0.3:
     resolution: {integrity: sha512-wKG8UsVbPVq8+7eavgAm5CVmulQWN6Ddod2ZoA3euZ1zPvJPwIQ2GrOYaCJr3cFrrMIX+nQyBJHBHYxUAPcM+Q==}
@@ -20682,7 +20699,6 @@ packages:
       base64-js: 1.5.1
       fast-deep-equal: 2.0.1
       uuid: 8.3.2
-    dev: false
 
   /launchdarkly-react-client-sdk@3.0.9(react-dom@18.3.1)(react@18.3.1):
     resolution: {integrity: sha512-U7STCSINfL698jI7tpUnvWc7iqsnkAdCV8rAGz3oeQB+BMn4SJ0yjpf5OA9I2pKdh7u+SlWJST/gz657tSUdVA==}
@@ -20695,7 +20711,6 @@ packages:
       lodash.camelcase: 4.3.0
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-    dev: false
 
   /leven@3.1.0:
     resolution: {integrity: sha512-qsda+H8jTaUaN/x5vzW2rzc+8Rw4TAQ/4KjB46IwK5VH+IlVeeeje/EoZRpiXvIqjFgK84QffqPztGI3VBLG1A==}
@@ -20826,11 +20841,19 @@ packages:
     resolution: {integrity: sha512-ff3BX/tSioo+XojX4MOsOMhJw0nZoUEF011LX8g8d3gvjVbxd89cCio4BCXronjxcTUIJUoqKEUA+n4CqvvRPw==}
     dev: true
 
+  /lodash.kebabcase@4.1.1:
+    resolution: {integrity: sha512-N8XRTIMMqqDgSy4VLKPnJ/+hpGZN+PHQiJnSenYqPaVV/NCqEogTnAdZLQiGKhxX+JCs8waWq2t1XHWKOmlY8g==}
+    dev: true
+
   /lodash.memoize@4.1.2:
     resolution: {integrity: sha512-t7j+NzmgnQzTAYXcsHYLgimltOV1MXHtlOWf6GjL9Kj8GK5FInw5JotxvbOs+IvV1/Dzo04/fCGfLVs7aXb4Ag==}
 
   /lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
+
+  /lodash.snakecase@4.1.1:
+    resolution: {integrity: sha512-QZ1d4xoBHYUeuouhEq3lk3Uq7ldgyFXGBhg04+oRLnIz8o9T65Eh+8YdroUwn846zchkA9yDsDl5CVVaV2nqYw==}
+    dev: true
 
   /lodash.sortby@4.7.0:
     resolution: {integrity: sha512-HDWXG8isMntAyRF5vZ7xKuEvOhT4AhlRt/3czTSjvGUxjYCBVRQY48ViDHyfYz9VIoBkW4TMGQNapx+l3RUwdA==}

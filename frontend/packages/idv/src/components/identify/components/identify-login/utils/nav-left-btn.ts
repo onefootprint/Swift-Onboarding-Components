@@ -5,6 +5,7 @@ import { shouldShowChallengeSelector } from '../state/utils';
 const getLeftNavButton = (
   state: IdentifyMachineHook[0],
   send: IdentifyMachineHook[1],
+  onBackFromLogin?: () => void,
 ): NavigationHeaderLeftButtonProps => {
   const { context, history, matches } = state;
   const { bootstrapData } = context;
@@ -18,6 +19,8 @@ const getLeftNavButton = (
     });
   const CLOSE = { variant: 'close' } as const;
   const BACK = { variant: 'back', onBack } as const;
+  // Special case to handle the back button to return from IdentifyLogin to the IdentifySignup flow
+  const BACK_FROM_LOGIN = onBackFromLogin ? ({ variant: 'back', onBack: onBackFromLogin } as const) : undefined;
 
   // If true, we've been given information with which to identify the user, so we generally don't
   // want to allow going back to the email/phone input screens
@@ -31,16 +34,16 @@ const getLeftNavButton = (
     if (hasChallengeSelector) {
       return BACK;
     }
-    return identifyStartedWithBootstrapOrAuthToken ? CLOSE : BACK;
+    return identifyStartedWithBootstrapOrAuthToken ? (BACK_FROM_LOGIN ?? CLOSE) : BACK;
   }
   if (matches('emailChallenge')) {
     if (hasChallengeSelector) {
       return BACK;
     }
-    return identifyStartedWithBootstrapOrAuthToken ? CLOSE : BACK;
+    return identifyStartedWithBootstrapOrAuthToken ? (BACK_FROM_LOGIN ?? CLOSE) : BACK;
   }
   if (matches('challengeSelectOrPasskey')) {
-    return identifyStartedWithBootstrapOrAuthToken ? CLOSE : BACK;
+    return identifyStartedWithBootstrapOrAuthToken ? (BACK_FROM_LOGIN ?? CLOSE) : BACK;
   }
   if (matches('phoneIdentification')) {
     return BACK;

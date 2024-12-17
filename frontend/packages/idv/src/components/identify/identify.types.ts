@@ -2,6 +2,7 @@ import type { DeviceInfo } from '@/idv/hooks';
 import type { DIMetadata } from '@/idv/types';
 import type { ChallengeKind, ObConfigAuth, OverallOutcome, PublicOnboardingConfig } from '@onefootprint/types';
 import type { IdentifyBootstrapData, LogoConfig } from './components/identify-login/state/types';
+import type { State } from './utils/reducer';
 
 export type InitArgs = {
   initialAuthToken?: string;
@@ -28,6 +29,12 @@ export type DoneArgs = {
   phoneNumber?: DIMetadata<string>;
   email?: DIMetadata<string>;
   availableChallengeKinds?: ChallengeKind[];
+};
+
+export type Context = {
+  state: State;
+  initArgs: Omit<InitArgs, 'bootstrapData'>;
+  onPrev?: () => void;
 };
 
 export type ObKeyHeader = { 'X-Onboarding-Config-Key': string };
