@@ -9,9 +9,7 @@ type ContentProps = {
 };
 
 const Content = ({ ruleResults, showTriggered }: ContentProps) => {
-  const { t } = useTranslation('entity-details', {
-    keyPrefix: 'onboardings.rules',
-  });
+  const { t } = useTranslation('entity-details', { keyPrefix: 'onboardings.rules' });
 
   const getRuleActionColor = (action: RuleAction) => {
     if (action === 'pass_with_manual_review') return 'success';
