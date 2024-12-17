@@ -13,7 +13,7 @@ stripe.api_key = os.environ["STRIPE_API_KEY"]
 
 
 SMALL_INVOICE_NOTIONAL_CENTS = 500_00
-
+ALLOW_CC_EMAIL_DOMAIN_LIST = ["zillowgroup.com", "aryeo.com"]
 
 def dollar_fmt(amount_cents: int):
     return f"${(amount_cents / 100):,.2f}"
@@ -195,7 +195,9 @@ def send_invoice(invoice: stripe.Invoice):
             stripe.InvoiceItem.delete(item.id)
 
     payment_methods = ["ach_credit_transfer", "us_bank_account"]
-    if invoice.total < SMALL_INVOICE_NOTIONAL_CENTS:
+    customer_allowed_cc = any(d in invoice.customer_email for d in ALLOW_CC_EMAIL_DOMAIN_LIST)
+    
+    if invoice.total < SMALL_INVOICE_NOTIONAL_CENTS or customer_allowed_cc:
         # For small invoices, let tenants pay via card
         payment_methods.append("card")
         payment_methods.append("cashapp")
