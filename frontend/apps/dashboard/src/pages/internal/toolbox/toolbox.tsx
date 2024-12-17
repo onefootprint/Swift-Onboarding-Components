@@ -80,7 +80,7 @@ const Tenants = () => {
       useDialogComponent: useCreateSandboxTenantForm,
     },
     {
-      title: 'Grant edit rights [WIP]',
+      title: 'Grant edit rights',
       subtitle: 'Grant Footprint employees specific edit rights when impersonating a tenant',
       icon: IcoWriting24,
       useDialogComponent: useGrantEditRightsForm,

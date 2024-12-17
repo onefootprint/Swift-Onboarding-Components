@@ -125,6 +125,7 @@
     "decrypt_all": "Everything",
     "decrypt_custom": "Custom attributes",
     "decrypt_documents": "Documents",
+    "decrypt_document_and_selfie": "Documents and selfie",
     "onboarding": "Onboarding",
     "manage_webhooks": "Manage webhook configuration",
     "decrypt": {
@@ -140,7 +141,9 @@
       "custom": "Custom attributes",
       "us_legal_status": "Legal status in the U.S.",
       "investor_profile": "Broker questions (Investor profile)",
-      "card": "Card data"
+      "card": "Card data",
+      "decrypt_document_and_selfie": "Documents and selfie",
+      "decrypt_document": "Documents"
     },
     "hints": {
       "read": "Basic read-only access",
