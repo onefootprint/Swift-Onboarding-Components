@@ -1,33 +1,22 @@
-import useEntityId from '@/entities/components/details/hooks/use-entity-id';
-import { getEntitiesByFpIdDataOptions } from '@onefootprint/axios/dashboard';
-import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import hasLegalStatus from '../../utils/has-legal-status';
 import hasNationality from '../../utils/has-nationality';
+import Decrypt from '../decrypt';
 import Subsection from '../subsection';
-import Decrypt from './components/decrypt';
 import Fieldset from './components/fieldset';
 import useField from './hooks/use-field';
 import useFieldsets from './hooks/use-fieldsets';
-import useSeqnoVault from './hooks/use-seqno-vault';
+import type { VaultType } from './hooks/use-seqno-vault';
 
 type OnboardingUserDataProps = {
   onboardingId: string;
-  seqno: number | undefined;
+  canDecrypt: boolean;
+  vault: { data: VaultType | undefined; update: (newData: VaultType) => void; isAllDecrypted: boolean };
 };
 
-const OnboardingUserData = ({ onboardingId, seqno }: OnboardingUserDataProps) => {
+const OnboardingUserData = ({ canDecrypt, onboardingId, vault }: OnboardingUserDataProps) => {
   const { t } = useTranslation('entity-details', { keyPrefix: 'onboardings.user-data' });
-  const entityId = useEntityId();
-  const { data: entityAttributes } = useQuery({
-    ...getEntitiesByFpIdDataOptions({
-      path: { fpId: entityId },
-      query: { seqno },
-    }),
-    enabled: Boolean(entityId) && Boolean(seqno),
-  });
-  const { data: vaultData, update: updateVault, isAllDecrypted } = useSeqnoVault(entityAttributes, seqno?.toString());
-  const hasDecryptableDIs = Boolean(entityAttributes?.some(attr => attr.isDecryptable));
+  const { data: vaultData, update: updateVault, isAllDecrypted } = vault;
   const includeNationality = hasNationality(vaultData) && !hasLegalStatus(vaultData);
   const { basic, address, identity, custom } = useFieldsets(includeNationality);
   const getFieldProps = useField(vaultData);
@@ -36,10 +25,11 @@ const OnboardingUserData = ({ onboardingId, seqno }: OnboardingUserDataProps) =>
   return (
     <Subsection
       title={t('title')}
+      hasDivider
       rightComponent={
-        !isAllDecrypted && (
+        isAllDecrypted && (
           <Decrypt
-            canDecrypt={hasDecryptableDIs}
+            canDecrypt={canDecrypt}
             onDecryptSuccess={updateVault}
             onboardingId={onboardingId}
             vaultData={vaultData}

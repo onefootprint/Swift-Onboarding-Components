@@ -5,8 +5,8 @@ import { useRequestErrorToast } from '@onefootprint/hooks';
 import type { DataIdentifier, VaultValue } from '@onefootprint/types';
 import { LinkButton, LoadingSpinner, Tooltip } from '@onefootprint/ui';
 import { useState } from 'react';
-import { useDecryptControls } from '../../../../../../../vault/components/vault-actions';
-import type { VaultType } from '../../hooks/use-seqno-vault';
+import { useDecryptControls } from '../../../../../vault/components/vault-actions';
+import type { VaultType } from '../onboarding-user-data/hooks/use-seqno-vault';
 
 type DecryptProps = {
   canDecrypt: boolean;

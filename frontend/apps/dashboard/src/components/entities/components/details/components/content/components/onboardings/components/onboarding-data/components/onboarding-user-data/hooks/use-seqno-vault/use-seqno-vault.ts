@@ -73,7 +73,7 @@ const useSeqnoVault = (entityAttributes: EntityAttribute[] | undefined, seqno?: 
     enabled: !!entityAttributes,
   });
 
-  return { ...query, update, isAllDecrypted: isAllDecrypted(query.data) };
+  return { data: query.data, update, isAllDecrypted: isAllDecrypted(query.data) };
 };
 
 export default useSeqnoVault;

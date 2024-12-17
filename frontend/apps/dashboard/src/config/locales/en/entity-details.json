@@ -1255,8 +1255,13 @@
       "title": "User data",
       "decrypt-all": "Decrypt all"
     },
+    "business-insight": {
+      "encrypted": "For security reasons, you must decrypt all before viewing these details."
+    },
     "business-details": {
-      "title": "Business details"
+      "title": "Business details",
+      "business-name": "Business name",
+      "other-details": "Other business details"
     },
     "people": {
       "title": "People"

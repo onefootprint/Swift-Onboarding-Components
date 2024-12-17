@@ -22,7 +22,7 @@ export type Subsection =
   | 'sos-filings'
   | 'watchlists'
   | 'offices';
-type SubsectionMap = Partial<Record<Subsection, { title: string; iconComponent: Icon }>>;
+type SubsectionMap = Partial<Record<Subsection, { title: string; iconComponent: Icon; isBusinessInsight?: boolean }>>;
 
 const useSubsections = (onboarding: EntityOnboarding, riskSignals: RiskSignal[] | undefined): SubsectionMap => {
   const { t } = useTranslation('entity-details', { keyPrefix: 'onboardings' });
@@ -50,22 +50,27 @@ const useSubsections = (onboarding: EntityOnboarding, riskSignals: RiskSignal[] 
     'business-details': {
       title: t('business-details.title'),
       iconComponent: IcoStore16,
+      isBusinessInsight: true,
     },
     people: {
       title: t('people.title'),
       iconComponent: IcoUsers16,
+      isBusinessInsight: true,
     },
     'sos-filings': {
       title: t('sos-filings.title'),
       iconComponent: IcoFileText16,
+      isBusinessInsight: true,
     },
     watchlists: {
       title: t('watchlists.title'),
       iconComponent: IcoEye16,
+      isBusinessInsight: true,
     },
     offices: {
       title: t('offices.title'),
       iconComponent: IcoBuilding16,
+      isBusinessInsight: true,
     },
   };
 

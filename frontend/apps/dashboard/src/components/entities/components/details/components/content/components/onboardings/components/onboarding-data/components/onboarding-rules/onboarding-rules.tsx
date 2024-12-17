@@ -30,7 +30,7 @@ const OnboardingRules = ({ ruleSetResultId }: OnboardingRulesProps) => {
   };
 
   return (
-    <Subsection title={t('title')} rightComponent={<RulesDropdown onClick={handleClick} />}>
+    <Subsection title={t('title')} hasDivider rightComponent={<RulesDropdown onClick={handleClick} />}>
       {isPending && <Loading />}
       {error && <ErrorComponent error={error} />}
       {data && data.ruleResults.length > 0 && (

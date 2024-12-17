@@ -1,11 +1,16 @@
 import useEntityId from '@/entities/components/details/hooks/use-entity-id';
-import { getEntitiesByFpIdOnboardingsByOnboardingIdRiskSignalsOptions } from '@onefootprint/axios/dashboard';
+import {
+  getEntitiesByFpIdDataOptions,
+  getEntitiesByFpIdOnboardingsByOnboardingIdRiskSignalsOptions,
+} from '@onefootprint/axios/dashboard';
 import type { EntityOnboarding } from '@onefootprint/request-types/dashboard';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
+import OnboardingBusinessInsight from './components/onboarding-business-insight';
 import OnboardingRiskSignals from './components/onboarding-risk-signals';
 import OnboardingRules from './components/onboarding-rules';
 import OnboardingUserData from './components/onboarding-user-data';
+import useSeqnoVault from './components/onboarding-user-data/hooks/use-seqno-vault';
 import SidebarItem from './components/sidebar-item';
 import useSubsections, { type Subsection } from './hooks/use-subsections';
 import groupRiskSignals from './utils/group-risk-signals';
@@ -22,8 +27,18 @@ const OnboardingData = ({ onboarding }: OnboardingDataProps) => {
     }),
     enabled: Boolean(entityId) && Boolean(onboarding.id),
   });
+  const { data: entityAttributes } = useQuery({
+    ...getEntitiesByFpIdDataOptions({
+      path: { fpId: entityId },
+      query: { seqno: onboarding.seqno },
+    }),
+    enabled: Boolean(entityId) && Boolean(onboarding.seqno),
+  });
+  const hasDecryptableDIs = Boolean(entityAttributes?.some(attr => attr.isDecryptable));
+  const seqnoVault = useSeqnoVault(entityAttributes, onboarding.seqno?.toString());
   const subsections = useSubsections(onboarding, riskSignals);
   const [selectedSubsection, setSelectedSubsection] = useState<Subsection>(Object.keys(subsections)[0] as Subsection);
+  const isBusinessInsight = subsections[selectedSubsection]?.isBusinessInsight;
 
   useEffect(() => {
     setSelectedSubsection(Object.keys(subsections)[0] as Subsection);
@@ -48,7 +63,17 @@ const OnboardingData = ({ onboarding }: OnboardingDataProps) => {
         )}
         {selectedSubsection === 'rules' && <OnboardingRules ruleSetResultId={onboarding.ruleSetResults[0].id} />}
         {selectedSubsection === 'user-data' && (
-          <OnboardingUserData onboardingId={onboarding.id} seqno={onboarding.seqno} />
+          <OnboardingUserData canDecrypt={hasDecryptableDIs} onboardingId={onboarding.id} vault={seqnoVault} />
+        )}
+        {isBusinessInsight && (
+          <OnboardingBusinessInsight
+            canDecrypt={hasDecryptableDIs}
+            isDecrypted={seqnoVault.isAllDecrypted}
+            selectedSubsection={selectedSubsection}
+            title={subsections[selectedSubsection]?.title ?? ''}
+            onboardingId={onboarding.id}
+            vault={seqnoVault}
+          />
         )}
       </div>
     </div>
