@@ -8,7 +8,12 @@ const Layout = ({ children, onClose }: LayoutProps) => {
     <div className="w-[500px] border border-gray-100 p-8 relative">
       {onClose && (
         <nav className="flex justify-start p-3 -mt-3">
-          <button type="button" onClick={onClose} className=" right-4 top-4 text-gray-500 hover:text-gray-700">
+          <button
+            type="button"
+            onClick={onClose}
+            className="right-4 top-4 text-gray-500 hover:text-gray-700"
+            style={{ background: 'none' }}
+          >
             <svg
               width="24"
               height="24"
