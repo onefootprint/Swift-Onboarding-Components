@@ -60,6 +60,7 @@ pub mod scoped_vault_version;
 pub mod session;
 pub mod socure_device_session;
 pub mod stytch_fingerprint_event;
+pub mod super_admin_request;
 pub mod task;
 pub mod task_execution;
 pub mod tenant;

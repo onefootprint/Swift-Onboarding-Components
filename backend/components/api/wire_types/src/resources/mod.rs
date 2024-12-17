@@ -29,6 +29,7 @@ pub use self::vault_created::*;
 pub use self::vault_dr::*;
 pub use self::watchlist_check::*;
 pub use self::webhook_portal::*;
+pub use access_request::*;
 pub use aml::*;
 pub use auth_method::*;
 pub use authorized_org::*;
@@ -58,6 +59,7 @@ pub use user_insight::*;
 pub use user_label::*;
 pub use user_tag::*;
 
+mod access_request;
 mod actor;
 mod aml;
 mod annotation;

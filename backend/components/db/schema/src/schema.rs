@@ -1245,6 +1245,27 @@ diesel::table! {
 diesel::table! {
     use diesel::sql_types::*;
 
+    super_admin_request (id) {
+        id -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        tenant_user_id -> Text,
+        reason -> Nullable<Text>,
+        insight_event_id -> Text,
+        tenant_id -> Text,
+        scopes -> Array<Nullable<Jsonb>>,
+        created_at -> Timestamptz,
+        expires_at -> Timestamptz,
+        responder_tenant_user_id -> Nullable<Text>,
+        responded_at -> Nullable<Timestamptz>,
+        approved -> Nullable<Bool>,
+        responder_insight_event_id -> Nullable<Text>,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+
     task (id) {
         id -> Text,
         created_at -> Timestamptz,
@@ -1996,6 +2017,8 @@ diesel::joinable!(socure_device_session -> workflow (workflow_id));
 diesel::joinable!(stytch_fingerprint_event -> scoped_vault (scoped_vault_id));
 diesel::joinable!(stytch_fingerprint_event -> vault (vault_id));
 diesel::joinable!(stytch_fingerprint_event -> verification_result (verification_result_id));
+diesel::joinable!(super_admin_request -> insight_event (insight_event_id));
+diesel::joinable!(super_admin_request -> tenant (tenant_id));
 diesel::joinable!(task_execution -> task (task_id));
 diesel::joinable!(tenant_android_app_meta -> tenant (tenant_id));
 diesel::joinable!(tenant_api_key -> tenant (tenant_id));
@@ -2121,6 +2144,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     session,
     socure_device_session,
     stytch_fingerprint_event,
+    super_admin_request,
     task,
     task_execution,
     tenant,

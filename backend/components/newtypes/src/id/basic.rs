@@ -396,6 +396,10 @@ define_newtype_id!(
 define_newtype_id!(VaultDrManifestId, String, "Identifier for a vault_dr_manifest");
 define_newtype_id!(TwilioMessageLogId, String, "Identifier for a twilio_message_log");
 define_newtype_id!(PlaybookId, String, "Identifier for a playbook row");
-
 define_newtype_int!(DataLifetimeSeqno, i64);
 define_newtype_int!(ScopedVaultOrderingId, i64);
+define_newtype_id!(
+    SuperAdminAccessRequestId,
+    String,
+    "Identifier for an access request"
+);

@@ -1,3 +1,4 @@
+mod access_requests;
 mod assume;
 mod cleanup;
 mod compliance_partnership;
@@ -32,4 +33,5 @@ pub fn configure(config: &mut actix_web::web::ServiceConfig) {
         .service(vault_dr_test_backfill::post);
 
     tenants::configure(config);
+    access_requests::configure(config);
 }

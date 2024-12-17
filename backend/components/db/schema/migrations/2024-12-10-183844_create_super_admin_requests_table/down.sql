@@ -1,0 +1,1 @@
+DROP TABLE super_admin_request;

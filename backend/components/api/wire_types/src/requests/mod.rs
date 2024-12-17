@@ -114,3 +114,6 @@ pub use self::entity::*;
 
 pub mod vault_dr;
 pub use self::vault_dr::*;
+
+pub mod access_request;
+pub use self::access_request::*;
