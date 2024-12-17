@@ -99,8 +99,8 @@ const AddressDataStep = ({ authToken, defaultValues, onSubmit }: AddressDataStep
           <FormInput id="city" placeholder="New York" {...register('city', { required: 'City is required' })} />
           <FormError>{errors.city?.message}</FormError>
         </div>
-        <div className="flex gap-4 mb-6">
-          <div className="flex-1">
+        <div className="flex mb-6">
+          <div className="flex-1 mr-4">
             <FormLabel htmlFor="state">State *</FormLabel>
             <FormSelect id="state" {...register('state', { required: 'State is required' })}>
               <option value="">Select...</option>
