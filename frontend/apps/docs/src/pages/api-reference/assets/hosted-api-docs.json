@@ -1101,6 +1101,32 @@
                 ]
             }
         },
+        "/hosted/onboarding/avis_result": {
+            "post": {
+                "tags": [
+                    "Onboarding",
+                    "Hosted"
+                ],
+                "description": "Returns the workflow's status. Only available for demo tenants and POS tenants.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OnboardingResultResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "User Onboarding Token": []
+                    }
+                ]
+            }
+        },
         "/hosted/onboarding/config": {
             "get": {
                 "tags": [
@@ -1701,32 +1727,6 @@
                                     "items": {
                                         "$ref": "#/components/schemas/AuthMethod"
                                     }
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "User Token": []
-                    }
-                ]
-            }
-        },
-        "/hosted/user/auth_requirements": {
-            "get": {
-                "tags": [
-                    "Challenge",
-                    "Hosted"
-                ],
-                "description": "Returns the set of auth requirements to satisfy the auth portion of the playbook in the provided session",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/AuthRequirementsResponse"
                                 }
                             }
                         }
@@ -2818,20 +2818,6 @@
                     "email"
                 ]
             },
-            "AuthRequirementsResponse": {
-                "type": "object",
-                "properties": {
-                    "all_requirements": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/ApiOnboardingRequirement"
-                        }
-                    }
-                },
-                "required": [
-                    "all_requirements"
-                ]
-            },
             "AuthV1Options": {
                 "type": "object",
                 "properties": {
@@ -3033,6 +3019,7 @@
                 "type": "object",
                 "properties": {
                     "challenge_response": {
+                        "description": "Required for challenges other than SMS link",
                         "type": "string"
                     },
                     "challenge_token": {
@@ -7366,6 +7353,21 @@
                     "auth_token"
                 ]
             },
+            "OnboardingResultResponse": {
+                "type": "object",
+                "properties": {
+                    "requires_manual_review": {
+                        "type": "boolean"
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/OnboardingStatus"
+                    }
+                },
+                "required": [
+                    "requires_manual_review",
+                    "status"
+                ]
+            },
             "OnboardingSessionResponse": {
                 "type": "object",
                 "properties": {
@@ -7375,6 +7377,16 @@
                 },
                 "required": [
                     "bootstrap_data"
+                ]
+            },
+            "OnboardingStatus": {
+                "type": "string",
+                "enum": [
+                    "pass",
+                    "fail",
+                    "incomplete",
+                    "pending",
+                    "none"
                 ]
             },
             "OnboardingStatusResponse": {

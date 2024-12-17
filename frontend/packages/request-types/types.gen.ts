@@ -22,9 +22,6 @@ export type AuthMethod = {
   kind: AuthMethodKind;
 };
 export type AuthMethodKind = 'phone' | 'passkey' | 'email';
-export type AuthRequirementsResponse = {
-  allRequirements: Array<ApiOnboardingRequirement>;
-};
 export type AuthV1Options = {
   showLogo?: boolean;
 };
@@ -77,6 +74,9 @@ export type ChallengeRequest = {
   challengeKind: ChallengeKind;
 };
 export type ChallengeVerifyRequest = {
+  /**
+   * Required for challenges other than SMS link
+   */
   challengeResponse?: string;
   /**
    * Opaque challenge state token
@@ -1991,11 +1991,16 @@ export type kind15 = 'liveness';
 export type OnboardingResponse = {
   authToken: string;
 };
+export type OnboardingResultResponse = {
+  requiresManualReview: boolean;
+  status: OnboardingStatus;
+};
 export type OnboardingSessionResponse = {
   bootstrapData: {
     [key: string]: unknown;
   };
 };
+export type OnboardingStatus = 'pass' | 'fail' | 'incomplete' | 'pending' | 'none';
 export type OnboardingStatusResponse = {
   allRequirements: Array<ApiOnboardingRequirement>;
   /**
@@ -2994,6 +2999,16 @@ export type PostHostedOnboardingAuthorizeData = {
 };
 export type PostHostedOnboardingAuthorizeResponse = Empty;
 export type PostHostedOnboardingAuthorizeError = unknown;
+export type PostHostedOnboardingAvisResultData = {
+  headers?: {
+    /**
+     * Short-lived auth token for a user during bifrost. Issued by identify and contains scopes to perform specific user actions.
+     */
+    'X-Fp-Authorization'?: string;
+  };
+};
+export type PostHostedOnboardingAvisResultResponse = OnboardingResultResponse;
+export type PostHostedOnboardingAvisResultError = unknown;
 export type GetHostedOnboardingConfigData = {
   headers?: {
     /**
@@ -3201,16 +3216,6 @@ export type GetHostedUserAuthMethodsData = {
 };
 export type GetHostedUserAuthMethodsResponse = Array<AuthMethod>;
 export type GetHostedUserAuthMethodsError = unknown;
-export type GetHostedUserAuthRequirementsData = {
-  headers?: {
-    /**
-     * Short-lived auth token for a user. Issued by identify and contains scopes to perform specific user actions.
-     */
-    'X-Fp-Authorization'?: string;
-  };
-};
-export type GetHostedUserAuthRequirementsResponse = AuthRequirementsResponse;
-export type GetHostedUserAuthRequirementsError = unknown;
 export type GetHostedUserAuthorizedOrgsData = {
   headers?: {
     /**
@@ -4038,6 +4043,17 @@ export type $OpenApiTs = {
       };
     };
   };
+  '/hosted/onboarding/avis_result': {
+    post: {
+      req: PostHostedOnboardingAvisResultData;
+      res: {
+        /**
+         * OK
+         */
+        '200': OnboardingResultResponse;
+      };
+    };
+  };
   '/hosted/onboarding/config': {
     get: {
       req: GetHostedOnboardingConfigData;
@@ -4236,17 +4252,6 @@ export type $OpenApiTs = {
          * OK
          */
         '200': Array<AuthMethod>;
-      };
-    };
-  };
-  '/hosted/user/auth_requirements': {
-    get: {
-      req: GetHostedUserAuthRequirementsData;
-      res: {
-        /**
-         * OK
-         */
-        '200': AuthRequirementsResponse;
       };
     };
   };

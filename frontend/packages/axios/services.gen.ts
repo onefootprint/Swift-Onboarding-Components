@@ -40,9 +40,6 @@ import type {
   GetHostedUserAuthMethodsData,
   GetHostedUserAuthMethodsError,
   GetHostedUserAuthMethodsResponse,
-  GetHostedUserAuthRequirementsData,
-  GetHostedUserAuthRequirementsError,
-  GetHostedUserAuthRequirementsResponse,
   GetHostedUserAuthorizedOrgsData,
   GetHostedUserAuthorizedOrgsError,
   GetHostedUserAuthorizedOrgsResponse,
@@ -134,6 +131,9 @@ import type {
   PostHostedOnboardingAuthorizeData,
   PostHostedOnboardingAuthorizeError,
   PostHostedOnboardingAuthorizeResponse,
+  PostHostedOnboardingAvisResultData,
+  PostHostedOnboardingAvisResultError,
+  PostHostedOnboardingAvisResultResponse,
   PostHostedOnboardingData,
   PostHostedOnboardingError,
   PostHostedOnboardingFpData,
@@ -647,6 +647,22 @@ export const postHostedOnboardingAuthorize = <ThrowOnError extends boolean = fal
 };
 
 /**
+ * Returns the workflow's status. Only available for demo tenants and POS tenants.
+ */
+export const postHostedOnboardingAvisResult = <ThrowOnError extends boolean = false>(
+  options?: Options<PostHostedOnboardingAvisResultData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).post<
+    PostHostedOnboardingAvisResultResponse,
+    PostHostedOnboardingAvisResultError,
+    ThrowOnError
+  >({
+    ...options,
+    url: '/hosted/onboarding/avis_result',
+  });
+};
+
+/**
  * Get the details of an onboarding configuration.
  */
 export const getHostedOnboardingConfig = <ThrowOnError extends boolean = false>(
@@ -924,22 +940,6 @@ export const getHostedUserAuthMethods = <ThrowOnError extends boolean = false>(
       url: '/hosted/user/auth_methods',
     },
   );
-};
-
-/**
- * Returns the set of auth requirements to satisfy the auth portion of the playbook in the provided session
- */
-export const getHostedUserAuthRequirements = <ThrowOnError extends boolean = false>(
-  options?: Options<GetHostedUserAuthRequirementsData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).get<
-    GetHostedUserAuthRequirementsResponse,
-    GetHostedUserAuthRequirementsError,
-    ThrowOnError
-  >({
-    ...options,
-    url: '/hosted/user/auth_requirements',
-  });
 };
 
 /**

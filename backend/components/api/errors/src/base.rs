@@ -107,6 +107,7 @@ define_err_type!(BadRequest, BAD_REQUEST);
 define_err_type!(Unauthorized, UNAUTHORIZED);
 define_err_type!(Forbidden, FORBIDDEN);
 define_err_type!(ServerErr, INTERNAL_SERVER_ERROR);
+define_err_type!(NotFound, NOT_FOUND);
 
 macro_rules! fp_error_trait_impl {
     ($typ:ty, $status_code: tt) => {

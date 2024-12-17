@@ -447,14 +447,14 @@ export const getAccessRequest = (
 ): AccessRequest =>
   deepmerge<AccessRequest>(
     {
-      approved: false,
-      createdAt: '1908-12-10T06:09:17.0Z',
-      expiresAt: '1897-07-01T04:09:49.0Z',
-      id: 'ffde6153-5b39-4d01-8913-61415287e7e5',
-      reason: 'enim minim',
-      requester: 'elit amet anim',
-      respondedAt: '1917-11-13T11:27:35.0Z',
-      responder: 'velit pariatur',
+      approved: true,
+      createdAt: '1934-08-28T19:08:28.0Z',
+      expiresAt: '1965-11-13T01:10:45.0Z',
+      id: 'ce7b9580-c2e3-403a-bba0-ba9e55eff8b8',
+      reason: 'nostrud in dolore cillum exercitation',
+      requester: 'dolor Ut quis',
+      respondedAt: '1904-05-29T19:05:55.0Z',
+      responder: 'reprehenderit aliqua',
       scopes: [
         {
           kind: 'read',
@@ -2826,8 +2826,8 @@ export const getCreateAccessRequestRequest = (
 ): CreateAccessRequestRequest =>
   deepmerge<CreateAccessRequestRequest>(
     {
-      durationHours: -94774508,
-      reason: 'aliqua in',
+      durationHours: -57648542,
+      reason: 'magna qui deserunt',
       scopes: [
         {
           kind: 'read',
@@ -2839,7 +2839,7 @@ export const getCreateAccessRequestRequest = (
           kind: 'read',
         },
       ],
-      tenantId: '665ea396-b6d3-4d55-9ab8-45e78af8896c',
+      tenantId: 'e1d7607a-4880-4f02-b72c-aabbe4d08112',
     },
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
@@ -8890,7 +8890,7 @@ export const getPatchAccessRequestRequest = (
 ): PatchAccessRequestRequest =>
   deepmerge<PatchAccessRequestRequest>(
     {
-      approved: false,
+      approved: true,
     },
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },

@@ -2,6 +2,7 @@
 use paperclip::actix::web;
 
 mod authorize;
+mod avis_result;
 mod config;
 mod fingerprint_visit;
 mod index;
@@ -33,5 +34,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(neuro_id::get)
         .service(timeline::post)
         .service(session::get)
+        .service(avis_result::post)
         .service(config::get);
 }

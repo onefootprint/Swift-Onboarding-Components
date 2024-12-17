@@ -1,4 +1,5 @@
 from tests.bifrost_client import BifrostClient
+from tests.utils import post
 
 
 def test_basic_bifrost(sandbox_tenant):
@@ -23,3 +24,11 @@ def test_basic_bifrost(sandbox_tenant):
     user2 = bifrost.run()
 
     assert user2.fp_id == user.fp_id
+
+
+def test_avis_result(sandbox_tenant):
+    obc = sandbox_tenant.default_ob_config
+    bifrost = BifrostClient.new_user(obc)
+    bifrost.run()
+    body = post("hosted/onboarding/avis_result", None, bifrost.auth_token)
+    assert body["status"] == bifrost.validate_response["user"]["status"]

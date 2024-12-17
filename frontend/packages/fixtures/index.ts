@@ -4,7 +4,6 @@ import type {
   ApiOnboardingRequirement,
   AuthMethod,
   AuthMethodKind,
-  AuthRequirementsResponse,
   AuthV1Options,
   AuthV1SdkArgs,
   AuthorizeFields,
@@ -121,7 +120,9 @@ import type {
   OnboardingRequirementRegisterAuthMethod,
   OnboardingRequirementRegisterPasskey,
   OnboardingResponse,
+  OnboardingResultResponse,
   OnboardingSessionResponse,
+  OnboardingStatus,
   OnboardingStatusResponse,
   PostBusinessOnboardingRequest,
   PostOnboardingRequest,
@@ -195,37 +196,6 @@ export const getAuthMethod = (
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getAuthMethodKind = (props: AuthMethodKind): AuthMethodKind => props ?? 'email';
-
-export const getAuthRequirementsResponse = (
-  props: Partial<AuthRequirementsResponse>,
-  options: { overwriteArray: boolean } = { overwriteArray: true },
-): AuthRequirementsResponse =>
-  deepmerge<AuthRequirementsResponse>(
-    {
-      allRequirements: [
-        {
-          isMet: true,
-          requirement: {
-            kind: 'process',
-          },
-        },
-        {
-          isMet: true,
-          requirement: {
-            kind: 'process',
-          },
-        },
-        {
-          isMet: true,
-          requirement: {
-            kind: 'process',
-          },
-        },
-      ],
-    },
-    props,
-    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
-  );
 
 export const getAuthV1Options = (
   props: Partial<AuthV1Options>,
@@ -4108,6 +4078,19 @@ export const getOnboardingResponse = (
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 
+export const getOnboardingResultResponse = (
+  props: Partial<OnboardingResultResponse>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): OnboardingResultResponse =>
+  deepmerge<OnboardingResultResponse>(
+    {
+      requiresManualReview: false,
+      status: 'fail',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
 export const getOnboardingSessionResponse = (
   props: Partial<OnboardingSessionResponse>,
   options: { overwriteArray: boolean } = { overwriteArray: true },
@@ -4119,6 +4102,7 @@ export const getOnboardingSessionResponse = (
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+export const getOnboardingStatus = (props: OnboardingStatus): OnboardingStatus => props ?? 'pending';
 
 export const getOnboardingStatusResponse = (
   props: Partial<OnboardingStatusResponse>,

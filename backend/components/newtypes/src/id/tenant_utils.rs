@@ -6,6 +6,7 @@ use derive_more::From;
 impl TenantId {
     pub const APITURE: &'static str = "org_VWhEJ36DGxIgTSl8CFJOhR";
     pub const ARYEO: &'static str = "org_6CTPv02MXFKKWjB6wc5zHg";
+    pub const AVIS_POS: &'static str = "org_5kllpJJHldcAB4yvW8bfyb";
     pub const BASIC_CAPITAL: &'static str = "org_hfT6m85IKbPHDFVOcybEmF";
     pub const BLOOM: &'static str = "org_xpRKH6lk73aZxuJbsGkUaJ";
     pub const COAST: &'static str = "org_vZfj1sekMjwGdURGCWisF";
@@ -65,6 +66,10 @@ impl TenantId {
 
     pub fn is_triumph(&self) -> bool {
         self.0 == Self::TRIUMPH
+    }
+
+    pub fn is_avis_pos(&self) -> bool {
+        self.0 == Self::AVIS_POS
     }
 }
 

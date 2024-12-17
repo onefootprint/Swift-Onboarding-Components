@@ -1,7 +1,6 @@
 import type {
   ApiOnboardingRequirement,
   AuthMethod,
-  AuthRequirementsResponse,
   AuthV1Options,
   AuthV1SdkArgs,
   AuthorizeFields,
@@ -93,6 +92,7 @@ import type {
   OnboardingRequirementRegisterAuthMethod,
   OnboardingRequirementRegisterPasskey,
   OnboardingResponse,
+  OnboardingResultResponse,
   OnboardingSessionResponse,
   OnboardingStatusResponse,
   PostBusinessOnboardingRequest,
@@ -584,28 +584,6 @@ export const hosted_AuthMethod: AuthMethod = {
   kind: 'phone',
 };
 export const hosted_AuthMethodKind: AuthMethodKind = 'email';
-export const hosted_AuthRequirementsResponse: AuthRequirementsResponse = {
-  allRequirements: [
-    {
-      isMet: true,
-      requirement: {
-        kind: 'process',
-      },
-    },
-    {
-      isMet: true,
-      requirement: {
-        kind: 'process',
-      },
-    },
-    {
-      isMet: true,
-      requirement: {
-        kind: 'process',
-      },
-    },
-  ],
-};
 export const hosted_AuthV1Options: AuthV1Options = {
   showLogo: true,
 };
@@ -3619,9 +3597,14 @@ export const hosted_OnboardingRequirementRegisterPasskey: OnboardingRequirementR
 export const hosted_OnboardingResponse: OnboardingResponse = {
   authToken: '47a04282-eeab-4b1b-8620-2201f48afa8f',
 };
+export const hosted_OnboardingResultResponse: OnboardingResultResponse = {
+  requiresManualReview: false,
+  status: 'fail',
+};
 export const hosted_OnboardingSessionResponse: OnboardingSessionResponse = {
   bootstrapData: {},
 };
+export const hosted_OnboardingStatus: OnboardingStatus = 'pending';
 export const hosted_OnboardingStatusResponse: OnboardingStatusResponse = {
   allRequirements: [
     {
@@ -4026,14 +4009,14 @@ export const hosted_WorkflowRequestConfigOnboard: WorkflowRequestConfigOnboard =
   kind: 'onboard',
 };
 export const dashboard_AccessRequest: AccessRequest = {
-  approved: false,
-  createdAt: '1908-12-10T06:09:17.0Z',
-  expiresAt: '1897-07-01T04:09:49.0Z',
-  id: 'ffde6153-5b39-4d01-8913-61415287e7e5',
-  reason: 'enim minim',
-  requester: 'elit amet anim',
-  respondedAt: '1917-11-13T11:27:35.0Z',
-  responder: 'velit pariatur',
+  approved: true,
+  createdAt: '1934-08-28T19:08:28.0Z',
+  expiresAt: '1965-11-13T01:10:45.0Z',
+  id: 'ce7b9580-c2e3-403a-bba0-ba9e55eff8b8',
+  reason: 'nostrud in dolore cillum exercitation',
+  requester: 'dolor Ut quis',
+  respondedAt: '1904-05-29T19:05:55.0Z',
+  responder: 'reprehenderit aliqua',
   scopes: [
     {
       kind: 'read',
@@ -5659,8 +5642,8 @@ export const dashboard_CopyPlaybookRequest: CopyPlaybookRequest = {
 };
 export const dashboard_CountrySpecificDocumentMapping: CountrySpecificDocumentMapping = {};
 export const dashboard_CreateAccessRequestRequest: CreateAccessRequestRequest = {
-  durationHours: -94774508,
-  reason: 'aliqua in',
+  durationHours: -57648542,
+  reason: 'magna qui deserunt',
   scopes: [
     {
       kind: 'read',
@@ -5672,7 +5655,7 @@ export const dashboard_CreateAccessRequestRequest: CreateAccessRequestRequest = 
       kind: 'read',
     },
   ],
-  tenantId: '665ea396-b6d3-4d55-9ab8-45e78af8896c',
+  tenantId: 'e1d7607a-4880-4f02-b72c-aabbe4d08112',
 };
 export const dashboard_CreateAnnotationRequest: CreateAnnotationRequest = {
   isPinned: false,
@@ -10504,7 +10487,7 @@ export const dashboard_PartnerOrganization: PartnerOrganization = {
   websiteUrl: 'https://terrible-deduction.org',
 };
 export const dashboard_PatchAccessRequestRequest: PatchAccessRequestRequest = {
-  approved: false,
+  approved: true,
 };
 export const dashboard_PatchProxyConfigRequest: PatchProxyConfigRequest = {
   accessReason: 'culpa',

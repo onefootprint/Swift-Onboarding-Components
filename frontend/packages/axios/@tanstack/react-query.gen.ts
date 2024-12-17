@@ -14,7 +14,6 @@ import type {
   GetHostedOnboardingSessionData,
   GetHostedOnboardingStatusData,
   GetHostedUserAuthMethodsData,
-  GetHostedUserAuthRequirementsData,
   GetHostedUserAuthorizedOrgsData,
   GetHostedUserPrivateTokenData,
   GetHostedUserTokenData,
@@ -98,6 +97,9 @@ import type {
   PostHostedOnboardingAuthorizeData,
   PostHostedOnboardingAuthorizeError,
   PostHostedOnboardingAuthorizeResponse,
+  PostHostedOnboardingAvisResultData,
+  PostHostedOnboardingAvisResultError,
+  PostHostedOnboardingAvisResultResponse,
   PostHostedOnboardingData,
   PostHostedOnboardingError,
   PostHostedOnboardingFpData,
@@ -187,7 +189,6 @@ import {
   getHostedOnboardingSession,
   getHostedOnboardingStatus,
   getHostedUserAuthMethods,
-  getHostedUserAuthRequirements,
   getHostedUserAuthorizedOrgs,
   getHostedUserPrivateToken,
   getHostedUserToken,
@@ -220,6 +221,7 @@ import {
   postHostedIdentifyVerifyContactInfo,
   postHostedOnboarding,
   postHostedOnboardingAuthorize,
+  postHostedOnboardingAvisResult,
   postHostedOnboardingFp,
   postHostedOnboardingProcess,
   postHostedOnboardingSds,
@@ -1223,6 +1225,45 @@ export const postHostedOnboardingAuthorizeMutation = (
   return mutationOptions;
 };
 
+export const postHostedOnboardingAvisResultQueryKey = (options?: Options<PostHostedOnboardingAvisResultData>) => [
+  createQueryKey('postHostedOnboardingAvisResult', options),
+];
+
+export const postHostedOnboardingAvisResultOptions = (options?: Options<PostHostedOnboardingAvisResultData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await postHostedOnboardingAvisResult({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: postHostedOnboardingAvisResultQueryKey(options),
+  });
+};
+
+export const postHostedOnboardingAvisResultMutation = (
+  options?: Partial<Options<PostHostedOnboardingAvisResultData>>,
+) => {
+  const mutationOptions: UseMutationOptions<
+    PostHostedOnboardingAvisResultResponse,
+    AxiosError<PostHostedOnboardingAvisResultError>,
+    Options<PostHostedOnboardingAvisResultData>
+  > = {
+    mutationFn: async localOptions => {
+      const { data } = await postHostedOnboardingAvisResult({
+        ...options,
+        ...localOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
 export const getHostedOnboardingConfigQueryKey = (options?: Options<GetHostedOnboardingConfigData>) => [
   createQueryKey('getHostedOnboardingConfig', options),
 ];
@@ -1807,25 +1848,6 @@ export const getHostedUserAuthMethodsOptions = (options?: Options<GetHostedUserA
       return data;
     },
     queryKey: getHostedUserAuthMethodsQueryKey(options),
-  });
-};
-
-export const getHostedUserAuthRequirementsQueryKey = (options?: Options<GetHostedUserAuthRequirementsData>) => [
-  createQueryKey('getHostedUserAuthRequirements', options),
-];
-
-export const getHostedUserAuthRequirementsOptions = (options?: Options<GetHostedUserAuthRequirementsData>) => {
-  return queryOptions({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getHostedUserAuthRequirements({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getHostedUserAuthRequirementsQueryKey(options),
   });
 };
 

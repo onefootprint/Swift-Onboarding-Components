@@ -14,11 +14,9 @@ use api_errors::BadRequest;
 use api_route_hosted_core::validation_token::create_validation_token;
 use api_wire_types::hosted::onboarding_validate::HostedValidateResponse;
 use itertools::Itertools;
+use paperclip::actix;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
-use paperclip::actix::{
-    self,
-};
 
 #[api_v2_operation(
     tags(Onboarding, Hosted),
