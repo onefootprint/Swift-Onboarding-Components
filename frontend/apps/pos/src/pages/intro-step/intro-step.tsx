@@ -36,9 +36,7 @@ const Intro = ({ onDone }: IntroStepProps) => {
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
-      countryCode: '+55',
-      email: 'rafael@onefootprint.com',
-      phoneNumber: '48988124050',
+      countryCode: '+1',
     },
   });
   const mutation = useMutation(postHostedIdentifySignupChallengeMutation({}));
@@ -85,7 +83,6 @@ const Intro = ({ onDone }: IntroStepProps) => {
         <div className="block w-full mb-6">
           <FormLabel htmlFor="email">Email</FormLabel>
           <FormInput
-            autoFocus
             id="email"
             type="email"
             placeholder="customer@example.com"
