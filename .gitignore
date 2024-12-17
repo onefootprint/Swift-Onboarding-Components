@@ -4,3 +4,4 @@
 vscode-target
 .DS_Store
 .idea
+semgrep-results.json

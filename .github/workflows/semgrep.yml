@@ -20,7 +20,9 @@ jobs:
       - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36
         id: files-changed
         with:
-          list-files: shell
+          # list-files: shell and list-files: escape don't work with semgrep.
+          # Test with files with [ and ] in the path.
+          list-files: json
           predicate-quantifier: 'every'
           filters: |
             semgrep:
@@ -56,7 +58,7 @@ jobs:
             --exclude-rule=javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
             --json-output=semgrep-results.json
             --verbose
-            ${{ steps.files-changed.outputs.src_files }}
+            ${{ join(fromJSON(steps.files-changed.outputs.src_files), ' ') }}
 
       - name: Post results as PR comments
         if: github.event_name == 'pull_request'
