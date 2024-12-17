@@ -139,23 +139,23 @@ const CustomDataStep = ({ authToken, defaultValues, onSubmit }: CustomDataStepPr
         <div className="block w-full mb-6">
           <FormLabel htmlFor="under24hRental">Under 24h rental *</FormLabel>
           <div className="flex flex-col text-left">
-            <label className="radio-label">
+            <label className="radio-label flex items-center mb-1">
               <input
                 type="radio"
                 {...register('under24hRental', { required: 'Under 24h rental is required' })}
                 value="Y"
-                className="radio-input"
+                className="radio-input w-4 h-4"
               />
-              Yes
+              <span className="ml-2">Yes</span>
             </label>
-            <label className="radio-label">
+            <label className="radio-label flex items-center">
               <input
                 type="radio"
                 {...register('under24hRental', { required: 'Under 24h rental is required' })}
                 value="N"
-                className="radio-input"
+                className="radio-input w-4 h-4"
               />
-              No
+              <span className="ml-2">No</span>
             </label>
           </div>
           <FormError>{errors.under24hRental?.message}</FormError>
@@ -163,23 +163,23 @@ const CustomDataStep = ({ authToken, defaultValues, onSubmit }: CustomDataStepPr
         <div className="block w-full mb-6">
           <FormLabel htmlFor="businessLeisure">Business Leisure Indicator *</FormLabel>
           <div className="flex flex-col text-left">
-            <label className="radio-label">
+            <label className="radio-label flex items-center mb-1">
               <input
                 type="radio"
                 {...register('businessLeisure', { required: 'Business Leisure Indicator is required' })}
                 value="L"
-                className="radio-input"
+                className="radio-input w-4 h-4"
               />
-              Leisure
+              <span className="ml-2">Leisure</span>
             </label>
-            <label className="radio-label">
+            <label className="radio-label flex items-center">
               <input
                 type="radio"
                 {...register('businessLeisure', { required: 'Business Leisure Indicator is required' })}
                 value="B"
-                className="radio-input"
+                className="radio-input w-4 h-4"
               />
-              Business
+              <span className="ml-2">Business</span>
             </label>
           </div>
           <FormError>{errors.businessLeisure?.message}</FormError>
@@ -187,23 +187,23 @@ const CustomDataStep = ({ authToken, defaultValues, onSubmit }: CustomDataStepPr
         <div className="block w-full mb-6">
           <FormLabel htmlFor="localMarketIndicator">Local Market Indicator *</FormLabel>
           <div className="flex flex-col text-left">
-            <label className="radio-label">
+            <label className="radio-label flex items-center mb-1">
               <input
                 type="radio"
                 {...register('localMarketIndicator', { required: 'Local Market Indicator is required' })}
                 value="Y"
-                className="radio-input"
+                className="radio-input w-4 h-4"
               />
-              Yes
+              <span className="ml-2">Yes</span>
             </label>
-            <label className="radio-label">
+            <label className="radio-label flex items-center">
               <input
                 type="radio"
                 {...register('localMarketIndicator', { required: 'Local Market Indicator is required' })}
                 value="N"
-                className="radio-input"
+                className="radio-input w-4 h-4"
               />
-              No
+              <span className="ml-2">No</span>
             </label>
           </div>
           <FormError>{errors.localMarketIndicator?.message}</FormError>
