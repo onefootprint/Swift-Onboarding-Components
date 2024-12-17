@@ -7,7 +7,6 @@ use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::headers::InsightHeaders;
 use api_core::FpResult;
-use api_errors::ServerErr;
 use api_errors::UnauthorizedInto;
 use api_wire_types::Empty;
 use api_wire_types::GetVerifyContactInfoResponse;
@@ -47,24 +46,17 @@ pub async fn post(
                 return Ok(());
             }
 
-            let sv_txn = auth
-                .su_id
-                .as_ref()
+            let sv_txn = (auth.su_id.as_ref())
                 .map(|sv_id| -> FpResult<_> {
                     let sv = ScopedVault::lock(conn, sv_id)?;
                     DataLifetime::new_sv_txn(conn, sv)
                 })
                 .transpose()?;
 
-            // let sv_txn = sv
-            //     .as_ref()
-            //     .map(|sv| -> FpResult<_> { })
-            //     .transpose()?;
-
             // Specifically save the insight event from the phone that clicked on the link
             let insight = CreateInsightEvent::from(insight_headers).insert_with_conn(conn)?;
             let ae_args = NewAuthEventArgs {
-                vault_id: auth.user_vault_id.clone(),
+                vault_id: auth.uv_id.clone(),
                 sv_txn,
                 insight_event_id: Some(insight.id),
                 kind: AuthEventKind::SmsLink,
@@ -99,15 +91,14 @@ pub async fn get(
     state: web::Data<State>,
     auth: ContactInfoVerifyAuth,
 ) -> ApiResponse<GetVerifyContactInfoResponse> {
-    let insight_event_id = auth.data.data.insight_event_id.clone();
+    let insight_event_id = auth.data.insight_event_id.clone();
     let insight_event = state
         .db_query(move |conn| InsightEvent::get(conn, &insight_event_id))
         .await?;
-    let tenant = (auth.data.tenant.as_ref()).ok_or(ServerErr("No tenant found"))?;
     let response = GetVerifyContactInfoResponse {
         origin_insight_event: api_wire_types::InsightEvent::from_db(insight_event),
-        tenant_name: tenant.name.clone(),
-        is_verified: auth.data.data.auth_event_id.is_some(),
+        tenant_name: auth.data.tenant.name.clone(),
+        is_verified: auth.data.auth_event_id.is_some(),
     };
     Ok(response)
 }

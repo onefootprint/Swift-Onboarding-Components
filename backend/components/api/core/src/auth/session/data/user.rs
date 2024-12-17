@@ -15,7 +15,7 @@ use newtypes::InsightEventId;
 use newtypes::ObConfigurationId;
 use newtypes::RequestedTokenScope;
 use newtypes::ScopedVaultId;
-use newtypes::SessionAuthToken;
+use newtypes::TenantId;
 use newtypes::UserAuthScope;
 use newtypes::VaultId;
 use newtypes::WorkflowId;
@@ -352,7 +352,9 @@ pub struct EmailVerifySession {
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct ContactInfoVerifySessionData {
-    pub user_token: SessionAuthToken,
+    pub uv_id: VaultId,
+    pub su_id: Option<ScopedVaultId>,
+    pub tenant_id: TenantId,
     pub auth_event_id: Option<AuthEventId>,
     /// The insight event created by the desktop session that sent the sms link
     pub insight_event_id: InsightEventId,

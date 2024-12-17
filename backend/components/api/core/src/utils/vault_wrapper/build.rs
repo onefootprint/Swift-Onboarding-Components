@@ -54,7 +54,7 @@ impl<Type> VaultWrapper<Type> {
         vd: Vec<DbVaultData>,
         documents: Vec<DocumentData>,
         lifetimes: Vec<DataLifetime>,
-        sv_id: Option<&ScopedVaultId>,
+        sv_id: Option<ScopedVaultId>,
     ) -> FpResult<Self> {
         let mut documents: HashMap<_, _> = documents
             .into_iter()
@@ -98,7 +98,7 @@ impl<Type> VaultWrapper<Type> {
                 // vault with most up-to-date data first
                 let v = v
                     .into_iter()
-                    .map(|d| Ok((sort_key(&d.lifetime, sv_id)?, d)))
+                    .map(|d| Ok((sort_key(&d.lifetime, sv_id.as_ref())?, d)))
                     .collect::<FpResult<Vec<_>>>()?
                     .into_iter()
                     .sorted_by_key(|(key, _)| *key)
@@ -114,6 +114,7 @@ impl<Type> VaultWrapper<Type> {
             all_data: ordered_data,
             seqno,
             is_hydrated: PhantomData,
+            sv_id,
         };
         Ok(result)
     }
@@ -140,7 +141,7 @@ impl<Type> VaultWrapper<Type> {
         let data = DbVaultData::get_for(conn, &active_lifetime_ids)?;
         let documents = DocumentData::get_for(conn, &active_lifetime_ids)?;
 
-        let result = Self::build_internal(uv, seqno, data, documents, active_lifetimes, sv_id.as_ref())?;
+        let result = Self::build_internal(uv, seqno, data, documents, active_lifetimes, sv_id)?;
         Ok(result)
     }
 }

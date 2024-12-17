@@ -7,6 +7,7 @@ use db::models::vault_data::VaultData as DbVaultData;
 use db::HasLifetime;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeSeqno;
+use newtypes::ScopedVaultId;
 use std::collections::HashMap;
 use std::marker::PhantomData;
 
@@ -37,6 +38,7 @@ pub struct Any;
 #[derive(Debug, Clone)]
 pub struct VaultWrapper<Type = Any> {
     pub vault: Vault,
+    pub sv_id: Option<ScopedVaultId>,
     /// All VaultDatas for each DataIdentifier.
     /// When there are multiple VaultDatas for one DI, the most recent VaultData comes first.
     /// Generally should use the .data() util instead of accessing this directly

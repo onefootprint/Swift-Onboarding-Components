@@ -56,7 +56,8 @@ pub async fn post(
     let args = InitiateChallengeArgs {
         challenge_kind,
         tenant: tenant.as_ref(),
-        user_session: Some((token, session)),
+        user_token: Some(token),
+        user_session: Some(session),
         insight_headers,
     };
     let response = initiate_challenge(&state, ctx, args).await?;

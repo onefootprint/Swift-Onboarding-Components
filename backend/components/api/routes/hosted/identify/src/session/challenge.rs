@@ -2,6 +2,7 @@ use crate::session::requirements::get_requirements;
 use crate::utils::initiate_challenge;
 use crate::utils::InitiateChallengeArgs;
 use crate::State;
+use api_core::auth::session::GetSessionForUpdate;
 use api_core::auth::user::IdentifyAuthContext;
 use api_core::errors::error_with_code::ErrorWithCode;
 use api_core::telemetry::RootSpan;
@@ -45,11 +46,13 @@ pub async fn post(
 
     let ChallengeRequest { challenge_kind } = request.into_inner();
     let su = identify.su.clone();
+    let tenant = identify.data.tenant.clone();
     let ctx = get_user_auth_methods(&state, su.id.clone(), &[]).await?;
     let args = InitiateChallengeArgs {
         challenge_kind,
-        tenant: Some(&identify.tenant),
-        user_session: None,
+        tenant: Some(&tenant),
+        user_token: None,
+        user_session: Some(identify.session()),
         insight_headers,
     };
     let response = initiate_challenge(&state, ctx, args).await?;

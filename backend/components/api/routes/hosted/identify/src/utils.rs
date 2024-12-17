@@ -40,7 +40,8 @@ use webauthn_rs_proto::UserVerificationPolicy;
 pub(crate) struct InitiateChallengeArgs<'a> {
     pub challenge_kind: ChallengeKind,
     pub tenant: Option<&'a Tenant>,
-    pub user_session: Option<(SessionAuthToken, AuthSession)>,
+    pub user_token: Option<SessionAuthToken>,
+    pub user_session: Option<AuthSession>,
     pub insight_headers: InsightHeaders,
 }
 
@@ -52,6 +53,7 @@ pub(crate) async fn initiate_challenge<'a>(
     let InitiateChallengeArgs {
         challenge_kind,
         tenant,
+        user_token,
         user_session,
         insight_headers,
     } = args;
@@ -63,8 +65,6 @@ pub(crate) async fn initiate_challenge<'a>(
     else {
         return Err(ErrorWithCode::UnsupportedChallengeKind(challenge_kind.to_string()).into());
     };
-    let token = user_session.as_ref().map(|(token, _)| token.clone());
-
     let (rx, challenge_data, time_before_retry_s, biometric_challenge_json) = match auth_method.info {
         AuthMethodInfo::Passkey { passkeys } => {
             let challenge = initiate_passkey_login_challenge(state, passkeys)?;
@@ -81,16 +81,20 @@ pub(crate) async fn initiate_challenge<'a>(
             let e164 = phone.e164();
             let session_id = insight_headers.session_id.clone();
             let session_key = state.session_sealing_key.clone();
-            let (user_token, session) = user_session.ok_or(BadRequest(
-                "Cannot initiate sms_link challenge without user auth session token",
+            let uv_id = vault.id.clone();
+            let tenant_id = t.id.clone();
+            let session = user_session.ok_or(BadRequest(
+                "Cannot initiate sms_link challenge without user auth session",
             ))?;
             let ci_token = state
                 .db_query(move |conn| {
                     let insight_event = CreateInsightEvent::from(insight_headers).insert_with_conn(conn)?;
                     let session_data = ContactInfoVerifySessionData {
-                        user_token,
-                        auth_event_id: None,
+                        uv_id,
+                        su_id: ctx.vw.sv_id,
+                        tenant_id,
                         insight_event_id: insight_event.id,
+                        auth_event_id: None,
                     };
                     let (ci_token, _) =
                         session.create_derived(conn, &session_key, session_data.into(), None)?;
@@ -98,7 +102,7 @@ pub(crate) async fn initiate_challenge<'a>(
                 })
                 .await?;
             let url = (state.config.service_config).generate_link(LinkKind::ContactInfoVerify, &ci_token);
-            let v_id = Some(vault.id);
+            let v_id = Some(vault.id.clone());
             let rx = send_sms_link_challenge_non_blocking(state, t, phone, sandbox_id, v_id, session_id, url)
                 .await?;
             let data = SmsLinkChallengeState {
@@ -148,7 +152,7 @@ pub(crate) async fn initiate_challenge<'a>(
     let data = ChallengeState { data: challenge_data };
     let challenge_token = Challenge::new(data).seal(&state.challenge_sealing_key)?;
     let challenge_data = UserChallengeData {
-        token,
+        token: user_token,
         challenge_kind,
         challenge_token,
         biometric_challenge_json,

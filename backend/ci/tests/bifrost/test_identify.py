@@ -629,30 +629,28 @@ def test_sms_link(twilio, sandbox_tenant, live_phone_number):
     #
     # First, create a user with the live phone number
     #
-
     obc = sandbox_tenant.default_ob_config
 
-    data = dict(
-        phone_number=dict(value=live_phone_number),
-        scope="onboarding",
-        challenge_kind="sms_link",
-    )
+    data = {"id.phone_number": live_phone_number, "id.email": FIXTURE_EMAIL}
+    data = dict(data=data, scope="onboarding")
     sandbox_id = _gen_random_sandbox_id()
     sandbox_id_h = SandboxId(sandbox_id)
+    body = post("hosted/identify/session", data, obc.key, sandbox_id_h)
+    token = FpAuth(body["token"])
+
     session_id_h = SessionId(str(uuid4()))
+    data = dict(challenge_kind="sms_link")
     initiate_challenge = lambda: post(
-        "hosted/identify/signup_challenge", data, obc.key, sandbox_id_h, session_id_h
+        "hosted/identify/session/challenge", data, token, session_id_h
     )
     # Rate limiting may take a while
     body = try_until_success(initiate_challenge, 20)
-    token = FpAuth(body["challenge_data"]["token"])
 
     # Should not be able to verify yet since the link hasn't been clicked
-    verify_data = dict(
-        challenge_token=body["challenge_data"]["challenge_token"],
-        scope="onboarding",
+    verify_data = dict(challenge_token=body["challenge_data"]["challenge_token"])
+    body = post(
+        "hosted/identify/session/challenge/verify", verify_data, token, status_code=412
     )
-    body = post("hosted/identify/verify", verify_data, token, status_code=412)
     assert body["message"] == "Contact info is not yet verified"
     assert body["code"] == "E128"
 
@@ -672,7 +670,8 @@ def test_sms_link(twilio, sandbox_tenant, live_phone_number):
     post("hosted/identify/verify_contact_info", None, ci_token)
 
     # Now we should be able to verify
-    body = post("hosted/identify/verify", verify_data, token, sandbox_id_h)
+    post("hosted/identify/session/challenge/verify", verify_data, token)
+    body = post("hosted/identify/session/verify", None, token)
     auth_token = FpAuth(body["auth_token"])
 
     # Check that the validation token has the proper auth events
@@ -699,6 +698,7 @@ def test_sms_link(twilio, sandbox_tenant, live_phone_number):
     )
     # Rate limiting may take a while
     body = try_until_success(initiate_challenge, 20)
+    challenge_token = body["challenge_data"]["challenge_token"]
 
     (_, ci_token) = extract_sms_link_token(
         twilio, live_phone_number, sandbox_tenant, session_id_h.value
@@ -712,7 +712,8 @@ def test_sms_link(twilio, sandbox_tenant, live_phone_number):
     post("hosted/identify/verify_contact_info", None, ci_token)
 
     # Now we should be able to verify
-    body = post("hosted/identify/verify", verify_data, token, sandbox_id_h)
+    data = dict(challenge_token=challenge_token, scope="onboarding")
+    body = post("hosted/identify/verify", data, token, sandbox_id_h)
     auth_token = FpAuth(body["auth_token"])
 
 

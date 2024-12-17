@@ -1,5 +1,3 @@
-use super::ParsedUserSessionContext;
-use super::UserSessionContext;
 use crate::auth::session::user::ContactInfoVerifySessionData;
 use crate::auth::session::AllowSessionUpdate;
 use crate::auth::session::AuthSessionData;
@@ -7,12 +5,13 @@ use crate::auth::session::ExtractableAuthSession;
 use crate::auth::session::LoadSessionContext;
 use crate::auth::AuthError;
 use crate::auth::SessionContext;
-use crate::utils::session::AuthSession;
 use crate::FpResult;
+use db::models::scoped_vault::ScopedVault;
+use db::models::tenant::Tenant;
 use db::PgConn;
 use paperclip::actix::Apiv2Security;
 
-#[derive(Debug, Clone, Apiv2Security)]
+#[derive(Debug, Clone, Apiv2Security, derive_more::Deref)]
 #[openapi(
     apiKey,
     alias = "Async contact info verification token",
@@ -21,16 +20,10 @@ use paperclip::actix::Apiv2Security;
     description = "Short-lived auth token for async verification of contact info."
 )]
 pub struct ContactInfoVerifySession {
+    #[deref]
     pub data: ContactInfoVerifySessionData,
-    user_session: ParsedUserSessionContext,
-}
-
-impl std::ops::Deref for ContactInfoVerifySession {
-    type Target = UserSessionContext;
-
-    fn deref(&self) -> &Self::Target {
-        &self.user_session.0
-    }
+    pub tenant: Tenant,
+    pub su: Option<ScopedVault>,
 }
 
 impl ExtractableAuthSession for ContactInfoVerifySession {
@@ -38,24 +31,27 @@ impl ExtractableAuthSession for ContactInfoVerifySession {
         vec!["X-Fp-Authorization"]
     }
 
-    fn try_load_session(
-        conn: &mut PgConn,
-        value: AuthSessionData,
-        ctx: LoadSessionContext,
-    ) -> FpResult<Self> {
+    fn try_load_session(conn: &mut PgConn, value: AuthSessionData, _: LoadSessionContext) -> FpResult<Self> {
         let data = match value {
             AuthSessionData::ContactInfoVerify(data) => data,
             _ => return Err(AuthError::SessionTypeError.into()),
         };
-        let ContactInfoVerifySessionData { user_token, .. } = &data;
-        let user_session = AuthSession::get(conn, &ctx.sealing_key, user_token)?;
-        let user_session = ParsedUserSessionContext::try_load_session(conn, user_session.data, ctx)?;
+        let tenant = Tenant::get(conn, &data.tenant_id)?;
+        let su = (data.su_id.as_ref())
+            .map(|id| ScopedVault::get(conn, id))
+            .transpose()?;
 
-        Ok(ContactInfoVerifySession { user_session, data })
+        Ok(ContactInfoVerifySession { tenant, su, data })
     }
 
     fn log_authed_principal(&self, root_span: tracing_actix_web::RootSpan) {
-        self.user_session.log_authed_principal(root_span)
+        root_span.record("vault_id", self.uv_id.to_string());
+        root_span.record("tenant_id", self.tenant_id.to_string());
+        if let Some(su) = self.su.as_ref() {
+            root_span.record("fp_id", su.fp_id.to_string());
+            root_span.record("is_live", su.is_live);
+        }
+        root_span.record("auth_method", "contact_info_verify");
     }
 }
 

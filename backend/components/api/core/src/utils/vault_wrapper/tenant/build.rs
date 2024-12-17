@@ -100,7 +100,7 @@ impl<Type> VaultWrapper<Type> {
                     vds.get(&uv_id).cloned().unwrap_or_default(),
                     document_datas.get(&uv_id).cloned().unwrap_or_default(),
                     all_lifetimes.get(&uv_id).cloned().unwrap_or_default(),
-                    Some(&sv.id),
+                    Some(sv.id.clone()),
                 )?;
                 let sv_id = sv.id.clone();
                 let uvw = TenantVw {
