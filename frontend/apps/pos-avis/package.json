@@ -1,6 +1,6 @@
 {
   "name": "@onefootprint/pos-avis",
-  "version": "0.1.2",
+  "version": "0.0.1",
   "private": true,
   "dependencies": {
     "class-variance-authority": "^0.7.0",
