@@ -16,7 +16,7 @@ use paperclip::actix::{
 
 #[api_v2_operation(
     description = "Lists all access requests for the tenant",
-    tags(AccessRequests, Organization, Private)
+    tags(Dashboard, AccessRequests, Private)
 )]
 #[actix::get("/private/access_requests")]
 pub async fn list_access_requests(

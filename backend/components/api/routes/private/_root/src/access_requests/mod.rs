@@ -1,10 +1,10 @@
-use actix_web::web;
+use paperclip::actix::web::ServiceConfig;
 
 mod create;
 mod list;
 mod patch;
 
-pub fn configure(config: &mut web::ServiceConfig) {
+pub fn configure(config: &mut ServiceConfig) {
     config
         .service(create::create_access_request)
         .service(list::list_access_requests)

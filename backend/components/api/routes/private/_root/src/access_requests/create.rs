@@ -19,7 +19,7 @@ use paperclip::actix::{
 
 #[api_v2_operation(
     description = "Creates a new access request",
-    tags(AccessRequests, Organization, Private)
+    tags(Dashboard, AccessRequests, Private)
 )]
 #[actix::post("/private/access_requests")]
 pub async fn create_access_request(

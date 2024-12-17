@@ -18,7 +18,7 @@ use paperclip::actix::{
 
 #[api_v2_operation(
     description = "Updates an access request (e.g. to approve it or extend it's expiration time)",
-    tags(AccessRequests, Organization, Private)
+    tags(Dashboard, AccessRequests, Private)
 )]
 #[actix::patch("/private/access_requests/{request_id}")]
 pub async fn patch_access_request(

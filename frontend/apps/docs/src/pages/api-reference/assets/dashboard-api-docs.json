@@ -8782,6 +8782,129 @@
                 ]
             }
         },
+        "/private/access_requests": {
+            "get": {
+                "tags": [
+                    "Dashboard",
+                    "AccessRequests",
+                    "Private"
+                ],
+                "description": "Lists all access requests for the tenant",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "approved",
+                        "schema": {
+                            "type": "boolean"
+                        },
+                        "style": "form"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/AccessRequest"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Firm Employee Token": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Dashboard",
+                    "AccessRequests",
+                    "Private"
+                ],
+                "description": "Creates a new access request",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateAccessRequestRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AccessRequest"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Firm Employee Token": []
+                    }
+                ]
+            }
+        },
+        "/private/access_requests/{request_id}": {
+            "patch": {
+                "tags": [
+                    "Dashboard",
+                    "AccessRequests",
+                    "Private"
+                ],
+                "description": "Updates an access request (e.g. to approve it or extend it's expiration time)",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "request_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchAccessRequestRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AccessRequest"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Firm Employee Token": []
+                    }
+                ]
+            }
+        },
         "/ro_status": {
             "get": {
                 "tags": [
@@ -8909,6 +9032,12 @@
                 "name": "X-Fp-Dashboard-Authorization",
                 "description": "Short-lived auth token for a firm-employee dashboard user assuming a tenant."
             },
+            "Firm Employee Token": {
+                "type": "apiKey",
+                "in": "header",
+                "name": "X-Fp-Dashboard-Authorization",
+                "description": "Short-lived auth token for a firm-employee dashboard user."
+            },
             "Secret API Key": {
                 "type": "apiKey",
                 "in": "header",
@@ -8917,6 +9046,51 @@
             }
         },
         "schemas": {
+            "AccessRequest": {
+                "type": "object",
+                "properties": {
+                    "approved": {
+                        "type": "boolean"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "expires_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "id": {
+                        "type": "string"
+                    },
+                    "reason": {
+                        "type": "string"
+                    },
+                    "requester": {
+                        "type": "string"
+                    },
+                    "responded_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "responder": {
+                        "type": "string"
+                    },
+                    "scopes": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TenantScope"
+                        }
+                    }
+                },
+                "required": [
+                    "created_at",
+                    "expires_at",
+                    "id",
+                    "requester",
+                    "scopes"
+                ]
+            },
             "ActionKind": {
                 "type": "string",
                 "enum": [
@@ -11168,6 +11342,33 @@
             },
             "CountrySpecificDocumentMapping": {
                 "type": "object"
+            },
+            "CreateAccessRequestRequest": {
+                "type": "object",
+                "properties": {
+                    "duration_hours": {
+                        "description": "Duration in hours for how long the access is needed, defaults to 8 hours",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "reason": {
+                        "type": "string"
+                    },
+                    "scopes": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TenantScope"
+                        }
+                    },
+                    "tenant_id": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "duration_hours",
+                    "scopes",
+                    "tenant_id"
+                ]
             },
             "CreateAnnotationRequest": {
                 "type": "object",
@@ -17622,6 +17823,17 @@
                     "domains",
                     "id",
                     "name"
+                ]
+            },
+            "PatchAccessRequestRequest": {
+                "type": "object",
+                "properties": {
+                    "approved": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "approved"
                 ]
             },
             "PatchProxyConfigRequest": {

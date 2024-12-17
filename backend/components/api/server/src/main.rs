@@ -86,6 +86,8 @@ async fn run_api_server(config: Config, state: State) -> FpResult<()> {
     let meter = opentelemetry_api::global::meter("actix_web");
     let request_metrics = RequestMetricsBuilder::new().build(meter);
 
+    let is_local = state.config.service_config.is_local();
+
     HttpServer::new(move || {
         let cors: actix_cors::Cors = actix_cors::Cors::default()
             .allow_any_origin()
@@ -133,7 +135,7 @@ async fn run_api_server(config: Config, state: State) -> FpResult<()> {
             ..Default::default()
         };
 
-        App::new()
+        let app = App::new()
             .app_data(web::Data::new(state.clone()))
             .wrap_fn(|req, srv| {
                 // Set a timeout slightly below the ALB timeout to ensure that the API server
@@ -174,11 +176,18 @@ async fn run_api_server(config: Config, state: State) -> FpResult<()> {
             .configure(api_route_private_protected::configure)
             .wrap_api_with_spec(spec)
             .configure(api_routes_root::configure)
-            .with_json_spec_at("docs-spec")
-            .with_json_spec_v3_at("docs-spec-v3")
-            .with_rapidoc_at("docs-ui")
-            .default_service(actix_web::web::to(default_not_found))
-            .build()
+            .configure(api_route_private_root::configure_super_admin_dashboard)
+            .default_service(actix_web::web::to(default_not_found));
+
+        // only generate openapi specs for local server running
+        if is_local {
+            app.with_json_spec_at("docs-spec")
+                .with_json_spec_v3_at("docs-spec-v3")
+                .with_rapidoc_at("docs-ui")
+                .build()
+        } else {
+            app.build()
+        }
     })
     // Our loadbalancer has a keep alive idle timeout of 60s. To make sure that the target doesn't
     // time out while the loadbalancer is waiting for a response, increase the keep alive timeout

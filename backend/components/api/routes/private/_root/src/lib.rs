@@ -33,5 +33,10 @@ pub fn configure(config: &mut actix_web::web::ServiceConfig) {
         .service(vault_dr_test_backfill::post);
 
     tenants::configure(config);
+}
+
+/// configures routes for which we generate OpenAPI specs
+/// TODO: migrate cleanup, entities, assume, test_tenant to use paperclip
+pub fn configure_super_admin_dashboard(config: &mut paperclip::actix::web::ServiceConfig) {
     access_requests::configure(config);
 }
