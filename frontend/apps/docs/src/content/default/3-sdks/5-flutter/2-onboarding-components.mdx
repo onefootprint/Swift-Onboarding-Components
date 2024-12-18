@@ -269,11 +269,11 @@ Next we create challenge based on the response from the previous step. We have a
 
 - `footprintUtils(context).isReadyForAuth` tells you whether the SDK is ready to create an auth challenge.
 - `FootprintOtp` is a widget that provides a set of OTP utils: `createAuthTokenBasedChallenge` , `createEmailPhoneBasedChallenge` , and `verifyOtpChallenge` (we will talk about verification in the next step).
-- In rare cases when we don’t support inline OTP, we throw `InlineOtpNotSupportedException` . You can use `footprintUtils(context).launchIdentify` to launch the OTP flow on the webview in those cases.
+- In rare cases when we don’t support inline OTP, we throw `FootprintError` with kind `inlineOtpNotSupported` . You can use `footprintUtils(context).launchIdentify` to launch the OTP flow on the webview in those cases.
 
 Additionally, to collect email and phone from the user, we need to create a form with the user's email and phone number using a set of form, field, and input widgets we provide with our SDK. Our widgets are raw, meaning that you have to provide necessary styles to match your application's design.
 
-```dart highlight="127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 108, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90"
+```dart highlight="127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 108, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90"
 import 'package:flutter/material.dart';
 import 'package:footprint_flutter/footprint_flutter.dart';
 
@@ -420,14 +420,16 @@ class _IdentifyState extends State<Identify> {
             otpUtils.createAuthTokenBasedChallenge().then((challengeKind) {
               handleChallengeCreated(challengeKind);
             }).catchError(
-              (_) {
-                footprintUtils(context).launchIdentify(
-                    onAuthenticated: (verificationResult) {
-                  widget.handleAuthenticated(verificationResult);
-                } // Don't pass email and phone number - it's going to use auth token
-                    );
-              },
-              test: (err) => err is InlineOtpNotSupportedException,
+              (err) {
+                if (err is FootprintError &&
+                  err.kind == ErrorKind.inlineOtpNotSupported) {
+                  footprintUtils(context).launchIdentify(
+                      onAuthenticated: (verificationResult) {
+                    widget.handleAuthenticated(verificationResult);
+                  } // Don't pass email and phone number - it's going to use auth token
+                      );
+                }
+              }
             );
             return const Center(child: CircularProgressIndicator());
           }
@@ -487,16 +489,18 @@ class _IdentifyState extends State<Identify> {
                 .then((challegeKind) {
               handleChallengeCreated(challegeKind);
             }).catchError(
-              (_) {
-                footprintUtils(context).launchIdentify(
-                  email: formData.email,
-                  phoneNumber: formData.phoneNumber,
-                  onAuthenticated: (verificationResult) {
-                    widget.handleAuthenticated(verificationResult);
-                  },
-                );
-              },
-              test: (err) => err is InlineOtpNotSupportedException,
+              (err) {
+                if (err is FootprintError &&
+                  err.kind == ErrorKind.inlineOtpNotSupported) {
+                  footprintUtils(context).launchIdentify(
+                    email: formData.email,
+                    phoneNumber: formData.phoneNumber,
+                    onAuthenticated: (verificationResult) {
+                      widget.handleAuthenticated(verificationResult);
+                    },
+                  );
+                }
+              }
             );
           });
         }
@@ -511,7 +515,7 @@ class _IdentifyState extends State<Identify> {
 
 Finally we need to verify the challenge using `verifyOtpChallenge` returns a `verificationResult`.
 
-```dart highlight="134, 135, 136, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259"
+```dart highlight="134, 135, 136, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 263"
 import 'package:flutter/material.dart';
 import 'package:footprint_flutter/footprint_flutter.dart';
 
@@ -662,14 +666,16 @@ class _IdentifyState extends State<Identify> {
             otpUtils.createAuthTokenBasedChallenge().then((challengeKind) {
               handleChallengeCreated(challengeKind);
             }).catchError(
-              (_) {
-                footprintUtils(context).launchIdentify(
-                    onAuthenticated: (verificationResult) {
-                  widget.handleAuthenticated(verificationResult);
-                } // Don't pass email and phone number - it's going to use auth token
-                    );
-              },
-              test: (err) => err is InlineOtpNotSupportedException,
+              (err) {
+                if (err is FootprintError &&
+                  err.kind == ErrorKind.inlineOtpNotSupported) {
+                  footprintUtils(context).launchIdentify(
+                      onAuthenticated: (verificationResult) {
+                    widget.handleAuthenticated(verificationResult);
+                  } // Don't pass email and phone number - it's going to use auth token
+                      );
+                }
+              }
             );
             return const Center(child: CircularProgressIndicator());
           }
@@ -743,16 +749,18 @@ class _IdentifyState extends State<Identify> {
                 .then((challegeKind) {
               handleChallengeCreated(challegeKind);
             }).catchError(
-              (_) {
-                footprintUtils(context).launchIdentify(
-                  email: formData.email,
-                  phoneNumber: formData.phoneNumber,
-                  onAuthenticated: (verificationResult) {
-                    widget.handleAuthenticated(verificationResult);
-                  },
-                );
-              },
-              test: (err) => err is InlineOtpNotSupportedException,
+              (err) {
+                if (err is FootprintError &&
+                  err.kind == ErrorKind.inlineOtpNotSupported) {
+                    footprintUtils(context).launchIdentify(
+                      email: formData.email,
+                      phoneNumber: formData.phoneNumber,
+                      onAuthenticated: (verificationResult) {
+                        widget.handleAuthenticated(verificationResult);
+                      },
+                    );
+                }
+              }
             );
           });
         }
@@ -785,7 +793,7 @@ Once the authentication is completed, you can start collecting user data.
 
 The data collection form is constructed similarly to the identification form.
 
-```dart highlight="4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 299, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311, 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 330, 331, 332, 333, 334, 335, 336, 337, 338, 339, 340, 341, 342, 343, 344, 345, 346, 347, 348, 349, 350, 351, 352, 353, 354, 355, 356, 357, 358, 359, 360, 361, 362, 363, 364, 365, 366, 367, 368, 369, 370"
+```dart highlight="4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 303, 304, 305, 306, 307, 308, 309, 310, 311, 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 330, 331, 332, 333, 334, 335, 336, 337, 338, 339, 340, 341, 342, 343, 344, 345, 346, 347, 348, 349, 350, 351, 352, 353, 354, 355, 356, 357, 358, 359, 360, 361, 362, 363, 364, 365, 366, 367, 368, 369, 370, 371, 372, 373, 374"
 import 'package:flutter/material.dart';
 import 'package:footprint_flutter/footprint_flutter.dart';
 
@@ -970,14 +978,16 @@ class _IdentifyState extends State<Identify> {
             otpUtils.createAuthTokenBasedChallenge().then((challengeKind) {
               handleChallengeCreated(challengeKind);
             }).catchError(
-              (_) {
-                footprintUtils(context).launchIdentify(
-                    onAuthenticated: (verificationResult) {
-                  widget.handleAuthenticated(verificationResult);
-                } // Don't pass email and phone number - it's going to use auth token
-                    );
-              },
-              test: (err) => err is InlineOtpNotSupportedException,
+              (err) {
+                if (err is FootprintError &&
+                  err.kind == ErrorKind.inlineOtpNotSupported) {
+                  footprintUtils(context).launchIdentify(
+                      onAuthenticated: (verificationResult) {
+                    widget.handleAuthenticated(verificationResult);
+                  } // Don't pass email and phone number - it's going to use auth token
+                      );
+                }
+              }
             );
             return const Center(child: CircularProgressIndicator());
           }
@@ -1051,16 +1061,18 @@ class _IdentifyState extends State<Identify> {
                 .then((challegeKind) {
               handleChallengeCreated(challegeKind);
             }).catchError(
-              (_) {
-                footprintUtils(context).launchIdentify(
-                  email: formData.email,
-                  phoneNumber: formData.phoneNumber,
-                  onAuthenticated: (verificationResult) {
-                    widget.handleAuthenticated(verificationResult);
-                  },
-                );
-              },
-              test: (err) => err is InlineOtpNotSupportedException,
+              (err) {
+                if (err is FootprintError &&
+                  err.kind == ErrorKind.inlineOtpNotSupported) {
+                  footprintUtils(context).launchIdentify(
+                    email: formData.email,
+                    phoneNumber: formData.phoneNumber,
+                    onAuthenticated: (verificationResult) {
+                      widget.handleAuthenticated(verificationResult);
+                    },
+                  );
+                }
+              }
             );
           });
         }
@@ -1162,7 +1174,7 @@ class DataCollection extends StatelessWidget {
 
 You can save the collected calling the `vault` function which can be accessed by calling `footprintUtils` function.
 
-```dart highlight="305, 306, 307, 308, 309, 310, 311, 312, 313, 314, 315, 316, 317"
+```dart highlight="309, 310, 311, 312, 313, 314, 315, 316, 317, 318, 319, 320, 321"
 import 'package:flutter/material.dart';
 import 'package:footprint_flutter/footprint_flutter.dart';
 
@@ -1347,14 +1359,16 @@ class _IdentifyState extends State<Identify> {
             otpUtils.createAuthTokenBasedChallenge().then((challengeKind) {
               handleChallengeCreated(challengeKind);
             }).catchError(
-              (_) {
-                footprintUtils(context).launchIdentify(
-                    onAuthenticated: (verificationResult) {
-                  widget.handleAuthenticated(verificationResult);
-                } // Don't pass email and phone number - it's going to use auth token
-                    );
-              },
-              test: (err) => err is InlineOtpNotSupportedException,
+              (err) {
+                if (err is FootprintError &&
+                  err.kind == ErrorKind.inlineOtpNotSupported) {
+                  footprintUtils(context).launchIdentify(
+                      onAuthenticated: (verificationResult) {
+                    widget.handleAuthenticated(verificationResult);
+                  } // Don't pass email and phone number - it's going to use auth token
+                      );
+                }
+              }
             );
             return const Center(child: CircularProgressIndicator());
           }
@@ -1428,16 +1442,18 @@ class _IdentifyState extends State<Identify> {
                 .then((challegeKind) {
               handleChallengeCreated(challegeKind);
             }).catchError(
-              (_) {
-                footprintUtils(context).launchIdentify(
-                  email: formData.email,
-                  phoneNumber: formData.phoneNumber,
-                  onAuthenticated: (verificationResult) {
-                    widget.handleAuthenticated(verificationResult);
-                  },
-                );
-              },
-              test: (err) => err is InlineOtpNotSupportedException,
+              (err) {
+                if (err is FootprintError &&
+                  err.kind == ErrorKind.inlineOtpNotSupported) {
+                  footprintUtils(context).launchIdentify(
+                    email: formData.email,
+                    phoneNumber: formData.phoneNumber,
+                    onAuthenticated: (verificationResult) {
+                      widget.handleAuthenticated(verificationResult);
+                    },
+                  );
+                }
+              }
             );
           });
         }
@@ -1554,9 +1570,9 @@ The `vault` function can be called with one or more data fields meaning you can 
 Once all the data are collected, we need to finalizing the onboarding. We can verify if all the data are collected by checking the response from `footprintUtils(context).getRequirements()`. In order to finalize the onboarding, we have two options:
 
 - If all requirements are completed and there is no passkey and id-doc requirements, we can call `footprintUtils(context).process()` for process the onbaording inline. `footprintUtils(context).process()` return a validation token.
-- `footprintUtils(context).process()` will throw an `InlineProcessException` if all requirements are not completed or if inline process is not supported for this case. If that happens you can handoff to Footprint's flow to finalize the onboarding: we'll collect any missing data, as well as register passkeys (if needed) and finalize the onboarding sending you a validation token. You can handoff to Footprint’s flow calling the `handoff` function which can be accessed by calling `footprintUtils` function.
+- `footprintUtils(context).process()` will throw an `FootprintError` with `inlineProcessNotSupported` if all requirements are not completed or if inline process is not supported for this case. If that happens you can handoff to Footprint's flow to finalize the onboarding: we'll collect any missing data, as well as register passkeys (if needed) and finalize the onboarding sending you a validation token. You can handoff to Footprint’s flow calling the `handoff` function which can be accessed by calling `footprintUtils` function.
 
-```dart highlight="91,92,93, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 324, 325, 326, 327, 328, 329, 330, 331, 332, 333, 334, 335, 336"
+```dart highlight="91,92,93, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 328, 329, 330, 331, 332, 333, 334, 335, 336, 337, 338, 339, 340, 341, 342"
 import 'package:flutter/material.dart';
 import 'package:footprint_flutter/footprint_flutter.dart';
 
@@ -1754,14 +1770,16 @@ class _IdentifyState extends State<Identify> {
             otpUtils.createAuthTokenBasedChallenge().then((challengeKind) {
               handleChallengeCreated(challengeKind);
             }).catchError(
-              (_) {
-                footprintUtils(context).launchIdentify(
-                    onAuthenticated: (verificationResult) {
-                  widget.handleAuthenticated(verificationResult);
-                } // Don't pass email and phone number - it's going to use auth token
-                    );
-              },
-              test: (err) => err is InlineOtpNotSupportedException,
+              (err) {
+                if (err is FootprintError &&
+                  err.kind == ErrorKind.inlineOtpNotSupported) {
+                  footprintUtils(context).launchIdentify(
+                      onAuthenticated: (verificationResult) {
+                    widget.handleAuthenticated(verificationResult);
+                  } // Don't pass email and phone number - it's going to use auth token
+                      );
+                }
+              }
             );
             return const Center(child: CircularProgressIndicator());
           }
@@ -1835,16 +1853,18 @@ class _IdentifyState extends State<Identify> {
                 .then((challegeKind) {
               handleChallengeCreated(challegeKind);
             }).catchError(
-              (_) {
-                footprintUtils(context).launchIdentify(
-                  email: formData.email,
-                  phoneNumber: formData.phoneNumber,
-                  onAuthenticated: (verificationResult) {
-                    widget.handleAuthenticated(verificationResult);
-                  },
-                );
-              },
-              test: (err) => err is InlineOtpNotSupportedException,
+              (err) {
+                if (err is FootprintError &&
+                  err.kind == ErrorKind.inlineOtpNotSupported) {
+                  footprintUtils(context).launchIdentify(
+                    email: formData.email,
+                    phoneNumber: formData.phoneNumber,
+                    onAuthenticated: (verificationResult) {
+                      widget.handleAuthenticated(verificationResult);
+                    },
+                  );
+                }
+              }
             );
           });
         }
@@ -1884,13 +1904,15 @@ class DataCollection extends StatelessWidget {
           onCompleted(vTok);
         }).catchError(
           (error) {
-            footprintUtils(context).handoff(
-              onComplete: (validationToken) => onCompleted(validationToken),
-              onCancel: () => print("Handoff Cancelled"),
-              onError: (err) => print("Handoff Error $err"),
-            );
-          },
-          test: (error) => error is InlineProcessException,
+            if (error is FootprintError &&
+              error.kind == ErrorKind.inlineProcessNotSupported){
+              footprintUtils(context).handoff(
+                onComplete: (validationToken) => onCompleted(validationToken),
+                onCancel: () => print("Handoff Cancelled"),
+                onError: (err) => print("Handoff Error $err"),
+              );
+            }
+          }
         );
       },
     ).catchError(
