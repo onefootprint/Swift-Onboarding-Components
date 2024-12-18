@@ -1,5 +1,6 @@
 use self::response::PaResponse;
 use crate::idology::error::Error as IdologyError;
+use crate::RawResponseWrapper;
 use newtypes::vendor_credentials::IdologyCredentials;
 use newtypes::IdvData;
 use newtypes::PiiJsonValue;
@@ -13,20 +14,17 @@ pub struct IdologyPaRequest {
     pub tenant_identifier: String,
 }
 
-pub struct IdologyPaAPIResponse {
-    pub raw_response: PiiJsonValue,
-    pub result: Result<PaResponse, IdologyError>,
-}
+pub type IdologyPaAPIResponse = RawResponseWrapper<PaResponse, IdologyError>;
 
 impl IdologyPaAPIResponse {
     pub fn from_response(raw_response: PiiJsonValue) -> Self {
-        let result = || {
+        let parse_response = || {
             let parsed_response = crate::idology::pa::response::parse_response(raw_response.leak().clone())?;
             parsed_response.response.validate()?;
             Ok(parsed_response)
         };
-        let result = result();
-        Self { result, raw_response }
+        let parsed = parse_response();
+        Self { raw_response, parsed }
     }
 }
 

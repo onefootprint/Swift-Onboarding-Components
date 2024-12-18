@@ -14,7 +14,6 @@ use std::fmt::Display;
 
 pub mod build_request;
 pub mod fp_device_attestation;
-pub mod idology;
 pub mod incode;
 pub mod kyc;
 pub mod middesk;

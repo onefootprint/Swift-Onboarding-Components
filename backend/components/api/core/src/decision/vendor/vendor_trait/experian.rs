@@ -3,12 +3,8 @@ use super::VendorAPIResponse;
 use async_trait::async_trait;
 use idv::experian::ExperianCrossCoreRequest;
 use idv::experian::ExperianCrossCoreResponse;
-use idv::experian::{
-    self,
-};
 use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::ParsedResponse;
-use newtypes::PiiJsonValue;
 use newtypes::VendorAPI;
 ////////////////////
 /// Experian Impl
@@ -23,19 +19,8 @@ impl VendorAPICall<ExperianCrossCoreRequest, ExperianCrossCoreResponse, idv::exp
         request: ExperianCrossCoreRequest,
     ) -> Result<ExperianCrossCoreResponse, idv::experian::error::Error> {
         let raw_response = idv::experian::cross_core::send_precise_id_request(self, request).await?;
-        // catch errors that cannot be deserialized
-        let parsed_response = experian::cross_core::response::parse_response(raw_response.clone())
-            .map_err(|e| e.into_error_with_response(raw_response.clone()))?;
-
-        // catch errors that come from deserialized response validations
-        parsed_response
-            .validate()
-            .map_err(|e| e.into_error_with_response(raw_response.clone()))?;
-
-        Ok(ExperianCrossCoreResponse {
-            raw_response: PiiJsonValue::new(raw_response),
-            parsed_response,
-        })
+        let response = ExperianCrossCoreResponse::from_response(raw_response);
+        Ok(response)
     }
 }
 
@@ -49,6 +34,10 @@ impl VendorAPIResponse for ExperianCrossCoreResponse {
     }
 
     fn parsed_response(&self) -> ParsedResponse {
-        ParsedResponse::ExperianPreciseID(self.parsed_response.clone())
+        match &self.parsed {
+            Ok(res) => ParsedResponse::ExperianPreciseID(res.clone()),
+            // TODO: rm or fix
+            Err(_) => ParsedResponse::IncodeRawResponse(self.raw_response.clone()),
+        }
     }
 }

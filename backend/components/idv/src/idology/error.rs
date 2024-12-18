@@ -28,20 +28,11 @@ pub enum Error {
     ScanVerifyDocumentSubmissionNotSuccessful,
     #[error("Credentials for tenant not configured")]
     CredentialsNotFound,
-    #[error("Parsable APIError {0}")]
-    ErrorWithResponse(Box<ErrorWithResponse>),
 }
 
 impl Error {
     pub fn should_retry_request(&self) -> bool {
         matches!(&self, Error::DocumentResultsNotReady | Error::ReqwestError(_))
-    }
-
-    pub fn into_error_with_response(self, response: serde_json::Value) -> Self {
-        Self::ErrorWithResponse(Box::new(ErrorWithResponse {
-            error: self,
-            response: response.into(),
-        }))
     }
 }
 

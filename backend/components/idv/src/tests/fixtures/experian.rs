@@ -11,6 +11,6 @@ pub fn create_response(ssn_result_code: Option<&str>, score: Option<&str>) -> Ex
     // println!("fuck2: {:#?}", fuck2);
     ExperianCrossCoreResponse {
         raw_response: PiiJsonValue::from(fuck),
-        parsed_response: r,
+        parsed: Ok(r),
     }
 }

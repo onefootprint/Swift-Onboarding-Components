@@ -44,7 +44,6 @@ use db::CursorPagination;
 use db::TxnPgConn;
 use db_schema::schema::document_request;
 use diesel::prelude::*;
-use idv::experian::ExperianCrossCoreRequest;
 use idv::experian::ExperianCrossCoreResponse;
 use idv::idology::IdologyExpectIDAPIResponse;
 use idv::idology::IdologyExpectIDRequest;
@@ -370,11 +369,7 @@ pub fn mock_idology_pa_hit(state: &mut State, aml_kinds: Vec<AmlKind>) {
             AmlKind::Am => panic!("idology cannot return adverse media hits"),
         })
         .collect();
-    let mut mock_idology_expect_id = MockVendorAPICall::<
-        IdologyExpectIDRequest,
-        IdologyExpectIDAPIResponse,
-        idv::idology::error::Error,
-    >::new();
+    let mut mock_idology_expect_id = MockVendorAPICall::new();
     mock_idology_expect_id
         .expect_make_request()
         .times(1)
@@ -388,43 +383,35 @@ pub fn mock_idology_pa_hit(state: &mut State, aml_kinds: Vec<AmlKind>) {
     state.set_idology_expect_id(Arc::new(mock_idology_expect_id));
 }
 
-fn mock_idology_error(state: &mut State, error: idv::idology::error::Error) {
-    let mut mock_idology_expect_id = MockVendorAPICall::<
-        IdologyExpectIDRequest,
-        IdologyExpectIDAPIResponse,
-        idv::idology::error::Error,
-    >::new();
+pub fn mock_idology_hard_error(state: &mut State) {
+    let mut mock_idology_expect_id = MockVendorAPICall::new();
     mock_idology_expect_id
         .expect_make_request()
         .times(1)
-        .return_once(move |_| Err(error));
+        .return_once(move |_| Err(idv::idology::error::Error::UnknownError("oops".to_owned())));
     state.set_idology_expect_id(Arc::new(mock_idology_expect_id));
 }
 
-pub fn mock_idology_hard_error(state: &mut State) {
-    mock_idology_error(state, idv::idology::error::Error::UnknownError("oops".to_owned()));
-}
-
 pub fn mock_idology_parseable_error(state: &mut State) {
-    mock_idology_error(
-        state,
-        idv::idology::error::Error::ErrorWithResponse(Box::new(idv::idology::error::ErrorWithResponse {
-            error: idv::idology::error::Error::UnknownError("Last name is too short yo".to_owned()),
-            response: PiiJsonValue::new(
+    let mut mock_idology_expect_id = MockVendorAPICall::new();
+    mock_idology_expect_id
+        .expect_make_request()
+        .times(1)
+        .return_once(move |_| {
+            Ok(IdologyExpectIDAPIResponse{
+                raw_response:PiiJsonValue::new(
                 serde_json::json!({"response":{"error":"Last name is too short","id-scan":null,"results":null,"id-number":null,"qualifiers":null,"restriction":null,"summary-result":null}}),
             ),
-        })),
-    );
+            parsed: Err(idv::idology::error::Error::UnknownError("Last name is too short yo".to_owned())),
+            })
+        });
+    state.set_idology_expect_id(Arc::new(mock_idology_expect_id));
 }
 
 pub struct WithSsnResultCode(pub Option<&'static str>);
 pub struct WithScore(pub Option<&'static str>);
 pub fn mock_experian(state: &mut State, ssn_result_code: WithSsnResultCode, score: WithScore) {
-    let mut mock_experian = MockVendorAPICall::<
-        ExperianCrossCoreRequest,
-        ExperianCrossCoreResponse,
-        idv::experian::error::Error,
-    >::new();
+    let mut mock_experian = MockVendorAPICall::new();
     mock_experian
         .expect_make_request()
         .times(1)
@@ -437,38 +424,34 @@ pub fn mock_experian(state: &mut State, ssn_result_code: WithSsnResultCode, scor
     state.set_experian_cross_core(Arc::new(mock_experian));
 }
 
-fn mock_experian_error(state: &mut State, error: idv::experian::error::Error) {
-    let mut mock_experian = MockVendorAPICall::<
-        ExperianCrossCoreRequest,
-        ExperianCrossCoreResponse,
-        idv::experian::error::Error,
-    >::new();
+pub fn mock_experian_hard_error(state: &mut State) {
+    let mut mock_experian = MockVendorAPICall::new();
     mock_experian
         .expect_make_request()
         .times(1)
-        .return_once(move |_| Err(error));
+        .return_once(move |_| Err(idv::experian::error::Error::UserNamePasswordError));
     state.set_experian_cross_core(Arc::new(mock_experian));
 }
 
-pub fn mock_experian_hard_error(state: &mut State) {
-    mock_experian_error(state, idv::experian::error::Error::UserNamePasswordError);
-}
-
 pub fn mock_experian_parseable_error(state: &mut State) {
-    mock_experian_error(
-        state,
-        idv::experian::error::Error::ErrorWithResponse(Box::new(idv::experian::error::ErrorWithResponse {
-            error: idv::experian::error::Error::ResponseError(
-                idv::experian::error::CrossCoreResponseError::Error(
-                    idv::experian::cross_core::error_code::ErrorCode::InvalidSurname,
-                    "018".to_owned(),
+    let mut mock_experian = MockVendorAPICall::new();
+    mock_experian
+        .expect_make_request()
+        .times(1)
+        .return_once(move |_| {
+            Ok(ExperianCrossCoreResponse {
+                raw_response: PiiJsonValue::new(
+                    serde_json::json!({"responseHeader":{"category":null,"tenantId":"abc123","messageTime":"2023-11-29T15:31:06Z","requestType":"PreciseIdOnly","expRequestId":"abc123","responseCode":"R0201","responseType":"INFO","overallResponse":{"score":null,"decision":null,"decisionText":null,"spareObjects":[],"decisionReasons":[],"recommendedNextActions":[]},"responseMessage":"Workflow Complete.","clientReferenceId":"vreq_abc"},"clientResponsePayload":{"decisionElements":[{"matches":null,"decisions":null,"otherData":{"json":{"fraudSolutions":{"response":{"products":{"preciseIdServer":{"error":{"errorCode":"106","reportDate":"11292023","reportTime":"093108","actionIndicator":{"code":"C","value":""},"referenceNumber":"vreq_abc","errorDescription":"Invalid surname"},"header":"<SCRUBBED>","summary":null,"glbDetail":null,"ipAddress":"<SCRUBBED>","onFileSsn":"<SCRUBBED>","sessionId":null,"preciseMatch":null,"pidxmlversion":"06.00"},"customerManagement":null}}}}},"applicantId":"Contact1","serviceName":"PreciseId","warningsErrors":[{"responseCode":"106","responseType":"ERROR","responseMessage":"Invalid surname"}],"normalizedScore":-1}],"orchestrationDecisions":[]}}),
                 ),
-            ),
-            response: PiiJsonValue::new(
-                serde_json::json!({"responseHeader":{"category":null,"tenantId":"abc123","messageTime":"2023-11-29T15:31:06Z","requestType":"PreciseIdOnly","expRequestId":"abc123","responseCode":"R0201","responseType":"INFO","overallResponse":{"score":null,"decision":null,"decisionText":null,"spareObjects":[],"decisionReasons":[],"recommendedNextActions":[]},"responseMessage":"Workflow Complete.","clientReferenceId":"vreq_abc"},"clientResponsePayload":{"decisionElements":[{"matches":null,"decisions":null,"otherData":{"json":{"fraudSolutions":{"response":{"products":{"preciseIdServer":{"error":{"errorCode":"106","reportDate":"11292023","reportTime":"093108","actionIndicator":{"code":"C","value":""},"referenceNumber":"vreq_abc","errorDescription":"Invalid surname"},"header":"<SCRUBBED>","summary":null,"glbDetail":null,"ipAddress":"<SCRUBBED>","onFileSsn":"<SCRUBBED>","sessionId":null,"preciseMatch":null,"pidxmlversion":"06.00"},"customerManagement":null}}}}},"applicantId":"Contact1","serviceName":"PreciseId","warningsErrors":[{"responseCode":"106","responseType":"ERROR","responseMessage":"Invalid surname"}],"normalizedScore":-1}],"orchestrationDecisions":[]}}),
-            ),
-        })),
-    );
+                parsed: Err(idv::experian::error::Error::ResponseError(
+                    idv::experian::error::CrossCoreResponseError::Error(
+                        idv::experian::cross_core::error_code::ErrorCode::InvalidSurname,
+                        "018".to_owned(),
+                    ),
+                )),
+            })
+        });
+    state.set_experian_cross_core(Arc::new(mock_experian));
 }
 
 pub fn mock_twilio(state: &mut State) {

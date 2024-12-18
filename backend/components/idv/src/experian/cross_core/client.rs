@@ -489,7 +489,7 @@ mod tests {
         };
 
         let res = send_precise_id_request(&fp_client, request).await.unwrap();
-        let resp: CrossCoreAPIResponse = serde_json::from_value(res).unwrap();
+        let resp: CrossCoreAPIResponse = serde_json::from_value(res.into_leak()).unwrap();
 
         resp.precise_id_response().unwrap().score().unwrap();
     }

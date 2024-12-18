@@ -10,6 +10,7 @@ use db::models::verification_result::VerificationResult;
 use db::DbError;
 use db::DbPool;
 use db::PgConn;
+use idv::RawResponseWrapper;
 use idv::VendorResponse;
 use newtypes::DecisionIntentId;
 use newtypes::DocumentId;
@@ -59,29 +60,16 @@ pub fn save_verification_results(
 pub fn save_error_verification_result(
     conn: &mut PgConn,
     req: VerificationRequest,
-    response: Option<PiiJsonValue>,
-    user_vault_public_key: &VaultPublicKey, // passed in so unit testing is easier
 ) -> FpResult<VerificationResult> {
     let now = Utc::now();
-    let (e_response, scrubbed_response) = if let Some(raw_json) = response {
-        let e_response = encrypt_verification_result_response(&raw_json, user_vault_public_key)?;
-        (
-            Some(e_response),
-            // there's a ton of PII potentially and it's too hard to keep this scrubbing stuff in
-            // sync with both success/error API responses
-            ScrubbedPiiVendorResponse::from(serde_json::json!({})),
-        )
-    } else {
-        // response is non-optional on vres. This is a hack
-        let empty_response = ScrubbedPiiVendorResponse::from(serde_json::json!({}));
-        (None, empty_response)
-    };
+    // response is non-optional on vres. This is a hack
+    let empty_response = ScrubbedPiiVendorResponse::from(serde_json::json!({}));
 
     let new_vres = NewVerificationResult {
         request_id: req.id.clone(),
-        response: scrubbed_response,
+        response: empty_response,
         timestamp: now,
-        e_response,
+        e_response: None,
         is_error: true,
     };
 
@@ -151,32 +139,15 @@ pub fn save_vreq_and_vres(
     Ok((vreq, vres))
 }
 
-pub fn save_vres(
+pub fn save_vres<E>(
     conn: &mut PgConn,
     public_key: &VaultPublicKey,
-    vendor_result: &Result<VendorResponse, VendorAPIError>,
+    vendor_result: &Result<VendorResponse, E>,
     vreq: &VerificationRequest,
 ) -> FpResult<VerificationResult> {
     match vendor_result {
         Ok(vr) => save_verification_result(conn, &(vreq.clone(), vr.clone()), public_key),
-        Err(e) => {
-            let json = vendor_api_error_to_json(e);
-            save_error_verification_result(conn, vreq.clone(), json, public_key)
-        }
-    }
-}
-
-// TODO: extend this to more vendors?
-fn vendor_api_error_to_json(vendor_api_error: &VendorAPIError) -> Option<PiiJsonValue> {
-    // TODO: can i remove these? and then use FpResult
-    match &vendor_api_error.error {
-        idv::Error::IDologyError(idv::idology::error::Error::ErrorWithResponse(e)) => {
-            Some(e.response.clone())
-        }
-        idv::Error::ExperianError(idv::experian::error::Error::ErrorWithResponse(e)) => {
-            Some(e.response.clone())
-        }
-        _ => None,
+        Err(_) => save_error_verification_result(conn, vreq.clone()),
     }
 }
 
@@ -205,6 +176,32 @@ impl SaveVerificationResultArgs {
             scrubbed_response: serde_json::json!("").into(),
             vault_public_key,
             should_save_verification_request,
+        }
+    }
+
+    pub fn new<T: serde::Serialize, E1, E2>(
+        request_result: &Result<RawResponseWrapper<T, E1>, E2>,
+        vault_public_key: VaultPublicKey,
+        should_save_verification_request: ShouldSaveVerificationRequest,
+    ) -> Self {
+        match request_result {
+            Ok(response) => {
+                let is_error = response.parsed.is_err();
+                let raw_response = response.raw_response.clone();
+
+                let scrubbed_response = (response.parsed.as_ref().ok())
+                    .and_then(|res| ScrubbedPiiVendorResponse::new(res).ok())
+                    .unwrap_or(serde_json::json!("").into());
+
+                Self {
+                    is_error,
+                    raw_response,
+                    scrubbed_response,
+                    should_save_verification_request,
+                    vault_public_key,
+                }
+            }
+            Err(_) => Self::error(should_save_verification_request, vault_public_key),
         }
     }
 
@@ -257,7 +254,6 @@ mod test {
     use db::models::decision_intent::DecisionIntent;
     use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
     use db::tests::test_db_pool::TestDbPool;
-    use idv::idology::IdologyExpectIDAPIResponse;
     use idv::idology::IdologyExpectIDRequest;
     use macros::test_state;
     use newtypes::vendor_credentials::IdologyCredentials;
@@ -344,33 +340,6 @@ mod test {
         let json = res.raw_response.clone().into_leak();
 
         let res = Ok::<_, idv::idology::error::Error>(res);
-
-        let req = IdologyExpectIDRequest {
-            idv_data: IdvData { ..Default::default() },
-            credentials: IdologyCredentials { ..Default::default() },
-            tenant_identifier: "yo".to_owned(),
-        };
-
-        test_save_vreq_and_vres(state, req, res, VendorAPI::IdologyExpectId, json).await;
-    }
-
-    #[test_state]
-    async fn save_vreq_and_vres_idology_error(state: &mut State) {
-        // TODO: refactor how we propogate errors + raw json response from vendor calls
-        let json = idv::tests::fixtures::idology::error_response_json();
-        let error =
-            serde_json::from_value::<idv::idology::expectid::response::ExpectIDResponse>(json.clone())
-                .unwrap()
-                .response
-                .validate()
-                .unwrap_err();
-
-        let res = Err::<IdologyExpectIDAPIResponse, _>(idv::idology::error::Error::ErrorWithResponse(
-            Box::new(idv::idology::error::ErrorWithResponse {
-                error,
-                response: PiiJsonValue::new(json.clone()),
-            }),
-        ));
 
         let req = IdologyExpectIDRequest {
             idv_data: IdvData { ..Default::default() },

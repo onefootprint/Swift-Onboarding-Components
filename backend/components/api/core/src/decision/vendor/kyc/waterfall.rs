@@ -112,7 +112,7 @@ pub async fn run_kyc_waterfall(state: &State, di: &DecisionIntent, wf: &Workflow
             .await?;
 
         // Make the vendor request
-        let (vreq, vres, res) = make_request::make_idv_vendor_call_save_vreq_vres(
+        let (vreq, vres, response) = make_request::make_idv_vendor_call_save_vreq_vres(
             state,
             &tvc,
             &di.scoped_vault_id,
@@ -124,10 +124,7 @@ pub async fn run_kyc_waterfall(state: &State, di: &DecisionIntent, wf: &Workflow
         let vres_id = vres.id.clone();
 
         // package up our response from a vendor
-        let hvres = (!vres.is_error).then_some(HydratedVerificationResult {
-            vres,
-            response: res.ok().map(|r| r.response),
-        });
+        let hvres = (!vres.is_error).then_some(HydratedVerificationResult { vres, response });
         let vendor_result = RequestAndMaybeHydratedResult { vreq, vres: hvres }.into_vendor_result();
 
         // evaluate WF Rules and determine the next (control flow action, rule action)

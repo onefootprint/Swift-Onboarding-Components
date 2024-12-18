@@ -10,6 +10,7 @@ use self::common::request::Request;
 use self::pa::IdologyPaRequest;
 use crate::footprint_http_client::FootprintVendorHttpClient;
 use crate::idology::error as IdologyError;
+use crate::RawResponseWrapper;
 use expectid::response::ExpectIDResponse;
 use newtypes::vendor_credentials::IdologyCredentials;
 use newtypes::IdvData;
@@ -21,10 +22,19 @@ pub struct IdologyExpectIDRequest {
     pub tenant_identifier: String,
 }
 
-#[derive(Clone)]
-pub struct IdologyExpectIDAPIResponse {
-    pub raw_response: PiiJsonValue,
-    pub parsed_response: ExpectIDResponse,
+pub type IdologyExpectIDAPIResponse = RawResponseWrapper<ExpectIDResponse, IdologyError::Error>;
+
+impl IdologyExpectIDAPIResponse {
+    pub fn from_response(raw_response: PiiJsonValue) -> Self {
+        let parse_response = || {
+            let parsed_response =
+                crate::idology::expectid::response::parse_response(raw_response.leak().clone())?;
+            parsed_response.response.validate()?;
+            Ok(parsed_response)
+        };
+        let parsed = parse_response();
+        Self { raw_response, parsed }
+    }
 }
 
 /// Make a request to the ExpectID module. Returns the result from ExpectID and a vec of
@@ -33,7 +43,7 @@ pub struct IdologyExpectIDAPIResponse {
 pub async fn verify_expectid(
     fp_http_client: &FootprintVendorHttpClient,
     request: IdologyExpectIDRequest,
-) -> Result<serde_json::Value, IdologyError::Error> {
+) -> Result<PiiJsonValue, IdologyError::Error> {
     let url = "https://web.idologylive.com/api/idiq.svc";
     let req_data = expectid::request::RequestData::try_from(request.idv_data, request.tenant_identifier)?;
     let req_list = Request::new(
@@ -53,7 +63,7 @@ pub async fn verify_expectid(
         .json::<serde_json::Value>()
         .await
         .map_err(IdologyError::ReqwestError::from)?;
-    Ok(idology_response)
+    Ok(PiiJsonValue::new(idology_response))
 }
 
 pub async fn standalone_pa(

@@ -7,7 +7,6 @@ use idv::idology::pa::IdologyPaRequest;
 use idv::idology::IdologyExpectIDAPIResponse;
 use idv::idology::IdologyExpectIDRequest;
 use idv::ParsedResponse;
-use newtypes::PiiJsonValue;
 use newtypes::VendorAPI;
 
 /////////////////////
@@ -22,19 +21,9 @@ impl VendorAPICall<IdologyExpectIDRequest, IdologyExpectIDAPIResponse, idv::idol
         &self,
         request: IdologyExpectIDRequest,
     ) -> Result<IdologyExpectIDAPIResponse, idv::idology::error::Error> {
-        let raw_response = idv::idology::verify_expectid(self, request).await?; // TODO: this should return PiiJsonValue itself
-        let parsed_response = idv::idology::expectid::response::parse_response(raw_response.clone())
-            .map_err(|e| e.into_error_with_response(raw_response.clone()))?;
-
-        parsed_response
-            .response
-            .validate()
-            .map_err(|e| e.into_error_with_response(raw_response.clone()))?;
-
-        Ok(IdologyExpectIDAPIResponse {
-            raw_response: PiiJsonValue::new(raw_response),
-            parsed_response,
-        })
+        let raw_response = idv::idology::verify_expectid(self, request).await?;
+        let response = IdologyExpectIDAPIResponse::from_response(raw_response);
+        Ok(response)
     }
 }
 
@@ -48,7 +37,11 @@ impl VendorAPIResponse for IdologyExpectIDAPIResponse {
     }
 
     fn parsed_response(&self) -> ParsedResponse {
-        ParsedResponse::IDologyExpectID(self.parsed_response.clone())
+        match &self.parsed {
+            Ok(res) => ParsedResponse::IDologyExpectID(res.clone()),
+            // TODO: rm or fix
+            Err(_) => ParsedResponse::IncodeRawResponse(self.raw_response.clone()),
+        }
     }
 }
 
@@ -79,7 +72,7 @@ impl VendorAPIResponse for IdologyPaAPIResponse {
     }
 
     fn parsed_response(&self) -> ParsedResponse {
-        match &self.result {
+        match &self.parsed {
             Ok(res) => ParsedResponse::IDologyPa(res.clone()),
             // TODO: rm or fix
             Err(_) => ParsedResponse::IncodeRawResponse(self.raw_response.clone()),

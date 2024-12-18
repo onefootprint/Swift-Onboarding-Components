@@ -356,6 +356,15 @@ pub fn elongate_if_single_letter(s: String) -> String {
     }
 }
 
+/// A wrapper type that includes both the raw PiiJsonValue response and the parsed response, or an
+/// error from attempting to parse the response.
+pub struct RawResponseWrapper<T, E> {
+    /// The raw response from the vendor.
+    pub raw_response: PiiJsonValue,
+    /// The parsed response from the vendor, or the error that occurred when attempting to parse it.
+    pub parsed: Result<T, E>,
+}
+
 #[cfg(test)]
 mod lib_tests {
     use super::elongate_if_single_letter;

@@ -34,7 +34,7 @@ pub async fn complete_vendor_call(
         (parse_reason_codes(res.clone())?, vres_id)
     } else {
         let (res, vres_id) = make_vendor_call(state, sv_id, di_id, tenant_id).await?;
-        let pa_res = res.result.map_err(idv::Error::from)?;
+        let pa_res = res.parsed.map_err(idv::Error::from)?;
         (parse_reason_codes(pa_res)?, vres_id)
     };
 
@@ -81,7 +81,7 @@ async fn make_vendor_call(
     let svid = sv_id.clone();
     let uv = state.db_query(move |conn| Vault::get(conn, &svid)).await?;
     let vreq = ShouldSaveVerificationRequest::No(vreq.id);
-    let args = SaveVerificationResultArgs::new_for_idology(&res, uv.public_key, vreq);
+    let args = SaveVerificationResultArgs::new(&res, uv.public_key, vreq);
     let (vres, _) = args.save(&state.db_pool).await?;
 
     let res = res.map_err(idv::Error::from)?;

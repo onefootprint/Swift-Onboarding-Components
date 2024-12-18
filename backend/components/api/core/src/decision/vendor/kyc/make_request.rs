@@ -1,10 +1,12 @@
 #![allow(clippy::too_many_arguments)]
 use super::waterfall_vendor_api::WaterfallVendorAPI;
 use crate::decision::vendor::build_request;
+use crate::decision::vendor::into_fp_error;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::decision::vendor::vendor_trait::VendorAPIResponse;
 use crate::decision::vendor::verification_result;
-use crate::decision::vendor::VendorAPIError;
+use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
+use crate::decision::vendor::verification_result::ShouldSaveVerificationRequest;
 use crate::vendor_clients::VendorClient;
 use crate::FpResult;
 use crate::State;
@@ -38,47 +40,11 @@ pub async fn make_idv_vendor_call_save_vreq_vres(
     di_id: &DecisionIntentId,
     ob_configuration_key: PublishablePlaybookKey,
     vendor_api: WaterfallVendorAPI,
-) -> FpResult<(
-    VerificationRequest,
-    VerificationResult,
-    Result<VendorResponse, VendorAPIError>,
-)> {
-    let (vreq, vendor_result) =
-        make_idv_vendor_call_save_vreq(state, tvc, sv_id, di_id, ob_configuration_key, vendor_api).await?;
-
-    if let Err(err) = vendor_result.as_ref() {
-        let VendorAPIError { vendor_api, error } = err;
-        tracing::warn!(?vendor_api, ?error, "Error making KYC vendor call");
-    }
-
-    let sv_id = sv_id.clone();
-    let v_req: VerificationRequest = vreq.clone();
-    let (vres, vendor_result) = state
-        .db_query(move |conn| {
-            let uv = Vault::get(conn, &sv_id)?;
-            let vres = verification_result::save_vres(conn, &uv.public_key, &vendor_result, &v_req)?;
-            Ok((vres, vendor_result))
-        })
-        .await?;
-
-    Ok((vreq, vres, vendor_result))
-}
-
-// For a given vendor_api, saves a vreq, populates IdvData from user's vault, makes the API call,
-// and returns the success or error response
-#[tracing::instrument(skip(state, tvc))]
-pub async fn make_idv_vendor_call_save_vreq(
-    state: &State,
-    tvc: &TenantVendorControl,
-    sv_id: &ScopedVaultId,
-    di_id: &DecisionIntentId,
-    ob_configuration_key: PublishablePlaybookKey,
-    vendor_api: WaterfallVendorAPI,
-) -> FpResult<(VerificationRequest, Result<VendorResponse, VendorAPIError>)> {
-    let sv_id = sv_id.clone();
-    let di_id = di_id.clone();
+) -> FpResult<(VerificationRequest, VerificationResult, Option<ParsedResponse>)> {
+    let svid = sv_id.clone();
+    let diid = di_id.clone();
     let vreq = state
-        .db_query(move |conn| VerificationRequest::create(conn, (&sv_id, &di_id, vendor_api.into()).into()))
+        .db_query(move |conn| VerificationRequest::create(conn, (&svid, &diid, vendor_api.into()).into()))
         .await?;
 
     let idv_data = build_request::build_idv_data_from_verification_request(
@@ -87,21 +53,31 @@ pub async fn make_idv_vendor_call_save_vreq(
         vreq.clone(),
     )
     .await?;
+    let svid = sv_id.clone();
+    let uv = state.db_query(move |conn| Vault::get(conn, &svid)).await?;
 
-    Ok((
-        vreq,
-        send_idv_request(state, tvc, vendor_api, idv_data, ob_configuration_key).await,
-    ))
+    let (vendor_result, vres) =
+        send_idv_request(state, tvc, uv, vendor_api, &vreq, idv_data, ob_configuration_key).await?;
+
+    if let Err(error) = vendor_result.as_ref() {
+        tracing::warn!(?vendor_api, ?error, "Error making KYC vendor call");
+    }
+
+    // Need vres and vendor_result
+    Ok((vreq, vres, vendor_result.ok()))
 }
 
 #[tracing::instrument(skip(state, tvc, idv_data))]
 pub async fn send_idv_request(
     state: &State,
     tvc: &TenantVendorControl,
+    uv: Vault,
     vendor_api: WaterfallVendorAPI,
+    vreq: &VerificationRequest,
     idv_data: IdvData,
     ob_configuration_key: PublishablePlaybookKey,
-) -> Result<VendorResponse, VendorAPIError> {
+) -> FpResult<(FpResult<ParsedResponse>, VerificationResult)> {
+    let vreq = vreq.clone();
     let is_production = state.config.service_config.is_production();
     match vendor_api {
         WaterfallVendorAPI::Idology => {
@@ -110,32 +86,48 @@ pub async fn send_idv_request(
                 credentials: tvc.idology_credentials(),
                 tenant_identifier: tvc.tenant_identifier(),
             };
-            send_idology_idv_request(
+            let res = send_idology_idv_request(
                 request,
                 is_production,
                 ob_configuration_key,
                 state.vendor_clients.idology_expect_id.clone(),
                 state.ff_client.clone(),
             )
-            .await
+            .await;
+            let vreq = ShouldSaveVerificationRequest::No(vreq.id);
+            let args = SaveVerificationResultArgs::new(&res, uv.public_key, vreq);
+            let (vres, _) = args.save(&state.db_pool).await?;
+            let res = res
+                .map_err(into_fp_error)
+                .and_then(|r| r.parsed.map_err(into_fp_error))
+                .map(ParsedResponse::IDologyExpectID);
+            Ok((res, vres))
         }
         WaterfallVendorAPI::Experian => {
             let request = ExperianCrossCoreRequest {
                 idv_data,
                 credentials: tvc.experian_credentials(),
             };
-            send_experian_idv_request(
+            let res = send_experian_idv_request(
                 request,
                 is_production,
                 ob_configuration_key,
                 state.vendor_clients.experian_cross_core.clone(),
                 state.ff_client.clone(),
             )
-            .await
+            .await;
+            let vreq = ShouldSaveVerificationRequest::No(vreq.id);
+            let args = SaveVerificationResultArgs::new(&res, uv.public_key, vreq);
+            let (vres, _) = args.save(&state.db_pool).await?;
+            let res = res
+                .map_err(into_fp_error)
+                .and_then(|r| r.parsed.map_err(into_fp_error))
+                .map(ParsedResponse::ExperianPreciseID);
+            Ok((res, vres))
         }
         WaterfallVendorAPI::Lexis => {
             let credentials = tvc.lexis_credentials();
-            if let Some(tbi) = tvc.tenant_business_info() {
+            let response = if let Some(tbi) = tvc.tenant_business_info() {
                 send_lexis_flex_id_request(
                     LexisFlexIdRequest {
                         idv_data,
@@ -155,13 +147,18 @@ pub async fn send_idv_request(
                 Err(idv::Error::AssertionError(
                     "Missing tenant_business_info".to_owned(),
                 ))
-            }
+            };
+            let (response, vres) = state
+                .db_pool
+                .db_query(move |conn| {
+                    let vres = verification_result::save_vres(conn, &uv.public_key, &response, &vreq)?;
+                    Ok((response, vres))
+                })
+                .await?;
+            let res = response.map(|r| r.response.clone()).map_err(into_fp_error);
+            Ok((res, vres))
         }
     }
-    .map_err(|e| VendorAPIError {
-        vendor_api: vendor_api.into(),
-        error: e,
-    })
 }
 
 
@@ -170,35 +167,20 @@ pub async fn send_idology_idv_request(
     request: IdologyExpectIDRequest,
     is_production: bool,
     ob_configuration_key: PublishablePlaybookKey,
-    idology_api_call: VendorClient<
-        IdologyExpectIDRequest,
-        IdologyExpectIDAPIResponse,
-        idv::idology::error::Error,
-    >,
+    client: VendorClient<IdologyExpectIDRequest, IdologyExpectIDAPIResponse, idv::idology::error::Error>,
     ff_client: Arc<dyn FeatureFlagClient>,
-) -> Result<VendorResponse, idv::Error> {
+) -> Result<IdologyExpectIDAPIResponse, idv::Error> {
     if is_production || ff_client.flag(BoolFlag::EnableIdologyInNonProd(&ob_configuration_key)) {
-        let res = idology_api_call.make_request(request).await;
-
-        res.map(|r| {
-            let parsed_response = r.parsed_response();
-            let raw_response = r.raw_response();
-            VendorResponse {
-                // TODO: later delete VendorResponse and just replace with VendorAPIResponse
-                response: parsed_response,
-                raw_response,
-            }
-        })
-        .map_err(|e| e.into())
+        client.make_request(request).await.map_err(|e| e.into())
     } else {
         let response = idv::test_fixtures::idology_fake_data_expectid_response();
 
         let parsed_response: ExpectIDResponse =
             idv::idology::expectid::response::parse_response(response.clone())?;
 
-        Ok(VendorResponse {
+        Ok(IdologyExpectIDAPIResponse {
             raw_response: response.into(),
-            response: ParsedResponse::IDologyExpectID(parsed_response),
+            parsed: Ok(parsed_response),
         })
     }
 }
@@ -209,34 +191,19 @@ pub async fn send_experian_idv_request(
     request: ExperianCrossCoreRequest,
     is_production: bool,
     ob_configuration_key: PublishablePlaybookKey,
-    experian_api_call: VendorClient<
-        ExperianCrossCoreRequest,
-        ExperianCrossCoreResponse,
-        idv::experian::error::Error,
-    >,
+    client: VendorClient<ExperianCrossCoreRequest, ExperianCrossCoreResponse, idv::experian::error::Error>,
     ff_client: Arc<dyn FeatureFlagClient>,
-) -> Result<VendorResponse, idv::Error> {
+) -> Result<ExperianCrossCoreResponse, idv::Error> {
     if is_production || ff_client.flag(BoolFlag::EnableExperianInNonProd(&ob_configuration_key)) {
-        let res = experian_api_call.make_request(request).await;
-
-        res.map(|r| {
-            let parsed_response = r.parsed_response();
-            let raw_response = r.raw_response();
-
-            VendorResponse {
-                response: parsed_response,
-                raw_response,
-            }
-        })
-        .map_err(|e| e.into())
+        client.make_request(request).await.map_err(|e| e.into())
     } else {
         let response = idv::test_fixtures::experian_cross_core_response(None, None);
 
         let parsed_response = idv::experian::cross_core::response::parse_response(response.clone())?;
 
-        Ok(VendorResponse {
-            response: ParsedResponse::ExperianPreciseID(parsed_response),
+        Ok(ExperianCrossCoreResponse {
             raw_response: response.into(),
+            parsed: Ok(parsed_response),
         })
     }
 }
@@ -315,20 +282,21 @@ mod tests {
 
         if expect_api_call {
             mock_api.expect_make_request().times(1).return_once(|_| {
+                let response = ExpectIDResponse {
+                    response: Response {
+                        qualifiers: None,
+                        results: None,
+                        summary_result: None,
+                        id_number: None,
+                        id_scan: None,
+                        error: None,
+                        restriction: None,
+                    },
+                };
                 Ok(IdologyExpectIDAPIResponse {
                     // TODO: helpers methods to make these and other test structs
                     raw_response: PiiJsonValue::from(json!({"yo": "sup"})),
-                    parsed_response: ExpectIDResponse {
-                        response: Response {
-                            qualifiers: None,
-                            results: None,
-                            summary_result: None,
-                            id_number: None,
-                            id_scan: None,
-                            error: None,
-                            restriction: None,
-                        },
-                    },
+                    parsed: Ok(response),
                 })
             });
         }

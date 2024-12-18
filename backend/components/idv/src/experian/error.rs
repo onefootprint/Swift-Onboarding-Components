@@ -1,5 +1,4 @@
 use super::cross_core::error_code::ErrorCode;
-use newtypes::PiiJsonValue;
 use std::fmt;
 
 #[derive(Debug, thiserror::Error)]
@@ -28,8 +27,6 @@ pub enum Error {
     InvalidScore(String),
     #[error("Experian Validation error {0}")]
     ValidationError(#[from] ValidationError),
-    #[error("ErrorWithResponse {0}")]
-    ErrorWithResponse(Box<ErrorWithResponse>),
     #[error("JWT Token needs refresh")]
     JwtTokenNeedsRefresh,
     #[error("Unknown Error")]
@@ -45,13 +42,6 @@ pub enum Error {
 }
 
 impl Error {
-    pub fn into_error_with_response(self, response: serde_json::Value) -> Self {
-        Self::ErrorWithResponse(Box::new(ErrorWithResponse {
-            error: self,
-            response: response.into(),
-        }))
-    }
-
     pub fn is_retryable_error(&self) -> bool {
         match self {
             Error::JwtTokenNeedsRefresh
@@ -71,7 +61,6 @@ impl Error {
             | Error::MissingPreciseIDResponse
             | Error::InvalidScore(_)
             | Error::ValidationError(_)
-            | Error::ErrorWithResponse(_)
             | Error::IncorrectPreciseIdVersion => false,
         }
     }
@@ -224,69 +213,5 @@ impl fmt::Display for EnvironmentMismatchError {
             "is_production={}, is_test_case={}",
             self.is_production, self.is_test_case
         )
-    }
-}
-
-/// In the case that we have errors that get returned in a deserializable json response,
-/// we still want to save these as VerificationResults.
-///
-/// This struct wraps `Error` so that we can propagate the json up and save.
-pub struct ErrorWithResponse {
-    pub error: Error,
-    pub response: PiiJsonValue,
-}
-
-impl ErrorWithResponse {
-    // some errors are expected since it involves input validation which experian is stingy about
-    pub fn is_known_error(&self) -> bool {
-        match &self.error {
-            Error::ResponseError(CrossCoreResponseError::Error(err, _)) => match err {
-                ErrorCode::ConsumerIsMinor
-                | ErrorCode::FormatError
-                | ErrorCode::InformationOnInquiryReportedAsFraudByConsumer
-                | ErrorCode::InvalidSurname
-                | ErrorCode::CurrentZipCodeError
-                | ErrorCode::StateRequiresMoreInfoForMatch
-                | ErrorCode::InputValidationError
-                | ErrorCode::SsnRequiredToAccessConsumerFile
-                | ErrorCode::GenerationCodeRequiredToAccessConsumerFile
-                | ErrorCode::YobRequiredToAccessConsumerFile
-                | ErrorCode::MiddleNameRequiredToAccessConsumerFile
-                | ErrorCode::CannotStandardizeAddress
-                | ErrorCode::InvalidStreetAddressFiled
-                | ErrorCode::CurrentAddressExceedsMaxLength => true,
-                ErrorCode::NFDUnavailable
-                | ErrorCode::NFDNotColoradoZip
-                | ErrorCode::NotEnoughInfoForExperianDetect
-                | ErrorCode::ExperianDetectNotAvailable
-                | ErrorCode::PreciseIdNotAvailable
-                | ErrorCode::FraudShieldNotAvailable
-                | ErrorCode::CreditReportingNotAvailable
-                | ErrorCode::InvalidPreambleForSubcode
-                | ErrorCode::InvalidUserIdOrPassword
-                | ErrorCode::KiqSessionTimeout
-                | ErrorCode::EndUserRequired
-                | ErrorCode::OtherPreciseIdError
-                | ErrorCode::Other(_)
-                | ErrorCode::ResubmitLater
-                | ErrorCode::ResubmitCheckpointSystem => false,
-            },
-            _ => false,
-        }
-    }
-}
-
-impl std::fmt::Display for ErrorWithResponse {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.error)
-    }
-}
-
-impl std::fmt::Debug for ErrorWithResponse {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("ErrorWithResponse")
-            .field("error", &self.error)
-            .field("response", &"<omitted>")
-            .finish()
     }
 }

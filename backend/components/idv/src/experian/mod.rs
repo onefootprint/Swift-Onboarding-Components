@@ -1,7 +1,8 @@
 use self::cross_core::response::CrossCoreAPIResponse;
+use crate::RawResponseWrapper;
+use error::Error as ExperianError;
 use newtypes::vendor_credentials::ExperianCredentials;
 use newtypes::IdvData;
-use newtypes::PiiJsonValue;
 use regex::Regex;
 
 pub mod auth;
@@ -23,10 +24,20 @@ pub struct ExperianCrossCoreRequest {
     pub credentials: ExperianCredentials,
 }
 
-#[derive(Clone)]
-pub struct ExperianCrossCoreResponse {
-    pub raw_response: PiiJsonValue,
-    pub parsed_response: CrossCoreAPIResponse,
+pub type ExperianCrossCoreResponse = RawResponseWrapper<CrossCoreAPIResponse, ExperianError>;
+
+impl ExperianCrossCoreResponse {
+    pub fn from_response(raw_response: newtypes::PiiJsonValue) -> Self {
+        let parse_response = || {
+            // catch errors that cannot be deserialized
+            let parsed_response = cross_core::response::parse_response(raw_response.leak().clone())?;
+            // catch errors that come from deserialized response validations
+            parsed_response.validate()?;
+            Ok(parsed_response)
+        };
+        let parsed = parse_response();
+        Self { raw_response, parsed }
+    }
 }
 
 fn normalize_with_regex(s: &str, regex: &Regex) -> String {
