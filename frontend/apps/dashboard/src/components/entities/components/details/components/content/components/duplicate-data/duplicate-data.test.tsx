@@ -57,6 +57,7 @@ describe('<DuplicateData/>', () => {
     expect(within(firstRow).getByText('Jane D.')).toBeInTheDocument();
     expect(within(firstRow).getByText('fp_id_test')).toBeInTheDocument();
     expect(within(firstRow).queryByText('Phone number')).not.toBeInTheDocument();
+    expect(within(firstRow).queryByText('Identity document number')).toBeInTheDocument();
     expect(within(firstRow).getByText('Email address')).toBeInTheDocument();
     expect(within(firstRow).getByText('SSN')).toBeInTheDocument();
     expect(within(firstRow).getByText('Pass')).toBeInTheDocument();

@@ -1532,7 +1532,8 @@
       "name-ssn4": "Name + SSN4",
       "dob-ssn4": "DOB + SSN4",
       "bank-routing-account": "Bank Routing + Account Number",
-      "card-number-cvc": "Card Number + CVC"
+      "card-number-cvc": "Card Number + CVC",
+      "identity-document-number": "Identity document number"
     },
     "other-tenants-summary": {
       "description": "Plus <strong>{{numMatches}}</strong> more matches in <strong>{{numTenants}}</strong> other companies",

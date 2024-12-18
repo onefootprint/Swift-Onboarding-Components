@@ -11,6 +11,7 @@ export enum DupeKind {
   dobSsn4 = 'dob_ssn4',
   bankRoutingAccount = 'bank_routing_account',
   cardNumberCvc = 'card_number_cvc',
+  identityDocumentNumber = 'identity_document_number',
 }
 
 export type DuplicateDataItem = {

@@ -26,6 +26,7 @@ const Row = ({ duplicateDataItem }: RowProps) => {
     [DupeKind.dobSsn4]: t('dupe-kinds.dob-ssn4'),
     [DupeKind.bankRoutingAccount]: t('dupe-kinds.bank-routing-account'),
     [DupeKind.cardNumberCvc]: t('dupe-kinds.card-number-cvc'),
+    [DupeKind.identityDocumentNumber]: t('dupe-kinds.identity-document-number'),
   };
 
   return (
