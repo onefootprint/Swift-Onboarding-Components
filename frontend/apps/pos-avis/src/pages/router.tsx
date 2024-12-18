@@ -4,7 +4,7 @@ import AddressDataStep from './address-data-step';
 import BasicDataStep from './basic-data-step';
 import CustomDataStep from './custom-data-step';
 import IntroStep from './intro-step';
-import SuccessStep from './success-step';
+import ResultStep from './result-step';
 import WaitingConfirmation from './waiting-confirmation';
 
 type RouterProps = {
@@ -88,7 +88,7 @@ const Router = ({ onboardingConfig }: RouterProps) => {
           onSubmit={data => {
             setContext(prev => ({
               ...prev,
-              step: 'success-step',
+              step: 'result-step',
               userData: {
                 ...prev.userData,
                 ...data,
@@ -97,7 +97,7 @@ const Router = ({ onboardingConfig }: RouterProps) => {
           }}
         />
       )}
-      {state.step === 'success-step' && <SuccessStep />}
+      {state.step === 'result-step' && <ResultStep authToken={state.tokens.authToken} />}
     </>
   );
 };
