@@ -183,7 +183,7 @@ fn vendor_api_error_to_json(vendor_api_error: &VendorAPIError) -> Option<PiiJson
 
 // For some Incode APIs we save the VReq first still (e.g. IncodeWatchlistCheck)
 pub enum ShouldSaveVerificationRequest {
-    Yes(VendorAPI),
+    Yes(VendorAPI, DecisionIntentId, ScopedVaultId, Option<DocumentId>),
     No(VerificationRequestId),
 }
 /// Struct to make sure we handle the different cases Vendor call errors we may see
@@ -193,22 +193,29 @@ pub struct SaveVerificationResultArgs {
     pub scrubbed_response: ScrubbedPiiVendorResponse,
     pub vault_public_key: VaultPublicKey,
     pub should_save_verification_request: ShouldSaveVerificationRequest,
-    pub decision_intent_id: DecisionIntentId,
-    pub scoped_vault_id: ScopedVaultId,
-    pub identity_document_id: Option<DocumentId>,
 }
 
 impl SaveVerificationResultArgs {
+    pub fn error(
+        should_save_verification_request: ShouldSaveVerificationRequest,
+        vault_public_key: VaultPublicKey,
+    ) -> Self {
+        Self {
+            is_error: true,
+            raw_response: serde_json::json!("").into(),
+            scrubbed_response: serde_json::json!("").into(),
+            vault_public_key,
+            should_save_verification_request,
+        }
+    }
+
     pub fn save_sync(self, conn: &mut PgConn) -> FpResult<(VerificationResultId, VerificationRequestId)> {
         let SaveVerificationResultArgs {
             scrubbed_response,
             raw_response,
             is_error,
             should_save_verification_request,
-            decision_intent_id,
             vault_public_key,
-            scoped_vault_id,
-            identity_document_id,
         } = self;
         let e_response = encrypt_verification_result_response(&raw_response, &vault_public_key)?;
         // This is interesting - we make the VReq and VRes at the same time.
@@ -216,11 +223,11 @@ impl SaveVerificationResultArgs {
         // is a VReq without a VRes - for the document workflow, we have the incode state
         // machine that tells us what state we're in.
         let vreq_id = match should_save_verification_request {
-            ShouldSaveVerificationRequest::Yes(vendor_api) => {
+            ShouldSaveVerificationRequest::Yes(vendor_api, di_id, sv_id, doc_id) => {
                 let args = NewVerificationRequestArgs {
-                    scoped_vault_id: &scoped_vault_id,
-                    identity_document_id: identity_document_id.as_ref(),
-                    decision_intent_id: &decision_intent_id,
+                    scoped_vault_id: &sv_id,
+                    identity_document_id: doc_id.as_ref(),
+                    decision_intent_id: &di_id,
                     vendor_api,
                 };
                 let vreq = VerificationRequest::create(conn, args)?;

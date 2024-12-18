@@ -30,11 +30,12 @@ use twilio::response::lookup::LookupV2Response;
 impl SaveVerificationResultArgs {
     pub fn new_for_twilio(
         request_result: &Result<TwilioLookupV2APIResponse, idv::twilio::Error>,
-        decision_intent_id: DecisionIntentId,
-        scoped_vault_id: ScopedVaultId,
+        di_id: DecisionIntentId,
+        sv_id: ScopedVaultId,
         vault_public_key: VaultPublicKey,
     ) -> Self {
-        let should_save_verification_request = ShouldSaveVerificationRequest::Yes(VendorAPI::TwilioLookupV2);
+        let should_save_verification_request =
+            ShouldSaveVerificationRequest::Yes(VendorAPI::TwilioLookupV2, di_id, sv_id, None);
         match request_result {
             Ok(response) => {
                 let TwilioLookupV2APIResponse {
@@ -53,22 +54,10 @@ impl SaveVerificationResultArgs {
                     raw_response,
                     scrubbed_response,
                     should_save_verification_request,
-                    decision_intent_id,
                     vault_public_key,
-                    scoped_vault_id,
-                    identity_document_id: None,
                 }
             }
-            Err(_) => Self {
-                is_error: true,
-                raw_response: serde_json::json!("").into(),
-                scrubbed_response: serde_json::json!("").into(),
-                should_save_verification_request,
-                decision_intent_id,
-                vault_public_key,
-                scoped_vault_id,
-                identity_document_id: None,
-            },
+            Err(_) => Self::error(should_save_verification_request, vault_public_key),
         }
     }
 }

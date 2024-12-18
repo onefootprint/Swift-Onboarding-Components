@@ -156,14 +156,13 @@ pub async fn run_curp_validation_check(
                 .make_request(IncodeCurpValidationRequest { credentials, curp })
                 .await;
 
-            let args = SaveVerificationResultArgs::new(
-                &res,
+            let vreq = ShouldSaveVerificationRequest::Yes(
+                VendorAPI::IncodeCurpValidation,
                 di.id.clone(),
                 di.scoped_vault_id.clone(),
                 None,
-                vw.vault.public_key.clone(),
-                ShouldSaveVerificationRequest::Yes(VendorAPI::IncodeCurpValidation),
             );
+            let args = SaveVerificationResultArgs::new_for_incode(&res, vw.vault.public_key.clone(), vreq);
             let (vres_id, vreq_id) = args.save(&state.db_pool).await?;
             let curp_response = res.map_err(into_fp_error)?;
             let raw_response = curp_response.raw_response.clone();

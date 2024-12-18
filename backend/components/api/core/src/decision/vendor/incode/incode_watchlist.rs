@@ -60,16 +60,11 @@ async fn save_verification_result_for_watchlist_check<
 >(
     db_pool: &DbPool,
     res: &Result<IncodeResponse<T>, idv::incode::error::Error>,
-    sv_id: &ScopedVaultId,
-    di_id: &DecisionIntentId,
     user_vault_public_key: &VaultPublicKey,
     vreq_id: VerificationRequestId,
 ) -> FpResult<VerificationResultId> {
-    let args = SaveVerificationResultArgs::new(
+    let args = SaveVerificationResultArgs::new_for_incode(
         res,
-        di_id.clone(),
-        sv_id.clone(),
-        None,
         user_vault_public_key.clone(),
         ShouldSaveVerificationRequest::No(vreq_id),
     );
@@ -119,8 +114,6 @@ async fn call_watchlist_result(
             let vres_id = save_verification_result_for_watchlist_check(
                 &state.db_pool,
                 &res,
-                sv_id,
-                di_id,
                 user_vault_public_key,
                 vreq_id,
             )
@@ -146,8 +139,6 @@ async fn call_watchlist_result(
             let vres_id = save_verification_result_for_watchlist_check(
                 &state.db_pool,
                 &res,
-                sv_id,
-                di_id,
                 user_vault_public_key,
                 vreq_id,
             )

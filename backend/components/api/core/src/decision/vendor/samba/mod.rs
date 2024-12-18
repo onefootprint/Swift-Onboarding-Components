@@ -17,16 +17,17 @@ pub mod get_report;
 impl SaveVerificationResultArgs {
     pub fn new_for_samba<T>(
         request_result: &Result<SambaAPIResponse<T>, idv::samba::error::Error>,
-        decision_intent_id: DecisionIntentId,
-        scoped_vault_id: ScopedVaultId,
+        di_id: DecisionIntentId,
+        sv_id: ScopedVaultId,
         vault_public_key: VaultPublicKey,
         vendor_api: VendorAPI,
-        document_id: Option<DocumentId>,
+        doc_id: Option<DocumentId>,
     ) -> Self
     where
         T: DeserializeOwned + Serialize,
     {
-        let should_save_verification_request = ShouldSaveVerificationRequest::Yes(vendor_api);
+        let should_save_verification_request =
+            ShouldSaveVerificationRequest::Yes(vendor_api, di_id, sv_id, doc_id);
         match request_result {
             Ok(response) => {
                 let is_error = response.result.is_error();
@@ -43,22 +44,10 @@ impl SaveVerificationResultArgs {
                     raw_response,
                     scrubbed_response,
                     should_save_verification_request,
-                    decision_intent_id,
                     vault_public_key,
-                    scoped_vault_id,
-                    identity_document_id: document_id,
                 }
             }
-            Err(_) => Self {
-                is_error: true,
-                raw_response: serde_json::json!("").into(),
-                scrubbed_response: serde_json::json!("").into(),
-                should_save_verification_request,
-                decision_intent_id,
-                vault_public_key,
-                scoped_vault_id,
-                identity_document_id: document_id,
-            },
+            Err(_) => Self::error(should_save_verification_request, vault_public_key),
         }
     }
 }

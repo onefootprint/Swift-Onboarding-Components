@@ -36,12 +36,12 @@ use newtypes::WorkflowId;
 impl SaveVerificationResultArgs {
     pub fn new_for_neuro(
         request_result: &Result<NeuroApiResponse, idv::neuro_id::error::Error>,
-        decision_intent_id: DecisionIntentId,
-        scoped_vault_id: ScopedVaultId,
+        di_id: DecisionIntentId,
+        sv_id: ScopedVaultId,
         vault_public_key: VaultPublicKey,
     ) -> Self {
         let should_save_verification_request =
-            ShouldSaveVerificationRequest::Yes(VendorAPI::NeuroIdAnalytics);
+            ShouldSaveVerificationRequest::Yes(VendorAPI::NeuroIdAnalytics, di_id, sv_id, None);
         match request_result {
             Ok(response) => {
                 let is_error = response.result.is_error();
@@ -58,22 +58,10 @@ impl SaveVerificationResultArgs {
                     raw_response,
                     scrubbed_response,
                     should_save_verification_request,
-                    decision_intent_id,
                     vault_public_key,
-                    scoped_vault_id,
-                    identity_document_id: None,
                 }
             }
-            Err(_) => Self {
-                is_error: true,
-                raw_response: serde_json::json!("").into(),
-                scrubbed_response: serde_json::json!("").into(),
-                should_save_verification_request,
-                decision_intent_id,
-                vault_public_key,
-                scoped_vault_id,
-                identity_document_id: None,
-            },
+            Err(_) => Self::error(should_save_verification_request, vault_public_key),
         }
     }
 }
