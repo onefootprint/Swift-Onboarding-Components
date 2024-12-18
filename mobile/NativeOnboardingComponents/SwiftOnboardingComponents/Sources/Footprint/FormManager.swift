@@ -286,49 +286,46 @@ class FormManager: ObservableObject {
         }
     }
     
-    
-    
-    // TODO: address getVaultData
  
-//    func getVaultData() -> VaultData {
-//        var vaultData: VaultData = VaultData.init(data: <#T##[DataIdentifier : Any]#>)
-//        
-//        for key in fieldsUsed {
-//            switch key {
-//            case "idEmail":
-//                vaultData.idEmail = idEmail.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idEmail
-//            case "idPhoneNumber":
-//                vaultData.idPhoneNumber = idPhoneNumber.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idPhoneNumber
-//            case "idDob":
-//                vaultData.idDob = idDob.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idDob
-//            case "idSsn4":
-//                vaultData.idSsn4 = idSsn4.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idSsn4
-//            case "idSsn9":
-//                vaultData.idSsn9 = idSsn9.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idSsn9
-//            case "idFirstName":
-//                vaultData.idFirstName = idFirstName.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idFirstName
-//            case "idLastName":
-//                vaultData.idLastName = idLastName.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idLastName
-//            case "idMiddleName":
-//                vaultData.idMiddleName = idMiddleName.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idMiddleName
-//            case "idCountry":
-//                vaultData.idCountry = idCountry.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idCountry
-//            case "idState":
-//                vaultData.idState = idState.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idState
-//            case "idCity":
-//                vaultData.idCity = idCity.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idCity
-//            case "idZip":
-//                vaultData.idZip = idZip.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idZip
-//            case "idAddressLine1":
-//                vaultData.idAddressLine1 = idAddressLine1.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idAddressLine1
-//            case "idAddressLine2":
-//                vaultData.idAddressLine2 = idAddressLine2.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idAddressLine2
-//            default:
-//                break
-//            }
-//        }
-//        return vaultData
-//    }
+    func getVaultData() -> VaultData {
+        var data: [DataIdentifier : Any] = [:]
+        
+        for key in fieldsUsed {
+            switch key {
+            case "idEmail":
+                data[DataIdentifier.idemail] = idEmail.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idEmail
+            case "idPhoneNumber":
+                data[DataIdentifier.idphonenumber] = idPhoneNumber.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idPhoneNumber
+            case "idDob":
+                data[DataIdentifier.iddob] = idDob.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idDob
+            case "idSsn4":
+                data[DataIdentifier.idssn4] = idSsn4.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idSsn4
+            case "idSsn9":
+                data[DataIdentifier.idssn9] = idSsn9.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idSsn9
+            case "idFirstName":
+                data[DataIdentifier.idfirstname] = idFirstName.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idFirstName
+            case "idLastName":
+                data[DataIdentifier.idlastname] = idLastName.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idLastName
+            case "idMiddleName":
+                data[DataIdentifier.idmiddlename] = idMiddleName.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idMiddleName
+            case "idCountry":
+                data[DataIdentifier.idcountry] = idCountry.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idCountry
+            case "idState":
+                data[DataIdentifier.idstate] = idState.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idState
+            case "idCity":
+                data[DataIdentifier.idcity] = idCity.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idCity
+            case "idZip":
+                data[DataIdentifier.idzip] = idZip.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idZip
+            case "idAddressLine1":
+                data[DataIdentifier.idaddressline1] = idAddressLine1.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idAddressLine1
+            case "idAddressLine2":
+                data[DataIdentifier.idaddressline2] = idAddressLine2.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idAddressLine2
+            default:
+                break
+            }
+        }
+        return VaultData.init(data: data)
+    }
     
     func getErrorByFieldName(fieldName: FpFieldName) -> String? {
         switch fieldName {

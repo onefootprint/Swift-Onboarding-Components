@@ -37,8 +37,7 @@ public struct FpForm<Content: View>: View {
                 handleSubmit: {
                     form.triggerValidation()
                     if form.isValid {
-                        // TODO: fix me
-                        self.onSubmit(VaultData.init(data: [DataIdentifier.idfirstname: "test"]))
+                        self.onSubmit(form.getVaultData())
                     }
                 },
                 setValue: { value, field in

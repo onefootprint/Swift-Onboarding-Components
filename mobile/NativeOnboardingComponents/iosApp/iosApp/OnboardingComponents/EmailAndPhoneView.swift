@@ -15,9 +15,9 @@ struct EmailAndPhoneView: View {
                 isLoading = true
                 Task {
                     do {
-                        
-                        // TODO: fix the vaultData
-                        let challengeKind = try await Footprint.shared.createChallenge(email: "sandbox@onefootprint.com", phoneNumber: "+15555550100")
+                        let emailInput = vaultData.idEmail
+                        let phoneNumberInput = vaultData.idPhoneNumber
+                        let challengeKind = try await Footprint.shared.createChallenge(email: emailInput, phoneNumber: phoneNumberInput)
                         print("Pin code sent to: \(challengeKind)")
                         self.challengeKind = challengeKind
                         shouldNavigateToNextView = true

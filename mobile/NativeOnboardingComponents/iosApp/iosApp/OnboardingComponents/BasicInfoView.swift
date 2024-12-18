@@ -9,20 +9,19 @@ struct BasicInfoView: View {
     @State private var isDataReady: Bool = false // State variable to track data readiness
     
     
-    // TODO: address vaultData
     private var defaultFormValues: [FpFieldName : String?] {
         [
-            .idFirstName:  "John",
-            .idMiddleName:   "",
-            .idLastName:   "Doe",
-            .idDob:   "01/01/1990",
-            .idAddressLine1:   "123 Main St",
-            .idAddressLine2:   "Apt 4B",
-            .idCity:   "New York",
-            .idState:   "NY",
-            .idZip:   "10001",
-            .idCountry:   "US",
-            .idSsn9:   "123-45-6789"
+            .idFirstName: vaultData?.idFirstName ?? "John",
+            .idMiddleName: vaultData?.idMiddleName ?? "",
+            .idLastName: vaultData?.idLastName ?? "Doe",
+            .idDob: vaultData?.idDob ?? "01/01/1990",
+            .idAddressLine1: vaultData?.idAddressLine1 ?? "123 Main St",
+            .idAddressLine2: vaultData?.idAddressLine2 ?? "Apt 4B",
+            .idCity: vaultData?.idCity ?? "New York",
+            .idState: vaultData?.idState ?? "NY",
+            .idZip: vaultData?.idZip ?? "10001",
+            .idCountry: vaultData?.idCountry ?? "US",
+            .idSsn9: vaultData?.idSsn9 ?? "123-45-6789"
         ]
     }
 
@@ -60,12 +59,18 @@ struct BasicInfoView: View {
     private func fetchVaultData() {
         Task {
             do {
-                // TODO: which fileds should we retrieve?
                 let fetchedVaultData = try await Footprint.shared.getVaultData(fields:
                     [DataIdentifier.idfirstname,
                     DataIdentifier.idmiddlename,
                     DataIdentifier.idlastname,
-                    DataIdentifier.iddob
+                    DataIdentifier.iddob,
+                     DataIdentifier.idaddressline1,
+                     DataIdentifier.idaddressline2,
+                     DataIdentifier.idcity,
+                     DataIdentifier.idstate,
+                     DataIdentifier.idzip,
+                     DataIdentifier.idcountry
+                     // SSN can't be decrypted
                 ])
                 DispatchQueue.main.async {
                     self.vaultData = fetchedVaultData

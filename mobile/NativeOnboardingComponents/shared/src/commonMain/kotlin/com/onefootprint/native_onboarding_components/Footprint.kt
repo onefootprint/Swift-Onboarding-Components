@@ -227,14 +227,14 @@ object Footprint {
     @Throws(FootprintException::class, CancellationException::class)
     suspend fun vault(data: VaultData) {
         mutex.withLock {
-            VaultUtils.vaultData(data = data, authToken = vaultingToken)
+            VaultUtils.vaultData(data = data, authToken = vaultingToken, locale = l10n.locale ?: FootprintSupportedLocale.EN_US)
         }
     }
 
     @Throws(FootprintException::class, CancellationException::class)
     suspend fun getVaultData(fields: List<DataIdentifier>): VaultData {
         mutex.withLock {
-            return VaultUtils.decryptVaultData(authToken = verifiedAuthToken, fields = fields)
+            return VaultUtils.decryptVaultData(authToken = verifiedAuthToken, fields = fields, locale = l10n.locale ?: FootprintSupportedLocale.EN_US)
         }
     }
 

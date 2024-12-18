@@ -16,6 +16,7 @@ class FootprintException(
         ONBOARDING_ERROR,
         INLINE_PROCESS_NOT_SUPPORTED,
         INLINE_OTP_NOT_SUPPORTED,
+        FORMAT_ERROR,
         NOT_ALLOWED,
         WEBVIEW_ERROR,
         UI_ERROR

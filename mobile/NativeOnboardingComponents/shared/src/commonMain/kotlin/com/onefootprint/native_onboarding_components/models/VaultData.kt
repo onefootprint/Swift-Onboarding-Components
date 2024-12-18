@@ -245,6 +245,32 @@ class VaultData(private val data: Map<DataIdentifier, Any?>) {
         return modernRawUserDataRequest
     }
 
+    // getters for all the fields
+    val idFirstName: String? get() = data[DataIdentifier.idFirstName] as? String
+    val idMiddleName: String? get() = data[DataIdentifier.idMiddleName] as? String
+    val idLastName: String? get() = data[DataIdentifier.idLastName] as? String
+    val idDob: String? get() = data[DataIdentifier.idDob] as? String
+    val idSsn4: String? get() = data[DataIdentifier.idSsn4] as? String
+    val idSsn9: String? get() = data[DataIdentifier.idSsn9] as? String
+    val idUsTaxId: String? get() = data[DataIdentifier.idUsTaxId] as? String
+    val idAddressLine1: String? get() = data[DataIdentifier.idAddressLine1] as? String
+    val idAddressLine2: String? get() = data[DataIdentifier.idAddressLine2] as? String
+    val idCity: String? get() = data[DataIdentifier.idCity] as? String
+    val idState: String? get() = data[DataIdentifier.idState] as? String
+    val idZip: String? get() = data[DataIdentifier.idZip] as? String
+    val idCountry: String? get() = data[DataIdentifier.idCountry] as? String
+    val idEmail: String? get() = data[DataIdentifier.idEmail] as? String
+    val idPhoneNumber: String? get() = data[DataIdentifier.idPhoneNumber] as? String
+    val idUsLegalStatus: String? get() = data[DataIdentifier.idUsLegalStatus] as? String
+    val idVisaKind: String? get() = data[DataIdentifier.idVisaKind] as? String
+    val idVisaExpirationDate: String? get() = data[DataIdentifier.idVisaExpirationDate] as? String
+    val idCitizenships: List<Iso3166TwoDigitCountryCode>? get() = data[DataIdentifier.idCitizenships] as? List<Iso3166TwoDigitCountryCode>
+    val idNationality: String? get() = data[DataIdentifier.idNationality] as? String
+    val idDriversLicenseNumber: String? get() = data[DataIdentifier.idDriversLicenseNumber] as? String
+    val idDriversLicenseState: String? get() = data[DataIdentifier.idDriversLicenseState] as? String
+    val idItin: String? get() = data[DataIdentifier.idItin] as? String
+
+
     override fun toString(): String {
         return "VaultData(data=$data)"
     }
