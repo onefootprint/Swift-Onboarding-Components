@@ -37,11 +37,12 @@ const OnboardingData = ({ onboarding }: OnboardingDataProps) => {
   const hasDecryptableDIs = Boolean(entityAttributes?.some(attr => attr.isDecryptable));
   const seqnoVault = useSeqnoVault(entityAttributes, onboarding.seqno?.toString());
   const subsections = useSubsections(onboarding, riskSignals);
-  const [selectedSubsection, setSelectedSubsection] = useState<Subsection>(Object.keys(subsections)[0] as Subsection);
+  const subsectionKeys = Object.keys(subsections) as (keyof typeof subsections)[];
+  const [selectedSubsection, setSelectedSubsection] = useState<Subsection>(subsectionKeys[0]);
   const isBusinessInsight = subsections[selectedSubsection]?.isBusinessInsight;
 
   useEffect(() => {
-    setSelectedSubsection(Object.keys(subsections)[0] as Subsection);
+    setSelectedSubsection(subsectionKeys[0]);
   }, [riskSignals, onboarding.ruleSetResults]);
 
   return (

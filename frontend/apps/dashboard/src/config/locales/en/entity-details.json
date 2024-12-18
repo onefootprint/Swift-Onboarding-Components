@@ -1260,8 +1260,30 @@
     },
     "business-details": {
       "title": "Business details",
-      "business-name": "Business name",
-      "other-details": "Other business details"
+      "name": {
+        "title": "Business name",
+        "table": {
+          "aria-label": "Business names",
+          "empty-state": "No names",
+          "header": {
+            "name": "Name",
+            "type": "Type",
+            "notes": "Notes"
+          },
+          "source": "Source: {{sources}}",
+          "legal": "Legal",
+          "dba": "Doing business as"
+        }
+      },
+      "details": {
+        "title": "Other business details",
+        "formation-date": "Formation date",
+        "formation-state": "Formation state",
+        "tin": "TIN (EIN)",
+        "entity-type": "Entity type",
+        "phone-number": "Phone number",
+        "website": "Website"
+      }
     },
     "people": {
       "title": "People"

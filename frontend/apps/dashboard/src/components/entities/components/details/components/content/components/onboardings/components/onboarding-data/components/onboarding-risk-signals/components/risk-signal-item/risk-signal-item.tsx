@@ -1,6 +1,7 @@
 import useRiskSignalsFilters from '@/entities/components/details/hooks/use-risk-signals-filters';
 import type { RiskSignal } from '@onefootprint/request-types/dashboard';
 import { Divider } from '@onefootprint/ui';
+import { cva } from 'class-variance-authority';
 import isSentilinkSignal from '../../../../../../../risk-signals/utils/is-sentilink-signal';
 import useRiskSignalSeverityText from '../../../../hooks/use-risk-signal-severity-text';
 
@@ -31,16 +32,20 @@ const RiskSignalItem = ({ riskSignal }: RiskSignalItemProps) => {
   };
 
   return (
-    <button
-      className="relative flex items-end gap-2 py-1 hover:after:content-[''] hover:after:absolute hover:after:top-0 hover:after:left-[-12px] hover:after:w-[calc(100%+24px)] hover:after:h-full hover:after:bg-secondary hover:after:rounded-[2px] hover:after:-z-10"
-      onClick={handleRowClick}
-      type="button"
-    >
+    <button className={riskSignalItemItem()} onClick={handleRowClick} type="button">
       <span className="text-snippet-1 text-secondary">{reasonCode}</span>
       <Divider variant="secondary" marginBottom={2} />
       <span className={`text-caption-1 text-${getSeverityColor()}`}>{riskSignalSeverityT(severity)}</span>
     </button>
   );
 };
+
+const riskSignalItemItem = cva([
+  'relative flex items-end gap-2 py-1',
+  'hover:after:content-[""]',
+  'hover:after:absolute hover:after:top-0 hover:after:left-[-12px]',
+  'hover:after:w-[calc(100%+24px)] hover:after:h-full',
+  'hover:after:bg-secondary hover:after:rounded-[2px] hover:after:-z-10',
+]);
 
 export default RiskSignalItem;

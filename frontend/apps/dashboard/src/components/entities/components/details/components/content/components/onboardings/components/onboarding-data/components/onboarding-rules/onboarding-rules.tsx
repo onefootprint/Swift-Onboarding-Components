@@ -16,6 +16,7 @@ type OnboardingRulesProps = {
 
 const OnboardingRules = ({ ruleSetResultId }: OnboardingRulesProps) => {
   const { t } = useTranslation('entity-details', { keyPrefix: 'onboardings.rules' });
+  const [showTriggeredRules, setShowTriggeredRules] = useState(true);
   const entityId = useEntityId();
   const { data, isPending, error } = useQuery({
     ...getEntitiesByFpIdRuleSetResultByRuleSetResultIdOptions({
@@ -23,7 +24,6 @@ const OnboardingRules = ({ ruleSetResultId }: OnboardingRulesProps) => {
     }),
     enabled: Boolean(entityId) && Boolean(ruleSetResultId),
   });
-  const [showTriggeredRules, setShowTriggeredRules] = useState(true);
 
   const handleClick = (isTriggered: boolean) => {
     setShowTriggeredRules(isTriggered);

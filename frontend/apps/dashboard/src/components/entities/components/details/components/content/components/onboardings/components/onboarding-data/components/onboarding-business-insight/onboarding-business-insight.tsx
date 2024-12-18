@@ -3,6 +3,7 @@ import type { Subsection as SubsectionType } from '../../hooks/use-subsections';
 import Decrypt from '../decrypt';
 import type { VaultType } from '../onboarding-user-data/hooks/use-seqno-vault';
 import Subsection from '../subsection';
+import DecryptedContent from './components/decrypted-content';
 
 type OnboardingBusinessInsightProps = {
   canDecrypt: boolean;
@@ -16,6 +17,7 @@ type OnboardingBusinessInsightProps = {
 const OnboardingBusinessInsight = ({
   canDecrypt,
   isDecrypted,
+  selectedSubsection,
   title,
   onboardingId,
   vault,
@@ -23,26 +25,24 @@ const OnboardingBusinessInsight = ({
   const { t } = useTranslation('entity-details', { keyPrefix: 'onboardings.business-insight' });
   const { data: vaultData, update: updateVault } = vault;
 
-  if (!isDecrypted) {
-    return (
-      <Subsection
-        title={title}
-        hasDivider
-        rightComponent={
-          <Decrypt
-            canDecrypt={canDecrypt}
-            onDecryptSuccess={updateVault}
-            onboardingId={onboardingId}
-            vaultData={vaultData}
-          />
-        }
-      >
-        <span className="text-body-3">{t('encrypted')}</span>
-      </Subsection>
-    );
-  }
-
-  return <span className="text-body-3">[decrypted details here]</span>;
+  return isDecrypted ? (
+    <DecryptedContent onboardingId={onboardingId} selectedSubsection={selectedSubsection} />
+  ) : (
+    <Subsection
+      title={title}
+      hasDivider
+      rightComponent={
+        <Decrypt
+          canDecrypt={canDecrypt}
+          onDecryptSuccess={updateVault}
+          onboardingId={onboardingId}
+          vaultData={vaultData}
+        />
+      }
+    >
+      <span className="text-body-3">{t('encrypted')}</span>
+    </Subsection>
+  );
 };
 
 export default OnboardingBusinessInsight;
