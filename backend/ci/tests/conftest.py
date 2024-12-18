@@ -180,6 +180,7 @@ def skip_phone_obc(sandbox_tenant):
         must_collect_data=["full_address", "name", "email"],
         optional_data=[],
         is_no_phone_flow=True,
+        required_auth_methods=["email"],
     )
 
 

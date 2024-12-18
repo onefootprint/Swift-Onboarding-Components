@@ -242,3 +242,33 @@ def test_doc_playbook(sandbox_tenant):
     body = post("hosted/identify/session/challenge/verify", data, token)
 
     post("hosted/identify/session/verify", None, token)
+
+
+def test_no_phone_playbook(skip_phone_obc):
+    sandbox_id = _gen_random_sandbox_id()
+    sandbox_id_h = SandboxId(sandbox_id)
+    data = dict(scope="onboarding", data=dict())
+    body = post("hosted/identify/session", data, skip_phone_obc.key, sandbox_id_h)
+    token = FpAuth(body["token"])
+
+    # Check the requirements. Should only need to collect email
+    body = get("hosted/identify/session/requirements", None, token)
+    print(body)
+    assert body["requirements"][0]["kind"] == "collect_data"
+    assert body["requirements"][0]["cdo"] == "email"
+    assert body["requirements"][1]["kind"] == "challenge"
+    assert body["requirements"][1]["auth_method"] == "email"
+
+    # Vault the email
+    data = {"id.email": FIXTURE_EMAIL}
+    body = patch("hosted/identify/session/vault", data, token)
+
+    # Verify the email
+    data = dict(challenge_kind="email")
+    body = post("hosted/identify/session/challenge", data, token)
+    challenge_token = body["challenge_data"]["challenge_token"]
+
+    data = dict(challenge_token=challenge_token, challenge_response="000000")
+    body = post("hosted/identify/session/challenge/verify", data, token)
+
+    post("hosted/identify/session/verify", None, token)
