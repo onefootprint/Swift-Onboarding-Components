@@ -21,6 +21,7 @@ use newtypes::AuthMethodKind;
 use newtypes::CollectedDataOption as CDO;
 use newtypes::IdentityDataKind::Email;
 use newtypes::IdentityDataKind::PhoneNumber;
+use newtypes::ObConfigurationKind;
 use newtypes::PreviewApi::SmsLinkAuthentication;
 use paperclip::actix;
 use paperclip::actix::api_v2_operation;
@@ -81,9 +82,13 @@ pub(super) async fn get_requirements(
     // challenge them
     let mut requirements = vec![];
     let obc = identify.obc.clone();
+    let required_auth_methods = obc.required_auth_methods.unwrap_or(vec![AuthMethodKind::Phone]);
+
     let possible_auth_cdos = vec![CDO::Email, CDO::PhoneNumber];
     for cdo in possible_auth_cdos {
-        let playbook_requires = obc.must_collect_data.contains(&cdo);
+        // Document playbooks never collect email or phone, but we need them for the identify flow
+        let playbook_requires =
+            obc.must_collect_data.contains(&cdo) || obc.kind == ObConfigurationKind::Document;
         let is_populated = cdo
             .required_data_identifiers()
             .iter()
@@ -95,9 +100,8 @@ pub(super) async fn get_requirements(
 
     let tenant_supports_sms_link = identify.tenant.can_access_preview(&SmsLinkAuthentication);
     // If no auth methods are required, we default to phone
-    let auth_methods = obc.required_auth_methods.unwrap_or(vec![AuthMethodKind::Phone]);
     let aes = &identify.auth_events;
-    let challenge_reqs = auth_methods
+    let challenge_reqs = required_auth_methods
         .into_iter()
         .sorted_by_key(challenge_priority)
         .filter(|am| {
