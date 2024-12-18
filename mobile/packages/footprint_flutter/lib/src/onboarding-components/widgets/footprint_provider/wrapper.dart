@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:footprint_flutter/src/models/internal/onboarding_config.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/footprint_error.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/sandbox_outcome.dart';
 import 'package:footprint_flutter/src/onboarding-components/providers/fp_context_notifier.dart';
 import 'package:footprint_flutter/src/onboarding-components/queries/get_onboarding_config.dart';
@@ -35,22 +36,34 @@ class _WrapperState extends ConsumerState<Wrapper> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       getOnboardingConfig(widget.publicKey).then((config) {
         if (config.kind == OnboardingConfigKind.kyb) {
-          throw Exception(
-              'KYB is not supported yet in the sdk. Please use the hosted flow for KYB.');
+          throw FootprintError(
+            kind: ErrorKind.notAllowed,
+            message:
+                'KYB is not supported yet in the sdk. Please use the hosted flow for KYB.',
+          );
         }
 
         if (config.isLive && widget.sandboxId != null) {
-          throw Exception('sandboxId is not allowed in live mode');
+          throw FootprintError(
+            kind: ErrorKind.notAllowed,
+            message: 'sandboxId is not allowed in live mode',
+          );
         }
 
         if (config.isLive && widget.sandboxOutcome != null) {
-          throw Exception('sandboxOutcome is not allowed in live mode');
+          throw FootprintError(
+            kind: ErrorKind.notAllowed,
+            message: 'sandboxOutcome is not allowed in live mode',
+          );
         }
 
         if (config.requiresIdDoc == false &&
             widget.sandboxOutcome?.idDocOutcome != null) {
-          throw Exception(
-              'idDocOutcome is not allowed for no-document verification flow');
+          throw FootprintError(
+            kind: ErrorKind.notAllowed,
+            message:
+                'idDocOutcome is not allowed for no-document verification flow',
+          );
         }
 
         if (!config.isLive) {
@@ -58,7 +71,10 @@ class _WrapperState extends ConsumerState<Wrapper> {
           String? newSandboxId = widget.sandboxId;
           if (newSandboxId != null) {
             if (!isAlphanumeric(newSandboxId)) {
-              throw Exception('sandboxId must be alphanumeric');
+              throw FootprintError(
+                kind: ErrorKind.initializationError,
+                message: 'sandboxId must be alphanumeric',
+              );
             }
           } else {
             newSandboxId = generateRandomString(length: 12);

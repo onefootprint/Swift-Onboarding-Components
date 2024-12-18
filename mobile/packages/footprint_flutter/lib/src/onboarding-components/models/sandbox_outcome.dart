@@ -9,7 +9,7 @@ enum OverallOutcome {
 
   const OverallOutcome(this.value);
 
-  static OverallOutcome fromString(String value) {
+  static OverallOutcome? fromString(String value) {
     switch (value) {
       case "fail":
         return OverallOutcome.fail;
@@ -22,7 +22,7 @@ enum OverallOutcome {
       case "step_up":
         return OverallOutcome.stepUp;
       default:
-        throw Exception("Invalid value $value");
+        return null;
     }
   }
 
@@ -41,7 +41,7 @@ enum IdDocOutcome {
 
   const IdDocOutcome(this.value);
 
-  static IdDocOutcome fromString(String value) {
+  static IdDocOutcome? fromString(String value) {
     switch (value) {
       case "pass":
         return IdDocOutcome.pass;
@@ -50,7 +50,7 @@ enum IdDocOutcome {
       case "real":
         return IdDocOutcome.real;
       default:
-        throw Exception("Invalid value $value");
+        return null;
     }
   }
 

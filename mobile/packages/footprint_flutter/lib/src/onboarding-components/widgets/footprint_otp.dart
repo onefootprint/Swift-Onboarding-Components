@@ -6,8 +6,8 @@ import 'package:footprint_flutter/src/models/l10n.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/auth_token_status.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/challenge_data.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/challenge_kind.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/footprint_error.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/form_data.dart';
-import 'package:footprint_flutter/src/onboarding-components/models/inline_otp_not_supported_exception.dart';
 import 'package:footprint_flutter/src/onboarding-components/providers/fp_context_notifier.dart';
 import 'package:footprint_flutter/src/onboarding-components/queries/create_otp_challenge.dart';
 import 'package:footprint_flutter/src/onboarding-components/queries/get_onboarding_status.dart';
@@ -55,36 +55,49 @@ class _FootprintOtpState extends ConsumerState<FootprintOtp> {
     final hasEmail = email != null && email.isNotEmpty;
     final hasPhoneNumber = phoneNumber != null && phoneNumber.isNotEmpty;
 
+    if (obConfig == null || obConfigKind == null) {
+      throw FootprintError(
+        kind: ErrorKind.initializationError,
+        message: 'Onboarding config not found. Please check your public key',
+      );
+    }
+
     if (requiredAuthMethods != null && requiredAuthMethods.length > 1) {
-      throw InlineOtpNotSupportedException(
-          'Multiple auth methods are not supported');
+      throw FootprintError(
+        kind: ErrorKind.inlineOtpNotSupported,
+        message: "Multiple auth methods are not supported",
+      );
     }
     if (!hasEmail && !hasPhoneNumber) {
-      throw Exception('Email and/or phone number is required');
+      throw FootprintError(
+        kind: ErrorKind.authError,
+        message: "Email and/or phone number is required",
+      );
     }
 
     if (requiredAuthMethods?.length == 1) {
       if (requiredAuthMethods?.first == AuthMethodKind.email && !hasEmail) {
-        throw Exception('Email is required');
+        throw FootprintError(
+          kind: ErrorKind.authError,
+          message: "Email is required",
+        );
       }
       if (requiredAuthMethods?.first == AuthMethodKind.phone &&
           !hasPhoneNumber) {
-        throw Exception('Phone number is required');
+        throw FootprintError(
+          kind: ErrorKind.authError,
+          message: "Phone number is required",
+        );
       }
     }
 
     // If there is a valid auth token, we should not be using email/phone number
     if (authToken != null) {
-      throw Exception(
-          "You provided an auth token. Please authenticate using it or remove the auth token and authenticate using email/phone number");
-    }
-    if (obConfig == null || obConfigKind == null) {
-      throw Exception(
-          'Onboarding config not found. Please check your public key');
-    }
-    if (requiredAuthMethods != null && requiredAuthMethods.length > 1) {
-      throw InlineOtpNotSupportedException(
-          'Multiple auth methods are not supported');
+      throw FootprintError(
+        kind: ErrorKind.authError,
+        message:
+            "You provided an auth token. Please authenticate using it or remove the auth token and authenticate using email/phone number",
+      );
     }
 
     final challengeResponse = await createOtpChallenge((
@@ -98,10 +111,16 @@ class _FootprintOtpState extends ConsumerState<FootprintOtp> {
       scope: getIdentifyScopeFromObConfigKind(obConfigKind),
     ));
     if (challengeResponse.challengeData == null) {
-      throw Exception('Challenge data not found');
+      throw FootprintError(
+        kind: ErrorKind.authError,
+        message: 'Challenge data not found',
+      );
     }
     if (challengeResponse.error != null) {
-      throw Exception(challengeResponse.error);
+      throw FootprintError(
+        kind: ErrorKind.authError,
+        message: challengeResponse.error,
+      );
     }
     setState(() {
       _challengeData = challengeResponse.challengeData;
@@ -118,23 +137,36 @@ class _FootprintOtpState extends ConsumerState<FootprintOtp> {
     final authToken = fpContext.authToken;
     final authTokenStatus = fpContext.authTokenStatus;
     if (obConfig == null || obConfigKind == null) {
-      throw Exception(
-          'Onboarding config not found. Please check your public key');
+      throw FootprintError(
+        kind: ErrorKind.initializationError,
+        message: 'Onboarding config not found. Please check your public key',
+      );
     }
     if (authToken == null) {
-      throw Exception(
-          'Auth token not found. Please authenticate using email/phone number');
+      throw FootprintError(
+        kind: ErrorKind.authError,
+        message:
+            'Auth token not found. Please authenticate using email/phone number',
+      );
     }
     if (authTokenStatus == null) {
-      throw Exception(
-          'Please check the required auth methods before authenticating using auth token');
+      throw FootprintError(
+        kind: ErrorKind.authError,
+        message:
+            'Please call requiresAuth before authenticating using auth token',
+      );
     }
     if (authTokenStatus == AuthTokenStatus.invalid) {
-      throw Exception('Auth token is invalid. Please use a valid auth token');
+      throw FootprintError(
+        kind: ErrorKind.authError,
+        message: 'Auth token is invalid. Please use a valid auth token',
+      );
     }
     if (requiredAuthMethods != null && requiredAuthMethods.length > 1) {
-      throw InlineOtpNotSupportedException(
-          'Multiple auth methods are not supported');
+      throw FootprintError(
+        kind: ErrorKind.inlineOtpNotSupported,
+        message: "Multiple auth methods are not supported",
+      );
     }
     final challengeResponse = await createOtpChallenge((
       email: null,
@@ -146,10 +178,16 @@ class _FootprintOtpState extends ConsumerState<FootprintOtp> {
       scope: getIdentifyScopeFromObConfigKind(obConfigKind),
     ));
     if (challengeResponse.challengeData == null) {
-      throw Exception('Challenge data not found');
+      throw FootprintError(
+        kind: ErrorKind.authError,
+        message: 'Challenge data not found',
+      );
     }
     if (challengeResponse.error != null) {
-      throw Exception(challengeResponse.error);
+      throw FootprintError(
+        kind: ErrorKind.authError,
+        message: challengeResponse.error,
+      );
     }
     setState(() {
       _challengeData = challengeResponse.challengeData;
@@ -164,11 +202,17 @@ class _FootprintOtpState extends ConsumerState<FootprintOtp> {
     final locale = ref.read(fpContextNotifierProvider).locale;
 
     if (obConfigKind == null) {
-      throw Exception('Onboarding config kind not found');
+      throw FootprintError(
+        kind: ErrorKind.initializationError,
+        message: 'Onboarding config kind not found',
+      );
     }
 
     if (_challengeData == null) {
-      throw Exception('Challenge data not found');
+      throw FootprintError(
+        kind: ErrorKind.authError,
+        message: 'Challenge data not found',
+      );
     }
 
     final (:authToken, :vaultingToken, :validationToken) =

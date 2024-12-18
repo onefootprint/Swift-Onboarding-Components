@@ -1,3 +1,4 @@
+import 'package:footprint_flutter/src/onboarding-components/models/footprint_error.dart';
 import 'package:meta/meta.dart';
 
 class FormData {
@@ -216,7 +217,10 @@ class FormData {
   List<BusinessBeneficialOwners> _updateBoField(
       List<BusinessBeneficialOwners> boList, int index, String field, value) {
     if (index > boList.length) {
-      throw Exception('Request beneficial owner field index out of bounds');
+      throw FootprintError(
+        kind: ErrorKind.uiError,
+        message: 'Beneficial owner index out of bounds',
+      );
     }
     if (index == boList.length) {
       return boList +

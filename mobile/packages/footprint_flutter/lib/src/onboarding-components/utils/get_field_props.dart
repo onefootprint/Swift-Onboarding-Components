@@ -5,6 +5,7 @@ import 'package:footprint_flutter/src/config/corporation_types.dart';
 import 'package:footprint_flutter/src/config/countries.dart';
 import 'package:footprint_flutter/src/models/l10n.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/data_identifier.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/footprint_error.dart';
 import 'package:footprint_flutter/src/onboarding-components/providers/fp_context_notifier.dart';
 import 'package:footprint_flutter/src/onboarding-components/utils/validators.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
@@ -32,18 +33,27 @@ FieldProps getFieldProps(
 
   if (name.toString().isEmpty) {
     // Should never happen, but just in case
-    throw Exception('Field name is empty');
+    throw FootprintError(
+      kind: ErrorKind.uiError,
+      message: "Field name is empty",
+    );
   }
 
   if (name == DataIdentifier.custom) {
     if (additionalIdentifier == null) {
-      throw Exception('Field $name requires additional identifier');
+      throw FootprintError(
+        kind: ErrorKind.uiError,
+        message: "Field $name requires additional identifier",
+      );
     }
   }
 
   final props = getProps(name, additionalIdentifier, locale);
   if (props == null) {
-    throw Exception('Field $name is not supported');
+    throw FootprintError(
+      kind: ErrorKind.uiError,
+      message: "Field $name is not supported",
+    );
   }
 
   return (

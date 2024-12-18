@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/footprint_error.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/form_data.dart';
 import 'package:footprint_flutter/src/onboarding-components/utils/get_footprint_service.dart';
 import 'package:footprint_flutter/src/onboarding-components/widgets/footprint_service.dart';
@@ -6,7 +7,10 @@ import 'package:footprint_flutter/src/onboarding-components/widgets/footprint_se
 _FootprintUtils footprintUtils(BuildContext context) {
   final helpers = FootprintService.of(context);
   if (helpers == null) {
-    throw Exception('No FootprintService found in context');
+    throw FootprintError(
+      kind: ErrorKind.uiError,
+      message: 'No FootprintService found in context',
+    );
   }
   final launchIdentify = helpers.launchIdentify;
   final vault = helpers.vault;

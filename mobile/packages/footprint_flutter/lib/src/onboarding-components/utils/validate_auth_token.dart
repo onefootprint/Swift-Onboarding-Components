@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:footprint_flutter/src/models/internal/onboarding_config.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/auth_token_status.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/footprint_error.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/identify_scope.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/sandbox_outcome.dart';
 import 'package:footprint_flutter/src/onboarding-components/providers/fp_context_notifier.dart';
@@ -63,14 +64,20 @@ Future<ValidateAuthTokenResult> validateAuthToken({
   OnboardingConfigKind? obConfigKind;
 
   if (onboardingConfig == null) {
-    throw Exception(
-        'Onboarding config not found. Please make sure you have the correct publicKey and "isReady" is true');
+    throw FootprintError(
+      kind: ErrorKind.initializationError,
+      message:
+          "Onboarding config not found. Please make sure you have the correct publicKey and 'isReady' is true",
+    );
   } else {
     obConfigKind = onboardingConfig.kind;
   }
 
   if (obConfigKind == null) {
-    throw Exception('We could not determine the onboarding config kind');
+    throw FootprintError(
+      kind: ErrorKind.initializationError,
+      message: 'We could not determine the onboarding config kind',
+    );
   }
 
   final identifyScope = getIdentifyScopeFromObConfigKind(obConfigKind);
@@ -117,6 +124,9 @@ Future<ValidateAuthTokenResult> validateAuthToken({
     ref
         .read(fpContextNotifierProvider.notifier)
         .updateAuthTokenStatus(AuthTokenStatus.invalid);
-    throw Exception('Error identifying authToken. Please check your token');
+    throw FootprintError(
+      kind: ErrorKind.invalidAuthTokenError,
+      message: 'Error identifying authToken. Please check your token',
+    );
   }
 }

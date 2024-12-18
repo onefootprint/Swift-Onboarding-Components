@@ -2,8 +2,10 @@ import 'dart:convert';
 
 import 'package:footprint_flutter/src/config/constants.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/data_identifier.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/footprint_error.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/onboarding_status.dart';
 import 'package:footprint_flutter/src/onboarding-components/utils/get_dis_from_cdo.dart';
+import 'package:footprint_flutter/src/onboarding-components/utils/parse_api_error_response.dart';
 import 'package:http/http.dart' as http;
 
 typedef Fields = ({
@@ -40,8 +42,12 @@ Future<OnboardingStatusResponse> getOnboardingRequirements(
     final responseBody = jsonDecode(response.body);
     return OnboardingStatusResponse.fromJson(responseBody);
   } else {
-    throw Exception(
-        'Failed to get onboarding status. Status code: ${response.statusCode}');
+    final parsedError = parseApiErrorResponse(response.body);
+    throw FootprintError(
+      kind: ErrorKind.onboardingError,
+      message: 'Failed to get onboarding status',
+      supportId: parsedError.supportId,
+    );
   }
 }
 

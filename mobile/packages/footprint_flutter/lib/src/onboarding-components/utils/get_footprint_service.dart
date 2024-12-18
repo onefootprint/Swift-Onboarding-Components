@@ -6,8 +6,8 @@ import 'package:footprint_flutter/src/models/internal/onboarding_config.dart';
 import 'package:footprint_flutter/src/models/l10n.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/auth_token_status.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/footprint_configuration.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/footprint_error.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/form_data.dart';
-import 'package:footprint_flutter/src/onboarding-components/models/inline_process_exception.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/onboarding_status.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/onboarding_step.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/save_data_request.dart';
@@ -63,7 +63,10 @@ typedef GetRequirementsHandler = Future<GetOnboardingStatusResult> Function();
     if (status == AuthTokenStatus.validWithInsufficientScope) {
       return true;
     }
-    throw Exception('Invalid auth token. Please use a valid auth token.');
+    throw FootprintError(
+      kind: ErrorKind.invalidAuthTokenError,
+      message: 'Invalid auth token. Please use a valid auth token.',
+    );
   }
 
   Future<VerificationResult> getVerificationResult({
@@ -98,7 +101,10 @@ typedef GetRequirementsHandler = Future<GetOnboardingStatusResult> Function();
     final obConfigKind = fpContext.onboardingConfig?.kind;
     final locale = fpContext.locale ?? FootprintSupportedLocale.enUS;
     if (obConfigKind == null) {
-      throw Exception('Onboarding config kind not found');
+      throw FootprintError(
+        kind: ErrorKind.initializationError,
+        message: 'Onboarding config kind not found',
+      );
     }
 
     // If we already have a vaulting token, we don't need to authenticate
@@ -313,23 +319,35 @@ typedef GetRequirementsHandler = Future<GetOnboardingStatusResult> Function();
     final locale = fpContext.locale;
 
     if (onboardingConfig == null) {
-      throw Exception(
-          'No onboarding config found. Please make sure that the publicKey is correct and "isReady" is true.');
+      throw FootprintError(
+        kind: ErrorKind.initializationError,
+        message:
+            'No onboarding config found. Please make sure that the publicKey is correct and "isReady" is true.',
+      );
     }
 
     if (onboardingConfig.kind == OnboardingConfigKind.auth) {
-      throw Exception(
-          "Saving data is not allowed for auth playbooks. Please use a KYC or KYB playbook.");
+      throw FootprintError(
+        kind: ErrorKind.notAllowed,
+        message:
+            'Saving data is not allowed for auth playbooks. Please use a KYC or KYB playbook.',
+      );
     }
 
     if (vaultToken == null) {
-      throw Exception('No auth token found. Please authenticate first.');
+      throw FootprintError(
+        kind: ErrorKind.authError,
+        message: 'No vaulting token found. Please authenticate first.',
+      );
     }
 
     if (onboardingConfig.kind != OnboardingConfigKind.kyc &&
         onboardingConfig.kind != OnboardingConfigKind.kyb) {
-      throw Exception(
-          'Unsupported onboarding config kind. Please make sure that the kind is either "kyc" or "kyb".');
+      throw FootprintError(
+        kind: ErrorKind.notAllowed,
+        message:
+            'Unsupported onboarding config kind. Please make sure that the kind is either "kyc" or "kyb".',
+      );
     }
 
     final formattedData = formatBeforeSave(
@@ -353,18 +371,33 @@ typedef GetRequirementsHandler = Future<GetOnboardingStatusResult> Function();
     final obConfigKind = fpContext.onboardingConfig?.kind;
 
     if (obConfigKind == null) {
-      onError?.call(Exception('Onboarding config kind not found.'));
+      onError?.call(
+        FootprintError(
+          kind: ErrorKind.initializationError,
+          message: 'Onboarding config kind not found.',
+        ),
+      );
       return;
     }
 
     if (obConfigKind == OnboardingConfigKind.auth) {
-      onError?.call(Exception('Handoff is not allowed for auth playbooks.'));
+      onError?.call(
+        FootprintError(
+          kind: ErrorKind.notAllowed,
+          message:
+              'Handoff is not allowed for auth playbooks. Please use a KYC or KYB playbook.',
+        ),
+      );
       return;
     }
 
     if (authToken == null) {
-      onError
-          ?.call(Exception('No auth token found. Please authenticate first.'));
+      onError?.call(
+        FootprintError(
+          kind: ErrorKind.authError,
+          message: 'No auth token found. Please authenticate first.',
+        ),
+      );
       return;
     }
 
@@ -393,27 +426,38 @@ typedef GetRequirementsHandler = Future<GetOnboardingStatusResult> Function();
     final obConfigKind = fpContext.onboardingConfig?.kind;
 
     if (obConfigKind == OnboardingConfigKind.auth) {
-      throw Exception(
-          "Processing is not allowed for auth playbooks. Please use a KYC or KYB playbook.");
+      throw FootprintError(
+        kind: ErrorKind.notAllowed,
+        message:
+            'Processing is not allowed for auth playbooks. Please use a KYC or KYB playbook.',
+      );
     }
 
     if (authToken == null) {
-      throw Exception('No auth token found. Please authenticate first.');
+      throw FootprintError(
+        kind: ErrorKind.authError,
+        message: 'No auth token found. Please authenticate first.',
+      );
     }
 
     final requirementsBeforeProcess = await getOnboardingStatus(authToken);
     for (var requirement in requirementsBeforeProcess.requirements.all) {
       if (!requirement.isMet &&
           requirement.kind != OnboardingRequirementKind.process) {
-        throw InlineProcessException(
-            "Process error. Onboarding requirements not met.");
+        throw FootprintError(
+          kind: ErrorKind.inlineProcessNotSupported,
+          message: "Process error. Onboarding requirements not met.",
+        );
       }
     }
 
     try {
       await process(authToken);
     } catch (e) {
-      throw InlineProcessException("Failed to process onboarding. Error: $e");
+      throw FootprintError(
+        kind: ErrorKind.inlineProcessNotSupported,
+        message: "Failed to process onboarding. Error: $e",
+      );
     }
 
     final validationToken =
@@ -427,13 +471,18 @@ typedef GetRequirementsHandler = Future<GetOnboardingStatusResult> Function();
     final obConfigKind = fpContext.onboardingConfig?.kind;
 
     if (obConfigKind == OnboardingConfigKind.auth) {
-      throw Exception(
-        "Getting requirements is not allowed for auth playbooks. Please use a KYC or KYB playbook.",
+      throw FootprintError(
+        kind: ErrorKind.notAllowed,
+        message:
+            'Getting requirements is not allowed for auth playbooks. Please use a KYC or KYB playbook.',
       );
     }
 
     if (authToken == null) {
-      throw Exception('No auth token found. Please authenticate first.');
+      throw FootprintError(
+        kind: ErrorKind.authError,
+        message: 'No auth token found. Please authenticate first.',
+      );
     }
 
     final requirements = await getOnboardingStatus(authToken);

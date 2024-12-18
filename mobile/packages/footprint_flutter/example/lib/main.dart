@@ -191,7 +191,7 @@ class _OnboardingComponentsState extends State<OnboardingComponents> {
           sandboxOutcome: SandboxOutcome(
             overallOutcome: OverallOutcome.fail,
           ),
-          sandboxId: "3jmlksncdsvbvsbevdsaww",
+          // sandboxId: "3jmlksncdsvbvsbevdsaww",
           // authToken: "utok_0DcG15SEkP4YAuMwOoEsBGrjrFK0OTuUei",
           child: const Kyc(), // Use Auth() for Auth Playbook
         ),
@@ -437,16 +437,16 @@ class _IdentifyState extends State<Identify> {
           if (!isChallengeCreated) {
             otpUtils.createAuthTokenBasedChallenge().then((challengeKind) {
               handleChallengeCreated(challengeKind);
-            }).catchError(
-              (_) {
+            }).catchError((err) {
+              if (err is FootprintError &&
+                  err.kind == ErrorKind.inlineOtpNotSupported) {
                 footprintUtils(context).launchIdentify(
                     onAuthenticated: (verificationResult) {
                   widget.handleAuthenticated(verificationResult);
                 } // Don't pass email and phone number - it's going to use auth token
                     );
-              },
-              test: (err) => err is InlineOtpNotSupportedException,
-            );
+              }
+            });
             return const Center(child: CircularProgressIndicator());
           }
 
@@ -518,8 +518,9 @@ class _IdentifyState extends State<Identify> {
             )
                 .then((challegeKind) {
               handleChallengeCreated(challegeKind);
-            }).catchError(
-              (_) {
+            }).catchError((err) {
+              if (err is FootprintError &&
+                  err.kind == ErrorKind.inlineOtpNotSupported) {
                 footprintUtils(context).launchIdentify(
                   email: formData.email,
                   phoneNumber: formData.phoneNumber,
@@ -527,9 +528,8 @@ class _IdentifyState extends State<Identify> {
                     widget.handleAuthenticated(verificationResult);
                   },
                 );
-              },
-              test: (err) => err is InlineOtpNotSupportedException,
-            );
+              }
+            });
           });
         }
         return Container(
@@ -778,9 +778,9 @@ class Ssn extends StatelessWidget {
       (_) {
         utilMethods.process().then((validationToken) {
           onCompleted(validationToken);
-        }).catchError(
-          (err) {
-            print("Process Error $err");
+        }).catchError((err) {
+          if (err is FootprintError &&
+              err.kind == ErrorKind.inlineProcessNotSupported) {
             utilMethods.handoff(
               onComplete: (token) {
                 onCompleted(token);
@@ -792,9 +792,10 @@ class Ssn extends StatelessWidget {
                 print("Handoff canceled");
               },
             );
-          },
-          test: (err) => err is InlineProcessException,
-        );
+          } else {
+            print("Process Error $err");
+          }
+        });
       },
     ).catchError(
       (err) {

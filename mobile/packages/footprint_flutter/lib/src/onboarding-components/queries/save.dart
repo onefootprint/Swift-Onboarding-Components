@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:footprint_flutter/src/config/constants.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/footprint_error.dart';
 import "package:footprint_flutter/src/onboarding-components/models/save_data_request.dart";
+import 'package:footprint_flutter/src/onboarding-components/utils/parse_api_error_response.dart';
 import 'package:http/http.dart' as http;
 
 typedef DataKind = ({bool hasId, bool hasBusiness});
@@ -21,7 +23,10 @@ Future<SaveDataResponse> save(SaveDataRequest payload) async {
 
   final dataKind = getDataKind(data);
   if (dataKind.hasId && dataKind.hasBusiness) {
-    throw Exception("You can't submit id and business at the same time");
+    throw FootprintError(
+      kind: ErrorKind.vaultingError,
+      message: "You can't submit id and business at the same time",
+    );
   }
 
   final url =
@@ -39,6 +44,12 @@ Future<SaveDataResponse> save(SaveDataRequest payload) async {
   if (response.statusCode == 200) {
     return SaveDataResponse(data: response.body);
   } else {
-    throw Exception('Failed to save data. Error: ${response.body}');
+    final parsedError = parseApiErrorResponse(response.body);
+    throw FootprintError(
+      kind: ErrorKind.vaultingError,
+      message: "Failed to save data. ${parsedError.message}",
+      supportId: parsedError.supportId,
+      context: parsedError.context,
+    );
   }
 }

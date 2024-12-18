@@ -1,4 +1,5 @@
 import 'package:footprint_flutter/src/models/internal/onboarding_config.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/footprint_error.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/identify_scope.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/init_onboarding_response.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/sandbox_outcome.dart';
@@ -7,6 +8,7 @@ import 'dart:convert';
 import 'package:footprint_flutter/src/config/constants.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/verification_response.dart';
 import 'package:footprint_flutter/src/onboarding-components/queries/validate_onboarding.dart';
+import 'package:footprint_flutter/src/onboarding-components/utils/parse_api_error_response.dart';
 import 'package:http/http.dart' as http;
 
 typedef VerifyOtpChallengeRequest = ({
@@ -45,7 +47,12 @@ Future<VerificationResponse> verify(
     final responseBody = jsonDecode(response.body);
     return VerificationResponse.fromJson(responseBody);
   } else {
-    throw Exception('Failed to verify OTP challenge');
+    final parsedError = parseApiErrorResponse(response.body);
+    throw FootprintError(
+      kind: ErrorKind.authError,
+      message: 'Failed to verify OTP challenge',
+      supportId: parsedError.supportId,
+    );
   }
 }
 
@@ -63,7 +70,12 @@ Future<ValidationTokenResponse> getValidationToken(String token) async {
     final responseBody = jsonDecode(response.body);
     return ValidationTokenResponse.fromJson(responseBody);
   } else {
-    throw Exception('Failed to get validation token');
+    final parsedError = parseApiErrorResponse(response.body);
+    throw FootprintError(
+      kind: ErrorKind.userError,
+      message: "Failed to get validation token",
+      supportId: parsedError.supportId,
+    );
   }
 }
 
@@ -86,7 +98,12 @@ Future<InitOnboardingResponse> initOnboarding(
     final responseBody = jsonDecode(response.body);
     return InitOnboardingResponse.fromJson(responseBody);
   } else {
-    throw Exception('Failed to initialize onboarding');
+    final parsedError = parseApiErrorResponse(response.body);
+    throw FootprintError(
+      kind: ErrorKind.onboardingError,
+      message: 'Failed to initialize onboarding',
+      supportId: parsedError.supportId,
+    );
   }
 }
 
@@ -107,7 +124,12 @@ Future<VaultingTokenResponse> createVaultingToken(String authToken) async {
     final responseBody = jsonDecode(response.body);
     return VaultingTokenResponse.fromJson(responseBody);
   } else {
-    throw Exception('Failed to create vaulting token');
+    final parsedError = parseApiErrorResponse(response.body);
+    throw FootprintError(
+      kind: ErrorKind.authError,
+      message: 'Failed to create vaulting token',
+      supportId: parsedError.supportId,
+    );
   }
 }
 

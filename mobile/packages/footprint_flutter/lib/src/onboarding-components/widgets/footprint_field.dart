@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/data_identifier.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/footprint_error.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/form-errors.dart';
 import 'package:footprint_flutter/src/onboarding-components/utils/get_field_props.dart';
 import 'package:footprint_flutter/src/onboarding-components/widgets/field_context.dart';
@@ -23,10 +24,16 @@ class FootprintField extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (createField == null && child == null) {
-      throw Exception("Either child or createField must be provided");
+      throw FootprintError(
+        kind: ErrorKind.uiError,
+        message: 'Either child or createField must be provided',
+      );
     }
     if (createField != null && child != null) {
-      throw Exception("Only one of child or createField must be provided");
+      throw FootprintError(
+        kind: ErrorKind.uiError,
+        message: 'Only one of child or createField must be provided',
+      );
     }
     final props = getFieldProps(ref, name, additionalIdentifier);
     if (child != null) {

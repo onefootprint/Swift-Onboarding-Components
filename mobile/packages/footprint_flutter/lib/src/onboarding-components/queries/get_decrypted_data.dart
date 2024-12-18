@@ -3,8 +3,10 @@ import 'dart:convert';
 import 'package:footprint_flutter/src/config/constants.dart';
 import 'package:footprint_flutter/src/models/l10n.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/data_identifier.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/footprint_error.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/form_data.dart';
 import 'package:footprint_flutter/src/onboarding-components/utils/date_formatter.dart';
+import 'package:footprint_flutter/src/onboarding-components/utils/parse_api_error_response.dart';
 import 'package:http/http.dart' as http;
 
 typedef GetDecryptedDataRequest = ({
@@ -19,7 +21,10 @@ Map<String, dynamic> formatDecryptedData(
     final usDobString = fromISO8601ToUSDate(data['id.dob']);
     data['id.dob'] = fromUsDateToStringInput(locale, usDobString ?? '');
     if (data['id.dob'] == null || data['id.dob'] == '') {
-      throw Exception('Invalid date format. Error in formatting date.');
+      throw FootprintError(
+        kind: ErrorKind.decryptionError,
+        message: 'Invalid date format. Error in formatting date.',
+      );
     }
   }
 
@@ -30,8 +35,11 @@ Map<String, dynamic> formatDecryptedData(
         fromUsDateToStringInput(locale, usVisaExpirationDateString ?? '');
     if (data["id.visa_expiration_date"] == null ||
         data["id.visa_expiration_date"] == '') {
-      throw Exception(
-          "Invalid date format. Error in formatting visa expiration date.");
+      throw FootprintError(
+        kind: ErrorKind.decryptionError,
+        message:
+            'Invalid date format. Error in formatting visa expiration date.',
+      );
     }
   }
 
@@ -42,8 +50,10 @@ Map<String, dynamic> formatDecryptedData(
         fromUsDateToStringInput(locale, usFormationDateString ?? '');
     if (data["business.formation_date"] == null ||
         data["business.formation_date"] == '') {
-      throw Exception(
-          "Invalid date format. Error in formatting formation date.");
+      throw FootprintError(
+        kind: ErrorKind.decryptionError,
+        message: 'Invalid date format. Error in formatting formation date.',
+      );
     }
   }
 
@@ -70,7 +80,12 @@ Future<Map<String, dynamic>> getDecryptedUserData(
     final responseBody = jsonDecode(response.body);
     return responseBody;
   } else {
-    throw Exception('Failed to get decrypted user data');
+    final parsedError = parseApiErrorResponse(response.body);
+    throw FootprintError(
+      kind: ErrorKind.decryptionError,
+      message: 'Failed to get decrypted user data',
+      supportId: parsedError.supportId,
+    );
   }
 }
 
@@ -94,7 +109,12 @@ Future<Map<String, dynamic>> getDecryptedBusinessData(
     final responseBody = jsonDecode(response.body);
     return responseBody;
   } else {
-    throw Exception('Failed to get decrypted business data');
+    final parsedError = parseApiErrorResponse(response.body);
+    throw FootprintError(
+      kind: ErrorKind.decryptionError,
+      message: 'Failed to get decrypted business data',
+      supportId: parsedError.supportId,
+    );
   }
 }
 

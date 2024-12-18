@@ -3,9 +3,10 @@ import 'dart:convert';
 import 'package:footprint_flutter/src/config/constants.dart';
 import 'package:footprint_flutter/src/models/internal/auth_method.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/challenge_response.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/footprint_error.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/identify_response.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/identify_scope.dart';
-import 'package:footprint_flutter/src/onboarding-components/models/inline_otp_not_supported_exception.dart';
+import 'package:footprint_flutter/src/onboarding-components/utils/parse_api_error_response.dart';
 import 'package:http/http.dart' as http;
 
 typedef OtpChallengeRequest = ({
@@ -55,7 +56,12 @@ Future<IdentifyResponse> identify(OtpIdentifyRequest requestData) async {
     final responseBody = jsonDecode(response.body);
     return IdentifyResponse.fromJson(responseBody);
   } else {
-    throw Exception('Failed to identify before creating OTP challenge');
+    final parsedError = parseApiErrorResponse(response.body);
+    throw FootprintError(
+      kind: ErrorKind.userError,
+      message: 'Failed to identify before creating OTP challenge',
+      supportId: parsedError.supportId,
+    );
   }
 }
 
@@ -75,7 +81,12 @@ Future<ChallengeResponse> loginChallenge(
     final responseBody = jsonDecode(response.body);
     return ChallengeResponse.fromJson(responseBody);
   } else {
-    throw Exception('Failed to create login challenge');
+    final parsedError = parseApiErrorResponse(response.body);
+    throw FootprintError(
+      kind: ErrorKind.authError,
+      message: 'Failed to create OTP login challenge',
+      supportId: parsedError.supportId,
+    );
   }
 }
 
@@ -123,7 +134,12 @@ Future<ChallengeResponse> signupChallenge(
     final responseBody = jsonDecode(response.body);
     return ChallengeResponse.fromJson(responseBody);
   } else {
-    throw Exception('Failed to create OTP signup challenge');
+    final parsedError = parseApiErrorResponse(response.body);
+    throw FootprintError(
+      kind: ErrorKind.authError,
+      message: 'Failed to create OTP signup challenge',
+      supportId: parsedError.supportId,
+    );
   }
 }
 
@@ -141,7 +157,10 @@ Future<ChallengeResponse> createOtpChallenge(
     final hasVerifiedSource =
         identifyResponse.user!.authMethods.any((e) => e.isVerified);
     if (!hasVerifiedSource) {
-      throw InlineOtpNotSupportedException("No verified source found");
+      throw FootprintError(
+        kind: ErrorKind.inlineOtpNotSupported,
+        message: "No verified source found",
+      );
     }
     final hasPhone = identifyResponse.user!.authMethods.any(
       (e) => e.kind == AuthMethodKind.phone && e.isVerified,
@@ -152,13 +171,19 @@ Future<ChallengeResponse> createOtpChallenge(
     if (requestData.requiredAuthMethods != null) {
       if (requestData.requiredAuthMethods!.contains(AuthMethodKind.phone) &&
           !hasPhone) {
-        throw InlineOtpNotSupportedException(
-            "Inline OTP not supported - phone number is required but has not been verified");
+        throw FootprintError(
+          kind: ErrorKind.inlineOtpNotSupported,
+          message:
+              "Inline OTP not supported - phone number is required but has not been verified",
+        );
       }
       if (requestData.requiredAuthMethods!.contains(AuthMethodKind.email) &&
           !hasEmail) {
-        throw InlineOtpNotSupportedException(
-            "Inline OTP not supported - email is required but has not been verified");
+        throw FootprintError(
+          kind: ErrorKind.inlineOtpNotSupported,
+          message:
+              "Inline OTP not supported - email is required but has not been verified",
+        );
       }
     }
     if (hasPhone) {
@@ -170,7 +195,10 @@ Future<ChallengeResponse> createOtpChallenge(
           kind: "email", token: identifyResponse.user!.token);
       return loginChallengeResponse;
     } else {
-      throw InlineOtpNotSupportedException("No supported auth method found");
+      throw FootprintError(
+        kind: ErrorKind.inlineOtpNotSupported,
+        message: "No supported auth method found",
+      );
     }
   }
   final signupChallengeResponse = await signupChallenge(requestData);

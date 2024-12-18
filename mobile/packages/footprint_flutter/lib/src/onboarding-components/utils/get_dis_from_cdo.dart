@@ -57,6 +57,6 @@ List<DataIdentifier> getDisFromCdo(CollectedDataOption cdo) {
         DataIdentifier.investorFundingSources,
       ];
     default:
-      throw Exception("CollectedDataOption not supported: $cdo");
+      return [];
   }
 }

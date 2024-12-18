@@ -1,4 +1,5 @@
 import 'package:footprint_flutter/src/models/l10n.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/footprint_error.dart';
 import 'package:footprint_flutter/src/onboarding-components/utils/date_formatter.dart';
 
 Map<String, dynamic> removeEmpty(Map<String, dynamic> obj) {
@@ -16,7 +17,10 @@ Map<String, dynamic> formatBeforeSave(
     final usDobString = strInputToUSDate(locale, data['id.dob']);
     data['id.dob'] = fromUSDateToISO8601Format(usDobString);
     if (data['id.dob'] == null) {
-      throw Exception('Invalid date format. Error in formatting date.');
+      throw FootprintError(
+        kind: ErrorKind.vaultingError,
+        message: "Invalid date format. Error in formatting date.",
+      );
     }
   }
 
@@ -26,8 +30,11 @@ Map<String, dynamic> formatBeforeSave(
     data["id.visa_expiration_date"] =
         fromUSDateToISO8601Format(usVisaExpirationDateString);
     if (data["id.visa_expiration_date"] == null) {
-      throw Exception(
-          "Invalid date format. Error in formatting visa expiration date.");
+      throw FootprintError(
+        kind: ErrorKind.vaultingError,
+        message:
+            "Invalid date format. Error in formatting visa expiration date.",
+      );
     }
   }
 
@@ -37,8 +44,10 @@ Map<String, dynamic> formatBeforeSave(
     data["business.formation_date"] =
         fromUSDateToISO8601Format(usFormationDateString);
     if (data["business.formation_date"] == null) {
-      throw Exception(
-          "Invalid date format. Error in formatting formation date.");
+      throw FootprintError(
+        kind: ErrorKind.vaultingError,
+        message: "Invalid date format. Error in formatting formation date.",
+      );
     }
   }
 

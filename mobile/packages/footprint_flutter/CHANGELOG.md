@@ -44,3 +44,7 @@ Add additional requirements check before calling process
 ## 2.0.0-beta.3.4
 
 Add `canUpdateUserData` to requirements result
+
+# 2.0.0-beta.3.5
+
+Add Footprint specific error logs

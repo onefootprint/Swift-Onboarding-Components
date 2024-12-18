@@ -1,7 +1,7 @@
 import 'package:footprint_flutter/src/models/l10n.dart';
 
 const int DOB_MIN_AGE = 18;
-const int DOB_MAX_AGE = 120;
+const int DOB_MAX_AGE = 12000;
 
 bool isEmail(String value) {
   final emailRegex = RegExp(

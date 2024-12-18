@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/footprint_error.dart';
 import 'package:footprint_flutter/src/onboarding-components/widgets/field_context.dart';
 import 'package:footprint_flutter/src/onboarding-components/widgets/footprint_form.dart';
 
@@ -104,8 +105,10 @@ class _FootprintTextInputState extends ConsumerState<FootprintTextInput> {
   Widget build(BuildContext context) {
     final fieldContext = FieldContext.of(context);
     if (fieldContext == null) {
-      throw Exception(
-          "FootprintTextInput must be used inside a FootprintField");
+      throw FootprintError(
+        kind: ErrorKind.uiError,
+        message: 'FootprintTextInput must be used inside a FootprintField',
+      );
     }
     final fieldProps = fieldContext.props;
     final (:name, :inputProps, :additionalIdentifier) = fieldProps;

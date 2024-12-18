@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:footprint_flutter/src/onboarding-components/models/footprint_error.dart';
 
 class FormErrors {
   Map<String, FieldError> errors;
@@ -7,7 +8,10 @@ class FormErrors {
 
   factory FormErrors.build(GlobalKey<FormState> formKey) {
     if (formKey.currentState == null) {
-      throw Exception('Form key does not have a current state');
+      throw FootprintError(
+        kind: ErrorKind.uiError,
+        message: 'Form key does not have a current state',
+      );
     }
 
     final granularErrors = formKey.currentState!.validateGranularly();
