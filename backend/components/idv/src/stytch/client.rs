@@ -24,7 +24,7 @@ impl StytchClient {
 
 impl StytchClient {
     #[tracing::instrument(skip_all)]
-    pub async fn lookup(&self, telemetry_id: &str) -> Result<serde_json::Value, error::Error> {
+    pub async fn lookup(&self, telemetry_id: &str) -> Result<reqwest::Response, error::Error> {
         let url = format!(
             "https://telemetry.stytch.com/v1/fingerprint/lookup?telemetry_id={}",
             telemetry_id
@@ -36,15 +36,14 @@ impl StytchClient {
             .basic_auth(self.project_id.clone(), Some(self.secret.leak()))
             .send()
             .await
-            .map_err(|e| error::Error::RequestError(e.to_string()))?
-            .json::<serde_json::Value>()
-            .await?;
+            .map_err(|e| error::Error::RequestError(e.to_string()))?;
         Ok(res)
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use super::super::StytchLookupResponse;
     use super::*;
     use dotenv;
     use newtypes::PiiString;
@@ -59,8 +58,7 @@ mod tests {
         let telemetry_id = "afdcd45a-cbb0-4835-9899-957c17207e6f";
 
         let res = stytch_client.lookup(telemetry_id).await.unwrap();
-        tracing::info!(res = format!("{:?}", res), "res");
-        let parsed = crate::stytch::response::parse_response(res).unwrap();
-        assert_eq!(telemetry_id, parsed.telemetry_id);
+        let parsed = StytchLookupResponse::from_response(res).await;
+        assert_eq!(telemetry_id, parsed.result.unwrap().telemetry_id);
     }
 }

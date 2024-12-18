@@ -6,9 +6,8 @@ use actix_web::web::Json;
 use api_core::auth::user::UserSessionContext;
 use api_core::auth::SessionContext;
 use api_core::decision;
-use api_core::decision::vendor;
+use api_core::decision::vendor::verification_result::SaveVerificationResultArgs;
 use api_core::utils::headers::TelemetryHeaders;
-use api_core::FpError;
 use api_core::FpResult;
 use api_errors::ServerErr;
 use api_wire_types::hosted::stytch::StytchTelemetryRequest;
@@ -18,20 +17,16 @@ use db::models::risk_signal::RiskSignal;
 use db::models::stytch_fingerprint_event::NewStytchFingerprintEvent;
 use db::models::stytch_fingerprint_event::StytchFingerprintEvent;
 use db::models::vault::Vault;
-use db::models::verification_request::VerificationRequest;
 use db::TxnPgConn;
-use either::Either;
+use idv::stytch::response::LookupResponse;
 use idv::stytch::StytchLookupRequest;
-use idv::stytch::StytchLookupResponse;
-use idv::ParsedResponse;
-use idv::VendorResponse;
 use newtypes::DecisionIntentKind;
 use newtypes::RiskSignalGroupKind;
 use newtypes::ScopedVaultId;
 use newtypes::VaultId;
-use newtypes::VaultPublicKey;
 use newtypes::VendorAPI;
 use newtypes::VerificationCheckKind;
+use newtypes::VerificationResultId;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
 use paperclip::actix::{
@@ -62,144 +57,87 @@ async fn post_inner(
     state: &State,
     telemetry_id: String,
     user_auth: SessionContext<UserSessionContext>,
-    telemetry_headers: TelemetryHeaders,
+    telemetry: TelemetryHeaders,
 ) -> FpResult<()> {
-    let req = StytchLookupRequest {
-        telemetry_id: telemetry_id.clone(),
-    };
-    let res = state.vendor_clients.stytch_lookup.make_request(req).await;
-    let res = match res {
-        Ok(res) => Either::Left(res),
-        Err(err) => match err {
-            idv::stytch::error::Error::ErrorWithResponse(err) => {
-                tracing::warn!(?err, ?telemetry_id, "Stytch error response");
-                Either::Right(err.response.clone())
-            }
-            _ => Err(FpError::from(idv::Error::from(err)))?,
-        },
-    };
-
     let uv_id = user_auth.user.id.clone();
     let su_id = (user_auth.su_id.clone()).ok_or(ServerErr("auth missing scoped_user_id"))?;
     let wf_id = user_auth.wf_id.clone();
+    let req = StytchLookupRequest {
+        telemetry_id: telemetry_id.clone(),
+    };
+
+    let res = state.vendor_clients.stytch_lookup.make_request(req).await;
+    if let Some(Err(e)) = res.as_ref().ok().map(|r| &r.result) {
+        tracing::warn!(?e, ?telemetry_id, "Stytch error response");
+    }
 
     // We want to only show a signal set of device signals from Stytch OR Neuro or else it's confusing
-    let should_hide_risk_signals = (user_auth.obc.as_ref())
-        .map(|o| {
-            o.verification_checks()
-                .get(VerificationCheckKind::NeuroId)
-                .is_some()
-        })
-        .unwrap_or(false);
+    let hide_rs = (user_auth.obc.as_ref())
+        .and_then(|o| o.verification_checks().get(VerificationCheckKind::NeuroId))
+        .is_some();
 
     state
-        .db_transaction(move |conn: &mut db::TxnPgConn<'_>| -> FpResult<_> {
+        .db_transaction(move |conn| {
             let wf_id = wf_id.as_ref();
             let di = DecisionIntent::create(conn, DecisionIntentKind::DeviceFingerprint, &su_id, wf_id)?;
-            let vreq = VerificationRequest::create(conn, (&su_id, &di.id, VendorAPI::StytchLookup).into())?;
             let uv = Vault::get(conn, &uv_id)?;
 
-            match res {
-                // successful response
-                Either::Left(res) => {
-                    save_successful_response(
-                        conn,
-                        vreq,
-                        res,
-                        &uv.public_key,
-                        &uv_id,
-                        &su_id,
-                        telemetry_headers,
-                        should_hide_risk_signals,
-                    )?;
-                }
-                // error response
-                Either::Right(res) => {
-                    vendor::verification_result::save_error_verification_result(
-                        conn,
-                        &(vreq, Some(res)),
-                        &uv.public_key,
-                    )?;
-                }
-            };
-
+            let pk = user_auth.user.public_key.clone();
+            let args = SaveVerificationResultArgs::new_for_stytch(&res, di.id.clone(), su_id.clone(), pk);
+            let (vres_id, _) = args.save_sync(conn)?;
+            if let Some(res) = res.ok().and_then(|r| r.result.ok()) {
+                save_successful_response(conn, res, &uv_id, &su_id, telemetry, vres_id, hide_rs)?;
+            }
             Ok(())
         })
         .await?;
 
     Ok(())
 }
+
 #[allow(clippy::too_many_arguments)]
 fn save_successful_response(
     conn: &mut TxnPgConn,
-    vreq: VerificationRequest,
-    res: StytchLookupResponse,
-    public_key: &VaultPublicKey,
+    res: LookupResponse,
     uv_id: &VaultId,
     sv_id: &ScopedVaultId,
     telemetry_headers: TelemetryHeaders,
+    vres_id: VerificationResultId,
     hide_risk_signals: bool,
 ) -> FpResult<()> {
-    let vendor_response = VendorResponse {
-        response: ParsedResponse::StytchLookup(res.parsed_response.clone()),
-        raw_response: res.raw_response,
-    };
-    let vres =
-        vendor::verification_result::save_verification_result(conn, &(vreq, vendor_response), public_key)?;
-
-    let reason_codes =
-        decision::features::stytch::lookup_response_to_footprint_reason_codes(&res.parsed_response);
+    let reason_codes = decision::features::stytch::lookup_response_to_footprint_reason_codes(&res);
     let scope = sv_id.into();
 
-    let _rs = RiskSignal::bulk_save_for_scope(
+    RiskSignal::bulk_save_for_scope(
         conn,
         scope,
         reason_codes
             .into_iter()
-            .map(|rc| (rc, VendorAPI::StytchLookup, vres.id.clone()))
+            .map(|rc| (rc, VendorAPI::StytchLookup, vres_id.clone()))
             .collect::<Vec<_>>(),
         RiskSignalGroupKind::WebDevice,
         hide_risk_signals,
     )?;
 
-    let _e = StytchFingerprintEvent::create(
+    let fingerprints = &res.fingerprints;
+    StytchFingerprintEvent::create(
         conn,
         NewStytchFingerprintEvent {
             created_at: Utc::now(),
             session_id: telemetry_headers.session_id,
             vault_id: Some(uv_id.clone()),
             scoped_vault_id: Some(sv_id.clone()),
-            verification_result_id: vres.id,
-            browser_fingerprint: res
-                .parsed_response
-                .fingerprints
-                .browser_fingerprint
+            verification_result_id: vres_id,
+            browser_fingerprint: (fingerprints.browser_fingerprint.as_ref())
                 .map(|s| s.leak_to_string().into()),
-            browser_id: res
-                .parsed_response
-                .fingerprints
-                .browser_id
+            browser_id: (fingerprints.browser_id.as_ref()).map(|s| s.leak_to_string().into()),
+            hardware_fingerprint: (fingerprints.hardware_fingerprint.as_ref())
                 .map(|s| s.leak_to_string().into()),
-            hardware_fingerprint: res
-                .parsed_response
-                .fingerprints
-                .hardware_fingerprint
+            network_fingerprint: (fingerprints.network_fingerprint.as_ref())
                 .map(|s| s.leak_to_string().into()),
-            network_fingerprint: res
-                .parsed_response
-                .fingerprints
-                .network_fingerprint
+            visitor_fingerprint: (fingerprints.visitor_fingerprint.as_ref())
                 .map(|s| s.leak_to_string().into()),
-            visitor_fingerprint: res
-                .parsed_response
-                .fingerprints
-                .visitor_fingerprint
-                .map(|s| s.leak_to_string().into()),
-            visitor_id: res
-                .parsed_response
-                .fingerprints
-                .visitor_id
-                .map(|s| s.leak_to_string().into()),
+            visitor_id: (fingerprints.visitor_id.as_ref()).map(|s| s.leak_to_string().into()),
         },
     )?;
     Ok(())

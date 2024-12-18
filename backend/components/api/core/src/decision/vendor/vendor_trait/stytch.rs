@@ -5,7 +5,6 @@ use idv::stytch::client::StytchClient;
 use idv::stytch::StytchLookupRequest;
 use idv::stytch::StytchLookupResponse;
 use idv::ParsedResponse;
-use newtypes::PiiJsonValue;
 use newtypes::VendorAPI;
 
 #[async_trait]
@@ -16,12 +15,9 @@ impl VendorAPICall<StytchLookupRequest, StytchLookupResponse, idv::stytch::error
         request: StytchLookupRequest,
     ) -> Result<StytchLookupResponse, idv::stytch::error::Error> {
         let raw_response = self.lookup(&request.telemetry_id).await?;
-        let parsed_response = idv::stytch::response::parse_response(raw_response.clone())
-            .map_err(|e| e.into_error_with_response(raw_response.clone()))?;
-        Ok(StytchLookupResponse {
-            raw_response: PiiJsonValue::new(raw_response),
-            parsed_response,
-        })
+
+        let res = StytchLookupResponse::from_response(raw_response).await;
+        Ok(res)
     }
 }
 
@@ -35,6 +31,10 @@ impl VendorAPIResponse for StytchLookupResponse {
     }
 
     fn parsed_response(&self) -> ParsedResponse {
-        ParsedResponse::StytchLookup(self.parsed_response.clone())
+        match &self.result {
+            Ok(res) => ParsedResponse::StytchLookup(res.clone()),
+            // TODO: rm or fix
+            Err(_) => ParsedResponse::IncodeRawResponse(self.raw_response.clone()),
+        }
     }
 }

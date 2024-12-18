@@ -94,7 +94,6 @@ impl SentilinkAPIResponse {
         }
     }
 
-    #[allow(unused)]
     fn from_value(value: serde_json::Value, status_code: StatusCode, content_length: Option<u64>) -> Self {
         if status_code.is_success() {
             let parsed: Result<ApplicationRiskResponse, SentilinkError> =

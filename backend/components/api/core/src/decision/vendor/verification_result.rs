@@ -57,40 +57,40 @@ pub fn save_verification_results(
 /// Save a verification result for an errored VRes, encrypting the response payload in the process
 /// (if we got one back) For requests with no response payload, we will notate on VRes that the
 /// request was an error
-pub fn save_error_verification_results(
+pub fn save_error_verification_result(
     conn: &mut PgConn,
-    vendor_responses_with_errors: &[(VerificationRequest, Option<PiiJsonValue>)],
+    req: VerificationRequest,
+    response: Option<PiiJsonValue>,
     user_vault_public_key: &VaultPublicKey, // passed in so unit testing is easier
-) -> FpResult<Vec<VerificationResult>> {
+) -> FpResult<VerificationResult> {
     let now = Utc::now();
-    let new_verification_results: Vec<NewVerificationResult> = vendor_responses_with_errors
-        .iter()
-        .map(|(req, response)| {
-            let (e_response, scrubbed_response) = if let Some(raw_json) = response {
-                let e_response = encrypt_verification_result_response(raw_json, user_vault_public_key)?;
-                (
-                    Some(e_response),
-                    // there's a ton of PII potentially and it's too hard to keep this scrubbing stuff in
-                    // sync with both success/error API responses
-                    ScrubbedPiiVendorResponse::from(serde_json::json!({})),
-                )
-            } else {
-                // response is non-optional on vres. This is a hack
-                let empty_response = ScrubbedPiiVendorResponse::from(serde_json::json!({}));
-                (None, empty_response)
-            };
+    let (e_response, scrubbed_response) = if let Some(raw_json) = response {
+        let e_response = encrypt_verification_result_response(&raw_json, user_vault_public_key)?;
+        (
+            Some(e_response),
+            // there's a ton of PII potentially and it's too hard to keep this scrubbing stuff in
+            // sync with both success/error API responses
+            ScrubbedPiiVendorResponse::from(serde_json::json!({})),
+        )
+    } else {
+        // response is non-optional on vres. This is a hack
+        let empty_response = ScrubbedPiiVendorResponse::from(serde_json::json!({}));
+        (None, empty_response)
+    };
 
-            Ok(NewVerificationResult {
-                request_id: req.id.clone(),
-                response: scrubbed_response,
-                timestamp: now,
-                e_response,
-                is_error: true,
-            })
-        })
-        .collect::<FpResult<Vec<NewVerificationResult>>>()?;
+    let new_vres = NewVerificationResult {
+        request_id: req.id.clone(),
+        response: scrubbed_response,
+        timestamp: now,
+        e_response,
+        is_error: true,
+    };
 
-    VerificationResult::bulk_create(conn, new_verification_results)
+    let res = VerificationResult::bulk_create(conn, vec![new_vres])?
+        .into_iter()
+        .next()
+        .ok_or(FpError::from(DbError::IncorrectNumberOfRowsUpdated))?;
+    Ok(res)
 }
 
 pub fn save_verification_result(
@@ -99,16 +99,6 @@ pub fn save_verification_result(
     user_vault_public_key: &VaultPublicKey, // passed in so unit testing is easier
 ) -> FpResult<VerificationResult> {
     save_verification_results(conn, slice::from_ref(vendor_response), user_vault_public_key)?
-        .pop()
-        .ok_or(FpError::from(DbError::IncorrectNumberOfRowsUpdated))
-}
-
-pub fn save_error_verification_result(
-    conn: &mut PgConn,
-    vendor_response: &(VerificationRequest, Option<PiiJsonValue>),
-    user_vault_public_key: &VaultPublicKey,
-) -> FpResult<VerificationResult> {
-    save_error_verification_results(conn, slice::from_ref(vendor_response), user_vault_public_key)?
         .pop()
         .ok_or(FpError::from(DbError::IncorrectNumberOfRowsUpdated))
 }
@@ -172,13 +162,14 @@ pub fn save_vres(
         Ok(vr) => save_verification_result(conn, &(vreq.clone(), vr.clone()), public_key),
         Err(e) => {
             let json = vendor_api_error_to_json(e);
-            save_error_verification_result(conn, &(vreq.clone(), json), public_key)
+            save_error_verification_result(conn, vreq.clone(), json, public_key)
         }
     }
 }
 
 // TODO: extend this to more vendors?
 fn vendor_api_error_to_json(vendor_api_error: &VendorAPIError) -> Option<PiiJsonValue> {
+    // TODO: can i remove these? and then use FpResult
     match &vendor_api_error.error {
         idv::Error::IDologyError(idv::idology::error::Error::ErrorWithResponse(e)) => {
             Some(e.response.clone())
@@ -186,7 +177,6 @@ fn vendor_api_error_to_json(vendor_api_error: &VendorAPIError) -> Option<PiiJson
         idv::Error::ExperianError(idv::experian::error::Error::ErrorWithResponse(e)) => {
             Some(e.response.clone())
         }
-        idv::Error::StytchError(idv::stytch::error::Error::ErrorWithResponse(e)) => Some(e.response.clone()),
         _ => None,
     }
 }
@@ -207,8 +197,9 @@ pub struct SaveVerificationResultArgs {
     pub scoped_vault_id: ScopedVaultId,
     pub identity_document_id: Option<DocumentId>,
 }
+
 impl SaveVerificationResultArgs {
-    pub async fn save(self, db_pool: &DbPool) -> FpResult<(VerificationResultId, VerificationRequestId)> {
+    pub fn save_sync(self, conn: &mut PgConn) -> FpResult<(VerificationResultId, VerificationRequestId)> {
         let SaveVerificationResultArgs {
             scrubbed_response,
             raw_response,
@@ -220,36 +211,30 @@ impl SaveVerificationResultArgs {
             identity_document_id,
         } = self;
         let e_response = encrypt_verification_result_response(&raw_response, &vault_public_key)?;
-        let result = db_pool
-            .db_transaction(move |conn| {
-                // This is interesting - we make the VReq and VRes at the same time.
-                // In other vendor APIs, the only bookkeeping we have for an outstanding vendor request
-                // is a VReq without a VRes - for the document workflow, we have the incode state
-                // machine that tells us what state we're in.
-                let vreq_id = match should_save_verification_request {
-                    ShouldSaveVerificationRequest::Yes(vendor_api) => {
-                        let args = NewVerificationRequestArgs {
-                            scoped_vault_id: &scoped_vault_id,
-                            identity_document_id: identity_document_id.as_ref(),
-                            decision_intent_id: &decision_intent_id,
-                            vendor_api,
-                        };
-                        let vreq = VerificationRequest::create(conn, args)?;
-                        vreq.id
-                    }
-                    ShouldSaveVerificationRequest::No(vreq_id) => vreq_id,
+        // This is interesting - we make the VReq and VRes at the same time.
+        // In other vendor APIs, the only bookkeeping we have for an outstanding vendor request
+        // is a VReq without a VRes - for the document workflow, we have the incode state
+        // machine that tells us what state we're in.
+        let vreq_id = match should_save_verification_request {
+            ShouldSaveVerificationRequest::Yes(vendor_api) => {
+                let args = NewVerificationRequestArgs {
+                    scoped_vault_id: &scoped_vault_id,
+                    identity_document_id: identity_document_id.as_ref(),
+                    decision_intent_id: &decision_intent_id,
+                    vendor_api,
                 };
-                let res = VerificationResult::create(
-                    conn,
-                    vreq_id.clone(),
-                    scrubbed_response,
-                    e_response,
-                    is_error,
-                )?;
+                let vreq = VerificationRequest::create(conn, args)?;
+                vreq.id
+            }
+            ShouldSaveVerificationRequest::No(vreq_id) => vreq_id,
+        };
+        let res = VerificationResult::create(conn, vreq_id.clone(), scrubbed_response, e_response, is_error)?;
 
-                Ok((res.id, vreq_id))
-            })
-            .await?;
+        Ok((res.id, vreq_id))
+    }
+
+    pub async fn save(self, db_pool: &DbPool) -> FpResult<(VerificationResultId, VerificationRequestId)> {
+        let result = db_pool.db_transaction(move |conn| self.save_sync(conn)).await?;
         Ok(result)
     }
 }
@@ -268,15 +253,12 @@ mod test {
     use db::tests::test_db_pool::TestDbPool;
     use idv::idology::IdologyExpectIDAPIResponse;
     use idv::idology::IdologyExpectIDRequest;
-    use idv::stytch::StytchLookupRequest;
-    use idv::stytch::StytchLookupResponse;
     use macros::test_state;
     use newtypes::vendor_credentials::IdologyCredentials;
     use newtypes::DecisionIntentKind;
     use newtypes::IdvData;
     use newtypes::Vendor;
     use newtypes::VendorAPI;
-    use serde_json::json;
 
     async fn test_save_vreq_and_vres<T, U, E>(
         state: &State,
@@ -391,25 +373,5 @@ mod test {
         };
 
         test_save_vreq_and_vres(state, req, res, VendorAPI::IdologyExpectId, json).await;
-    }
-
-    #[test_state]
-    async fn save_vreq_and_vres_stytch_error(state: &mut State) {
-        let json = json!({"error_message": "something went mad wrong"});
-        let error: idv::stytch::error::Error =
-            idv::stytch::response::parse_response(json.clone()).unwrap_err();
-
-        let res = Err::<StytchLookupResponse, _>(idv::stytch::error::Error::ErrorWithResponse(Box::new(
-            idv::stytch::error::ErrorWithResponse {
-                error,
-                response: PiiJsonValue::new(json.clone()),
-            },
-        )));
-
-        let req = StytchLookupRequest {
-            telemetry_id: "yo".to_owned(),
-        };
-
-        test_save_vreq_and_vres(state, req, res, VendorAPI::StytchLookup, json).await;
     }
 }

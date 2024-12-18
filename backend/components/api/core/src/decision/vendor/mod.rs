@@ -20,6 +20,7 @@ pub mod middesk;
 pub mod neuro_id;
 pub mod samba;
 pub mod sentilink;
+pub mod stytch;
 pub mod tenant_vendor_control;
 pub mod twilio;
 pub mod vendor_api;

@@ -12,12 +12,14 @@ pub enum Error {
     SerdeJson(#[from] serde_json::Error),
     #[error("{0}")]
     ReqwestError(#[from] reqwest::Error),
+    #[error("Stytch reqwest error: {0} http status: {1}")]
+    ReqwestErrorWithCode(reqwest::Error, u16),
+    #[error("Stytch http error {0}")]
+    HttpError(u16),
     #[error("error sending request to fingerprint js api: {0}")]
     RequestError(String),
     #[error("Stytch error response: {0:?}")]
     StytchError(StytchErrorResponse),
-    #[error("ErrorWithResponse {0}")]
-    ErrorWithResponse(Box<ErrorWithResponse>),
 }
 
 #[derive(Clone, Debug, Display, EnumString, SerializeDisplay, DeserializeFromStr, Eq, PartialEq)]
@@ -32,15 +34,6 @@ pub enum StytchError {
 pub struct ErrorWithResponse {
     pub error: Error,
     pub response: PiiJsonValue,
-}
-
-impl Error {
-    pub fn into_error_with_response(self, response: serde_json::Value) -> Self {
-        Self::ErrorWithResponse(Box::new(ErrorWithResponse {
-            error: self,
-            response: response.into(),
-        }))
-    }
 }
 
 impl std::fmt::Display for ErrorWithResponse {
