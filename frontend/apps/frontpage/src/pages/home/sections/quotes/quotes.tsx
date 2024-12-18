@@ -10,7 +10,7 @@ const Quotes = () => {
     keyPrefix: 'pages.home.quotes',
   });
   return (
-    <FrontpageContainer className="flex flex-col items-center justify-center overflow-hidden md:gap-12 gap-9 py-9 md:py-11">
+    <FrontpageContainer className="flex flex-col items-center justify-center py-20 overflow-hidden md:gap-12 gap-9 md:py-28">
       <SectionTitle title={t('title')} subtitle={t('subtitle')} align="center" />
       <div className="flex flex-col gap-4 md:grid md:max-w-full md:grid-cols-2">
         <div className="relative flex flex-col gap-3">

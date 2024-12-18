@@ -11,7 +11,7 @@ const Control = () => {
 
   return (
     <>
-      <FrontpageContainer className="relative pt-16 pb-11 md:pt-32 md:pb-16 gap-11">
+      <FrontpageContainer className="relative pt-16 pb-11 md:py-24 gap-11">
         <SectionTitle title={t('title')} subtitle={t('subtitle')} />
       </FrontpageContainer>
       <IllustrationGrid />

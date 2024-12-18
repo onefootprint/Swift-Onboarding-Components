@@ -60,7 +60,7 @@ export const Leverage = () => {
   });
 
   return (
-    <FrontpageContainer className="flex flex-col gap-16 py-9 md:py-28">
+    <FrontpageContainer className="flex flex-col gap-20 py-9 md:py-20">
       <SectionTitle title={t('title')} subtitle={t('subtitle')} align="center" />
       <div className="flex flex-col gap-9 md:gap-24">
         {leverageData.map(({ variant, videoSrc, inverted, bullets }) => (

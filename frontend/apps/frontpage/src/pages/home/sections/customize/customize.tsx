@@ -53,9 +53,9 @@ export const Customize = () => {
   };
 
   return (
-    <FrontpageContainer className="flex flex-col items-center py-16 md:py-32 gap-9">
+    <FrontpageContainer className="flex flex-col items-center pt-24 pb-16 gap-9 md:pt-24 md:pb-9">
       <SectionTitle title={t('title')} subtitle={t('subtitle')} />
-      <div className="relative w-full">
+      <div className="relative w-full md:pt-4">
         <MockupScreen borderRadius={borderRadius} backgroundColor={backgroundColor} />
         <CustomInput
           className="absolute md:bottom-1/3 md:right-10 bottom-1/3 right-2"
