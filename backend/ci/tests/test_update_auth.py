@@ -64,8 +64,9 @@ def get_auth_token_for_ci_update(user, auth_playbook, limit_auth_methods=None):
     )
 
     # Finally, step up the token so it can be used to initiate a challenge
-    auth_token = IdentifyClient.from_token(auth_token).step_up(
-        kind="sms", scope="auth", assert_had_no_scopes=True
+    auth_token = IdentifyClient.from_token(auth_token).login(
+        kind="sms",
+        scope="auth",
     )
 
     return (user, auth_token)
@@ -159,9 +160,7 @@ def test_add_phone(skip_phone_obc):
     )
     auth_token = FpAuth(body["token"])
 
-    auth_token = IdentifyClient.from_token(auth_token).step_up(
-        kind="email", scope="auth"
-    )
+    auth_token = IdentifyClient.from_token(auth_token).login(kind="email", scope="auth")
 
     # Replace the contact info with a challenge
     data = dict(
@@ -283,9 +282,11 @@ def test_replace_passkey(user_with_token):
     body = post("hosted/user/challenge", data, auth_token, status_code=400)
     assert body["message"] == "Cannot initiate challenge of kind passkey"
 
-    # Step up the token using a passkey
+    # Login using a passkey
     auth_token = IdentifyClient.from_token(
-        auth_token, webauthn=user.client.webauthn_device
+        auth_token,
+        webauthn=user.client.webauthn_device,
+        expected_scopes={"auth", "explicit_auth"},
     ).login(kind="biometric", scope="auth")
 
     # Then can initiate replacing the paasskey

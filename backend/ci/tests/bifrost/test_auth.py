@@ -157,10 +157,8 @@ def test_multi_tenant_auth(sandbox_user, foo_sandbox_tenant, must_collect_data):
     auth_token = FpAuth(body["token"])
 
     # For now, we won't have implicit auth here because the user token has permission to see
-    # portable data at other tenants that foo_sandbox_tenant does not havej
-    auth_token = IdentifyClient.from_token(auth_token).step_up(
-        assert_had_no_scopes=True
-    )
+    # portable data at other tenants that foo_sandbox_tenant does not have
+    auth_token = IdentifyClient.from_token(auth_token).login()
     bifrost = BifrostClient.raw_auth(
         playbook, auth_token, sandbox_user.client.sandbox_id
     )

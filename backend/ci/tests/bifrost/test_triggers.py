@@ -62,9 +62,7 @@ def complete_redo_flow(auth_token, fp_id, obc, sandbox_id, pre_run=None):
     initial_num_obds = len(obds)
 
     # Re-run Bifrost with the token, optionally with any pre_run assertion checks
-    stepped_up_auth_token = IdentifyClient.from_token(auth_token).step_up(
-        assert_had_no_scopes=True
-    )
+    stepped_up_auth_token = IdentifyClient.from_token(auth_token).login()
     bifrost = BifrostClient.raw_auth(obc, stepped_up_auth_token, sandbox_id)
     if pre_run:
         pre_run(bifrost)
@@ -157,9 +155,7 @@ def test_retrigger_onboard(sandbox_tenant):
     assert wfr["config"]["data"]["playbook_id"] == obc.id
 
     # Re-run Bifrost with the token, optionally with any pre_run assertion checks
-    auth_token = IdentifyClient.from_token(initial_auth_token).step_up(
-        assert_had_no_scopes=True
-    )
+    auth_token = IdentifyClient.from_token(initial_auth_token).login()
     bifrost = BifrostClient.raw_auth(obc, auth_token, bifrost.sandbox_id)
     requirements = bifrost.get_status()["all_requirements"]
     assert requirements[0]["kind"] == "collect_data"
@@ -194,9 +190,7 @@ def test_retrigger_kyb(sandbox_tenant, kyb_sandbox_ob_config):
     assert body["key"] == obc.key.value
 
     # Re-run Bifrost with the token, optionally with any pre_run assertion checks
-    auth_token = IdentifyClient.from_token(initial_auth_token).step_up(
-        assert_had_no_scopes=True
-    )
+    auth_token = IdentifyClient.from_token(initial_auth_token).login()
     bifrost = BifrostClient.raw_auth(obc, auth_token, bifrost.sandbox_id)
     requirements = bifrost.get_status()["all_requirements"]
     assert requirements[0]["kind"] == "collect_business_data"
@@ -312,9 +306,7 @@ def test_collect_document_no_onboardings(sandbox_tenant):
     initial_auth_token = send_trigger(fp_id, sandbox_tenant, trigger)
 
     # re-run Bifrost with the token from the link we sent to user
-    auth_token = IdentifyClient.from_token(initial_auth_token).step_up(
-        assert_had_no_scopes=True
-    )
+    auth_token = IdentifyClient.from_token(initial_auth_token).login()
     # OBC here isn't actually correct
     bifrost = BifrostClient.raw_auth(
         sandbox_tenant.default_ob_config, auth_token, sandbox_id
@@ -462,9 +454,7 @@ def test_collect_business_documents_no_onboarding(sandbox_tenant):
     initial_auth_token = send_trigger(fp_id, sandbox_tenant, trigger, fp_bid=fp_bid)
 
     # re-run Bifrost with the token from the link we sent to user
-    auth_token = IdentifyClient.from_token(initial_auth_token).step_up(
-        assert_had_no_scopes=True
-    )
+    auth_token = IdentifyClient.from_token(initial_auth_token).login()
     # OBC here isn't actually correct
     bifrost = BifrostClient.raw_auth(
         sandbox_tenant.default_ob_config, auth_token, sandbox_id
@@ -526,9 +516,7 @@ def test_trigger_incomplete(sandbox_tenant, trigger):
     fp_id = get("hosted/user/private/token", None, bifrost.auth_token)["fp_id"]
 
     initial_auth_token = send_trigger(fp_id, sandbox_tenant, trigger)
-    auth_token = IdentifyClient.from_token(initial_auth_token).step_up(
-        assert_had_no_scopes=True
-    )
+    auth_token = IdentifyClient.from_token(initial_auth_token).login()
 
     # re-run Bifrost with the token from the link we sent to user
     bifrost = BifrostClient.raw_auth(
@@ -555,9 +543,7 @@ def test_cant_make_multiple_wfs(sandbox_tenant):
 
     # Make sure the token can't be used to make another Workflow by re-logging in with the same token.
     # Shouldn't include a met collect_data requirement because we inherited the completed Workflow.
-    auth_token = IdentifyClient.from_token(initial_auth_token).step_up(
-        assert_had_no_scopes=True
-    )
+    auth_token = IdentifyClient.from_token(initial_auth_token).login()
     post("hosted/onboarding", None, auth_token)
     body = get("hosted/onboarding/status", None, auth_token)
     assert not any(i["kind"] == "collect_data" for i in body["all_requirements"])

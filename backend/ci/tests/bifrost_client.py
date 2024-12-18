@@ -42,7 +42,7 @@ class BifrostClient:
         key = ob_config.tenant.s_sk if sandbox_id else ob_config.tenant.l_sk
         body = post(f"users/{fp_id}/token", data, key)
         auth_token = FpAuth(body["token"])
-        auth_token = IdentifyClient.from_token(auth_token).step_up()
+        auth_token = IdentifyClient.from_token(auth_token).login()
         return BifrostClient(ob_config, auth_token, sandbox_id, **kwargs)
 
     def raw_auth(ob_config, auth_token, sandbox_id, **kwargs):
@@ -101,7 +101,7 @@ class BifrostClient:
         email = override_email or FIXTURE_EMAIL
         if sandbox_id:
             # Edit the business name to have the same suffix as the phone number for more visibility
-            business_name = f'{BUSINESS_DATA["business.name"]} {sandbox_id}'
+            business_name = f"{BUSINESS_DATA['business.name']} {sandbox_id}"
         else:
             business_name = BUSINESS_DATA["business.name"]
 

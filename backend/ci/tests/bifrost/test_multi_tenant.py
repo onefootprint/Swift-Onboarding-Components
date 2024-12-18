@@ -73,9 +73,9 @@ def dual_onboarded_user(sandbox_tenant, foo_sandbox_tenant):
 
 def test_fp_id(dual_onboarded_user):
     # Make sure the fp_ids are different
-    assert (
-        dual_onboarded_user.fp_id != dual_onboarded_user.foo_fp_id
-    ), "Onboarding onto different tenants should give different fp_id"
+    assert dual_onboarded_user.fp_id != dual_onboarded_user.foo_fp_id, (
+        "Onboarding onto different tenants should give different fp_id"
+    )
 
 
 def test_prefill_timeline_events(
@@ -258,8 +258,8 @@ def test_one_click_with_kba(sandbox_tenant, foo_sandbox_tenant):
     new_token = FpAuth(body["token"])
 
     # Now, we can initiate an email challenge
-    auth_token = IdentifyClient.from_token(new_token).step_up(
-        kind="email", assert_had_no_scopes=True
+    auth_token = IdentifyClient.from_token(new_token).login(
+        kind="email"
     )
     bifrost = BifrostClient.raw_auth(obc, auth_token, sandbox_id)
     foo_user = bifrost.run()

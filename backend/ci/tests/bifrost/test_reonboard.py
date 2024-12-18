@@ -55,7 +55,7 @@ def test_allow_reonboard_user_token(sandbox_tenant, must_collect_data):
         body = post(f"users/{user.fp_id}/token", data, sandbox_tenant.s_sk)
         auth_token = FpAuth(body["token"])
 
-        auth_token = IdentifyClient.from_token(auth_token).step_up()
+        auth_token = IdentifyClient.from_token(auth_token).login()
         bifrost2 = BifrostClient.raw_auth(obc, auth_token, bifrost1.sandbox_id)
         bifrost2.run()
         return bifrost2
@@ -94,7 +94,7 @@ def test_allow_reonboard_ob_session_token(sandbox_tenant, must_collect_data):
     auth_token = FpAuth(body["token"])
     auth_token = IdentifyClient.from_token(
         auth_token, override_playbook_auth=ob_token
-    ).step_up()
+    ).login()
     bifrost3 = BifrostClient.raw_auth(
         obc,
         auth_token,

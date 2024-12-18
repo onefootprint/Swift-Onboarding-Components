@@ -5,7 +5,6 @@ from tests.utils import (
     post,
     create_ob_config,
     get,
-    patch,
     _gen_random_ssn,
 )
 from tests.identify_client import IdentifyClient
@@ -72,7 +71,7 @@ def test_reonboard_kyb(sandbox_tenant, kyb_sandbox_ob_config):
     auth_token = FpAuth(body["token"])
 
     # Run bifrost
-    auth_token = IdentifyClient.from_token(auth_token).step_up()
+    auth_token = IdentifyClient.from_token(auth_token).login()
 
     bifrost2 = BifrostClient.raw_auth(
         kyb_sandbox_ob_config, auth_token, bifrost.sandbox_id
@@ -140,7 +139,7 @@ def test_onboard_kyb_no_business(sandbox_tenant, kyb_sandbox_ob_config):
     auth_token = FpAuth(body["token"])
 
     # Run bifrost
-    auth_token = IdentifyClient.from_token(auth_token).step_up()
+    auth_token = IdentifyClient.from_token(auth_token).login()
     bifrost = BifrostClient.raw_auth(kyb_sandbox_ob_config, auth_token, sandbox_id)
     user = bifrost.run()
 
@@ -195,9 +194,7 @@ def test_api_vault(sandbox_tenant, ob_config):
     assert body["user"]["is_unverified"]
 
     # Should require step up because auth was not implied for API vault
-    auth_token = IdentifyClient.from_token(auth_token).step_up(
-        assert_had_no_scopes=True
-    )
+    auth_token = IdentifyClient.from_token(auth_token).login()
 
     # Run bifrost
     bifrost = BifrostClient.raw_auth(ob_config, auth_token, sandbox_id)
@@ -318,9 +315,7 @@ def test_provide_publishable_key_on_client(sandbox_tenant, ob_config):
     auth_token = FpAuth(body["token"])
 
     # Should have to go through identify again because auth not implied
-    auth_token = IdentifyClient.from_token(auth_token).step_up(
-        assert_had_no_scopes=True
-    )
+    auth_token = IdentifyClient.from_token(auth_token).login()
 
     # Should require passing obc key
     body = post("hosted/onboarding", None, auth_token, status_code=400)
@@ -367,9 +362,7 @@ def test_portablize_api_vault(sandbox_tenant, foo_sandbox_tenant, ob_config):
     assert body["user"]
     assert body["user"]["is_unverified"]
 
-    auth_token = IdentifyClient.from_token(auth_token).step_up(
-        assert_had_no_scopes=True
-    )
+    auth_token = IdentifyClient.from_token(auth_token).login()
 
     # re-run Bifrost with the token from the link we sent to user
     bifrost = BifrostClient.raw_auth(ob_config, auth_token, sandbox_id)
@@ -454,7 +447,7 @@ def test_error_with_key(sandbox_tenant, sandbox_user, operation_kind):
         sandbox_tenant.sk.key,
         status_code=400,
     )
-    assert body["message"] == f"Cannot provide playbook key for this token kind"
+    assert body["message"] == "Cannot provide playbook key for this token kind"
 
 
 def test_inherit_error_with_no_workflow_request(sandbox_tenant, sandbox_user):

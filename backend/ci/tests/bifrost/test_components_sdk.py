@@ -75,8 +75,10 @@ def test_components_sdk(sandbox_tenant):
     with pytest.raises(
         HttpError,
         match="Cannot create a new token from one issued for the components SDK",
-    ) as e:
-        IdentifyClient.from_token(components_token).login()
+    ):
+        IdentifyClient.from_token(
+            components_token, expected_scopes={"vault_data", "explicit_auth"}
+        ).login()
 
     data = dict(kind="email", action_kind="add_primary")
     body = post("hosted/user/challenge", data, components_token, status_code=403)

@@ -59,10 +59,12 @@ def test_decrypt_basic(sandbox_user, auth_token):
 
 
 def test_decrypt_sensitive(sandbox_user, auth_token):
-    # First, step up with the existing auth token
+    # First login, identified by the existing auth token
     auth_token = IdentifyClient.from_token(
-        auth_token, webauthn=sandbox_user.client.webauthn_device
-    ).step_up(kind="biometric", scope="my1fp")
+        auth_token,
+        webauthn=sandbox_user.client.webauthn_device,
+        expected_scopes={"basic_profile", "explicit_auth"},
+    ).login(kind="biometric", scope="my1fp")
     body = get("/hosted/user/token", None, auth_token)
     assert "sensitive_profile" in body["scopes"]
 

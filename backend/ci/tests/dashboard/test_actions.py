@@ -4,7 +4,6 @@ from tests.utils import post, get
 from tests.headers import FpAuth
 from tests.dashboard.utils import (
     assert_has_audit_event_with_details,
-    list_audit_events_with_details,
 )
 
 
@@ -21,9 +20,7 @@ def test_trigger_action(sandbox_tenant):
     trigger_response = next(i for i in body if i["kind"] == "trigger")
     auth_token = FpAuth(trigger_response["token"])
 
-    auth_token = IdentifyClient.from_token(auth_token).step_up(
-        assert_had_no_scopes=True
-    )
+    auth_token = IdentifyClient.from_token(auth_token).login()
     bifrost = BifrostClient.raw_auth(
         sandbox_tenant.default_ob_config, auth_token, bifrost.sandbox_id
     )

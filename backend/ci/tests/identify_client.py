@@ -10,12 +10,13 @@ from tests.headers import FpAuth, SandboxId
 
 
 class IdentifyClient:
-    def from_user(user, **kwargs):
+    @classmethod
+    def from_user(cls, user, **kwargs):
         """
         Initiate the IdentifyClient from a user created via BifrostClient, with optional kwarg
         overrides.
         """
-        return IdentifyClient(
+        return cls(
             playbook=kwargs.pop("playbook", user.client.ob_config),
             sandbox_id=kwargs.pop("sandbox_id", user.client.sandbox_id),
             webauthn=kwargs.pop("webauthn", user.client.webauthn_device),
@@ -26,9 +27,27 @@ class IdentifyClient:
             **kwargs,
         )
 
-    def from_token(auth_token, **kwargs):
+    @classmethod
+    def from_token(cls, auth_token, expected_scopes=set(), **kwargs):
+        """
+        Initialize the IdentifyClient such that the identified user is the one
+        associated with the given auth token.
+        """
+
+        body = get("hosted/user/token", None, auth_token)
+        original_scopes = body["scopes"]
+        assert (
+            set(original_scopes) == expected_scopes
+        ), "Token has different scopes than expected"
+
         return IdentifyClient(
-            playbook=None, sandbox_id=None, auth_token=auth_token, **kwargs
+            playbook=None,
+            sandbox_id=None,
+            phone_number=None,
+            email=None,
+            _auth_token=auth_token,
+            _auth_token_scopes=original_scopes,
+            **kwargs,
         )
 
     def __init__(
@@ -38,9 +57,11 @@ class IdentifyClient:
         webauthn=None,
         phone_number=FIXTURE_PHONE_NUMBER,
         email=FIXTURE_EMAIL,
-        auth_token=None,
         # Only used for BO auth
         override_playbook_auth=None,
+        # For internal use by other construtors.
+        _auth_token=None,
+        _auth_token_scopes=None,
     ):
         self.playbook = playbook
         self.playbook_auth_h = override_playbook_auth or getattr(playbook, "key", None)
@@ -49,8 +70,17 @@ class IdentifyClient:
         self.webauthn = webauthn
         self.phone_number = phone_number
         self.email = email
-        self.auth_token = auth_token
+        # Auth token used for identifying the user.
+        # Distinct from the auth token returned by login().
+        self._auth_token = _auth_token
+        self._auth_token_scopes = _auth_token_scopes
+
         self.headers = []
+
+        if self._auth_token and (self.phone_number or self.email):
+            raise Exception(
+                "Ambiguous initialization of IdentifyClient: choose a) auth_token or b) phone_number/email to identify a user"
+            )
 
     def with_headers(self, *args):
         self.headers = args
@@ -58,7 +88,7 @@ class IdentifyClient:
 
     def _login_challenge(self, kind, scope):
         data = dict(scope=scope)
-        if not self.auth_token:
+        if not self._auth_token:
             if kind == "email":
                 data["email"] = self.email
             else:
@@ -70,8 +100,8 @@ class IdentifyClient:
             headers.append(SandboxId(self.sandbox_id))
         if self.playbook_auth_h:
             headers.append(self.playbook_auth_h)
-        if self.auth_token:
-            headers.append(self.auth_token)
+        if self._auth_token:
+            headers.append(self._auth_token)
         body = post("hosted/identify", data, *headers)
         assert body["user"]
         assert kind in body["user"]["available_challenge_kinds"]
@@ -149,26 +179,14 @@ class IdentifyClient:
 
     def login(self, kind="sms", scope="onboarding"):
         self._login_challenge(kind, scope)
-        return self._verify(scope)
+        new_auth_token = self._verify(scope)
 
-    def step_up(self, kind="sms", scope="onboarding", assert_had_no_scopes=False):
-        """
-        Just a wrapper around login, including some assertions that the new token has additional
-        scopes
-        """
-        assert self.auth_token, "Can only step up if had existing token"
+        if self._auth_token:
+            self._validate_login_token(new_auth_token, kind, scope)
 
-        # Token should start with no scopes
-        body = get("hosted/user/token", None, self.auth_token)
-        original_scopes = body["scopes"]
-        if assert_had_no_scopes:
-            assert not body[
-                "scopes"
-            ], "Token expected to be only identified and have no scopes"
+        return new_auth_token
 
-        # Perform the step up
-        new_token = self.login(kind=kind, scope=scope)
-
+    def _validate_login_token(self, token, kind, scope):
         # Now, new token should have scopes
         if scope == "onboarding":
             expected_scope = "sign_up"
@@ -176,23 +194,24 @@ class IdentifyClient:
             expected_scope = "auth"
         elif scope == "my1fp":
             expected_scope = "basic_profile"
-        body = get("hosted/user/token", None, new_token)
+        body = get("hosted/user/token", None, token)
         new_scopes = body["scopes"]
         assert set(new_scopes) >= {expected_scope}
         assert (
-            new_token.value != self.auth_token.value
+            token.value != self._auth_token.value
         ), "Verify should give us a new token with permissions"
-        assert set(new_scopes) > set(
-            original_scopes
-        ), "Stepped up token should have additional scopes"
+
+        assert set(new_scopes) >= set(
+            self._auth_token_scopes
+        ), "New token should have at least the same scopes as the old token"
 
         # And scopes of old token shouldn't have changed
-        body = get("hosted/user/token", None, self.auth_token)
+        body = get("hosted/user/token", None, self._auth_token)
         assert set(body["scopes"]) == set(
-            original_scopes
+            self._auth_token_scopes
         ), "Original token scopes shouldn't have changed"
 
-        return new_token
+        return token
 
 
 def biometric_challenge_response(challenge_data, webauthn):

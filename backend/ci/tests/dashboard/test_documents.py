@@ -303,13 +303,11 @@ def test_decrypt_historical(user_with_documents):
     )
     audit_event = body["data"][0]
     assert audit_event["name"] == "decrypt_user_data"
-    assert set(audit_event["detail"]["data"]["decrypted_fields"]) == set(
-        [
-            "id.first_name",
-            "document.drivers_license.front.latest_upload",
-            "document.drivers_license.document_number",
-        ]
-    )
+    assert set(audit_event["detail"]["data"]["decrypted_fields"]) == set([
+        "id.first_name",
+        "document.drivers_license.front.latest_upload",
+        "document.drivers_license.document_number",
+    ])
 
 
 def test_review_documents(sandbox_tenant):
@@ -332,7 +330,8 @@ def test_review_documents(sandbox_tenant):
         data = dict(actions=[action])
         body = post(f"entities/{user.fp_id}/actions", data, *sandbox_tenant.db_auths)
         token = FpAuth(body[0]["token"])
-        token = IdentifyClient.from_token(token).step_up(assert_had_no_scopes=True)
+        token = IdentifyClient.from_token(token).login(
+        )
         bifrost = BifrostClient.raw_auth(obc, token, bifrost.sandbox_id)
         bifrost.run()
 

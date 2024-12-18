@@ -127,9 +127,7 @@ def test_get_business_owners(sandbox_tenant, kyb_sandbox_ob_config):
     initial_auth_token = send_trigger(
         primary_bo.fp_id, sandbox_tenant, trigger, fp_bid=fp_bid
     )
-    stepped_up_auth_token = IdentifyClient.from_token(initial_auth_token).step_up(
-        assert_had_no_scopes=True
-    )
+    stepped_up_auth_token = IdentifyClient.from_token(initial_auth_token).login()
     bifrost = BifrostClient.raw_auth(
         kyb_sandbox_ob_config, stepped_up_auth_token, primary_bo.client.sandbox_id
     )

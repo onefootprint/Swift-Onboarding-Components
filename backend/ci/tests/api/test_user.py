@@ -226,7 +226,7 @@ def test_kyc_stepup_link(sandbox_tenant, obc):
     assert body["status"] == "incomplete"
 
     auth_token = FpAuth(body["in_progress_link"]["token"])
-    auth_token = IdentifyClient.from_token(auth_token).step_up()
+    auth_token = IdentifyClient.from_token(auth_token).login()
     bifrost = BifrostClient.raw_auth(obc, auth_token, sandbox_id)
     user = bifrost.run()
     assert user.fp_id == fp_id

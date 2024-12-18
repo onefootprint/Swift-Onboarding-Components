@@ -201,7 +201,7 @@ def test_login_challenge(sandbox_user):
     req = body["requirements"][0]
     assert req["kind"] == "login"
     token = FpAuth(req["user"]["token"])
-    IdentifyClient.from_token(token).step_up(assert_had_no_scopes=True)
+    IdentifyClient.from_token(token).login()
 
 
 def test_doc_playbook(sandbox_tenant):

@@ -344,9 +344,7 @@ def test_cannot_select_business_for_redo(kyb_sandbox_ob_config, sandbox_tenant):
         data=dict(playbook_id=bifrost.ob_config.id, reuse_existing_bo_kyc=True),
     )
     auth_token = send_trigger(user.fp_id, sandbox_tenant, trigger, fp_bid=user.fp_bid)
-    auth_token = IdentifyClient.from_token(auth_token).step_up(
-        assert_had_no_scopes=True
-    )
+    auth_token = IdentifyClient.from_token(auth_token).login()
 
     # Should not be able to provide a business ID, since the session already has a business attached
     with pytest.raises(HttpError) as e:

@@ -277,7 +277,7 @@ def test_onboard_kyb_bos_linked_via_api(sandbox_tenant, kyb_sandbox_ob_config):
     body = post(f"users/{fp_id}/token", data, sandbox_tenant.s_sk)
     auth_token = FpAuth(body["token"])
 
-    auth_token = IdentifyClient.from_token(auth_token).step_up()
+    auth_token = IdentifyClient.from_token(auth_token).login()
     bifrost = BifrostClient.raw_auth(kyb_sandbox_ob_config, auth_token, sandbox_id)
     r = bifrost.get_requirement("collect_business_data")
 

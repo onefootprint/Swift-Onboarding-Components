@@ -206,9 +206,7 @@ def test_updating_linked_bo(kyb_sandbox_ob_config, sandbox_tenant):
     body = post(f"entities/{user.fp_id}/actions", data, *sandbox_tenant.db_auths)
     auth_token = FpAuth(body[0]["token"])
 
-    auth_token = IdentifyClient.from_token(auth_token).step_up(
-        assert_had_no_scopes=True
-    )
+    auth_token = IdentifyClient.from_token(auth_token).login()
     bifrost = BifrostClient.raw_auth(
         kyb_sandbox_ob_config, auth_token, user.client.sandbox_id
     )

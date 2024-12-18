@@ -11,8 +11,10 @@ def biometric_sandbox_user_auth(sandbox_user):
     auth token for sandbox_user from logging in via biometric credential
     """
     return IdentifyClient.from_token(
-        sandbox_user.client.auth_token, webauthn=sandbox_user.client.webauthn_device
-    ).step_up(kind="biometric", scope="onboarding")
+        sandbox_user.client.auth_token,
+        webauthn=sandbox_user.client.webauthn_device,
+        expected_scopes={"sign_up", "vault_data", "explicit_auth"},
+    ).login(kind="biometric", scope="onboarding")
 
 
 @pytest.mark.parametrize(

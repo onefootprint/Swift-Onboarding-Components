@@ -128,8 +128,8 @@ def test_step_up(no_phone_user, sandbox_tenant, skip_phone_obc):
     body = post(f"users/{no_phone_user.fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
 
-    # Step up the auth token using an email challenge
-    auth_token = IdentifyClient.from_token(auth_token).step_up(kind="email")
+    # Login using an email challenge, identified by the auth token
+    auth_token = IdentifyClient.from_token(auth_token).login(kind="email")
 
     # And use the auth token to onboard
     bifrost2 = BifrostClient.raw_auth(

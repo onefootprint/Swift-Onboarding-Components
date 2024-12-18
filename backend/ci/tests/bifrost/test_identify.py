@@ -159,9 +159,7 @@ def vault4(sandbox_id, foo_sandbox_tenant):
     assert body["user"]
     assert body["user"]["is_unverified"]
 
-    auth_token = IdentifyClient.from_token(auth_token).step_up(
-        assert_had_no_scopes=True
-    )
+    auth_token = IdentifyClient.from_token(auth_token).login()
     bifrost = BifrostClient.raw_auth(
         foo_sandbox_tenant.default_ob_config, auth_token, sandbox_id
     )
@@ -301,7 +299,7 @@ def test_login_flow(sandbox_user, sandbox_tenant, must_collect_data):
     assert not body["scopes"]
 
     # Now, we don't use the phone as an identifier - we just use the token that was given to us
-    auth_token = IdentifyClient.from_token(token).step_up(assert_had_no_scopes=True)
+    auth_token = IdentifyClient.from_token(token).login()
 
     # Make sure the token has scopes
     data = dict(scope="onboarding")
@@ -329,7 +327,7 @@ def test_login_flow_new_tenant(sandbox_tenant, sandbox_user, foo_sandbox_tenant)
     token = FpAuth(user["token"])
 
     # Now, we don't use the phone as an identifier - we just use the token that was given to us
-    auth_token = IdentifyClient.from_token(token).step_up(assert_had_no_scopes=True)
+    auth_token = IdentifyClient.from_token(token).login()
 
     # Finish onboarding onto this playbook using the auth token issued from the new flow
     bifrost = BifrostClient.raw_auth(obc, auth_token, sandbox_id)
@@ -497,9 +495,7 @@ def test_otp_unverified(sandbox_user, sandbox_tenant):
     new_token = FpAuth(body["token"])
 
     # Now, we can initiate an email challenge
-    auth_token = IdentifyClient.from_token(new_token).step_up(
-        kind="email", assert_had_no_scopes=True
-    )
+    auth_token = IdentifyClient.from_token(new_token).login(kind="email")
     bifrost = BifrostClient.raw_auth(obc, auth_token, sandbox_id)
     bifrost.run()
 
@@ -539,7 +535,7 @@ def test_cannot_make_duplicate(sandbox_user, sandbox_tenant):
 
     # Perform a login challenge using the token given in the erro
     token = FpAuth(body["context"]["token"])
-    IdentifyClient.from_token(token).step_up(assert_had_no_scopes=True)
+    IdentifyClient.from_token(token).login()
 
 
 def test_create_duplicate_vault(sandbox_user, foo_sandbox_tenant):
