@@ -82,17 +82,9 @@ impl IncodeStateTransition for AddConsent {
         ml_args.save(db_pool).await?;
 
         // Now ensure we don't have an error
-        privacy_res
-            .map_err(into_fp_error)?
-            .result
-            .into_success()
-            .map_err(into_fp_error)?;
+        privacy_res?.result.into_success().map_err(into_fp_error)?;
 
-        ml_res
-            .map_err(into_fp_error)?
-            .result
-            .into_success()
-            .map_err(into_fp_error)?;
+        ml_res?.result.into_success().map_err(into_fp_error)?;
         Ok(Some(Self {}))
     }
 

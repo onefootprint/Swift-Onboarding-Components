@@ -22,36 +22,33 @@ use newtypes::SealedVaultBytes;
 use newtypes::VaultPublicKey;
 use newtypes::VendorAPI;
 use newtypes::VerificationRequestId;
-use std::slice;
 
 type VerificationRequestWithVendorResponse = (VerificationRequest, VendorResponse);
 
 /// Save a verification result, encrypting the response payload in the process
-pub fn save_verification_results(
+pub fn save_verification_result(
     conn: &mut PgConn,
-    vendor_responses: &[VerificationRequestWithVendorResponse],
+    vendor_response: &VerificationRequestWithVendorResponse,
     user_vault_public_key: &VaultPublicKey, // passed in so unit testing is easier
-) -> FpResult<Vec<VerificationResult>> {
+) -> FpResult<VerificationResult> {
     let now = Utc::now();
-    let new_verification_results: Vec<NewVerificationResult> = vendor_responses
-        .iter()
-        .map(|(req, res)| {
-            // For testing rollout of footprint
-            let scrubbed_json = ScrubbedPiiVendorResponse::new(&res.response)?;
+    // For testing rollout of footprint
+    let (req, res) = vendor_response;
+    let scrubbed_json = ScrubbedPiiVendorResponse::new(&res.response)?;
+    let e_response = encrypt_verification_result_response(&res.raw_response, user_vault_public_key)?;
+    let new_verification_result = NewVerificationResult {
+        request_id: req.id.clone(),
+        response: scrubbed_json,
+        timestamp: now,
+        e_response: Some(e_response),
+        is_error: false,
+    };
 
-            let e_response = encrypt_verification_result_response(&res.raw_response, user_vault_public_key)?;
-
-            Ok(NewVerificationResult {
-                request_id: req.id.clone(),
-                response: scrubbed_json,
-                timestamp: now,
-                e_response: Some(e_response),
-                is_error: false,
-            })
-        })
-        .collect::<FpResult<Vec<NewVerificationResult>>>()?;
-
-    VerificationResult::bulk_create(conn, new_verification_results)
+    let result = VerificationResult::bulk_create(conn, vec![new_verification_result])?
+        .into_iter()
+        .next()
+        .ok_or(FpError::from(DbError::IncorrectNumberOfRowsUpdated))?;
+    Ok(result)
 }
 
 /// Save a verification result for an errored VRes, encrypting the response payload in the process
@@ -78,16 +75,6 @@ pub fn save_error_verification_result(
         .next()
         .ok_or(FpError::from(DbError::IncorrectNumberOfRowsUpdated))?;
     Ok(res)
-}
-
-pub fn save_verification_result(
-    conn: &mut PgConn,
-    vendor_response: &VerificationRequestWithVendorResponse,
-    user_vault_public_key: &VaultPublicKey, // passed in so unit testing is easier
-) -> FpResult<VerificationResult> {
-    save_verification_results(conn, slice::from_ref(vendor_response), user_vault_public_key)?
-        .pop()
-        .ok_or(FpError::from(DbError::IncorrectNumberOfRowsUpdated))
 }
 
 // Encrypt payload using UV
@@ -262,24 +249,23 @@ mod test {
     use newtypes::Vendor;
     use newtypes::VendorAPI;
 
-    async fn test_save_vreq_and_vres<T, U, E>(
+    async fn test_save_vreq_and_vres<T, U>(
         state: &State,
         req: T,
-        res: Result<U, E>,
+        res: FpResult<U>,
         vendor_api: VendorAPI,
         res_json: serde_json::Value,
     ) where
         T: Send + Sync + Sized,
         U: VendorAPIResponse + Send + Sync + 'static,
-        E: Send + Sync + Into<idv::Error> + 'static,
     {
-        let mut mock_client = MockVendorAPICall::<T, U, E>::new();
+        let mut mock_client = MockVendorAPICall::<T, U>::new();
         mock_client
             .expect_make_request()
             .times(1)
             .return_once(move |_| res);
 
-        let res: Result<U, E> = mock_client.make_request(req).await;
+        let res: FpResult<U> = mock_client.make_request(req).await;
 
         let res = res.map(|r| r.into_vendor_response()).map_err(|e| VendorAPIError {
             vendor_api,
@@ -339,7 +325,7 @@ mod test {
         let res = idv::tests::fixtures::idology::create_response("result.match".to_string(), None, None);
         let json = res.raw_response.clone().into_leak();
 
-        let res = Ok::<_, idv::idology::error::Error>(res);
+        let res = Ok(res);
 
         let req = IdologyExpectIDRequest {
             idv_data: IdvData { ..Default::default() },

@@ -57,11 +57,7 @@ impl StartOnboarding {
         // Now ensure we don't have an error
         // If we get an error here, the response does not include interviewId or anything else, so we just
         // error here and will restart
-        let successful_response = res
-            .map_err(into_fp_error)?
-            .result
-            .into_success()
-            .map_err(into_fp_error)?;
+        let successful_response = res?.result.into_success().map_err(into_fp_error)?;
 
         state
             .db_transaction(move |conn| {

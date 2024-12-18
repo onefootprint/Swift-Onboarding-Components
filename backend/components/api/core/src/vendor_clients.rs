@@ -67,70 +67,32 @@ use newtypes::SambaLicenseValidationCreate;
 use newtypes::SambaLicenseValidationGetReport;
 use std::sync::Arc;
 
-pub type VendorClient<Req, Resp, E> = Arc<dyn VendorAPICall<Req, Resp, E>>;
+pub type VendorClient<Req, Resp> = Arc<dyn VendorAPICall<Req, Resp>>;
 
 #[derive(Clone)]
 pub struct IncodeClients {
-    pub incode_start_onboarding: VendorClient<
-        IncodeStartOnboardingRequest,
-        IncodeResponse<OnboardingStartResponse>,
-        idv::incode::error::Error,
-    >,
-    pub incode_add_front:
-        VendorClient<IncodeAddFrontRequest, IncodeResponse<AddSideResponse>, idv::incode::error::Error>,
-    pub incode_add_back:
-        VendorClient<IncodeAddBackRequest, IncodeResponse<AddSideResponse>, idv::incode::error::Error>,
-    pub incode_process_id:
-        VendorClient<IncodeProcessIdRequest, IncodeResponse<ProcessIdResponse>, idv::incode::error::Error>,
-    pub incode_process_face: VendorClient<
-        IncodeProcessFaceRequest,
-        IncodeResponse<ProcessFaceResponse>,
-        idv::incode::error::Error,
-    >,
-    pub incode_fetch_scores: VendorClient<
-        IncodeFetchScoresRequest,
-        IncodeResponse<FetchScoresResponse>,
-        idv::incode::error::Error,
-    >,
-    pub incode_add_privacy_consent: VendorClient<
-        IncodeAddPrivacyConsentRequest,
-        IncodeResponse<AddConsentResponse>,
-        idv::incode::error::Error,
-    >,
-    pub incode_add_ml_consent: VendorClient<
-        IncodeAddMLConsentRequest,
-        IncodeResponse<AddConsentResponse>,
-        idv::incode::error::Error,
-    >,
-    pub incode_fetch_ocr:
-        VendorClient<IncodeFetchOCRRequest, IncodeResponse<FetchOCRResponse>, idv::incode::error::Error>,
-    pub incode_add_selfie:
-        VendorClient<IncodeAddSelfieRequest, IncodeResponse<AddSelfieResponse>, idv::incode::error::Error>,
-    pub incode_watchlist_check: VendorClient<
-        IncodeWatchlistCheckRequest,
-        IncodeResponse<WatchlistResultResponse>,
-        idv::incode::error::Error,
-    >,
-    pub incode_updated_watchlist_result: VendorClient<
-        IncodeUpdatedWatchlistResultRequest,
-        IncodeResponse<UpdatedWatchlistResultResponse>,
-        idv::incode::error::Error,
-    >,
-    pub incode_get_onboarding_status: VendorClient<
-        IncodeGetOnboardingStatusRequest,
-        IncodeResponse<GetOnboardingStatusResponse>,
-        idv::incode::error::Error,
-    >,
-    pub incode_curp_validation: VendorClient<
-        IncodeCurpValidationRequest,
-        IncodeResponse<CurpValidationResponse>,
-        idv::incode::error::Error,
-    >,
-    pub incode_government_validation: VendorClient<
-        IncodeGovernmentValidationRequest,
-        IncodeResponse<GovernmentValidationResponse>,
-        idv::incode::error::Error,
-    >,
+    pub incode_start_onboarding:
+        VendorClient<IncodeStartOnboardingRequest, IncodeResponse<OnboardingStartResponse>>,
+    pub incode_add_front: VendorClient<IncodeAddFrontRequest, IncodeResponse<AddSideResponse>>,
+    pub incode_add_back: VendorClient<IncodeAddBackRequest, IncodeResponse<AddSideResponse>>,
+    pub incode_process_id: VendorClient<IncodeProcessIdRequest, IncodeResponse<ProcessIdResponse>>,
+    pub incode_process_face: VendorClient<IncodeProcessFaceRequest, IncodeResponse<ProcessFaceResponse>>,
+    pub incode_fetch_scores: VendorClient<IncodeFetchScoresRequest, IncodeResponse<FetchScoresResponse>>,
+    pub incode_add_privacy_consent:
+        VendorClient<IncodeAddPrivacyConsentRequest, IncodeResponse<AddConsentResponse>>,
+    pub incode_add_ml_consent: VendorClient<IncodeAddMLConsentRequest, IncodeResponse<AddConsentResponse>>,
+    pub incode_fetch_ocr: VendorClient<IncodeFetchOCRRequest, IncodeResponse<FetchOCRResponse>>,
+    pub incode_add_selfie: VendorClient<IncodeAddSelfieRequest, IncodeResponse<AddSelfieResponse>>,
+    pub incode_watchlist_check:
+        VendorClient<IncodeWatchlistCheckRequest, IncodeResponse<WatchlistResultResponse>>,
+    pub incode_updated_watchlist_result:
+        VendorClient<IncodeUpdatedWatchlistResultRequest, IncodeResponse<UpdatedWatchlistResultResponse>>,
+    pub incode_get_onboarding_status:
+        VendorClient<IncodeGetOnboardingStatusRequest, IncodeResponse<GetOnboardingStatusResponse>>,
+    pub incode_curp_validation:
+        VendorClient<IncodeCurpValidationRequest, IncodeResponse<CurpValidationResponse>>,
+    pub incode_government_validation:
+        VendorClient<IncodeGovernmentValidationRequest, IncodeResponse<GovernmentValidationResponse>>,
 }
 
 impl IncodeClients {
@@ -141,77 +103,62 @@ impl IncodeClients {
             incode_start_onboarding: Arc::new(MockVendorAPICall::<
                 IncodeStartOnboardingRequest,
                 IncodeResponse<OnboardingStartResponse>,
-                idv::incode::error::Error,
             >::new()),
             incode_add_front: Arc::new(MockVendorAPICall::<
                 IncodeAddFrontRequest,
                 IncodeResponse<AddSideResponse>,
-                idv::incode::error::Error,
             >::new()),
             incode_add_back: Arc::new(MockVendorAPICall::<
                 IncodeAddBackRequest,
                 IncodeResponse<AddSideResponse>,
-                idv::incode::error::Error,
             >::new()),
             incode_process_id: Arc::new(MockVendorAPICall::<
                 IncodeProcessIdRequest,
                 IncodeResponse<ProcessIdResponse>,
-                idv::incode::error::Error,
             >::new()),
             incode_process_face: Arc::new(MockVendorAPICall::<
                 IncodeProcessFaceRequest,
                 IncodeResponse<ProcessFaceResponse>,
-                idv::incode::error::Error,
             >::new()),
             incode_fetch_scores: Arc::new(MockVendorAPICall::<
                 IncodeFetchScoresRequest,
                 IncodeResponse<FetchScoresResponse>,
-                idv::incode::error::Error,
             >::new()),
             incode_add_privacy_consent: Arc::new(MockVendorAPICall::<
                 IncodeAddPrivacyConsentRequest,
                 IncodeResponse<AddConsentResponse>,
-                idv::incode::error::Error,
             >::new()),
             incode_add_ml_consent: Arc::new(MockVendorAPICall::<
                 IncodeAddMLConsentRequest,
                 IncodeResponse<AddConsentResponse>,
-                idv::incode::error::Error,
             >::new()),
             incode_fetch_ocr: Arc::new(MockVendorAPICall::<
                 IncodeFetchOCRRequest,
                 IncodeResponse<FetchOCRResponse>,
-                idv::incode::error::Error,
             >::new()),
             incode_add_selfie: Arc::new(MockVendorAPICall::<
                 IncodeAddSelfieRequest,
                 IncodeResponse<AddSelfieResponse>,
-                idv::incode::error::Error,
             >::new()),
             incode_get_onboarding_status: Arc::new(MockVendorAPICall::<
                 IncodeGetOnboardingStatusRequest,
                 IncodeResponse<GetOnboardingStatusResponse>,
-                idv::incode::error::Error,
             >::new()),
             incode_watchlist_check: Arc::new(MockVendorAPICall::<
                 IncodeWatchlistCheckRequest,
                 IncodeResponse<WatchlistResultResponse>,
-                idv::incode::error::Error,
             >::new()),
             incode_updated_watchlist_result: Arc::new(MockVendorAPICall::<
                 IncodeUpdatedWatchlistResultRequest,
                 IncodeResponse<UpdatedWatchlistResultResponse>,
-                idv::incode::error::Error,
             >::new()),
             incode_curp_validation: Arc::new(MockVendorAPICall::<
                 IncodeCurpValidationRequest,
                 IncodeResponse<CurpValidationResponse>,
-                idv::incode::error::Error,
             >::new()),
             incode_government_validation: Arc::new(MockVendorAPICall::<
                 IncodeGovernmentValidationRequest,
                 IncodeResponse<GovernmentValidationResponse>,
-                idv::incode::error::Error,
             >::new()),
         }
     }
@@ -239,25 +186,17 @@ impl IncodeClients {
 
 #[derive(Clone)]
 pub struct SambaClients {
-    pub samba_create_license_validation_order: VendorClient<
-        SambaOrderRequest<SambaLicenseValidationCreate>,
-        SambaAPIResponse<CreateOrderResponse>,
-        idv::samba::error::Error,
-    >,
+    pub samba_create_license_validation_order:
+        VendorClient<SambaOrderRequest<SambaLicenseValidationCreate>, SambaAPIResponse<CreateOrderResponse>>,
     pub samba_get_license_validation_report: VendorClient<
         SambaGetReportRequest<SambaLicenseValidationGetReport>,
         SambaAPIResponse<GetLVOrderResponse>,
-        idv::samba::error::Error,
     >,
-    pub samba_create_activity_history_order: VendorClient<
-        SambaOrderRequest<SambaActivityHistoryCreate>,
-        SambaAPIResponse<CreateOrderResponse>,
-        idv::samba::error::Error,
-    >,
+    pub samba_create_activity_history_order:
+        VendorClient<SambaOrderRequest<SambaActivityHistoryCreate>, SambaAPIResponse<CreateOrderResponse>>,
     pub samba_get_activity_history_report: VendorClient<
         SambaGetReportRequest<SambaActivityHistoryGetReport>,
         SambaAPIResponse<GetAHOrderResponse>,
-        idv::samba::error::Error,
     >,
 }
 
@@ -269,22 +208,18 @@ impl SambaClients {
             samba_create_license_validation_order: Arc::new(MockVendorAPICall::<
                 SambaOrderRequest<SambaLicenseValidationCreate>,
                 SambaAPIResponse<CreateOrderResponse>,
-                idv::samba::error::Error,
             >::new()),
             samba_get_license_validation_report: Arc::new(MockVendorAPICall::<
                 SambaGetReportRequest<SambaLicenseValidationGetReport>,
                 SambaAPIResponse<GetLVOrderResponse>,
-                idv::samba::error::Error,
             >::new()),
             samba_create_activity_history_order: Arc::new(MockVendorAPICall::<
                 SambaOrderRequest<SambaActivityHistoryCreate>,
                 SambaAPIResponse<CreateOrderResponse>,
-                idv::samba::error::Error,
             >::new()),
             samba_get_activity_history_report: Arc::new(MockVendorAPICall::<
                 SambaGetReportRequest<SambaActivityHistoryGetReport>,
                 SambaAPIResponse<GetAHOrderResponse>,
-                idv::samba::error::Error,
             >::new()),
         }
     }
@@ -301,8 +236,7 @@ impl SambaClients {
 
 #[derive(Clone)]
 pub struct SentilinkClients {
-    pub sentilink_application_risk:
-        VendorClient<SentilinkApplicationRiskRequest, SentilinkAPIResponse, idv::sentilink::error::Error>,
+    pub sentilink_application_risk: VendorClient<SentilinkApplicationRiskRequest, SentilinkAPIResponse>,
 }
 
 impl SentilinkClients {
@@ -313,7 +247,6 @@ impl SentilinkClients {
             sentilink_application_risk: Arc::new(MockVendorAPICall::<
                 SentilinkApplicationRiskRequest,
                 SentilinkAPIResponse,
-                idv::sentilink::error::Error,
             >::new()),
         }
     }
@@ -327,20 +260,16 @@ impl SentilinkClients {
 
 #[derive(Clone)]
 pub struct VendorClients {
-    pub socure_id_plus: VendorClient<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
-    pub twilio_lookup_v2: VendorClient<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
-    pub experian_cross_core:
-        VendorClient<ExperianCrossCoreRequest, ExperianCrossCoreResponse, idv::experian::error::Error>,
-    pub lexis_flex_id: VendorClient<LexisFlexIdRequest, LexisFlexIdResponse, idv::lexis::Error>,
-    pub middesk_create_business:
-        VendorClient<MiddeskCreateBusinessRequest, MiddeskCreateBusinessResponse, idv::middesk::Error>,
-    pub middesk_get_business:
-        VendorClient<MiddeskGetBusinessRequest, MiddeskGetBusinessResponse, idv::middesk::Error>,
-    pub idology_expect_id:
-        VendorClient<IdologyExpectIDRequest, IdologyExpectIDAPIResponse, idv::idology::error::Error>,
-    pub idology_pa: VendorClient<IdologyPaRequest, IdologyPaAPIResponse, idv::idology::error::Error>,
-    pub stytch_lookup: VendorClient<StytchLookupRequest, StytchLookupResponse, idv::stytch::error::Error>,
-    pub neuro_id: VendorClient<NeuroIdAnalyticsRequest, NeuroApiResponse, idv::neuro_id::error::Error>,
+    pub socure_id_plus: VendorClient<SocureIDPlusRequest, SocureIDPlusAPIResponse>,
+    pub twilio_lookup_v2: VendorClient<TwilioLookupV2Request, TwilioLookupV2APIResponse>,
+    pub experian_cross_core: VendorClient<ExperianCrossCoreRequest, ExperianCrossCoreResponse>,
+    pub lexis_flex_id: VendorClient<LexisFlexIdRequest, LexisFlexIdResponse>,
+    pub middesk_create_business: VendorClient<MiddeskCreateBusinessRequest, MiddeskCreateBusinessResponse>,
+    pub middesk_get_business: VendorClient<MiddeskGetBusinessRequest, MiddeskGetBusinessResponse>,
+    pub idology_expect_id: VendorClient<IdologyExpectIDRequest, IdologyExpectIDAPIResponse>,
+    pub idology_pa: VendorClient<IdologyPaRequest, IdologyPaAPIResponse>,
+    pub stytch_lookup: VendorClient<StytchLookupRequest, StytchLookupResponse>,
+    pub neuro_id: VendorClient<NeuroIdAnalyticsRequest, NeuroApiResponse>,
     pub incode: IncodeClients,
     pub samba: SambaClients,
     pub sentilink: SentilinkClients,
@@ -379,56 +308,33 @@ impl VendorClients {
         use crate::decision::vendor::vendor_trait::MockVendorAPICall;
 
         Self {
-            socure_id_plus: Arc::new(MockVendorAPICall::<
-                SocureIDPlusRequest,
-                SocureIDPlusAPIResponse,
-                idv::socure::Error,
-            >::new()),
+            socure_id_plus: Arc::new(
+                MockVendorAPICall::<SocureIDPlusRequest, SocureIDPlusAPIResponse>::new(),
+            ),
             twilio_lookup_v2: Arc::new(MockVendorAPICall::<
                 TwilioLookupV2Request,
                 TwilioLookupV2APIResponse,
-                idv::twilio::Error,
             >::new()),
             experian_cross_core: Arc::new(MockVendorAPICall::<
                 ExperianCrossCoreRequest,
                 ExperianCrossCoreResponse,
-                idv::experian::error::Error,
             >::new()),
-            lexis_flex_id: Arc::new(MockVendorAPICall::<
-                LexisFlexIdRequest,
-                LexisFlexIdResponse,
-                idv::lexis::Error,
-            >::new()),
+            lexis_flex_id: Arc::new(MockVendorAPICall::<LexisFlexIdRequest, LexisFlexIdResponse>::new()),
             middesk_create_business: Arc::new(MockVendorAPICall::<
                 MiddeskCreateBusinessRequest,
                 MiddeskCreateBusinessResponse,
-                idv::middesk::Error,
             >::new()),
             middesk_get_business: Arc::new(MockVendorAPICall::<
                 MiddeskGetBusinessRequest,
                 MiddeskGetBusinessResponse,
-                idv::middesk::Error,
             >::new()),
-            idology_pa: Arc::new(MockVendorAPICall::<
-                IdologyPaRequest,
-                IdologyPaAPIResponse,
-                idv::idology::error::Error,
-            >::new()),
+            idology_pa: Arc::new(MockVendorAPICall::<IdologyPaRequest, IdologyPaAPIResponse>::new()),
             idology_expect_id: Arc::new(MockVendorAPICall::<
                 IdologyExpectIDRequest,
                 IdologyExpectIDAPIResponse,
-                idv::idology::error::Error,
             >::new()),
-            stytch_lookup: Arc::new(MockVendorAPICall::<
-                StytchLookupRequest,
-                StytchLookupResponse,
-                idv::stytch::error::Error,
-            >::new()),
-            neuro_id: Arc::new(MockVendorAPICall::<
-                NeuroIdAnalyticsRequest,
-                NeuroApiResponse,
-                idv::neuro_id::error::Error,
-            >::new()),
+            stytch_lookup: Arc::new(MockVendorAPICall::<StytchLookupRequest, StytchLookupResponse>::new()),
+            neuro_id: Arc::new(MockVendorAPICall::<NeuroIdAnalyticsRequest, NeuroApiResponse>::new()),
             incode: IncodeClients::new_with_mocks(),
             samba: SambaClients::new_with_mocks(),
             sentilink: SentilinkClients::new_with_mocks(),

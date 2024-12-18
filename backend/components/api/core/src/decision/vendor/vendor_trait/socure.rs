@@ -1,5 +1,6 @@
 use super::VendorAPICall;
 use super::VendorAPIResponse;
+use api_errors::FpResult;
 use async_trait::async_trait;
 use idv::socure::client::SocureClient;
 use idv::socure::SocureIDPlusAPIResponse;
@@ -12,12 +13,9 @@ use newtypes::VendorAPI;
 /// Socure Impl
 /// /// ////////////////
 #[async_trait]
-impl VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error> for SocureClient {
+impl VendorAPICall<SocureIDPlusRequest, SocureIDPlusAPIResponse> for SocureClient {
     #[tracing::instrument("make_request", skip_all, fields(request = "SocureIDPlusRequest"))]
-    async fn make_request(
-        &self,
-        request: SocureIDPlusRequest,
-    ) -> Result<SocureIDPlusAPIResponse, idv::socure::Error> {
+    async fn make_request(&self, request: SocureIDPlusRequest) -> FpResult<SocureIDPlusAPIResponse> {
         let raw_response = self
             .idplus(
                 // TODO: this should return PiiJsonValue itself

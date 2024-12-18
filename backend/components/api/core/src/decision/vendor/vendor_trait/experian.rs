@@ -1,23 +1,20 @@
 use super::VendorAPICall;
 use super::VendorAPIResponse;
+use api_errors::FpResult;
 use async_trait::async_trait;
 use idv::experian::ExperianCrossCoreRequest;
 use idv::experian::ExperianCrossCoreResponse;
 use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::ParsedResponse;
 use newtypes::VendorAPI;
+
 ////////////////////
 /// Experian Impl
 /// /// ////////////////
 #[async_trait]
-impl VendorAPICall<ExperianCrossCoreRequest, ExperianCrossCoreResponse, idv::experian::error::Error>
-    for FootprintVendorHttpClient
-{
+impl VendorAPICall<ExperianCrossCoreRequest, ExperianCrossCoreResponse> for FootprintVendorHttpClient {
     #[tracing::instrument("make_request", skip_all, fields(request = "ExperianCrossCoreRequest"))]
-    async fn make_request(
-        &self,
-        request: ExperianCrossCoreRequest,
-    ) -> Result<ExperianCrossCoreResponse, idv::experian::error::Error> {
+    async fn make_request(&self, request: ExperianCrossCoreRequest) -> FpResult<ExperianCrossCoreResponse> {
         let raw_response = idv::experian::cross_core::send_precise_id_request(self, request).await?;
         let response = ExperianCrossCoreResponse::from_response(raw_response);
         Ok(response)

@@ -22,7 +22,6 @@ use db::models::verification_request::VReqIdentifier;
 use db::models::workflow::Workflow;
 use db::PgConn;
 use idv::incode::doc::response::FetchOCRResponse;
-use idv::samba::client::SambaResult;
 use idv::samba::common::SambaOrderRequest;
 use idv::samba::license_state_is_supported_for_license_validation;
 use idv::samba::response::CreateOrderResponse;
@@ -228,7 +227,7 @@ impl SambaOrderHelper {
         &self,
         state: &State,
         request: SambaOrderRequest<SambaLicenseValidationCreate>,
-    ) -> SambaResult<SambaAPIResponse<CreateOrderResponse>> {
+    ) -> FpResult<SambaAPIResponse<CreateOrderResponse>> {
         state
             .vendor_clients
             .samba
@@ -242,7 +241,7 @@ impl SambaOrderHelper {
         &self,
         state: &State,
         request: SambaOrderRequest<SambaActivityHistoryCreate>,
-    ) -> SambaResult<SambaAPIResponse<CreateOrderResponse>> {
+    ) -> FpResult<SambaAPIResponse<CreateOrderResponse>> {
         state
             .vendor_clients
             .samba
@@ -504,7 +503,7 @@ pub async fn run_samba_create_order(
 
     let (vres, _) = args.save(&state.db_pool).await?;
 
-    let resp = res.map_err(into_fp_error)?;
+    let resp = res?;
     // check we got a successful_response
     let create_order_response = resp.result.into_success().map_err(into_fp_error)?;
 

@@ -292,15 +292,32 @@ pub enum Error {
     FingerprintError(#[from] fingerprintjs::error::Error),
 }
 
-impl api_errors::FpErrorTrait for Error {
-    fn status_code(&self) -> api_errors::StatusCode {
-        api_errors::StatusCode::INTERNAL_SERVER_ERROR
-    }
+macro_rules! impl_fp_error_trait {
+    ($err: ty) => {
+        impl api_errors::FpErrorTrait for $err {
+            fn status_code(&self) -> api_errors::StatusCode {
+                api_errors::StatusCode::INTERNAL_SERVER_ERROR
+            }
 
-    fn message(&self) -> String {
-        self.to_string()
-    }
+            fn message(&self) -> String {
+                self.to_string()
+            }
+        }
+    };
 }
+
+impl_fp_error_trait!(Error);
+impl_fp_error_trait!(idology::error::Error);
+impl_fp_error_trait!(twilio::Error);
+impl_fp_error_trait!(socure::Error);
+impl_fp_error_trait!(experian::error::Error);
+impl_fp_error_trait!(middesk::Error);
+impl_fp_error_trait!(stytch::error::Error);
+impl_fp_error_trait!(lexis::Error);
+impl_fp_error_trait!(neuro_id::error::Error);
+impl_fp_error_trait!(samba::error::Error);
+impl_fp_error_trait!(sentilink::error::Error);
+impl_fp_error_trait!(fingerprintjs::error::Error);
 
 
 impl From<&ParsedResponse> for VendorAPI {

@@ -314,11 +314,8 @@ pub fn mock_incode(state: &mut State, with_hit: WithHit) {
             AmlKind::Am => "adverse-media".to_owned(),
         })
         .collect::<Vec<_>>();
-    let mut mock_incode_start_onboarding = MockVendorAPICall::<
-        IncodeStartOnboardingRequest,
-        IncodeResponse<OnboardingStartResponse>,
-        idv::incode::error::Error,
-    >::new();
+    let mut mock_incode_start_onboarding =
+        MockVendorAPICall::<IncodeStartOnboardingRequest, IncodeResponse<OnboardingStartResponse>>::new();
     mock_incode_start_onboarding
         .expect_make_request()
         .times(1)
@@ -328,7 +325,6 @@ pub fn mock_incode(state: &mut State, with_hit: WithHit) {
     let mut mock_incode_watchlist_check = MockVendorAPICall::<
         idv::incode::watchlist::IncodeWatchlistCheckRequest,
         IncodeResponse<idv::incode::watchlist::response::WatchlistResultResponse>,
-        idv::incode::error::Error,
     >::new();
 
     let res = idv::tests::fixtures::incode::watchlist_result_response(lists);
@@ -342,11 +338,8 @@ pub fn mock_incode(state: &mut State, with_hit: WithHit) {
 
 pub struct WithQualifier(pub Option<String>);
 pub fn mock_idology(state: &mut State, with_qualifier: WithQualifier) {
-    let mut mock_idology_expect_id = MockVendorAPICall::<
-        IdologyExpectIDRequest,
-        IdologyExpectIDAPIResponse,
-        idv::idology::error::Error,
-    >::new();
+    let mut mock_idology_expect_id =
+        MockVendorAPICall::<IdologyExpectIDRequest, IdologyExpectIDAPIResponse>::new();
     mock_idology_expect_id
         .expect_make_request()
         .times(1)
@@ -388,7 +381,7 @@ pub fn mock_idology_hard_error(state: &mut State) {
     mock_idology_expect_id
         .expect_make_request()
         .times(1)
-        .return_once(move |_| Err(idv::idology::error::Error::UnknownError("oops".to_owned())));
+        .return_once(move |_| Err(idv::idology::error::Error::UnknownError("oops".to_owned()).into()));
     state.set_idology_expect_id(Arc::new(mock_idology_expect_id));
 }
 
@@ -429,7 +422,7 @@ pub fn mock_experian_hard_error(state: &mut State) {
     mock_experian
         .expect_make_request()
         .times(1)
-        .return_once(move |_| Err(idv::experian::error::Error::UserNamePasswordError));
+        .return_once(move |_| Err(idv::experian::error::Error::UserNamePasswordError.into()));
     state.set_experian_cross_core(Arc::new(mock_experian));
 }
 
@@ -456,7 +449,7 @@ pub fn mock_experian_parseable_error(state: &mut State) {
 
 pub fn mock_twilio(state: &mut State) {
     let mut mock_twilio_lookup_v2 =
-        MockVendorAPICall::<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>::new();
+        MockVendorAPICall::<TwilioLookupV2Request, TwilioLookupV2APIResponse>::new();
     mock_twilio_lookup_v2
         .expect_make_request()
         .times(1)
@@ -466,11 +459,8 @@ pub fn mock_twilio(state: &mut State) {
 
 pub fn mock_middesk(state: &mut State, business_id: &str) {
     let business_id = business_id.to_owned();
-    let mut mock_middesk_create_business = MockVendorAPICall::<
-        MiddeskCreateBusinessRequest,
-        MiddeskCreateBusinessResponse,
-        idv::middesk::Error,
-    >::new();
+    let mut mock_middesk_create_business =
+        MockVendorAPICall::<MiddeskCreateBusinessRequest, MiddeskCreateBusinessResponse>::new();
     mock_middesk_create_business
         .expect_make_request()
         .times(1)

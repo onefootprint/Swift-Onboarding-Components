@@ -184,12 +184,11 @@ enum VendorRes {
 }
 
 fn mock_idology_pa(state: &mut State, vendor_result: &VendorRes) {
-    let mut mock =
-        MockVendorAPICall::<IdologyPaRequest, IdologyPaAPIResponse, idv::idology::error::Error>::new();
+    let mut mock = MockVendorAPICall::<IdologyPaRequest, IdologyPaAPIResponse>::new();
     let res = match vendor_result {
         VendorRes::Hit => Ok(idv::tests::fixtures::idology::create_response_pa_hit()),
         VendorRes::NoHit => Ok(idv::tests::fixtures::idology::create_response_pa_no_hit()),
-        VendorRes::Error => Err(idv::idology::error::Error::UnknownError("uhoh".to_owned())),
+        VendorRes::Error => Err(idv::idology::error::Error::UnknownError("uhoh".to_owned()).into()),
     };
     mock.expect_make_request().times(1).return_once(|_| res);
     state.set_idology_pa(Arc::new(mock));
@@ -204,11 +203,8 @@ fn mock_incode_watchlist_check(state: &mut State, vendor_result: &VendorRes) {
         VendorRes::Error => Ok(idv::tests::fixtures::incode::watchlist_result_error_response()),
     };
 
-    let mut mock_incode_start_onboarding = MockVendorAPICall::<
-        IncodeStartOnboardingRequest,
-        IncodeResponse<OnboardingStartResponse>,
-        idv::incode::error::Error,
-    >::new();
+    let mut mock_incode_start_onboarding =
+        MockVendorAPICall::<IncodeStartOnboardingRequest, IncodeResponse<OnboardingStartResponse>>::new();
     mock_incode_start_onboarding
         .expect_make_request()
         .times(1)
@@ -218,7 +214,6 @@ fn mock_incode_watchlist_check(state: &mut State, vendor_result: &VendorRes) {
     let mut mock_incode_watchlist_check = MockVendorAPICall::<
         idv::incode::watchlist::IncodeWatchlistCheckRequest,
         IncodeResponse<idv::incode::watchlist::response::WatchlistResultResponse>,
-        idv::incode::error::Error,
     >::new();
 
     mock_incode_watchlist_check
@@ -249,11 +244,8 @@ fn mock_incode_updated_watchlist_result(state: &mut State, vendor_result: &Vendo
         IncodeAPIResult::ResponseErrorUnhandled(_) => unimplemented!("not tested"),
     });
 
-    let mut mock_incode_start_onboarding = MockVendorAPICall::<
-        IncodeStartOnboardingRequest,
-        IncodeResponse<OnboardingStartResponse>,
-        idv::incode::error::Error,
-    >::new();
+    let mut mock_incode_start_onboarding =
+        MockVendorAPICall::<IncodeStartOnboardingRequest, IncodeResponse<OnboardingStartResponse>>::new();
     mock_incode_start_onboarding
         .expect_make_request()
         .times(1)
@@ -263,7 +255,6 @@ fn mock_incode_updated_watchlist_result(state: &mut State, vendor_result: &Vendo
     let mut mock_incode_updated_watchlist_result = MockVendorAPICall::<
         idv::incode::watchlist::IncodeUpdatedWatchlistResultRequest,
         IncodeResponse<idv::incode::watchlist::response::UpdatedWatchlistResultResponse>,
-        idv::incode::error::Error,
     >::new();
 
     mock_incode_updated_watchlist_result

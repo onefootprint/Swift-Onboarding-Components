@@ -144,7 +144,7 @@ async fn vendor_error(state: &mut State, vault_kind: VaultKind) {
     assert!(
         e.message()
             == "Incode error: Incode API Error: IncodeAPIResponseError Something bad happened yo:  in >"
-            || e.message() == "IDology error: Could not parse error code: uhoh"
+            || e.message() == "Could not parse error code: uhoh"
     );
 
     assert_eq!(WatchlistCheckStatusKind::Pending, wc.status);

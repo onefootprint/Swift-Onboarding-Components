@@ -10,6 +10,7 @@ use crate::decision::vendor::verification_result::ShouldSaveVerificationRequest;
 use crate::vendor_clients::VendorClient;
 use crate::FpResult;
 use crate::State;
+use api_errors::ServerErrInto;
 use db::models::vault::Vault;
 use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
@@ -98,7 +99,6 @@ pub async fn send_idv_request(
             let args = SaveVerificationResultArgs::new(&res, uv.public_key, vreq);
             let (vres, _) = args.save(&state.db_pool).await?;
             let res = res
-                .map_err(into_fp_error)
                 .and_then(|r| r.parsed.map_err(into_fp_error))
                 .map(ParsedResponse::IDologyExpectID);
             Ok((res, vres))
@@ -120,7 +120,6 @@ pub async fn send_idv_request(
             let args = SaveVerificationResultArgs::new(&res, uv.public_key, vreq);
             let (vres, _) = args.save(&state.db_pool).await?;
             let res = res
-                .map_err(into_fp_error)
                 .and_then(|r| r.parsed.map_err(into_fp_error))
                 .map(ParsedResponse::ExperianPreciseID);
             Ok((res, vres))
@@ -144,9 +143,7 @@ pub async fn send_idv_request(
             } else {
                 // shouldn't be possible since we check tvc.enabled_vendor_apis before attempting this
                 // function and that takes the presence of TBI into account
-                Err(idv::Error::AssertionError(
-                    "Missing tenant_business_info".to_owned(),
-                ))
+                ServerErrInto("Missing tenant_business_info")
             };
             let (response, vres) = state
                 .db_pool
@@ -155,7 +152,7 @@ pub async fn send_idv_request(
                     Ok((response, vres))
                 })
                 .await?;
-            let res = response.map(|r| r.response.clone()).map_err(into_fp_error);
+            let res = response.map(|r| r.response.clone());
             Ok((res, vres))
         }
     }
@@ -167,11 +164,11 @@ pub async fn send_idology_idv_request(
     request: IdologyExpectIDRequest,
     is_production: bool,
     ob_configuration_key: PublishablePlaybookKey,
-    client: VendorClient<IdologyExpectIDRequest, IdologyExpectIDAPIResponse, idv::idology::error::Error>,
+    client: VendorClient<IdologyExpectIDRequest, IdologyExpectIDAPIResponse>,
     ff_client: Arc<dyn FeatureFlagClient>,
-) -> Result<IdologyExpectIDAPIResponse, idv::Error> {
+) -> FpResult<IdologyExpectIDAPIResponse> {
     if is_production || ff_client.flag(BoolFlag::EnableIdologyInNonProd(&ob_configuration_key)) {
-        client.make_request(request).await.map_err(|e| e.into())
+        client.make_request(request).await
     } else {
         let response = idv::test_fixtures::idology_fake_data_expectid_response();
 
@@ -191,11 +188,11 @@ pub async fn send_experian_idv_request(
     request: ExperianCrossCoreRequest,
     is_production: bool,
     ob_configuration_key: PublishablePlaybookKey,
-    client: VendorClient<ExperianCrossCoreRequest, ExperianCrossCoreResponse, idv::experian::error::Error>,
+    client: VendorClient<ExperianCrossCoreRequest, ExperianCrossCoreResponse>,
     ff_client: Arc<dyn FeatureFlagClient>,
-) -> Result<ExperianCrossCoreResponse, idv::Error> {
+) -> FpResult<ExperianCrossCoreResponse> {
     if is_production || ff_client.flag(BoolFlag::EnableExperianInNonProd(&ob_configuration_key)) {
-        client.make_request(request).await.map_err(|e| e.into())
+        client.make_request(request).await
     } else {
         let response = idv::test_fixtures::experian_cross_core_response(None, None);
 
@@ -213,9 +210,9 @@ pub async fn send_lexis_flex_id_request(
     request: LexisFlexIdRequest,
     is_production: bool,
     ob_configuration_key: PublishablePlaybookKey,
-    client: VendorClient<LexisFlexIdRequest, LexisFlexIdResponse, idv::lexis::Error>,
+    client: VendorClient<LexisFlexIdRequest, LexisFlexIdResponse>,
     ff_client: Arc<dyn FeatureFlagClient>,
-) -> Result<VendorResponse, idv::Error> {
+) -> FpResult<VendorResponse> {
     if is_production || ff_client.flag(BoolFlag::EnableLexisInNonProd(&ob_configuration_key)) {
         let res = client.make_request(request).await;
 
@@ -228,7 +225,6 @@ pub async fn send_lexis_flex_id_request(
                 raw_response,
             }
         })
-        .map_err(|e| e.into())
     } else {
         let response = idv::test_fixtures::passing_lexis_flex_id_response();
         let parsed_response = idv::lexis::parse_response(response.clone())?;
@@ -267,11 +263,7 @@ mod tests {
     ) {
         let ob_configuration_key = PublishablePlaybookKey::from_str("obc123").unwrap();
         let mut mock_ff_client = MockFFClient::new();
-        let mut mock_api = MockVendorAPICall::<
-            IdologyExpectIDRequest,
-            IdologyExpectIDAPIResponse,
-            idv::idology::error::Error,
-        >::new();
+        let mut mock_api = MockVendorAPICall::<IdologyExpectIDRequest, IdologyExpectIDAPIResponse>::new();
 
         let ob_config_key = ob_configuration_key.clone();
         mock_ff_client.mock(|c| {

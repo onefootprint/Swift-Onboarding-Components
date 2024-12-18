@@ -1,5 +1,6 @@
 use super::VendorAPICall;
 use super::VendorAPIResponse;
+use api_errors::FpResult;
 use async_trait::async_trait;
 use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::sentilink::application_risk::request::ApplicationRiskRequest;
@@ -10,18 +11,13 @@ use idv::ParsedResponse;
 use newtypes::VendorAPI;
 
 #[async_trait]
-impl VendorAPICall<SentilinkApplicationRiskRequest, SentilinkAPIResponse, idv::sentilink::error::Error>
-    for FootprintVendorHttpClient
-{
+impl VendorAPICall<SentilinkApplicationRiskRequest, SentilinkAPIResponse> for FootprintVendorHttpClient {
     #[tracing::instrument(
         "make_request",
         skip_all,
         fields(request = "SentilinkAPIRequest<ApplicationRisk>")
     )]
-    async fn make_request(
-        &self,
-        request: SentilinkApplicationRiskRequest,
-    ) -> Result<SentilinkAPIResponse, idv::sentilink::error::Error> {
+    async fn make_request(&self, request: SentilinkApplicationRiskRequest) -> FpResult<SentilinkAPIResponse> {
         let client_adapter = SentilinkClientAdapter::new(request.credentials.clone());
         let request = ApplicationRiskRequest::try_from(request)?;
 

@@ -1,5 +1,6 @@
 use super::VendorAPICall;
 use super::VendorAPIResponse;
+use api_errors::FpResult;
 use async_trait::async_trait;
 use idv::middesk::client::MiddeskClient;
 use idv::middesk::MiddeskCreateBusinessRequest;
@@ -14,14 +15,12 @@ use newtypes::VendorAPI;
 /// Middesk impl
 /// /////////////////
 #[async_trait]
-impl VendorAPICall<MiddeskCreateBusinessRequest, MiddeskCreateBusinessResponse, idv::middesk::Error>
-    for MiddeskClient
-{
+impl VendorAPICall<MiddeskCreateBusinessRequest, MiddeskCreateBusinessResponse> for MiddeskClient {
     #[tracing::instrument("make_request", skip_all, fields(request = "MiddeskCreateBusinessRequest"))]
     async fn make_request(
         &self,
         request: MiddeskCreateBusinessRequest,
-    ) -> Result<MiddeskCreateBusinessResponse, idv::middesk::Error> {
+    ) -> FpResult<MiddeskCreateBusinessResponse> {
         let raw_response = self.post_business(request).await?;
         let parsed_response = idv::middesk::response::parse_response(raw_response.clone())?;
 
@@ -47,14 +46,9 @@ impl VendorAPIResponse for MiddeskCreateBusinessResponse {
 }
 
 #[async_trait]
-impl VendorAPICall<MiddeskGetBusinessRequest, MiddeskGetBusinessResponse, idv::middesk::Error>
-    for MiddeskClient
-{
+impl VendorAPICall<MiddeskGetBusinessRequest, MiddeskGetBusinessResponse> for MiddeskClient {
     #[tracing::instrument("make_request", skip_all, fields(request = "MiddeskGetBusinessRequest"))]
-    async fn make_request(
-        &self,
-        request: MiddeskGetBusinessRequest,
-    ) -> Result<MiddeskGetBusinessResponse, idv::middesk::Error> {
+    async fn make_request(&self, request: MiddeskGetBusinessRequest) -> FpResult<MiddeskGetBusinessResponse> {
         let raw_response = self.get_business(request).await?;
         let parsed_response = idv::middesk::response::parse_response(raw_response.clone())?;
 

@@ -146,6 +146,7 @@ fp_error_trait_impl!(std::str::Utf8Error, BAD_REQUEST);
 fp_error_trait_impl!(serde_json::Error, BAD_REQUEST);
 fp_error_trait_impl!(serde_cbor::Error, BAD_REQUEST);
 fp_error_trait_impl!(actix_web::error::JsonPayloadError, BAD_REQUEST);
+fp_error_trait_impl!(chrono::ParseError, INTERNAL_SERVER_ERROR);
 
 impl FpErrorTrait for webauthn_rs_core::error::WebauthnError {
     fn status_code(&self) -> StatusCode {

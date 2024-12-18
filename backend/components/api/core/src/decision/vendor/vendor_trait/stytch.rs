@@ -1,5 +1,6 @@
 use super::VendorAPICall;
 use super::VendorAPIResponse;
+use api_errors::FpResult;
 use async_trait::async_trait;
 use idv::stytch::client::StytchClient;
 use idv::stytch::StytchLookupRequest;
@@ -8,12 +9,9 @@ use idv::ParsedResponse;
 use newtypes::VendorAPI;
 
 #[async_trait]
-impl VendorAPICall<StytchLookupRequest, StytchLookupResponse, idv::stytch::error::Error> for StytchClient {
+impl VendorAPICall<StytchLookupRequest, StytchLookupResponse> for StytchClient {
     #[tracing::instrument("make_request", skip_all, fields(request = "StytchLookupRequest"))]
-    async fn make_request(
-        &self,
-        request: StytchLookupRequest,
-    ) -> Result<StytchLookupResponse, idv::stytch::error::Error> {
+    async fn make_request(&self, request: StytchLookupRequest) -> FpResult<StytchLookupResponse> {
         let raw_response = self.lookup(&request.telemetry_id).await?;
 
         let res = StytchLookupResponse::from_response(raw_response).await;

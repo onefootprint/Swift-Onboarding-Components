@@ -1,5 +1,6 @@
 use super::VendorAPICall;
 use super::VendorAPIResponse;
+use api_errors::FpResult;
 use async_trait::async_trait;
 use chrono::Datelike;
 use idv::footprint_http_client::FootprintVendorHttpClient;
@@ -26,7 +27,6 @@ use idv::incode::doc::IncodeFetchScoresRequest;
 use idv::incode::doc::IncodeGetOnboardingStatusRequest;
 use idv::incode::doc::IncodeProcessFaceRequest;
 use idv::incode::doc::IncodeProcessIdRequest;
-use idv::incode::error::Error as IncodeError;
 use idv::incode::government_validation::request::IncodeGovernmentValidationRequest;
 use idv::incode::government_validation::response::GovernmentValidationResponse;
 use idv::incode::response::OnboardingStartResponse;
@@ -44,14 +44,14 @@ use newtypes::VendorAPI;
 /// Incode impl
 /// /////////////////
 #[async_trait]
-impl VendorAPICall<IncodeStartOnboardingRequest, IncodeResponse<OnboardingStartResponse>, IncodeError>
+impl VendorAPICall<IncodeStartOnboardingRequest, IncodeResponse<OnboardingStartResponse>>
     for FootprintVendorHttpClient
 {
     #[tracing::instrument("make_request", skip_all, fields(request = "IncodeStartOnboardingRequest"))]
     async fn make_request(
         &self,
         request: IncodeStartOnboardingRequest,
-    ) -> Result<IncodeResponse<OnboardingStartResponse>, IncodeError> {
+    ) -> FpResult<IncodeResponse<OnboardingStartResponse>> {
         // derive is_prod from creds
         let client = IncodeClientAdapter::new(request.credentials)?;
         let raw_response = client
@@ -84,14 +84,12 @@ impl VendorAPIResponse for IncodeResponse<OnboardingStartResponse> {
 }
 
 #[async_trait]
-impl VendorAPICall<IncodeAddFrontRequest, IncodeResponse<AddSideResponse>, IncodeError>
-    for FootprintVendorHttpClient
-{
+impl VendorAPICall<IncodeAddFrontRequest, IncodeResponse<AddSideResponse>> for FootprintVendorHttpClient {
     #[tracing::instrument("make_request", skip_all, fields(request = "IncodeAddFrontRequest"))]
     async fn make_request(
         &self,
         request: IncodeAddFrontRequest,
-    ) -> Result<IncodeResponse<AddSideResponse>, IncodeError> {
+    ) -> FpResult<IncodeResponse<AddSideResponse>> {
         // derive is_prod from creds
         let client = IncodeClientAdapter::new(request.credentials.credentials.clone())?;
         let authenticated_client =
@@ -124,14 +122,9 @@ impl VendorAPIResponse for IncodeResponse<AddSideResponse> {
 }
 
 #[async_trait]
-impl VendorAPICall<IncodeAddBackRequest, IncodeResponse<AddSideResponse>, IncodeError>
-    for FootprintVendorHttpClient
-{
+impl VendorAPICall<IncodeAddBackRequest, IncodeResponse<AddSideResponse>> for FootprintVendorHttpClient {
     #[tracing::instrument("make_request", skip_all, fields(request = "IncodeAddBackRequest"))]
-    async fn make_request(
-        &self,
-        request: IncodeAddBackRequest,
-    ) -> Result<IncodeResponse<AddSideResponse>, IncodeError> {
+    async fn make_request(&self, request: IncodeAddBackRequest) -> FpResult<IncodeResponse<AddSideResponse>> {
         // derive is_prod from creds
         let client = IncodeClientAdapter::new(request.credentials.credentials.clone())?;
         let authenticated_client =
@@ -146,14 +139,12 @@ impl VendorAPICall<IncodeAddBackRequest, IncodeResponse<AddSideResponse>, Incode
 }
 
 #[async_trait]
-impl VendorAPICall<IncodeProcessIdRequest, IncodeResponse<ProcessIdResponse>, IncodeError>
-    for FootprintVendorHttpClient
-{
+impl VendorAPICall<IncodeProcessIdRequest, IncodeResponse<ProcessIdResponse>> for FootprintVendorHttpClient {
     #[tracing::instrument("make_request", skip_all, fields(request = "IncodeProcessIdRequest"))]
     async fn make_request(
         &self,
         request: IncodeProcessIdRequest,
-    ) -> Result<IncodeResponse<ProcessIdResponse>, IncodeError> {
+    ) -> FpResult<IncodeResponse<ProcessIdResponse>> {
         // derive is_prod from creds
         let client = IncodeClientAdapter::new(request.credentials.credentials.clone())?;
         let authenticated_client =
@@ -183,14 +174,14 @@ impl VendorAPIResponse for IncodeResponse<ProcessIdResponse> {
 }
 
 #[async_trait]
-impl VendorAPICall<IncodeFetchScoresRequest, IncodeResponse<FetchScoresResponse>, IncodeError>
+impl VendorAPICall<IncodeFetchScoresRequest, IncodeResponse<FetchScoresResponse>>
     for FootprintVendorHttpClient
 {
     #[tracing::instrument("make_request", skip_all, fields(request = "IncodeFetchScoresRequest"))]
     async fn make_request(
         &self,
         request: IncodeFetchScoresRequest,
-    ) -> Result<IncodeResponse<FetchScoresResponse>, IncodeError> {
+    ) -> FpResult<IncodeResponse<FetchScoresResponse>> {
         // derive is_prod from creds
         let client = IncodeClientAdapter::new(request.credentials.credentials.clone())?;
         let authenticated_client =
@@ -223,14 +214,14 @@ impl VendorAPIResponse for IncodeResponse<FetchScoresResponse> {
 // Consent
 //
 #[async_trait]
-impl VendorAPICall<IncodeAddPrivacyConsentRequest, IncodeResponse<AddConsentResponse>, IncodeError>
+impl VendorAPICall<IncodeAddPrivacyConsentRequest, IncodeResponse<AddConsentResponse>>
     for FootprintVendorHttpClient
 {
     #[tracing::instrument("make_request", skip_all, fields(request = "IncodeAddPrivacyConsentRequest"))]
     async fn make_request(
         &self,
         request: IncodeAddPrivacyConsentRequest,
-    ) -> Result<IncodeResponse<AddConsentResponse>, IncodeError> {
+    ) -> FpResult<IncodeResponse<AddConsentResponse>> {
         // derive is_prod from creds
         let client = IncodeClientAdapter::new(request.credentials.credentials.clone())?;
         let authenticated_client =
@@ -246,14 +237,14 @@ impl VendorAPICall<IncodeAddPrivacyConsentRequest, IncodeResponse<AddConsentResp
 }
 
 #[async_trait]
-impl VendorAPICall<IncodeAddMLConsentRequest, IncodeResponse<AddConsentResponse>, IncodeError>
+impl VendorAPICall<IncodeAddMLConsentRequest, IncodeResponse<AddConsentResponse>>
     for FootprintVendorHttpClient
 {
     #[tracing::instrument("make_request", skip_all, fields(request = "IncodeAddMLConsentRequest"))]
     async fn make_request(
         &self,
         request: IncodeAddMLConsentRequest,
-    ) -> Result<IncodeResponse<AddConsentResponse>, IncodeError> {
+    ) -> FpResult<IncodeResponse<AddConsentResponse>> {
         // derive is_prod from creds
         let client = IncodeClientAdapter::new(request.credentials.credentials.clone())?;
         let authenticated_client =
@@ -283,14 +274,12 @@ impl VendorAPIResponse for IncodeResponse<AddConsentResponse> {
 }
 
 #[async_trait]
-impl VendorAPICall<IncodeFetchOCRRequest, IncodeResponse<FetchOCRResponse>, IncodeError>
-    for FootprintVendorHttpClient
-{
+impl VendorAPICall<IncodeFetchOCRRequest, IncodeResponse<FetchOCRResponse>> for FootprintVendorHttpClient {
     #[tracing::instrument("make_request", skip_all, fields(request = "IncodeFetchOCRRequest"))]
     async fn make_request(
         &self,
         request: IncodeFetchOCRRequest,
-    ) -> Result<IncodeResponse<FetchOCRResponse>, IncodeError> {
+    ) -> FpResult<IncodeResponse<FetchOCRResponse>> {
         // derive is_prod from creds
         let client = IncodeClientAdapter::new(request.credentials.credentials.clone())?;
         let authenticated_client =
@@ -319,14 +308,12 @@ impl VendorAPIResponse for IncodeResponse<FetchOCRResponse> {
 }
 
 #[async_trait]
-impl VendorAPICall<IncodeAddSelfieRequest, IncodeResponse<AddSelfieResponse>, IncodeError>
-    for FootprintVendorHttpClient
-{
+impl VendorAPICall<IncodeAddSelfieRequest, IncodeResponse<AddSelfieResponse>> for FootprintVendorHttpClient {
     #[tracing::instrument("make_request", skip_all, fields(request = "IncodeAddSelfieRequest"))]
     async fn make_request(
         &self,
         request: IncodeAddSelfieRequest,
-    ) -> Result<IncodeResponse<AddSelfieResponse>, IncodeError> {
+    ) -> FpResult<IncodeResponse<AddSelfieResponse>> {
         // derive is_prod from creds
         let client = IncodeClientAdapter::new(request.credentials.credentials.clone())?;
         let authenticated_client =
@@ -355,14 +342,14 @@ impl VendorAPIResponse for IncodeResponse<AddSelfieResponse> {
 }
 
 #[async_trait]
-impl VendorAPICall<IncodeProcessFaceRequest, IncodeResponse<ProcessFaceResponse>, IncodeError>
+impl VendorAPICall<IncodeProcessFaceRequest, IncodeResponse<ProcessFaceResponse>>
     for FootprintVendorHttpClient
 {
     #[tracing::instrument("make_request", skip_all, fields(request = "IncodeProcessFaceRequest"))]
     async fn make_request(
         &self,
         request: IncodeProcessFaceRequest,
-    ) -> Result<IncodeResponse<ProcessFaceResponse>, IncodeError> {
+    ) -> FpResult<IncodeResponse<ProcessFaceResponse>> {
         // derive is_prod from creds
         let client = IncodeClientAdapter::new(request.credentials.credentials.clone())?;
         let authenticated_client =
@@ -390,7 +377,7 @@ impl VendorAPIResponse for IncodeResponse<ProcessFaceResponse> {
 }
 
 #[async_trait]
-impl VendorAPICall<IncodeGetOnboardingStatusRequest, IncodeResponse<GetOnboardingStatusResponse>, IncodeError>
+impl VendorAPICall<IncodeGetOnboardingStatusRequest, IncodeResponse<GetOnboardingStatusResponse>>
     for FootprintVendorHttpClient
 {
     #[tracing::instrument(
@@ -401,7 +388,7 @@ impl VendorAPICall<IncodeGetOnboardingStatusRequest, IncodeResponse<GetOnboardin
     async fn make_request(
         &self,
         request: IncodeGetOnboardingStatusRequest,
-    ) -> Result<IncodeResponse<GetOnboardingStatusResponse>, IncodeError> {
+    ) -> FpResult<IncodeResponse<GetOnboardingStatusResponse>> {
         // derive is_prod from creds
         let client = IncodeClientAdapter::new(request.credentials.credentials.clone())?;
         let authenticated_client =
@@ -442,14 +429,14 @@ impl VendorAPIResponse for IncodeResponse<GetOnboardingStatusResponse> {
 /// /////////////////
 
 #[async_trait]
-impl VendorAPICall<IncodeWatchlistCheckRequest, IncodeResponse<WatchlistResultResponse>, IncodeError>
+impl VendorAPICall<IncodeWatchlistCheckRequest, IncodeResponse<WatchlistResultResponse>>
     for FootprintVendorHttpClient
 {
     #[tracing::instrument("make_request", skip_all, fields(request = "IncodeWatchlistCheckRequest"))]
     async fn make_request(
         &self,
         request: IncodeWatchlistCheckRequest,
-    ) -> Result<IncodeResponse<WatchlistResultResponse>, IncodeError> {
+    ) -> FpResult<IncodeResponse<WatchlistResultResponse>> {
         // derive is_prod from creds
         let client = IncodeClientAdapter::new(request.credentials.credentials.clone())?;
         let authenticated_client =
@@ -492,12 +479,8 @@ impl VendorAPIResponse for IncodeResponse<WatchlistResultResponse> {
 }
 
 #[async_trait]
-impl
-    VendorAPICall<
-        IncodeUpdatedWatchlistResultRequest,
-        IncodeResponse<UpdatedWatchlistResultResponse>,
-        IncodeError,
-    > for FootprintVendorHttpClient
+impl VendorAPICall<IncodeUpdatedWatchlistResultRequest, IncodeResponse<UpdatedWatchlistResultResponse>>
+    for FootprintVendorHttpClient
 {
     #[tracing::instrument(
         "make_request",
@@ -507,7 +490,7 @@ impl
     async fn make_request(
         &self,
         request: IncodeUpdatedWatchlistResultRequest,
-    ) -> Result<IncodeResponse<UpdatedWatchlistResultResponse>, IncodeError> {
+    ) -> FpResult<IncodeResponse<UpdatedWatchlistResultResponse>> {
         // derive is_prod from creds
         let client = IncodeClientAdapter::new(request.credentials.credentials.clone())?;
         let authenticated_client =
@@ -540,14 +523,14 @@ impl VendorAPIResponse for IncodeResponse<UpdatedWatchlistResultResponse> {
 }
 
 #[async_trait]
-impl VendorAPICall<IncodeCurpValidationRequest, IncodeResponse<CurpValidationResponse>, IncodeError>
+impl VendorAPICall<IncodeCurpValidationRequest, IncodeResponse<CurpValidationResponse>>
     for FootprintVendorHttpClient
 {
     #[tracing::instrument("make_request", skip_all, fields(request = "IncodeCurpValidationRequest"))]
     async fn make_request(
         &self,
         request: IncodeCurpValidationRequest,
-    ) -> Result<IncodeResponse<CurpValidationResponse>, IncodeError> {
+    ) -> FpResult<IncodeResponse<CurpValidationResponse>> {
         // derive is_prod from creds
         let client = IncodeClientAdapter::new(request.credentials.credentials.clone())?;
         let authenticated_client =
@@ -579,12 +562,8 @@ impl VendorAPIResponse for IncodeResponse<CurpValidationResponse> {
 }
 
 #[async_trait]
-impl
-    VendorAPICall<
-        IncodeGovernmentValidationRequest,
-        IncodeResponse<GovernmentValidationResponse>,
-        IncodeError,
-    > for FootprintVendorHttpClient
+impl VendorAPICall<IncodeGovernmentValidationRequest, IncodeResponse<GovernmentValidationResponse>>
+    for FootprintVendorHttpClient
 {
     #[tracing::instrument(
         "make_request",
@@ -594,7 +573,7 @@ impl
     async fn make_request(
         &self,
         request: IncodeGovernmentValidationRequest,
-    ) -> Result<IncodeResponse<GovernmentValidationResponse>, IncodeError> {
+    ) -> FpResult<IncodeResponse<GovernmentValidationResponse>> {
         // derive is_prod from creds
         let client = IncodeClientAdapter::new(request.credentials.credentials.clone())?;
         let authenticated_client =

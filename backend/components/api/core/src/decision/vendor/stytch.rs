@@ -1,5 +1,6 @@
 use super::verification_result::SaveVerificationResultArgs;
 use super::verification_result::ShouldSaveVerificationRequest;
+use api_errors::FpResult;
 use idv::stytch::StytchLookupResponse;
 use newtypes::DecisionIntentId;
 use newtypes::ScopedVaultId;
@@ -10,7 +11,7 @@ use newtypes::VendorAPI;
 
 impl SaveVerificationResultArgs {
     pub fn new_for_stytch(
-        request_result: &Result<StytchLookupResponse, idv::stytch::error::Error>,
+        request_result: &FpResult<StytchLookupResponse>,
         di_id: DecisionIntentId,
         sv_id: ScopedVaultId,
         vault_public_key: VaultPublicKey,

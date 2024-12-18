@@ -35,7 +35,7 @@ use newtypes::WorkflowId;
 
 impl SaveVerificationResultArgs {
     pub fn new_for_neuro(
-        request_result: &Result<NeuroApiResponse, idv::neuro_id::error::Error>,
+        request_result: &FpResult<NeuroApiResponse>,
         di_id: DecisionIntentId,
         sv_id: ScopedVaultId,
         vault_public_key: VaultPublicKey,
@@ -125,7 +125,7 @@ pub async fn run_neuro_call(
     );
 
     let (vres, _) = args.save(&state.db_pool).await?;
-    let neuro_response = res.map_err(into_fp_error)?;
+    let neuro_response = res?;
     let parsed: NeuroIdAnalyticsResponse = neuro_response.result.into_success().map_err(into_fp_error)?;
 
     // save event for metrics/dupes/user insights

@@ -83,8 +83,7 @@ async fn make_vendor_call(
     let vreq = ShouldSaveVerificationRequest::No(vreq.id);
     let args = SaveVerificationResultArgs::new(&res, uv.public_key, vreq);
     let (vres, _) = args.save(&state.db_pool).await?;
-
-    let res = res.map_err(idv::Error::from)?;
+    let res = res?;
     Ok((res, vres.id))
 }
 

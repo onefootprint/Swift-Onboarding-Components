@@ -31,7 +31,7 @@ pub mod verification_result;
 #[derive(Debug)]
 pub struct VendorAPIError {
     pub vendor_api: VendorAPI,
-    pub error: idv::Error,
+    pub error: FpError,
 }
 
 impl api_errors::FpErrorTrait for VendorAPIError {

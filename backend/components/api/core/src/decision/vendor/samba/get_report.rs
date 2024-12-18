@@ -92,7 +92,7 @@ pub async fn get_samba_report(state: &State, webhook: SambaWebhook, kind: SambaO
             );
             let (vres, _) = args.save(&state.db_pool).await?;
 
-            let resp = res.map_err(into_fp_error)?;
+            let resp = res?;
             let _ = resp.result.into_success().map_err(into_fp_error)?;
             (vres.id, None)
         }
@@ -113,7 +113,7 @@ pub async fn get_samba_report(state: &State, webhook: SambaWebhook, kind: SambaO
                 order.document_id.clone(),
             );
             let (vres, _) = args.save(&state.db_pool).await?;
-            let resp = res.map_err(into_fp_error)?;
+            let resp = res?;
             let raw = resp.raw_response.clone();
             let _ = resp.result.into_success().map_err(into_fp_error)?;
             let data =

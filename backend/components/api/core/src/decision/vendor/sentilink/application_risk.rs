@@ -122,11 +122,7 @@ pub async fn run_sentilink_application_risk(
 
     let (vres, _) = args.save(&state.db_pool).await?;
 
-    let resp = res
-        .map_err(into_fp_error)?
-        .result
-        .into_success()
-        .map_err(into_fp_error)?;
+    let resp = res?.result.into_success().map_err(into_fp_error)?;
 
     let validated = resp.validate().map_err(into_fp_error)?;
 

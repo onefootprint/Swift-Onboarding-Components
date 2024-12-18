@@ -8,6 +8,7 @@ use crate::decision::vendor::into_fp_error;
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
 use crate::vendor_clients::IncodeClients;
 use crate::FpResult;
+use api_errors::FpErrorCode;
 use api_errors::ServerErr;
 use async_trait::async_trait;
 use db::models::document::Document;
@@ -76,13 +77,13 @@ impl IncodeStateTransition for GetOnboardingStatus {
                 // If polling Incode times out, return None to terminate the state machine.
                 // This prevents us from hard erroring during Bifrost and allows us to re-run the Incode state
                 // machine later (in /proceed or async thereafter)
-                if matches!(e, idv::incode::error::Error::ResultsNotReady) {
+                if e.code() == Some(FpErrorCode::IncodeResultsNotReady) {
                     tracing::error!(
                         "IncodeStateTransition::GetOnboardingStatus ResultsNotReady, not transitioning"
                     );
                     Ok(None)
                 } else {
-                    Err(into_fp_error(e))?
+                    Err(e)
                 }
             }
         }

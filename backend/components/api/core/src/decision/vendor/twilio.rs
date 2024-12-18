@@ -1,4 +1,3 @@
-use super::into_fp_error;
 use super::vendor_api::loaders::load_response_for_vendor_api;
 use super::verification_result::SaveVerificationResultArgs;
 use super::verification_result::ShouldSaveVerificationRequest;
@@ -29,7 +28,7 @@ use twilio::response::lookup::LookupV2Response;
 
 impl SaveVerificationResultArgs {
     pub fn new_for_twilio(
-        request_result: &Result<TwilioLookupV2APIResponse, idv::twilio::Error>,
+        request_result: &FpResult<TwilioLookupV2APIResponse>,
         di_id: DecisionIntentId,
         sv_id: ScopedVaultId,
         vault_public_key: VaultPublicKey,
@@ -120,7 +119,7 @@ pub async fn run_twilio_call(
     );
     let (vres, _) = args.save(&state.db_pool).await?;
 
-    let res = res.map_err(into_fp_error)?;
+    let res = res?;
 
     Ok(Some((res.parsed_response, vres.id)))
 }

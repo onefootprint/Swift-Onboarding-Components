@@ -1,6 +1,7 @@
 use super::verification_result::SaveVerificationResultArgs;
 use super::verification_result::ShouldSaveVerificationRequest;
 use api_errors::FpError;
+use api_errors::FpResult;
 use idv::sentilink::SentilinkAPIResponse;
 use newtypes::DecisionIntentId;
 use newtypes::ScopedVaultId;
@@ -12,7 +13,7 @@ pub mod application_risk;
 
 impl SaveVerificationResultArgs {
     pub fn new_for_sentilink(
-        request_result: &Result<SentilinkAPIResponse, idv::sentilink::error::Error>,
+        request_result: &FpResult<SentilinkAPIResponse>,
         di_id: DecisionIntentId,
         sv_id: ScopedVaultId,
         vault_public_key: VaultPublicKey,

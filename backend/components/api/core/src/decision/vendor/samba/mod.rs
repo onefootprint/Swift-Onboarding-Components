@@ -1,6 +1,7 @@
 use super::verification_result::SaveVerificationResultArgs;
 use super::verification_result::ShouldSaveVerificationRequest;
 use api_errors::FpError;
+use api_errors::FpResult;
 use idv::samba::SambaAPIResponse;
 use newtypes::DecisionIntentId;
 use newtypes::DocumentId;
@@ -16,7 +17,7 @@ pub mod get_report;
 
 impl SaveVerificationResultArgs {
     pub fn new_for_samba<T>(
-        request_result: &Result<SambaAPIResponse<T>, idv::samba::error::Error>,
+        request_result: &FpResult<SambaAPIResponse<T>>,
         di_id: DecisionIntentId,
         sv_id: ScopedVaultId,
         vault_public_key: VaultPublicKey,

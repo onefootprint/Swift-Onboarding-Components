@@ -60,10 +60,7 @@ pub async fn process_face_inner(
     args.save(db_pool).await?;
 
     // Now ensure we don't have an error
-    res.map_err(into_fp_error)?
-        .result
-        .into_success()
-        .map_err(into_fp_error)?;
+    res?.result.into_success().map_err(into_fp_error)?;
 
     Ok(())
 }

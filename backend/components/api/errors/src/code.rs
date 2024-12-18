@@ -35,6 +35,8 @@ pub enum FpErrorCode {
     DbDataNotFound,
     #[strum(serialize = "I109")]
     DbUniqueConstraintViolation,
+    #[strum(serialize = "I110")]
+    IncodeResultsNotReady,
 
     // Errors used by our client
     #[strum(serialize = "E101")]
@@ -119,6 +121,7 @@ impl FpErrorCode {
             Self::DbReadOnlyTransaction => false,
             Self::DbDataNotFound => false,
             Self::DbUniqueConstraintViolation => false,
+            Self::IncodeResultsNotReady => false,
 
             _ => true,
         }

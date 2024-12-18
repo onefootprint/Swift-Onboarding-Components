@@ -1,5 +1,6 @@
 use super::VendorAPICall;
 use super::VendorAPIResponse;
+use api_errors::FpResult;
 use async_trait::async_trait;
 use idv::twilio::TwilioLookupV2APIResponse;
 use idv::twilio::TwilioLookupV2Request;
@@ -11,12 +12,9 @@ use newtypes::VendorAPI;
 /// Twilio Impl
 /// /// ////////////////
 #[async_trait]
-impl VendorAPICall<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error> for twilio::Client {
+impl VendorAPICall<TwilioLookupV2Request, TwilioLookupV2APIResponse> for twilio::Client {
     #[tracing::instrument("make_request", skip_all, fields(request = "TwilioLookupV2Request"))]
-    async fn make_request(
-        &self,
-        request: TwilioLookupV2Request,
-    ) -> Result<TwilioLookupV2APIResponse, idv::twilio::Error> {
+    async fn make_request(&self, request: TwilioLookupV2Request) -> FpResult<TwilioLookupV2APIResponse> {
         let TwilioLookupV2Request {
             idv_data,
             lookup_fields,

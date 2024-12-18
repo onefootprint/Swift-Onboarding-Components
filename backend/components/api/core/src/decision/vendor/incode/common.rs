@@ -18,15 +18,15 @@ use newtypes::VendorAPI;
 
 impl SaveVerificationResultArgs {
     pub fn new_for_incode<T>(
-        request_result: &Result<IncodeResponse<T>, idv::incode::error::Error>,
+        request_result_ok: Option<&IncodeResponse<T>>,
         vault_public_key: VaultPublicKey,
         should_save_verification_request: ShouldSaveVerificationRequest,
     ) -> Self
     where
         T: IncodeClientErrorCustomFailureReasons + serde::Serialize,
     {
-        match request_result {
-            Ok(response) => {
+        match request_result_ok {
+            Some(response) => {
                 let is_error = response.result.is_error();
                 let raw_response = response.raw_response.clone();
                 let scrubbed_response = response
@@ -43,12 +43,12 @@ impl SaveVerificationResultArgs {
                     vault_public_key,
                 }
             }
-            Err(_) => Self::error(should_save_verification_request, vault_public_key),
+            None => Self::error(should_save_verification_request, vault_public_key),
         }
     }
 
     pub fn from<'a, T>(
-        request_result: &'a Result<IncodeResponse<T>, idv::incode::error::Error>,
+        request_result: &'a FpResult<IncodeResponse<T>>,
         // TODO make VendorAPI a function of T
         vendor_api: VendorAPI,
         ctx: &'a IncodeContext,
@@ -64,6 +64,7 @@ impl SaveVerificationResultArgs {
         let sv_id = ctx.sv_id.clone();
         let doc_id = Some(ctx.id_doc_id.clone());
         let vreq = ShouldSaveVerificationRequest::Yes(vendor_api, di_id, sv_id, doc_id);
+        let request_result = request_result.as_ref().ok();
         Self::new_for_incode(request_result, vault_public_key, vreq)
     }
 }
@@ -99,14 +100,11 @@ pub async fn call_start_onboarding(
         sv_id.clone(),
         None,
     );
-    let args = SaveVerificationResultArgs::new_for_incode(&res, user_vault_public_key.clone(), vreq);
+    let vres = res.as_ref().ok();
+    let args = SaveVerificationResultArgs::new_for_incode(vres, user_vault_public_key.clone(), vreq);
 
     args.save(&state.db_pool).await?;
 
-    let res = res
-        .map_err(into_fp_error)?
-        .result
-        .into_success()
-        .map_err(into_fp_error)?;
+    let res = res?.result.into_success().map_err(into_fp_error)?;
     Ok(res)
 }

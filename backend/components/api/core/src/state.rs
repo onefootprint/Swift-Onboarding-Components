@@ -376,7 +376,7 @@ impl State {
     #[cfg(test)]
     pub fn set_socure_id_plus(
         &mut self,
-        socure_id_plus: VendorClient<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
+        socure_id_plus: VendorClient<SocureIDPlusRequest, SocureIDPlusAPIResponse>,
     ) {
         self.vendor_clients.socure_id_plus = socure_id_plus;
     }
@@ -384,7 +384,7 @@ impl State {
     #[cfg(test)]
     pub fn set_twilio_lookup_v2(
         &mut self,
-        twilio_lookup_v2: VendorClient<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
+        twilio_lookup_v2: VendorClient<TwilioLookupV2Request, TwilioLookupV2APIResponse>,
     ) {
         self.vendor_clients.twilio_lookup_v2 = twilio_lookup_v2;
     }
@@ -392,11 +392,7 @@ impl State {
     #[cfg(test)]
     pub fn set_experian_cross_core(
         &mut self,
-        experian_cross_core: VendorClient<
-            ExperianCrossCoreRequest,
-            ExperianCrossCoreResponse,
-            idv::experian::error::Error,
-        >,
+        experian_cross_core: VendorClient<ExperianCrossCoreRequest, ExperianCrossCoreResponse>,
     ) {
         self.vendor_clients.experian_cross_core = experian_cross_core;
     }
@@ -404,11 +400,7 @@ impl State {
     #[cfg(test)]
     pub fn set_middesk_create_business(
         &mut self,
-        middesk_create_business: VendorClient<
-            MiddeskCreateBusinessRequest,
-            MiddeskCreateBusinessResponse,
-            idv::middesk::Error,
-        >,
+        middesk_create_business: VendorClient<MiddeskCreateBusinessRequest, MiddeskCreateBusinessResponse>,
     ) {
         self.vendor_clients.middesk_create_business = middesk_create_business;
     }
@@ -416,11 +408,7 @@ impl State {
     #[cfg(test)]
     pub fn set_middesk_get_business(
         &mut self,
-        middesk_get_business: VendorClient<
-            MiddeskGetBusinessRequest,
-            MiddeskGetBusinessResponse,
-            idv::middesk::Error,
-        >,
+        middesk_get_business: VendorClient<MiddeskGetBusinessRequest, MiddeskGetBusinessResponse>,
     ) {
         self.vendor_clients.middesk_get_business = middesk_get_business;
     }
@@ -428,20 +416,13 @@ impl State {
     #[cfg(test)]
     pub fn set_idology_expect_id(
         &mut self,
-        idology_expect_id: VendorClient<
-            IdologyExpectIDRequest,
-            IdologyExpectIDAPIResponse,
-            idv::idology::error::Error,
-        >,
+        idology_expect_id: VendorClient<IdologyExpectIDRequest, IdologyExpectIDAPIResponse>,
     ) {
         self.vendor_clients.idology_expect_id = idology_expect_id;
     }
 
     #[cfg(test)]
-    pub fn set_idology_pa(
-        &mut self,
-        idology_pa: VendorClient<IdologyPaRequest, IdologyPaAPIResponse, idv::idology::error::Error>,
-    ) {
+    pub fn set_idology_pa(&mut self, idology_pa: VendorClient<IdologyPaRequest, IdologyPaAPIResponse>) {
         self.vendor_clients.idology_pa = idology_pa;
     }
 
@@ -451,7 +432,6 @@ impl State {
         incode_start_onboarding: VendorClient<
             IncodeStartOnboardingRequest,
             IncodeResponse<OnboardingStartResponse>,
-            idv::incode::error::Error,
         >,
     ) {
         self.vendor_clients.incode.incode_start_onboarding = incode_start_onboarding;
@@ -460,11 +440,7 @@ impl State {
     #[cfg(test)]
     pub fn set_incode_add_front(
         &mut self,
-        incode_add_front: VendorClient<
-            IncodeAddFrontRequest,
-            IncodeResponse<AddSideResponse>,
-            idv::incode::error::Error,
-        >,
+        incode_add_front: VendorClient<IncodeAddFrontRequest, IncodeResponse<AddSideResponse>>,
     ) {
         self.vendor_clients.incode.incode_add_front = incode_add_front;
     }
@@ -472,11 +448,7 @@ impl State {
     #[cfg(test)]
     pub fn set_incode_add_back(
         &mut self,
-        incode_add_back: VendorClient<
-            IncodeAddBackRequest,
-            IncodeResponse<AddSideResponse>,
-            idv::incode::error::Error,
-        >,
+        incode_add_back: VendorClient<IncodeAddBackRequest, IncodeResponse<AddSideResponse>>,
     ) {
         self.vendor_clients.incode.incode_add_back = incode_add_back;
     }
@@ -484,11 +456,7 @@ impl State {
     #[cfg(test)]
     pub fn set_incode_process_id(
         &mut self,
-        incode_process_id: VendorClient<
-            IncodeProcessIdRequest,
-            IncodeResponse<ProcessIdResponse>,
-            idv::incode::error::Error,
-        >,
+        incode_process_id: VendorClient<IncodeProcessIdRequest, IncodeResponse<ProcessIdResponse>>,
     ) {
         self.vendor_clients.incode.incode_process_id = incode_process_id;
     }
@@ -496,11 +464,7 @@ impl State {
     #[cfg(test)]
     pub fn set_incode_process_face(
         &mut self,
-        incode_process_face: VendorClient<
-            IncodeProcessFaceRequest,
-            IncodeResponse<ProcessFaceResponse>,
-            idv::incode::error::Error,
-        >,
+        incode_process_face: VendorClient<IncodeProcessFaceRequest, IncodeResponse<ProcessFaceResponse>>,
     ) {
         self.vendor_clients.incode.incode_process_face = incode_process_face;
     }
@@ -511,7 +475,6 @@ impl State {
         incode_get_onboarding_status: VendorClient<
             IncodeGetOnboardingStatusRequest,
             IncodeResponse<GetOnboardingStatusResponse>,
-            idv::incode::error::Error,
         >,
     ) {
         self.vendor_clients.incode.incode_get_onboarding_status = incode_get_onboarding_status;
@@ -520,11 +483,7 @@ impl State {
     #[cfg(test)]
     pub fn set_incode_fetch_scores(
         &mut self,
-        incode_fetch_scores: VendorClient<
-            IncodeFetchScoresRequest,
-            IncodeResponse<FetchScoresResponse>,
-            idv::incode::error::Error,
-        >,
+        incode_fetch_scores: VendorClient<IncodeFetchScoresRequest, IncodeResponse<FetchScoresResponse>>,
     ) {
         self.vendor_clients.incode.incode_fetch_scores = incode_fetch_scores;
     }
@@ -535,7 +494,6 @@ impl State {
         incode_add_privacy_consent: VendorClient<
             IncodeAddPrivacyConsentRequest,
             IncodeResponse<AddConsentResponse>,
-            idv::incode::error::Error,
         >,
     ) {
         self.vendor_clients.incode.incode_add_privacy_consent = incode_add_privacy_consent;
@@ -544,11 +502,7 @@ impl State {
     #[cfg(test)]
     pub fn set_incode_add_ml_consent(
         &mut self,
-        incode_add_ml_consent: VendorClient<
-            IncodeAddMLConsentRequest,
-            IncodeResponse<AddConsentResponse>,
-            idv::incode::error::Error,
-        >,
+        incode_add_ml_consent: VendorClient<IncodeAddMLConsentRequest, IncodeResponse<AddConsentResponse>>,
     ) {
         self.vendor_clients.incode.incode_add_ml_consent = incode_add_ml_consent;
     }
@@ -556,11 +510,7 @@ impl State {
     #[cfg(test)]
     pub fn set_incode_fetch_ocr(
         &mut self,
-        incode_fetch_ocr: VendorClient<
-            IncodeFetchOCRRequest,
-            IncodeResponse<FetchOCRResponse>,
-            idv::incode::error::Error,
-        >,
+        incode_fetch_ocr: VendorClient<IncodeFetchOCRRequest, IncodeResponse<FetchOCRResponse>>,
     ) {
         self.vendor_clients.incode.incode_fetch_ocr = incode_fetch_ocr;
     }
@@ -568,11 +518,7 @@ impl State {
     #[cfg(test)]
     pub fn set_incode_add_selfie(
         &mut self,
-        incode_add_selfie: VendorClient<
-            IncodeAddSelfieRequest,
-            IncodeResponse<AddSelfieResponse>,
-            idv::incode::error::Error,
-        >,
+        incode_add_selfie: VendorClient<IncodeAddSelfieRequest, IncodeResponse<AddSelfieResponse>>,
     ) {
         self.vendor_clients.incode.incode_add_selfie = incode_add_selfie;
     }
@@ -583,7 +529,6 @@ impl State {
         incode_watchlist_check: VendorClient<
             IncodeWatchlistCheckRequest,
             IncodeResponse<WatchlistResultResponse>,
-            idv::incode::error::Error,
         >,
     ) {
         self.vendor_clients.incode.incode_watchlist_check = incode_watchlist_check;
@@ -595,7 +540,6 @@ impl State {
         incode_updated_watchlist_result: VendorClient<
             IncodeUpdatedWatchlistResultRequest,
             IncodeResponse<UpdatedWatchlistResultResponse>,
-            idv::incode::error::Error,
         >,
     ) {
         self.vendor_clients.incode.incode_updated_watchlist_result = incode_updated_watchlist_result;
@@ -636,7 +580,7 @@ mod test {
         state.set_ff_client(Arc::new(mock_ff_client));
 
         let mut mock_socure_api_call =
-            MockVendorAPICall::<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>::new();
+            MockVendorAPICall::<SocureIDPlusRequest, SocureIDPlusAPIResponse>::new();
 
         mock_socure_api_call
             .expect_make_request()

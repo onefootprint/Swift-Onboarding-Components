@@ -1,5 +1,6 @@
 use super::VendorAPICall;
 use super::VendorAPIResponse;
+use api_errors::FpResult;
 use async_trait::async_trait;
 use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::lexis::client::LexisFlexIdRequest;
@@ -9,12 +10,9 @@ use newtypes::PiiJsonValue;
 use newtypes::VendorAPI;
 
 #[async_trait]
-impl VendorAPICall<LexisFlexIdRequest, LexisFlexIdResponse, idv::lexis::Error> for FootprintVendorHttpClient {
+impl VendorAPICall<LexisFlexIdRequest, LexisFlexIdResponse> for FootprintVendorHttpClient {
     #[tracing::instrument("make_request", skip_all, fields(request = "LexisFlexIdRequest"))]
-    async fn make_request(
-        &self,
-        request: LexisFlexIdRequest,
-    ) -> Result<LexisFlexIdResponse, idv::lexis::Error> {
+    async fn make_request(&self, request: LexisFlexIdRequest) -> FpResult<LexisFlexIdResponse> {
         let raw_response = idv::lexis::client::flex_id(self, request).await?;
         let parsed_response = idv::lexis::parse_response(raw_response.clone())
             .map_err(|e| e.into_error_with_response(raw_response.clone()))?;

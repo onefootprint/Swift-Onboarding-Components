@@ -10,6 +10,7 @@ pub mod socure;
 pub mod stytch;
 pub mod twilio;
 
+use api_errors::FpResult;
 use async_trait::async_trait;
 use idv::ParsedResponse;
 use idv::VendorResponse;
@@ -34,11 +35,10 @@ pub trait VendorAPIResponse: Sized {
 // A trait representing a VendorAPICall
 #[cfg_attr(test, automock)]
 #[async_trait]
-pub trait VendorAPICall<T, U, E>: Send + Sync
+pub trait VendorAPICall<T, U>: Send + Sync
 where
     T: Send + Sync + Sized,
     U: VendorAPIResponse + Send + Sync,
-    E: Send + Sync + Into<idv::Error>,
 {
-    async fn make_request(&self, request_data: T) -> Result<U, E>;
+    async fn make_request(&self, request_data: T) -> FpResult<U>;
 }

@@ -1,5 +1,6 @@
 use super::VendorAPICall;
 use super::VendorAPIResponse;
+use api_errors::FpResult;
 use async_trait::async_trait;
 use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::neuro_id::client::NeuroIdClient;
@@ -9,14 +10,9 @@ use idv::ParsedResponse;
 use newtypes::VendorAPI;
 
 #[async_trait]
-impl VendorAPICall<NeuroIdAnalyticsRequest, NeuroApiResponse, idv::neuro_id::error::Error>
-    for FootprintVendorHttpClient
-{
+impl VendorAPICall<NeuroIdAnalyticsRequest, NeuroApiResponse> for FootprintVendorHttpClient {
     #[tracing::instrument("make_request", skip_all, fields(request = "NeuroIdAnalyticsRequest"))]
-    async fn make_request(
-        &self,
-        request: NeuroIdAnalyticsRequest,
-    ) -> Result<NeuroApiResponse, idv::neuro_id::error::Error> {
+    async fn make_request(&self, request: NeuroIdAnalyticsRequest) -> FpResult<NeuroApiResponse> {
         let NeuroIdAnalyticsRequest { credentials, id } = request;
         let neuro_client = NeuroIdClient::new(credentials)?;
         let response = neuro_client.get_profile(self, &id).await?;

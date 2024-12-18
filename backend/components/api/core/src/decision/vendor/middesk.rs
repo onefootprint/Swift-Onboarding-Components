@@ -469,11 +469,7 @@ impl MiddeskState<PendingGetBusinessCall> {
     pub async fn make_get_business_call(
         self,
         db_pool: &DbPool,
-        middesk_client: &VendorClient<
-            MiddeskGetBusinessRequest,
-            MiddeskGetBusinessResponse,
-            idv::middesk::Error,
-        >,
+        middesk_client: &VendorClient<MiddeskGetBusinessRequest, MiddeskGetBusinessResponse>,
         config: &Config,
         enclave_client: &EnclaveClient,
     ) -> FpResult<MiddeskStates> {
@@ -494,8 +490,7 @@ impl MiddeskState<PendingGetBusinessCall> {
                 business_id,
                 credentials: tvc.middesk_credentials(),
             })
-            .await
-            .map_err(|e| FpError::from(idv::Error::from(e)))?;
+            .await?;
 
         let vendor_response = VendorResponse {
             response: get_business_res.clone().parsed_response(),
@@ -724,11 +719,7 @@ pub async fn handle_middesk_webhook(state: &State, res: serde_json::Value) -> Fp
 
 async fn send_middesk_call(
     db_pool: &DbPool,
-    middesk_client: &VendorClient<
-        MiddeskCreateBusinessRequest,
-        MiddeskCreateBusinessResponse,
-        idv::middesk::Error,
-    >,
+    middesk_client: &VendorClient<MiddeskCreateBusinessRequest, MiddeskCreateBusinessResponse>,
     ff_client: Arc<dyn FeatureFlagClient>,
     config: &Config,
     enclave_client: &EnclaveClient,
@@ -747,7 +738,6 @@ async fn send_middesk_call(
                 tenant_id: tenant_id.clone(),
             })
             .await
-            .map_err(|e| FpError::from(idv::Error::from(e)))
     } else {
         // TODO: the faked vendor response thing doesn't really work well for stuff like Middesk flow. Would
         // need to rethink how to support this if its really needed.

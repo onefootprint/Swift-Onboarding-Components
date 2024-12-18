@@ -162,9 +162,10 @@ pub async fn run_curp_validation_check(
                 di.scoped_vault_id.clone(),
                 None,
             );
-            let args = SaveVerificationResultArgs::new_for_incode(&res, vw.vault.public_key.clone(), vreq);
+            let vres = res.as_ref().ok();
+            let args = SaveVerificationResultArgs::new_for_incode(vres, vw.vault.public_key.clone(), vreq);
             let (vres, vreq_id) = args.save(&state.db_pool).await?;
-            let curp_response = res.map_err(into_fp_error)?;
+            let curp_response = res?;
             let raw_response = curp_response.raw_response.clone();
             match curp_response.result.safe_into_success() {
                 either::Either::Left(parsed) => {

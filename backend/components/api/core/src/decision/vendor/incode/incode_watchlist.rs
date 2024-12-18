@@ -54,20 +54,17 @@ use newtypes::VerificationResultId;
 // For future us: This is just because we need IdvData, and we create that from
 // `build_idv_data_from_verification_request` which requires a Vreq We could just refactor so that
 // the fn just takes a seqno, rather than a vreq
-#[tracing::instrument(skip(db_pool, res, user_vault_public_key, vreq_id))]
+#[tracing::instrument(skip(db_pool, res_ok, user_vault_public_key, vreq_id))]
 async fn save_verification_result_for_watchlist_check<
     T: IncodeClientErrorCustomFailureReasons + serde::Serialize,
 >(
     db_pool: &DbPool,
-    res: &Result<IncodeResponse<T>, idv::incode::error::Error>,
+    res_ok: Option<&IncodeResponse<T>>,
     user_vault_public_key: &VaultPublicKey,
     vreq_id: VerificationRequestId,
 ) -> FpResult<VerificationResultId> {
-    let args = SaveVerificationResultArgs::new_for_incode(
-        res,
-        user_vault_public_key.clone(),
-        ShouldSaveVerificationRequest::No(vreq_id),
-    );
+    let vreq = ShouldSaveVerificationRequest::No(vreq_id);
+    let args = SaveVerificationResultArgs::new_for_incode(res_ok, user_vault_public_key.clone(), vreq);
 
     let (vres, _) = args.save(db_pool).await?;
 
@@ -113,16 +110,12 @@ async fn call_watchlist_result(
                 .await;
             let vres_id = save_verification_result_for_watchlist_check(
                 &state.db_pool,
-                &res,
+                res.as_ref().ok(),
                 user_vault_public_key,
                 vreq_id,
             )
             .await?;
-            let res = res
-                .map_err(into_fp_error)?
-                .result
-                .into_success()
-                .map_err(into_fp_error)?;
+            let res = res?.result.into_success().map_err(into_fp_error)?;
             (vres_id, res)
         }
 
@@ -138,17 +131,12 @@ async fn call_watchlist_result(
                 .await;
             let vres_id = save_verification_result_for_watchlist_check(
                 &state.db_pool,
-                &res,
+                res.as_ref().ok(),
                 user_vault_public_key,
                 vreq_id,
             )
             .await?;
-            let res = res
-                .map_err(into_fp_error)?
-                .result
-                .into_success()
-                .map_err(into_fp_error)?
-                .0;
+            let res = res?.result.into_success().map_err(into_fp_error)?.0;
             (vres_id, res)
         }
     };

@@ -89,11 +89,7 @@ impl IncodeStateTransition for FetchScores {
         let (score_vres, _) = score_args.save(db_pool).await?;
 
         // Now ensure we don't have an error
-        let score_response = scores_res
-            .map_err(into_fp_error)?
-            .result
-            .into_success()
-            .map_err(into_fp_error)?;
+        let score_response = scores_res?.result.into_success().map_err(into_fp_error)?;
 
         let (overall_score, overall_status) = score_response.document_score();
         if overall_score.is_none() || overall_status.is_none() {
@@ -111,11 +107,7 @@ impl IncodeStateTransition for FetchScores {
         let (ocr_vres, _) = ocr_args.save(db_pool).await?;
 
         // Now ensure we don't have an error
-        let ocr_response = ocr_res
-            .map_err(into_fp_error)?
-            .result
-            .into_success()
-            .map_err(into_fp_error)?;
+        let ocr_response = ocr_res?.result.into_success().map_err(into_fp_error)?;
 
         let wf_id = ctx.wf_id.clone();
         let sv_id = ctx.sv_id.clone();
@@ -342,7 +334,7 @@ async fn run_aws_rekognition(
                 None,
                 Err(VendorAPIError {
                     vendor_api: VendorAPI::AwsRekognition,
-                    error: err,
+                    error: err.into(),
                 }),
             )
         }
@@ -410,18 +402,14 @@ async fn add_customer_and_save_session(
     let resp = authenticated_client.add_customer(&http_client).await;
     let res = match resp {
         Ok(r) => Ok(IncodeResponse::from_response(r).await),
-        Err(e) => Err(e),
+        Err(e) => Err(e.into()),
     };
 
     // Save vres
     let session_args = SaveVerificationResultArgs::from(&res, VendorAPI::IncodeApproveSession, &ctx);
     session_args.save(db_pool).await?;
 
-    let parsed: AddCustomerResponse = res
-        .map_err(into_fp_error)?
-        .result
-        .into_success()
-        .map_err(into_fp_error)?;
+    let parsed: AddCustomerResponse = res?.result.into_success().map_err(into_fp_error)?;
 
     let log_success = parsed.success;
     let mut log_created_customer = false;

@@ -28,6 +28,7 @@ strum = { workspace = true }
 http = { workspace = true }
 url = { workspace = true }
 paste = { workspace = true }
+chrono = { workspace = true }
 webauthn-rs-core = { workspace = true }
 aws-sdk-pinpointsmsvoicev2 = { workspace = true }
 crypto = { path = "../../enclave/crypto" }

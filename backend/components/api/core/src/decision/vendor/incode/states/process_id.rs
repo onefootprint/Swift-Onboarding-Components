@@ -66,7 +66,7 @@ async fn process_id_inner(
     let args = SaveVerificationResultArgs::from(&res, VendorAPI::IncodeProcessId, ctx);
     args.save(db_pool).await?;
 
-    let res = res.map_err(into_fp_error)?.result;
+    let res = res?.result;
 
     // If we get the "Id already processed" error, then we ignore this an continue
     // else we throw other kinds of errors as usual

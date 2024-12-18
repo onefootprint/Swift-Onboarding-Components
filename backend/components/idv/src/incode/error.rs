@@ -33,3 +33,20 @@ pub enum Error {
     #[error("Input CURP was invalid")]
     InvalidCurp,
 }
+
+impl api_errors::FpErrorTrait for Error {
+    fn status_code(&self) -> api_errors::StatusCode {
+        api_errors::StatusCode::INTERNAL_SERVER_ERROR
+    }
+
+    fn message(&self) -> String {
+        self.to_string()
+    }
+
+    fn code(&self) -> Option<api_errors::FpErrorCode> {
+        match self {
+            Error::ResultsNotReady => Some(api_errors::FpErrorCode::IncodeResultsNotReady),
+            _ => None,
+        }
+    }
+}
