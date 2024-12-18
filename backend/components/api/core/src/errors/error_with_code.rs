@@ -34,8 +34,11 @@ pub enum ErrorWithCode {
     InvalidMimeType(String),
     #[error("Invalid file upload, try another file")]
     MultipartError,
-    #[error("Image too large")]
-    FileTooLarge(usize),
+    #[error("File too large: got {got_bytes} bytes, expected at most {expected_max_bytes} bytes")]
+    FileTooLarge {
+        got_bytes: usize,
+        expected_max_bytes: usize,
+    },
     #[error("Invalid content length")]
     InvalidContentLength,
     #[error("Missing filename")]
@@ -50,8 +53,11 @@ pub enum ErrorWithCode {
     ExistingVault(Option<SessionAuthToken>),
     #[error("File upload exceeded time limit")]
     FileUploadTimeout,
-    #[error("Image too small")]
-    FileTooSmall(usize),
+    #[error("File too small: got {got_bytes} bytes, expected at least {expected_min_bytes} bytes")]
+    FileTooSmall {
+        got_bytes: usize,
+        expected_min_bytes: usize,
+    },
 }
 
 impl api_errors::FpErrorTrait for ErrorWithCode {
@@ -71,8 +77,8 @@ impl api_errors::FpErrorTrait for ErrorWithCode {
             Self::MissingMimeType => StatusCode::BAD_REQUEST,
             Self::InvalidMimeType(_) => StatusCode::BAD_REQUEST,
             Self::MultipartError => StatusCode::BAD_REQUEST,
-            Self::FileTooLarge(_) => StatusCode::PAYLOAD_TOO_LARGE,
-            Self::FileTooSmall(_) => StatusCode::BAD_REQUEST,
+            Self::FileTooLarge { .. } => StatusCode::PAYLOAD_TOO_LARGE,
+            Self::FileTooSmall { .. } => StatusCode::BAD_REQUEST,
             Self::InvalidContentLength => StatusCode::BAD_REQUEST,
             Self::MissingFilename => StatusCode::BAD_REQUEST,
             Self::NoSessionFound => StatusCode::UNAUTHORIZED,
@@ -99,7 +105,7 @@ impl api_errors::FpErrorTrait for ErrorWithCode {
             Self::MissingMimeType => FpErrorCode::MissingMimeType,
             Self::InvalidMimeType(_) => FpErrorCode::InvalidMimeType,
             Self::MultipartError => FpErrorCode::MultipartError,
-            Self::FileTooLarge(_) => FpErrorCode::FileTooLarge,
+            Self::FileTooLarge { .. } => FpErrorCode::FileTooLarge,
             Self::InvalidContentLength => FpErrorCode::InvalidContentLength,
             Self::MissingFilename => FpErrorCode::MissingFilename,
             Self::NoSessionFound => FpErrorCode::NoSessionFound,
@@ -107,7 +113,7 @@ impl api_errors::FpErrorTrait for ErrorWithCode {
             Self::CouldNotParseSession => FpErrorCode::CouldNotParseSession,
             Self::ExistingVault(_) => FpErrorCode::ExistingVault,
             Self::FileUploadTimeout => FpErrorCode::FileUploadTimeout,
-            Self::FileTooSmall(_) => FpErrorCode::FileTooSmall,
+            Self::FileTooSmall { .. } => FpErrorCode::FileTooSmall,
         };
         Some(code)
     }
@@ -117,7 +123,14 @@ impl api_errors::FpErrorTrait for ErrorWithCode {
             Self::RateLimited(seconds) => json!({ "seconds": seconds }),
             Self::UnsupportedChallengeKind(challenge_kind) => json!({ "challenge_kind": challenge_kind }),
             Self::InvalidMimeType(file_type) => json!({ "file_type": file_type }),
-            Self::FileTooLarge(max_size) => json!({ "max_size": max_size }),
+            Self::FileTooLarge {
+                got_bytes,
+                expected_max_bytes,
+            } => json!({ "got_bytes": got_bytes, "expected_max_bytes": expected_max_bytes }),
+            Self::FileTooSmall {
+                got_bytes,
+                expected_min_bytes,
+            } => json!({ "got_bytes": got_bytes, "expected_min_bytes": expected_min_bytes }),
             Self::ExistingVault(token) => return token.as_ref().map(|t| json!({ "token": t })),
             _ => return None,
         };
@@ -140,7 +153,7 @@ impl api_errors::FpErrorTrait for ErrorWithCode {
         // May not be necessary in all environments (e.g. load balancers mask the issue), but it's
         // necessary in local dev to prevent the client from hanging.
         match self {
-            ErrorWithCode::FileUploadTimeout | ErrorWithCode::FileTooLarge(_) => {
+            ErrorWithCode::FileUploadTimeout | ErrorWithCode::FileTooLarge { .. } => {
                 resp.force_close();
             }
             _ => {}

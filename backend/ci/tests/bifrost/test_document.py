@@ -580,7 +580,7 @@ def test_user_uploading_small_image(doc_request_sandbox_ob_config):
         files=open_multipart_file("small_image.png", "image/png")(),
         status_code=400,
     )
-    assert body["message"].startswith("Image too small")
+    assert body["message"].startswith("File too small")
 
 
 # When a user has issues with their mobile device's camera initializing, we force the user to upload images

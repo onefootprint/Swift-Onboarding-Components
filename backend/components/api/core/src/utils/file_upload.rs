@@ -98,7 +98,10 @@ async fn handle_file_upload_inner(
             .map_err(|_| ErrorWithCode::InvalidContentLength)?;
 
     if request_content_length > max_allowed_file_size_in_bytes {
-        return Err(ErrorWithCode::FileTooLarge(max_allowed_file_size_in_bytes))?;
+        return Err(ErrorWithCode::FileTooLarge {
+            got_bytes: request_content_length,
+            expected_max_bytes: max_allowed_file_size_in_bytes,
+        })?;
     }
 
     // extract the file contents from body
@@ -128,8 +131,12 @@ async fn handle_file_upload_inner(
         let chunk = chunk.map_err(|_| ErrorWithCode::MultipartError)?;
         let chunk_size = chunk.len();
 
-        if bytes.len() + chunk_size > request_content_length {
-            return Err(ErrorWithCode::FileTooLarge(max_allowed_file_size_in_bytes))?;
+        let total_len = bytes.len() + chunk_size;
+        if total_len > request_content_length {
+            return Err(ErrorWithCode::FileTooLarge {
+                got_bytes: total_len,
+                expected_max_bytes: request_content_length,
+            })?;
         }
 
         bytes.put(chunk);
@@ -138,7 +145,10 @@ async fn handle_file_upload_inner(
     // wait until we've actually read the file in to determine the size since content length header
     // includes other aspects of the request
     if bytes.len() <= must_be_gt_file_size_in_bytes {
-        return Err(ErrorWithCode::FileTooSmall(must_be_gt_file_size_in_bytes))?;
+        return Err(ErrorWithCode::FileTooSmall {
+            got_bytes: bytes.len(),
+            expected_min_bytes: must_be_gt_file_size_in_bytes,
+        })?;
     }
 
     let bytes = PiiBytes::new(bytes.to_vec());
