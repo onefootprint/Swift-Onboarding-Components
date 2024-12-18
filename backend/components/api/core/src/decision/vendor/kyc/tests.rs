@@ -364,11 +364,8 @@ async fn assert_vendor_result(state: &mut State, expected_vendor: Vendor, vr: Ve
     assert!(!vres.is_error);
 
     match expected_vendor {
-        Vendor::Idology => assert!(matches!(vr.response.response, ParsedResponse::IDologyExpectID(_))),
-        Vendor::Experian => assert!(matches!(
-            vr.response.response,
-            ParsedResponse::ExperianPreciseID(_)
-        )),
+        Vendor::Idology => assert!(matches!(vr.response, ParsedResponse::IDologyExpectID(_))),
+        Vendor::Experian => assert!(matches!(vr.response, ParsedResponse::ExperianPreciseID(_))),
         _ => panic!(),
     };
 }

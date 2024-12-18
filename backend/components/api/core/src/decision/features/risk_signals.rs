@@ -38,7 +38,7 @@ pub fn parse_reason_codes_from_vendor_result(
                                   * here */
     vw: &VaultWrapper,
 ) -> FpResult<ParsedFootprintReasonCodes> {
-    let vendor_api: VendorAPI = (&vendor_result.response.response).into();
+    let vendor_api: VendorAPI = (&vendor_result.response).into();
     let vres_id = vendor_result.verification_result_id.clone();
     let submitted_info = UserSubmittedInfoForFRC::new(vw);
 
@@ -67,7 +67,7 @@ pub fn parse_reason_codes(
 ) -> Vec<FootprintReasonCode> {
     let dob_submitted = submitted_info.dob;
     let ssn_submitted = submitted_info.ssn;
-    match vendor_result.response.response {
+    match vendor_result.response {
         ParsedResponse::IDologyExpectID(r) => {
             idology_expectid::footprint_reason_codes(r, dob_submitted, ssn_submitted)
         }

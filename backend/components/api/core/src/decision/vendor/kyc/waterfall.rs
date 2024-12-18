@@ -126,7 +126,7 @@ pub async fn run_kyc_waterfall(state: &State, di: &DecisionIntent, wf: &Workflow
         // package up our response from a vendor
         let hvres = (!vres.is_error).then_some(HydratedVerificationResult {
             vres,
-            response: res.ok(),
+            response: res.ok().map(|r| r.response),
         });
         let vendor_result = RequestAndMaybeHydratedResult { vreq, vres: hvres }.into_vendor_result();
 

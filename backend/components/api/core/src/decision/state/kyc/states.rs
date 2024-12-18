@@ -369,7 +369,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         };
 
         let curp_reason_codes = curp_result.map(|v| {
-            let vendor_api: VendorAPI = (&v.response.response).into();
+            let vendor_api: VendorAPI = (&v.response).into();
             let vres_id = v.verification_result_id.clone();
             parse_reason_codes(v, user_submitted_info)
                 .into_iter()

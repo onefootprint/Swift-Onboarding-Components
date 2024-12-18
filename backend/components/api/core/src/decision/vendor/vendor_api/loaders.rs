@@ -8,7 +8,6 @@ use crate::State;
 use db::models::verification_request::VReqIdentifier;
 use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
-use idv::VendorResponse;
 use newtypes::EncryptedVaultPrivateKey;
 use newtypes::VerificationResultId;
 
@@ -38,18 +37,11 @@ impl<T: AsParsedResponse> LoadVendorResponseResult<T> {
             | LoadVendorResponseResult::NoResponse
             | LoadVendorResponseResult::Error(_) => None,
 
-            LoadVendorResponseResult::Success((r, vreq, vres)) => {
-                Some(VendorResult {
-                    response: VendorResponse {
-                        response: r.into_parsed_response(),
-                        // TODO: get rid of this, and just use parsed response for vendor map
-                        // https://linear.app/footprint/issue/FP-5624/just-use-parsed-resonse-and-stop-using-raw-response-on-vendor-result
-                        raw_response: serde_json::json!({}).into(),
-                    },
-                    verification_request_id: vreq.id,
-                    verification_result_id: vres.id,
-                })
-            }
+            LoadVendorResponseResult::Success((r, vreq, vres)) => Some(VendorResult {
+                response: r.into_parsed_response(),
+                verification_request_id: vreq.id,
+                verification_result_id: vres.id,
+            }),
         }
     }
 }

@@ -102,7 +102,7 @@ pub async fn save_fixture_vendor_result(
             )?;
 
             Ok(VendorResult {
-                response: vr,
+                response: vr.response,
                 verification_result_id: vres.id,
                 verification_request_id: vreq.id,
             })

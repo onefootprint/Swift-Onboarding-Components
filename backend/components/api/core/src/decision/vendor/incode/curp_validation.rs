@@ -213,10 +213,7 @@ pub async fn run_curp_validation_check(
                         .await?;
 
                     let vendor_result = VendorResult {
-                        response: VendorResponse {
-                            response: ParsedResponse::IncodeCurpValidation(parsed),
-                            raw_response,
-                        },
+                        response: ParsedResponse::IncodeCurpValidation(parsed),
                         verification_result_id: vres.id,
                         verification_request_id: vreq_id,
                     };
@@ -412,10 +409,7 @@ async fn save_canned_response(
             let _ = Document::update(conn, &id_doc_id, update)?;
 
             let vendor_result = VendorResult {
-                response: VendorResponse {
-                    response: ParsedResponse::IncodeCurpValidation(parsed),
-                    raw_response,
-                },
+                response: ParsedResponse::IncodeCurpValidation(parsed),
                 verification_result_id: vres.id,
                 verification_request_id: vreq.id,
             };

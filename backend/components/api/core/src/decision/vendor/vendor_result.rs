@@ -1,6 +1,6 @@
 use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
-use idv::VendorResponse;
+use idv::ParsedResponse;
 use newtypes::VendorAPI;
 use newtypes::VerificationRequestId;
 use newtypes::VerificationResultId;
@@ -9,7 +9,7 @@ use newtypes::VerificationResultId;
 // responses (waterfall), everywhere else we can return concrete types
 #[derive(Clone)]
 pub struct VendorResult {
-    pub response: VendorResponse,
+    pub response: ParsedResponse,
     pub verification_result_id: VerificationResultId,
     pub verification_request_id: VerificationRequestId,
 }
@@ -18,7 +18,7 @@ pub struct VendorResult {
 pub struct HydratedVerificationResult {
     pub vres: VerificationResult,
     // None if vres.is_error
-    pub response: Option<VendorResponse>,
+    pub response: Option<ParsedResponse>,
 }
 
 #[derive(Clone)]
@@ -43,7 +43,7 @@ impl RequestAndMaybeHydratedResult {
 
 impl VendorResult {
     pub fn vendor_api(&self) -> VendorAPI {
-        let parsed = &self.response.response;
+        let parsed = &self.response;
 
         parsed.into()
     }
