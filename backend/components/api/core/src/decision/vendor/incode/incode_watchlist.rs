@@ -69,9 +69,9 @@ async fn save_verification_result_for_watchlist_check<
         ShouldSaveVerificationRequest::No(vreq_id),
     );
 
-    let (vres_id, _) = args.save(db_pool).await?;
+    let (vres, _) = args.save(db_pool).await?;
 
-    Ok(vres_id)
+    Ok(vres.id)
 }
 
 #[tracing::instrument(skip(state, user_vault_public_key, credentials))]

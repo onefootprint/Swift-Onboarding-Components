@@ -502,7 +502,7 @@ pub async fn run_samba_create_order(
         doc_id.clone(),
     );
 
-    let (vres_id, _) = args.save(&state.db_pool).await?;
+    let (vres, _) = args.save(&state.db_pool).await?;
 
     let resp = res.map_err(into_fp_error)?;
     // check we got a successful_response
@@ -516,7 +516,7 @@ pub async fn run_samba_create_order(
                 lifetime_ids,
                 kind: samba_helper.kind,
                 order_id: create_order_response.order_id.leak_to_string().into(),
-                verification_result_id: vres_id,
+                verification_result_id: vres.id,
             };
             // create samba order
             let _ = SambaOrder::create(conn, args)?;

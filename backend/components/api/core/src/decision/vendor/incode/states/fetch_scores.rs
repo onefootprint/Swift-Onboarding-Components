@@ -86,7 +86,7 @@ impl IncodeStateTransition for FetchScores {
 
         // Save our result
         let score_args = SaveVerificationResultArgs::from(&scores_res, VendorAPI::IncodeFetchScores, ctx);
-        let (score_vres_id, _) = score_args.save(db_pool).await?;
+        let (score_vres, _) = score_args.save(db_pool).await?;
 
         // Now ensure we don't have an error
         let score_response = scores_res
@@ -108,7 +108,7 @@ impl IncodeStateTransition for FetchScores {
 
         // Save our result
         let ocr_args = SaveVerificationResultArgs::from(&ocr_res, VendorAPI::IncodeFetchOcr, ctx);
-        let (ocr_vres_id, _) = ocr_args.save(db_pool).await?;
+        let (ocr_vres, _) = ocr_args.save(db_pool).await?;
 
         // Now ensure we don't have an error
         let ocr_response = ocr_res
@@ -235,8 +235,8 @@ impl IncodeStateTransition for FetchScores {
         let rs = compute_risk_signals(
             args,
             ocr_comparison_fields,
-            ocr_vres_id,
-            score_vres_id,
+            ocr_vres.id,
+            score_vres.id,
             &session.ignored_failure_reasons,
         )?;
         let ocr_data = compute_ocr_data(&ctx.state, args, &rs).await?;
@@ -415,7 +415,7 @@ async fn add_customer_and_save_session(
 
     // Save vres
     let session_args = SaveVerificationResultArgs::from(&res, VendorAPI::IncodeApproveSession, &ctx);
-    let _ = session_args.save(db_pool).await?;
+    session_args.save(db_pool).await?;
 
     let parsed: AddCustomerResponse = res
         .map_err(into_fp_error)?

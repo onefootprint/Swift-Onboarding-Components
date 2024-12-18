@@ -90,11 +90,11 @@ pub async fn get_samba_report(state: &State, webhook: SambaWebhook, kind: SambaO
                 VendorAPI::SambaLicenseValidationGetReport,
                 order.document_id.clone(),
             );
-            let (vres_id, _) = args.save(&state.db_pool).await?;
+            let (vres, _) = args.save(&state.db_pool).await?;
 
             let resp = res.map_err(into_fp_error)?;
             let _ = resp.result.into_success().map_err(into_fp_error)?;
-            (vres_id, None)
+            (vres.id, None)
         }
         SambaOrderKind::ActivityHistory => {
             let request = SambaGetReportRequest::new(tvc.samba_credentials(), report_id.clone());
@@ -112,14 +112,14 @@ pub async fn get_samba_report(state: &State, webhook: SambaWebhook, kind: SambaO
                 VendorAPI::SambaActivityHistoryGetReport,
                 order.document_id.clone(),
             );
-            let (vres_id, _) = args.save(&state.db_pool).await?;
+            let (vres, _) = args.save(&state.db_pool).await?;
             let resp = res.map_err(into_fp_error)?;
             let raw = resp.raw_response.clone();
             let _ = resp.result.into_success().map_err(into_fp_error)?;
             let data =
                 compute_vault_data_for_activity_history(state, raw, false, &di.scoped_vault_id).await?;
 
-            (vres_id, Some(data))
+            (vres.id, Some(data))
         }
     };
 

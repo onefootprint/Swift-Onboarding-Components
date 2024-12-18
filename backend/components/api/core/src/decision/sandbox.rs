@@ -352,10 +352,10 @@ pub async fn save_fixture_neuro_result(
         vault_public_key.clone(),
     );
 
-    let (vres_id, _) = args.save(&state.db_pool).await?;
+    let (vres, _) = args.save(&state.db_pool).await?;
     let neuro_id = NeuroIdentityId::from(wf_id.clone());
-    save_neuro_event(state, &parsed, t_id, neuro_id, sv_id, wf_id, &vres_id).await?;
-    Ok(Some((parsed, vres_id)))
+    save_neuro_event(state, &parsed, t_id, neuro_id, sv_id, wf_id, &vres.id).await?;
+    Ok(Some((parsed, vres.id)))
 }
 
 pub async fn save_fixture_sentilink_result(
@@ -394,9 +394,9 @@ pub async fn save_fixture_sentilink_result(
         VendorAPI::SentilinkApplicationRisk,
     );
 
-    let (vres_id, _) = args.save(&state.db_pool).await?;
+    let (vres, _) = args.save(&state.db_pool).await?;
     let validated = parsed.validate().map_err(into_fp_error)?;
-    Ok(Some((validated, vres_id)))
+    Ok(Some((validated, vres.id)))
 }
 
 #[cfg(test)]

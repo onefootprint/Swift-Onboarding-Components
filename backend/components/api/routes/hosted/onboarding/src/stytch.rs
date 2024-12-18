@@ -84,9 +84,9 @@ async fn post_inner(
 
             let pk = user_auth.user.public_key.clone();
             let args = SaveVerificationResultArgs::new_for_stytch(&res, di.id.clone(), su_id.clone(), pk);
-            let (vres_id, _) = args.save_sync(conn)?;
+            let (vres, _) = args.save_sync(conn)?;
             if let Some(res) = res.ok().and_then(|r| r.result.ok()) {
-                save_successful_response(conn, res, &uv_id, &su_id, telemetry, vres_id, hide_rs)?;
+                save_successful_response(conn, res, &uv_id, &su_id, telemetry, vres.id, hide_rs)?;
             }
             Ok(())
         })

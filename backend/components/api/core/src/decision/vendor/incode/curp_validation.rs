@@ -163,7 +163,7 @@ pub async fn run_curp_validation_check(
                 None,
             );
             let args = SaveVerificationResultArgs::new_for_incode(&res, vw.vault.public_key.clone(), vreq);
-            let (vres_id, vreq_id) = args.save(&state.db_pool).await?;
+            let (vres, vreq_id) = args.save(&state.db_pool).await?;
             let curp_response = res.map_err(into_fp_error)?;
             let raw_response = curp_response.raw_response.clone();
             match curp_response.result.safe_into_success() {
@@ -217,14 +217,14 @@ pub async fn run_curp_validation_check(
                             response: ParsedResponse::IncodeCurpValidation(parsed),
                             raw_response,
                         },
-                        verification_result_id: vres_id,
+                        verification_result_id: vres.id,
                         verification_request_id: vreq_id,
                     };
 
                     Ok(Some(vendor_result))
                 }
                 either::Either::Right(errors) => {
-                    handle_curp_error(state, &di.scoped_vault_id, wf_id, &vres_id, errors).await?;
+                    handle_curp_error(state, &di.scoped_vault_id, wf_id, &vres.id, errors).await?;
 
                     Err(into_fp_error(idv::incode::error::Error::InvalidCurp))
                 }

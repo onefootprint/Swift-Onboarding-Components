@@ -21,7 +21,6 @@ use newtypes::SealedVaultBytes;
 use newtypes::VaultPublicKey;
 use newtypes::VendorAPI;
 use newtypes::VerificationRequestId;
-use newtypes::VerificationResultId;
 use std::slice;
 
 type VerificationRequestWithVendorResponse = (VerificationRequest, VendorResponse);
@@ -209,7 +208,7 @@ impl SaveVerificationResultArgs {
         }
     }
 
-    pub fn save_sync(self, conn: &mut PgConn) -> FpResult<(VerificationResultId, VerificationRequestId)> {
+    pub fn save_sync(self, conn: &mut PgConn) -> FpResult<(VerificationResult, VerificationRequestId)> {
         let SaveVerificationResultArgs {
             scrubbed_response,
             raw_response,
@@ -237,10 +236,10 @@ impl SaveVerificationResultArgs {
         };
         let res = VerificationResult::create(conn, vreq_id.clone(), scrubbed_response, e_response, is_error)?;
 
-        Ok((res.id, vreq_id))
+        Ok((res, vreq_id))
     }
 
-    pub async fn save(self, db_pool: &DbPool) -> FpResult<(VerificationResultId, VerificationRequestId)> {
+    pub async fn save(self, db_pool: &DbPool) -> FpResult<(VerificationResult, VerificationRequestId)> {
         let result = db_pool.db_transaction(move |conn| self.save_sync(conn)).await?;
         Ok(result)
     }

@@ -120,7 +120,7 @@ pub async fn run_sentilink_application_risk(
         VendorAPI::SentilinkApplicationRisk,
     );
 
-    let (vres_id, _) = args.save(&state.db_pool).await?;
+    let (vres, _) = args.save(&state.db_pool).await?;
 
     let resp = res
         .map_err(into_fp_error)?
@@ -143,5 +143,5 @@ pub async fn run_sentilink_application_risk(
         })
         .await?;
 
-    Ok(Some((validated, vres_id)))
+    Ok(Some((validated, vres.id)))
 }

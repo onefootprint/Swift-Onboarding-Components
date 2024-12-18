@@ -124,12 +124,12 @@ pub async fn run_neuro_call(
         vw.vault.public_key.clone(),
     );
 
-    let (vres_id, _) = args.save(&state.db_pool).await?;
+    let (vres, _) = args.save(&state.db_pool).await?;
     let neuro_response = res.map_err(into_fp_error)?;
     let parsed: NeuroIdAnalyticsResponse = neuro_response.result.into_success().map_err(into_fp_error)?;
 
     // save event for metrics/dupes/user insights
-    save_neuro_event(state, &parsed, t_id, id, &di.scoped_vault_id, wf_id, &vres_id).await?;
+    save_neuro_event(state, &parsed, t_id, id, &di.scoped_vault_id, wf_id, &vres.id).await?;
 
     // Save billing event
     let sv_id = di.scoped_vault_id.clone();
@@ -144,7 +144,7 @@ pub async fn run_neuro_call(
         })
         .await?;
 
-    Ok(Some((parsed, vres_id)))
+    Ok(Some((parsed, vres.id)))
 }
 
 pub async fn save_neuro_event(

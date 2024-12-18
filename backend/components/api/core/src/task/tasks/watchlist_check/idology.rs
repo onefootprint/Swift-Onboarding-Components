@@ -82,10 +82,10 @@ async fn make_vendor_call(
     let uv = state.db_query(move |conn| Vault::get(conn, &svid)).await?;
     let vreq = ShouldSaveVerificationRequest::No(vreq.id);
     let args = SaveVerificationResultArgs::new_for_idology(&res, uv.public_key, vreq);
-    let (vres_id, _) = args.save(&state.db_pool).await?;
+    let (vres, _) = args.save(&state.db_pool).await?;
 
     let res = res.map_err(idv::Error::from)?;
-    Ok((res, vres_id))
+    Ok((res, vres.id))
 }
 
 fn parse_reason_codes(res: PaResponse) -> FpResult<Vec<FootprintReasonCode>> {

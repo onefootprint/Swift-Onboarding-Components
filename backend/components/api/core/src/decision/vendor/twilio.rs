@@ -118,9 +118,9 @@ pub async fn run_twilio_call(
         di.scoped_vault_id.clone(),
         vw.vault.public_key.clone(),
     );
-    let (vres_id, _) = args.save(&state.db_pool).await?;
+    let (vres, _) = args.save(&state.db_pool).await?;
 
     let res = res.map_err(into_fp_error)?;
 
-    Ok(Some((res.parsed_response, vres_id)))
+    Ok(Some((res.parsed_response, vres.id)))
 }
