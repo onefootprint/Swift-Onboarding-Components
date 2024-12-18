@@ -58,7 +58,7 @@ const OnboardingData = ({ onboarding }: OnboardingDataProps) => {
           />
         ))}
       </div>
-      <div className="p-6 flex flex-col gap-2 flex-1 overflow-y-auto">
+      <div className="p-6 flex-1 overflow-y-auto">
         {selectedSubsection === 'risk-signals' && (
           <OnboardingRiskSignals riskSignals={groupRiskSignals(riskSignals ?? [])} />
         )}

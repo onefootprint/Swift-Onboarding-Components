@@ -1,10 +1,10 @@
-import type { BusinessDetail, InsightBusinessName } from '@onefootprint/request-types/dashboard';
 import { useTranslation } from 'react-i18next';
 import Subsection from '../../../../../subsection';
+import type { FormattedDetails, FormattedName } from '../../../../onboarding-business-insight.types';
 
 type BusinessDetailsProps = {
-  names: InsightBusinessName[];
-  details?: BusinessDetail;
+  names: FormattedName[];
+  details: FormattedDetails;
 };
 
 const BusinessDetails = ({ names, details }: BusinessDetailsProps) => {
@@ -12,10 +12,10 @@ const BusinessDetails = ({ names, details }: BusinessDetailsProps) => {
 
   return (
     <div className="flex flex-col gap-6">
-      <Subsection title={t('name.title')} hasDivider>
+      <Subsection title={t('name.title')}>
         <span>{names.length}</span>
       </Subsection>
-      <Subsection title={t('details.title')}>
+      <Subsection title={t('details.title')} hasDivider>
         <span>{details?.formationDate}</span>
       </Subsection>
     </div>

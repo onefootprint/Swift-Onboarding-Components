@@ -1,10 +1,9 @@
 import useEntityId from '@/entities/components/details/hooks/use-entity-id';
-import { getEntitiesByFpBidOnboardingsByOnboardingIdBusinessInsightsOptions } from '@onefootprint/axios/dashboard';
-import { useQuery } from '@tanstack/react-query';
 import ErrorComponent from 'src/components/error';
 import type { Subsection } from '../../../../hooks/use-subsections';
 import BusinessDetails from './components/business-details';
 import Loading from './components/loading';
+import useOnboardingBusinessInsights from './hooks/use-onboarding-business-insights';
 
 export type DecryptedContentProps = {
   onboardingId: string;
@@ -13,16 +12,7 @@ export type DecryptedContentProps = {
 
 const DecryptedContent = ({ onboardingId, selectedSubsection }: DecryptedContentProps) => {
   const entityId = useEntityId();
-  const {
-    isPending,
-    error,
-    data: insights,
-  } = useQuery({
-    ...getEntitiesByFpBidOnboardingsByOnboardingIdBusinessInsightsOptions({
-      path: { fpBid: entityId, onboardingId },
-    }),
-    enabled: Boolean(entityId) && Boolean(onboardingId),
-  });
+  const { isPending, error, data: insights } = useOnboardingBusinessInsights(entityId, onboardingId);
 
   return (
     <>
