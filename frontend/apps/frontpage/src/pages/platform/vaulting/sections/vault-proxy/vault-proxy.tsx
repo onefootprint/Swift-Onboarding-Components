@@ -3,8 +3,8 @@ import { Container, Grid, media } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import Image from 'next/image';
 import { useTranslation } from 'react-i18next';
-import MicroFeatureCard from 'src/components/micro-feature-card';
 import styled, { css } from 'styled-components';
+import MicroFeatureCard from './components/micro-feature-card';
 
 import SectionSubtitle from '../../components/section-subtitle';
 import SectionTitle from '../../components/section-title';

@@ -1,49 +1,20 @@
-import { Stack, media } from '@onefootprint/ui';
-import styled, { css } from 'styled-components';
-
 import Form from './components/form';
 import Illustration from './components/illustration';
 import NavigationBar from './components/navigation-bar';
 
 type MockupScreenProps = {
-  $borderRadius: string;
-  $backgroundColor: string;
+  borderRadius: string;
+  backgroundColor: string;
 };
 
-const MockupScreen = ({ $borderRadius, $backgroundColor }: MockupScreenProps) => (
-  <Container direction="column" position="relative">
+const MockupScreen = ({ borderRadius, backgroundColor }: MockupScreenProps) => (
+  <div className="relative z-0 flex flex-col w-full mx-auto overflow-hidden border border-solid rounded isolate border-tertiary md:rounded-md min-h-fit">
     <NavigationBar />
-    <MainScreen>
-      <Illustration />
-      <Form $borderRadius={$borderRadius} $backgroundColor={$backgroundColor} />
-    </MainScreen>
-  </Container>
+    <div className="grid grid-cols-1 md:grid-cols-2 md:grid-template-cols-[1fr_1fr] md:aspect-[16/9] h-full min-h-[400px] border border-t-0 border-tertiary rounded-b-lg">
+      <Illustration backgroundColor={backgroundColor} />
+      <Form borderRadius={borderRadius} backgroundColor={backgroundColor} />
+    </div>
+  </div>
 );
-
-const Container = styled(Stack)`
-  width: 100%;
-  min-height: fit-content;
-  margin: auto;
-
-  ${media.greaterThan('md')`
-    max-width: 85%;
-  `}
-`;
-
-const MainScreen = styled(Stack)`
-  ${({ theme }) => css`
-    min-height: 420px;
-    height: 100%;
-    flex-direction: column;
-    border-radius: 0 0 ${theme.borderRadius.lg} ${theme.borderRadius.lg};
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    border-top: none;
-
-    ${media.greaterThan('md')`
-      flex-direction: row;
-      aspect-ratio: 16 / 9;
-    `}
-  `}
-`;
 
 export default MockupScreen;

@@ -1,94 +1,112 @@
-import { Box, Stack, Text } from '@onefootprint/ui';
-import { motion } from 'framer-motion';
-import { useRef } from 'react';
+import { Fragment, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
-import { useHover } from 'usehooks-ts';
 
+import { cx } from 'class-variance-authority';
+import { uniqueId } from 'lodash';
 import BaseCard from '../../components/base-card';
 import CardTitle from '../../components/card-title';
 import GrabbedChip from './components/grabbed-chip';
-import RulesTable from './components/rules-table';
+import RuleTag from './components/rule-tag';
+import type { RuleTagProps } from './components/rule-tag';
 
-const IllustrationMotionVariants = {
-  initial: {
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-    transform: 'translateY(0px)',
-  },
-  hover: {
-    boxShadow: '0 10px 15px rgba(0, 0, 0, 0.2)',
-    transform: 'translateY(-5px)',
-  },
-};
-
-const grabbedChipVariants = {
-  initial: {
-    x: '100%',
-    y: '-200%',
-    rotate: 0,
-    opacity: 0.8,
-    zIndex: 3,
-  },
-  hover: {
-    x: '60%',
-    y: '-50%',
-    opacity: 1,
-    rotate: -15,
-    transition: {
-      duration: 2,
-      ease: 'easeInOut',
+const ruleTableContent: RuleTagProps[][] = [
+  [
+    {
+      signal: 'phone_number',
+      op: 'is',
+      list: '@blocked_phones',
     },
-  },
-};
+    {
+      signal: 'id_flagged',
+      op: 'is',
+      list: undefined,
+    },
+  ],
+  [
+    {
+      signal: 'subject_deceased',
+      op: 'is',
+      list: undefined,
+    },
+    {
+      signal: 'address_input_is_po_box',
+      op: 'is not',
+      list: undefined,
+    },
+    {
+      signal: 'dob_located_coppa_alert',
+      op: 'is not',
+      list: undefined,
+    },
+    {
+      signal: 'multiple_records_found',
+      op: 'is',
+      list: undefined,
+    },
+  ],
+  [
+    {
+      signal: 'phone_number',
+      op: 'is',
+      list: '@blocked_phones',
+    },
+    {
+      signal: 'ssn_input_is_invalid',
+      op: 'is',
+      list: undefined,
+    },
+  ],
+];
 
 const BuildRules = () => {
   const cardRef = useRef<HTMLDivElement>(null);
-  const isHover = useHover(cardRef);
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.home.verify.cards.build-rules',
   });
 
   return (
-    <BaseCard overflow="hidden" ref={cardRef}>
+    <BaseCard className="overflow-hidden group" ref={cardRef}>
       <CardTitle title={t('title')} subtitle={t('subtitle')} />
-      <Box position="relative" height="fit-content" minHeight="280px">
-        <Illustration
-          direction="column"
-          gap={5}
-          variants={IllustrationMotionVariants}
-          animate={isHover ? 'hover' : 'initial'}
+      <div className="relative h-full">
+        <div
+          className={cx(
+            'flex flex-col gap-5',
+            'border border-solid rounded border-tertiary',
+            'bg-primary p-8 shadow-sm',
+            'w-full h-full md:w-[720px] origin-bottom-right',
+            'absolute -bottom-2 left-7',
+            'group-hover:shadow-lg group-hover:rotate-2',
+            'transition-transform-shadow duration-1000 ease-in-out',
+          )}
         >
-          <Stack direction="column" gap={2}>
-            <Text variant="label-1" color="error">
-              Fail
-            </Text>
-            <Text variant="body-2" color="secondary">
-              User will be marked as failed
-            </Text>
-          </Stack>
-          <RulesTable />
-        </Illustration>
-        <motion.div variants={grabbedChipVariants} initial="initial" animate={isHover ? 'hover' : 'initial'}>
+          <div className="flex flex-col gap-2">
+            <p className="text-label-1 text-error">Fail</p>
+            <p className="text-body-2 text-secondary">User will be marked as failed</p>
+          </div>
+          {ruleTableContent.map((row, rowIndex) => (
+            <div className="flex flex-row flex-wrap items-center gap-x-1 gap-y-3" key={uniqueId(`row-${rowIndex}-`)}>
+              <p className="text-body-3 text-tertiary">if</p>
+              {row.map(({ signal, op, list }, index) => (
+                <Fragment key={uniqueId(`rule-${index}-`)}>
+                  <RuleTag signal={signal} op={op} list={list} />
+                  {index < row.length - 1 && <p className="text-body-3 text-tertiary">and</p>}
+                </Fragment>
+              ))}
+            </div>
+          ))}
+        </div>
+        <div
+          className={cx(
+            'absolute -top-2 -right-[200px]',
+            'group-hover:right-[140px] group-hover:-rotate-12 group-hover:top-12',
+            'transition-all duration-[2000ms] ease-in-out',
+          )}
+        >
           <GrabbedChip />
-        </motion.div>
-      </Box>
+        </div>
+      </div>
     </BaseCard>
   );
 };
-
-const Illustration = styled(motion(Stack))`
-  ${({ theme }) => css`
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    border-radius: ${theme.borderRadius.lg};
-    padding: ${theme.spacing[7]};
-    overflow: hidden;
-    background-color: ${theme.backgroundColor.primary};
-    position: absolute;
-    left: ${theme.spacing[8]};
-    top: 0;
-    width: 720px;
-    box-shadow: ${theme.elevation[1]};
-  `}
-`;
 
 export default BuildRules;

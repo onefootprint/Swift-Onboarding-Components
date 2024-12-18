@@ -1,19 +1,13 @@
-import { Stack, Text } from '@onefootprint/ui';
-
 type CardTitleProps = {
   title: string;
   subtitle: string;
 };
 
 const CardTitle = ({ title, subtitle }: CardTitleProps) => (
-  <Stack direction="column" gap={3} padding={9} zIndex={2} position="relative">
-    <Text variant="label-1" tag="h4">
-      {title}
-    </Text>
-    <Text variant="body-2" tag="h5">
-      {subtitle}
-    </Text>
-  </Stack>
+  <div className="relative z-10 flex flex-col flex-shrink-0 gap-3 p-9">
+    <h4 className="text-label-1">{title}</h4>
+    <h5 className="text-body-2">{subtitle}</h5>
+  </div>
 );
 
 export default CardTitle;

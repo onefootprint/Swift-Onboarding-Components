@@ -1,5 +1,5 @@
 import { IcoPencil16, IcoPlusSmall16 } from '@onefootprint/icons';
-import { LinkButton, Stack, Text } from '@onefootprint/ui';
+import { LinkButton } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
 type CardTitleProps = {
@@ -13,8 +13,8 @@ const CardTitle = ({ children, type = 'edit', onClick }: CardTitleProps) => {
     keyPrefix: 'pages.home.control.illustration',
   });
   return (
-    <Stack direction="row" justify="space-between">
-      <Text variant="label-3">{children}</Text>
+    <div className="flex flex-row justify-between">
+      <p className="text-label-3">{children}</p>
       <LinkButton
         variant="label-3"
         iconPosition="left"
@@ -23,7 +23,7 @@ const CardTitle = ({ children, type = 'edit', onClick }: CardTitleProps) => {
       >
         {type === 'add' ? t('add') : t('edit')}
       </LinkButton>
-    </Stack>
+    </div>
   );
 };
 

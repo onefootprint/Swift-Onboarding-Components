@@ -1,9 +1,6 @@
 import { IcoCloseSmall16 } from '@onefootprint/icons';
-import { Divider, Stack, createFontStyles } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
-import type React from 'react';
 import { useEffect, useState } from 'react';
-import styled, { css } from 'styled-components';
 
 const cardVariants = {
   initial: { height: 0, filter: 'blur(5px)' },
@@ -40,38 +37,25 @@ const CardAppearContent = ({ isVisible, children, onClose }: CardAppearContentPr
   return (
     <AnimatePresence>
       {localVisible && (
-        <Stack gap={5} direction="column">
-          <Divider variant="secondary" />
-          <Container initial="initial" animate="visible" exit="exit" variants={cardVariants} position="relative">
+        <div className="flex flex-col gap-5">
+          <motion.div
+            className="relative pt-3 border-t border-solid border-tertiary"
+            initial="initial"
+            animate="visible"
+            exit="exit"
+            variants={cardVariants}
+          >
             {onClose && (
-              <CloseButton onClick={handleClose}>
+              <button type="button" className="absolute top-[-10px] right-[-10px] cursor-pointer" onClick={handleClose}>
                 <IcoCloseSmall16 color="tertiary" />
-              </CloseButton>
+              </button>
             )}
-            {children}
-          </Container>
-        </Stack>
+            <p className="text-body-3 text-secondary">{children}</p>
+          </motion.div>
+        </div>
       )}
     </AnimatePresence>
   );
 };
-
-const Container = styled(motion(Stack))`
-  ${({ theme }) => css`
-    ${createFontStyles('body-3')}
-    color: ${theme.color.secondary};
-    border-radius: ${theme.borderRadius.default};
-  `}
-`;
-
-const CloseButton = styled.button`
-  ${({ theme }) => css`
-    all: unset;
-    position: absolute;
-    top: -${theme.spacing[3]};
-    right: 0;
-    cursor: pointer;
-  `}
-`;
 
 export default CardAppearContent;

@@ -1,15 +1,10 @@
-import { Button, Stack, media } from '@onefootprint/ui';
+import { Button } from '@onefootprint/ui';
+import { cx } from 'class-variance-authority';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ButtonLink from 'src/components/button-link';
 import MarketingLink from 'src/components/marketing-link';
-import styled, { css } from 'styled-components';
 import ContactDialog from '../contact-dialog';
-
-type CtasDirection = {
-  desktop: 'column' | 'row';
-  mobile: 'column' | 'row';
-};
 
 type Labels = {
   primary?: string;
@@ -18,11 +13,9 @@ type Labels = {
 
 type CtasProps = {
   labels?: Labels;
-  direction?: CtasDirection;
-  align?: 'left' | 'center' | 'right';
 };
 
-const Ctas = ({ labels, direction = { desktop: 'row', mobile: 'column' }, align = 'center' }: CtasProps) => {
+const Ctas = ({ labels }: CtasProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'components.ctas' });
   const [showDialog, setShowDialog] = useState(false);
 
@@ -32,7 +25,13 @@ const Ctas = ({ labels, direction = { desktop: 'row', mobile: 'column' }, align 
 
   return (
     <>
-      <ButtonsContainer flexDirection={direction} align={align}>
+      <div
+        className={cx(
+          'flex flex-col justify-center items-center gap-3 px-3 w-full max-w-[580px] md:flex-row md:gap-3',
+          // Button and MarketingLink should take up the full width on mobile, and half width on desktop and while we migrate them to tailwind we need to keep this
+          '[&>button]:w-full [&>button]:md:w-auto [&>a]:w-full [&>a]:md:w-auto',
+        )}
+      >
         <Button variant="primary" size="large" onClick={handleBookCall}>
           {labels?.primary || t('book-a-call')}
         </Button>
@@ -41,38 +40,10 @@ const Ctas = ({ labels, direction = { desktop: 'row', mobile: 'column' }, align 
             {labels?.secondary || t('sign-up-for-free')}
           </ButtonLink>
         </MarketingLink>
-      </ButtonsContainer>
+      </div>
       <ContactDialog open={showDialog} onClose={() => setShowDialog(false)} />
     </>
   );
 };
-
-const ButtonsContainer = styled(Stack)<{
-  align?: 'left' | 'center' | 'right';
-  flexDirection?: CtasDirection;
-}>`
-	${({ theme, flexDirection, align }) => css`
-		flex-direction: ${flexDirection?.mobile};
-		gap: ${theme.spacing[3]};
-		margin-top: ${theme.spacing[3]};
-		width: 100%;
-		justify-content: ${align};
-
-    button {
-      width: 100%;
-    }
-
-		${media.greaterThan('md')`
-			flex-direction: ${flexDirection?.desktop};
-            margin-top: ${theme.spacing[5]};
-			justify-content: ${align};
-			width: 100%;
-
-			button {
-				width: fit-content;
-			}
-		`}
-	`}
-`;
 
 export default Ctas;

@@ -16,7 +16,13 @@ const KycCard = () => {
   };
   return (
     <CardContainer>
-      <Toggle label={t('toggle.title')} hint={t('toggle.subtitle')} checked={isToggled} onChange={handleToggle} />
+      <Toggle
+        label={t('toggle.title')}
+        hint={t('toggle.subtitle')}
+        checked={isToggled}
+        size="compact"
+        onChange={handleToggle}
+      />
       <CardAppearContent isVisible={isToggled}>{t('extra-content')}</CardAppearContent>
     </CardContainer>
   );

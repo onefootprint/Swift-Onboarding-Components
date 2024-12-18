@@ -1,8 +1,7 @@
-import { Container, Stack, media } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
 
-import SectionTitle from '../../../../components/desktop-share-post/section-title';
+import FrontpageContainer from 'src/components/frontpage-container';
+import SectionTitle from '../../../../components/section-title';
 import IllustrationGrid from './illustration-grid';
 
 const Control = () => {
@@ -11,27 +10,13 @@ const Control = () => {
   });
 
   return (
-    <SectionContainer>
-      <Container alignItems="center" justifyContent="center">
+    <>
+      <FrontpageContainer className="relative pt-16 pb-11 md:pt-32 md:pb-16 gap-11">
         <SectionTitle title={t('title')} subtitle={t('subtitle')} />
-      </Container>
+      </FrontpageContainer>
       <IllustrationGrid />
-    </SectionContainer>
+    </>
   );
 };
-
-const SectionContainer = styled(Stack)`
-  ${({ theme }) => css`
-    gap: ${theme.spacing[9]};
-    flex-direction: column;
-    align-items: center;
-    overflow: hidden;
-    padding: ${theme.spacing[9]} 0;
-
-    ${media.greaterThan('md')`
-      padding: ${theme.spacing[11]} 0;
-    `}
-  `}
-`;
 
 export default Control;

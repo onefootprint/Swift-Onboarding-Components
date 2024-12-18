@@ -1,4 +1,3 @@
-import { Box } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -75,15 +74,23 @@ const DeviceInsights = () => {
   const [showWhatsThis, setShowWhatsThis] = useState(false);
 
   return (
-    <BaseCard backgroundImage="/home/verify-cards/custom-map.png" overflow="hidden">
+    <BaseCard className="relative overflow-hidden">
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat bg-[url('/home/verify-cards/custom-map.png')]"
+        style={{
+          WebkitMaskImage: 'linear-gradient(to bottom, transparent, transparent 20%, black 100%)',
+          maskImage: 'linear-gradient(to bottom, transparent, transparent 20%, black 100%)',
+          maskType: 'alpha',
+        }}
+      />
       <CardTitle title={t('title')} subtitle={t('subtitle')} />
-      <Box position="relative" width="100%" height="100%" minHeight="260px">
+      <div className="relative w-full h-full min-h-[260px]">
         {deviceCards.map(card => (
           <DeviceSelect
             key={card.id}
             id={card.id}
             icon={card.icon}
-            $isActive={activeDevice === card.id}
+            isActive={activeDevice === card.id}
             onClick={() => setActiveDevice(card.id)}
             position={card.selectorPosition}
           />
@@ -100,8 +107,8 @@ const DeviceInsights = () => {
             onWhatsThisClick={() => setShowWhatsThis(true)}
           />
         )}
-        <WhatIsThisCard $isVisible={showWhatsThis} onClose={() => setShowWhatsThis(false)} />
-      </Box>
+      </div>
+      <WhatIsThisCard isVisible={showWhatsThis} onClose={() => setShowWhatsThis(false)} />
     </BaseCard>
   );
 };

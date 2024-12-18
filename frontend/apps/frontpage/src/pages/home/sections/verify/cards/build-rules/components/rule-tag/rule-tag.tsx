@@ -1,38 +1,25 @@
-import { Stack, Text } from '@onefootprint/ui';
-import styled, { css } from 'styled-components';
-
 export type RuleTagProps = {
+  className?: string;
   signal: string;
   op: 'is' | 'is not';
   list?: string;
-  $elevated?: boolean;
 };
 
-const RuleTag = ({ signal, op, list, $elevated }: RuleTagProps) => (
-  <Container direction="row" gap={3} $elevated={$elevated}>
-    <Text variant="label-3">{signal}</Text>
-    <Text variant="label-3">{op}</Text>
+const RuleTag = ({ signal, op, list, className }: RuleTagProps) => (
+  <div
+    className={`${className} bg-primary border border-solid border-tertiary px-3 rounded-full flex flex-row items-center gap-3`}
+  >
+    <p className="text-label-3">{signal}</p>
+    <p className="text-label-3">{op}</p>
     {list ? (
       <>
-        <Text variant="body-3" color="tertiary">
-          in
-        </Text>
-        <Text variant="body-3">{list}</Text>
+        <p className="text-body-3 text-tertiary">in</p>
+        <p className="text-body-3">{list}</p>
       </>
     ) : (
-      <Text variant="body-3">triggered</Text>
+      <p className="text-body-3">triggered</p>
     )}
-  </Container>
+  </div>
 );
-
-const Container = styled(Stack)<{ $elevated?: boolean }>`
-  ${({ theme, $elevated }) => css`
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    border-radius: ${theme.borderRadius.full};
-    padding: ${theme.spacing[1]} ${theme.spacing[4]};
-    background-color: ${theme.backgroundColor.primary};
-    box-shadow: ${$elevated ? theme.elevation[2] : 'none'};
-  `}
-`;
 
 export default RuleTag;

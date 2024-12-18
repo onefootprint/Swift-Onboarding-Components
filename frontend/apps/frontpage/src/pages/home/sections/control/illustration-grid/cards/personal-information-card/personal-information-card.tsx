@@ -8,6 +8,10 @@ import CardContainer from '../../components/card-container';
 import CardRow from '../../components/card-row';
 import CardTitle from '../../components/card-title';
 
+type PersonalInformationCardProps = {
+  className?: string;
+};
+
 const contentRows = [
   {
     title: 'basic-information',
@@ -78,13 +82,13 @@ const contentRows = [
   },
 ];
 
-const PersonalInformationCard = () => {
+const PersonalInformationCard = ({ className }: PersonalInformationCardProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.home.control.illustration.personal-information',
   });
   const [isExtraContentVisible, setIsExtraContentVisible] = useState(false);
   return (
-    <CardContainer>
+    <CardContainer className={className}>
       <CardTitle onClick={() => setIsExtraContentVisible(prev => !prev)}>{t('title')}</CardTitle>
       <CardAppearContent isVisible={isExtraContentVisible}>{t('extra-content')}</CardAppearContent>
       <Stack direction="column" gap={7}>

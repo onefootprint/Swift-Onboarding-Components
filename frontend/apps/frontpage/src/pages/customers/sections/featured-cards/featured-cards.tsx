@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
-import { BloomLogo, CobaLogo, ComposerLogo, FlexcarLogo } from 'src/components/company-logos/themed';
+import { BloomLogo, CobaLogo, ComposerLogo, FlexcarLogo } from 'src/components/company-logos';
 
 const FeaturedCards = () => {
   const { t } = useTranslation('common', {

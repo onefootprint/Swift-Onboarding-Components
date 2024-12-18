@@ -2,8 +2,8 @@ import { useTranslation } from 'react-i18next';
 import Banner from 'src/components/banner';
 import styled, { css } from 'styled-components';
 
-import DeveloperExperience from '../../../components/developer-experience';
 import SEO from '../../../components/seo';
+import DeveloperExperience from '../components/developer-experience';
 import Hero from './sections/hero';
 import IdentifyBos from './sections/identify-bos/indentify-bos';
 import IdentifyBusinesses from './sections/identify-businesss';

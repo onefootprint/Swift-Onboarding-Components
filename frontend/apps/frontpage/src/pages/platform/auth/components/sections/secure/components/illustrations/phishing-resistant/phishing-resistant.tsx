@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import HorizontalBeam from 'src/components/horizontal-beam';
+import HorizontalBeam from 'src/pages/platform/auth/components/sections/secure/components/illustrations/phishing-resistant/components/horizontal-beam';
 import styled from 'styled-components';
 
 import IllustrationContainer from '../../illustration-container';

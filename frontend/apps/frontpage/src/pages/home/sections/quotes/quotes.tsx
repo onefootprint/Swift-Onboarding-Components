@@ -1,8 +1,6 @@
-import { Container, Grid, media } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
-
-import SectionTitle from '../../../../components/desktop-share-post/section-title';
+import FrontpageContainer from 'src/components/frontpage-container';
+import SectionTitle from 'src/components/section-title';
 import QuoteCard from './components/quote-card';
 
 export type Companies = 'apiture' | 'flexcar' | 'bloom' | 'findigs' | 'coba';
@@ -12,55 +10,21 @@ const Quotes = () => {
     keyPrefix: 'pages.home.quotes',
   });
   return (
-    <QuotesContainer align="center" justify="center" direction="column">
+    <FrontpageContainer className="flex flex-col items-center justify-center overflow-hidden md:gap-12 gap-9 py-9 md:py-11">
       <SectionTitle title={t('title')} subtitle={t('subtitle')} align="center" />
-      <GridContainer>
-        <Column>
+      <div className="flex flex-col gap-4 md:grid md:max-w-full md:grid-cols-2">
+        <div className="relative flex flex-col gap-3">
           <QuoteCard company="apiture" />
           <QuoteCard company="coba" />
-        </Column>
-        <Column>
+        </div>
+        <div className="relative flex flex-col gap-3">
           <QuoteCard company="bloom" />
           <QuoteCard company="findigs" />
           <QuoteCard company="flexcar" />
-        </Column>
-      </GridContainer>
-    </QuotesContainer>
+        </div>
+      </div>
+    </FrontpageContainer>
   );
 };
-
-const QuotesContainer = styled(Container)`
-  ${({ theme }) => css`
-    gap: ${theme.spacing[9]};
-    overflow: hidden;
-    padding: ${theme.spacing[9]} 0;
-
-    ${media.greaterThan('md')`
-      padding: ${theme.spacing[11]} 0;
-    `}
-  `}
-`;
-
-const Column = styled(Grid.Item)`
-  ${({ theme }) => css`
-    position: relative;
-    flex-direction: column;
-    gap: ${theme.spacing[4]};
-  `}
-`;
-
-const GridContainer = styled(Grid.Container)`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[4]};
-
-    ${media.greaterThan('md')`
-      display: grid;
-      max-width: 100%;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    `}
-  `}
-`;
 
 export default Quotes;

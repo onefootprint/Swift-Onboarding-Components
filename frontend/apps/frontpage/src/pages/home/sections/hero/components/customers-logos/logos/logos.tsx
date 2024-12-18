@@ -1,8 +1,6 @@
-import { Box, media } from '@onefootprint/ui';
 import { motion, useAnimation } from 'framer-motion';
 import uniqueId from 'lodash/uniqueId';
 import { useEffect, useState } from 'react';
-import styled, { css } from 'styled-components';
 
 import {
   ApitureLogo,
@@ -15,7 +13,7 @@ import {
   GridLogo,
   WingSpan,
   YieldStreet,
-} from 'src/components/company-logos/themed';
+} from 'src/components/company-logos';
 
 const logos = [
   ComposerLogo,
@@ -85,45 +83,26 @@ const Logos = () => {
   }, [currentLogos, controls]);
 
   return (
-    <MarqueeContainer variants={marqueeContainerVariants} initial="initial" animate={controls}>
+    <motion.div
+      className="grid w-full grid-cols-2 grid-rows-2 gap-3 h-[120px] md:w-auto md:grid-cols-4 md:grid-rows-1 md:h-[80px] md:gap-8"
+      variants={marqueeContainerVariants}
+      initial="initial"
+      animate={controls}
+    >
       {currentLogos.map(logo => {
         const RenderedLogo = logo;
         return (
-          <MarqueeItem variants={marqueeItemVariants} key={uniqueId()}>
+          <motion.div
+            className="flex flex-row items-center justify-center"
+            variants={marqueeItemVariants}
+            key={uniqueId()}
+          >
             <RenderedLogo className="text-tertiary" />
-          </MarqueeItem>
+          </motion.div>
         );
       })}
-    </MarqueeContainer>
+    </motion.div>
   );
 };
-
-const MarqueeContainer = styled(motion(Box))`
-  ${({ theme }) => css`
-    display: grid;
-    width: 100%;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    grid-gap: ${theme.spacing[4]};
-    padding: ${theme.spacing[2]};
-    height: 120px;
-
-    ${media.greaterThan('md')`
-      width: auto;
-      grid-template-columns: repeat(${GROUP_SIZE}, minmax(140px, 1fr));    
-      grid-template-rows: 1fr;
-      height: 80px;
-      grid-gap: ${theme.spacing[2]};
-      padding: ${theme.spacing[2]};
-    `}
-  `}
-`;
-
-const MarqueeItem = styled(motion(Box))`
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-`;
 
 export default Logos;

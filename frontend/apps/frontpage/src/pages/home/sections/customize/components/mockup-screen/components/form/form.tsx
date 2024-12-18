@@ -1,15 +1,13 @@
-import { Box, Stack, Text, TextInput, createFontStyles, media } from '@onefootprint/ui';
+import { TextInput } from '@onefootprint/ui';
+import { cx } from 'class-variance-authority';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
-
-import ComponentNameBadge from '../../../component-name-badge';
 
 type FormProps = {
-  $borderRadius: string;
-  $backgroundColor: string;
+  borderRadius: string;
+  backgroundColor: string;
 };
 
-const Form = ({ $borderRadius, $backgroundColor }: FormProps) => {
+const Form = ({ borderRadius, backgroundColor }: FormProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.home.customize.components.screen',
   });
@@ -21,28 +19,30 @@ const Form = ({ $borderRadius, $backgroundColor }: FormProps) => {
     return `<${`${formattedName}Input`} />`;
   };
 
+  const componentBadgeClasses = cx(
+    'text-label-3 rounded-full bg-secondary border border-tertiary text-secondary w-fit px-2 py-1 whitespace-nowrap shadow z-1',
+  );
+
   return (
-    <FormContainer>
-      <Stack direction="column" gap={3} width="100%">
-        <Text variant="label-3">{t('title')}</Text>
-        <Text variant="body-3" color="secondary">
-          {t('subtitle')}
-        </Text>
-      </Stack>
-      <FieldsContainer>
-        <Box position="relative" width="100%">
+    <div className="flex flex-col items-center justify-center gap-5 overflow-visible border-t border-solid md:p-11 p-7 md:items-start md:w-full md:px-24 border-tertiary md:border-t-0">
+      <div className="flex flex-col w-full gap-2">
+        <p className="text-label-2">{t('title')}</p>
+        <p className="text-body-2 text-secondary">{t('subtitle')}</p>
+      </div>
+      <div className="relative flex flex-col w-full gap-6">
+        <div className="relative w-full overflow-visible">
           <TextInput type="text" label={t('first-name')} placeholder="Jane" />
-          <BadgeAligner>
-            <ComponentNameBadge>{generateComponentName(t('first-name'))}</ComponentNameBadge>
-          </BadgeAligner>
-        </Box>
-        <Box position="relative" width="100%">
+          <div className="absolute right-0 -top-3 md:transform md:translate-x-1 md:-top-3 md:-right-10">
+            <span className={componentBadgeClasses}>{generateComponentName(t('first-name'))}</span>
+          </div>
+        </div>
+        <div className="relative w-full overflow-visible">
           <TextInput type="text" label={t('last-name')} placeholder="Doe" />
-          <BadgeAligner>
-            <ComponentNameBadge>{generateComponentName(t('last-name'))}</ComponentNameBadge>
-          </BadgeAligner>
-        </Box>
-        <Box position="relative" width="100%">
+          <div className="absolute right-0 -top-3 md:transform md:translate-x-1 md:-top-3 md:-right-10">
+            <span className={componentBadgeClasses}>{generateComponentName(t('last-name'))}</span>
+          </div>
+        </div>
+        <div className="relative w-full overflow-visible">
           <TextInput
             type="text"
             label={t('date-of-birth')}
@@ -53,72 +53,23 @@ const Form = ({ $borderRadius, $backgroundColor }: FormProps) => {
             }}
             placeholder="MM/DD/YYYY"
           />
-          <BadgeAligner>
-            <ComponentNameBadge>{'<DOBInput />'}</ComponentNameBadge>
-          </BadgeAligner>
-        </Box>
-        <StyledButton $borderRadius={$borderRadius} $backgroundColor={$backgroundColor}>
+          <div className="absolute right-0 -top-3 md:transform md:translate-x-1 md:-top-3 md:-right-10">
+            <span className={componentBadgeClasses}>{'<DOBInput />'}</span>
+          </div>
+        </div>
+        <button
+          type="button"
+          className={cx('relative flex items-center justify-center flex-1 p-2 mt-5 text-quinary text-label-2')}
+          style={{
+            borderRadius: `${borderRadius}px`,
+            backgroundColor: backgroundColor,
+          }}
+        >
           {t('cta')}
-        </StyledButton>
-      </FieldsContainer>
-    </FormContainer>
+        </button>
+      </div>
+    </div>
   );
 };
-
-const FormContainer = styled(Stack)`
-  ${({ theme }) => css`
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: ${theme.spacing[9]} ${theme.spacing[7]};
-    gap: ${theme.spacing[7]};
-
-    ${media.greaterThan('md')`
-    padding: ${theme.spacing[9]} ${theme.spacing[10]};
-      align-items: flex-start;
-      width: 100%;   
-    `}
-  `}
-`;
-
-const FieldsContainer = styled(Stack)`
-  ${({ theme }) => css`
-    width: 100%;
-    flex-direction: column;
-    gap: ${theme.spacing[6]};
-    position: relative;
-  `}
-`;
-
-const BadgeAligner = styled(Box)`
-  ${({ theme }) => css`
-    position: absolute;
-    right: 0;
-    top: -${theme.spacing[3]};
-
-    ${media.greaterThan('md')`
-      transform: translateX(50%);
-      top: -${theme.spacing[3]};
-      right: -${theme.spacing[10]};
-    `}
-  `}
-`;
-
-const StyledButton = styled.button<FormProps>`
-  ${({ theme, $borderRadius, $backgroundColor }) => css`
-    all: unset;
-    ${createFontStyles('label-3')}
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: ${theme.color.quinary};
-    padding: ${theme.spacing[3]};
-    flex: 1;
-    border-radius: ${$borderRadius}px;
-    background-color: ${$backgroundColor};
-    margin-top: ${theme.spacing[5]};
-  `}
-`;
 
 export default Form;

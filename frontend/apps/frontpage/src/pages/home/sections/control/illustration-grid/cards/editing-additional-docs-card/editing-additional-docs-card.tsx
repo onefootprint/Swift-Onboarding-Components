@@ -1,4 +1,4 @@
-import { Checkbox, Stack, Text } from '@onefootprint/ui';
+import { Checkbox } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -17,8 +17,8 @@ const EditingAdditionalDocsCard = () => {
 
   return (
     <CardContainer>
-      <Text variant="label-3">{t('title')}</Text>
-      <Stack direction="column" gap={3} paddingBottom={3}>
+      <p className="text-label-3">{t('title')}</p>
+      <div className="flex flex-col gap-2">
         <Checkbox
           label={t('proof-of-address.title')}
           hint={t('proof-of-address.subtitle')}
@@ -37,7 +37,7 @@ const EditingAdditionalDocsCard = () => {
           checked={customDocChecked}
           onChange={() => setCustomDocChecked(!customDocChecked)}
         />
-      </Stack>
+      </div>
       <CardAppearContent isVisible={isExtraContentVisible}>{t('extra-content')}</CardAppearContent>
     </CardContainer>
   );

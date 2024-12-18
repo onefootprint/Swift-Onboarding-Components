@@ -1,4 +1,3 @@
-import { Text } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -6,20 +5,22 @@ import CardAppearContent from '../../components/card-appear-content';
 import CardContainer from '../../components/card-container/card-container';
 import CardTitle from '../../components/card-title';
 
-export const AdditionalDocumentsCard = () => {
-  const [isExtraContentVisible, setIsExtraContentVisible] = useState(false);
+type AdditionalDocumentsCardProps = {
+  className?: string;
+};
+
+export const AdditionalDocumentsCard = ({ className }: AdditionalDocumentsCardProps) => {
+  const [isExtraContentVisible, setIsExtraContentVisible] = useState<boolean>(false);
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.home.control.illustration.additional-documents',
   });
 
   return (
-    <CardContainer size="compact">
-      <CardTitle type="add" onClick={() => setIsExtraContentVisible(prev => !prev)}>
+    <CardContainer className={className}>
+      <CardTitle type="add" onClick={() => setIsExtraContentVisible((prev: boolean) => !prev)}>
         {t('title')}
       </CardTitle>
-      <Text variant="body-3" color="tertiary">
-        {t('subtitle')}
-      </Text>
+      <p className="text-body-3 text-tertiary">{t('subtitle')}</p>
       <CardAppearContent isVisible={isExtraContentVisible}>{t('extra-content')}</CardAppearContent>
     </CardContainer>
   );

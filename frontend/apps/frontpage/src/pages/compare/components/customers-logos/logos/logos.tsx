@@ -15,7 +15,7 @@ import {
   GridLogo,
   WingSpan,
   YieldStreet,
-} from 'src/components/company-logos/themed';
+} from 'src/components/company-logos';
 
 const logos = [
   ComposerLogo,

@@ -1,8 +1,7 @@
 import { IcoAppclip24, IcoCheckCircle16, IcoCloseSmall16, IcoLaptop16, IcoSmartphone216 } from '@onefootprint/icons';
-import { LinkButton, Stack, Text, media } from '@onefootprint/ui';
+import { LinkButton } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
 
 type DeviceCardProps = {
   icon: 'phone' | 'computer';
@@ -41,106 +40,69 @@ const DeviceCard = ({ icon, deviceName, date, ip, biometric, appClip, id, onWhat
   });
 
   const renderBiometricStatus = () => (
-    <Stack direction="row" align="center" justify="center">
+    <div className="flex items-center justify-center">
       {biometric ? (
-        <Stack direction="row" align="center" justify="center" gap={2}>
+        <div className="flex items-center justify-center gap-1">
           <IcoCheckCircle16 color="success" />
-          <Text variant="label-2" color="success">
-            {t('verified')}
-          </Text>
-        </Stack>
+          <p className="text-label-2 text-success">{t('verified')}</p>
+        </div>
       ) : (
-        <Stack direction="row" align="center" justify="center" gap={2}>
+        <div className="flex items-center justify-center gap-1">
           <IcoCloseSmall16 color="error" />
-          <Text variant="label-2" color="error">
-            {t('not-verified')}
-          </Text>
-        </Stack>
+          <p className="text-label-2 text-error">{t('not-verified')}</p>
+        </div>
       )}
-    </Stack>
+    </div>
   );
 
   const renderAppClipInfo = () => (
-    <Stack direction="row" align="center" justify="center" gap={3}>
-      <Text variant="body-2" color="tertiary">
-        {t('app-clip.title')}
-      </Text>
-      <Text variant="body-2" color="tertiary">
-        ·
-      </Text>
+    <div className="flex items-center justify-center gap-2 ">
+      <p className="text-body-2 text-tertiary">{t('app-clip.title')}</p>
+      <p className="text-body-2 text-tertiary">·</p>
       <LinkButton variant="label-2" onClick={onWhatsThisClick}>
         {t('app-clip.whats-this')}
       </LinkButton>
-    </Stack>
+    </div>
   );
 
   return (
-    <CardContainer variants={cardAnimation} initial="initial" animate="animate" exit="exit" key={id}>
-      <Stack direction="column" align="center" justify="center" gap={5}>
-        <IconContainer>
+    <motion.div
+      className="absolute flex flex-col gap-5 p-6 bg-white/10 backdrop-blur-md shadow-md rounded-xl w-[340px] md:w-[400px] border border-solid border-tertiary rounded select-none"
+      variants={cardAnimation}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      key={id}
+    >
+      <div className="flex flex-col items-center justify-center gap-4">
+        <div className="flex items-center justify-center p-3 rounded-full bg-tertiary">
           {icon === 'phone' ? <IcoSmartphone216 color="quinary" /> : <IcoLaptop16 color="quinary" />}
-        </IconContainer>
-        <Text variant="label-2">{deviceName}</Text>
-      </Stack>
-      <Stack direction="column" align="center" justify="center" gap={5}>
-        <Stack direction="row" width="100%" align="center" justify="space-between">
-          <Text variant="body-2" color="tertiary">
-            {t('date-and-time')}
-          </Text>
-          <Text variant="label-2">{date}</Text>
-        </Stack>
-        <Stack direction="row" width="100%" align="center" justify="space-between">
-          <Text variant="body-2" color="tertiary">
-            {t('ip-address')}
-          </Text>
-          <Text variant="label-2">{ip}</Text>
-        </Stack>
-        <Stack direction="row" width="100%" align="center" justify="space-between">
-          <Text variant="body-2" color="tertiary">
-            {t('biometric')}
-          </Text>
+        </div>
+        <p className="text-label-2">{deviceName}</p>
+      </div>
+      <div className="flex flex-col items-center justify-center gap-4">
+        <div className="flex items-center justify-between w-full">
+          <p className="text-body-2 text-tertiary">{t('date-and-time')}</p>
+          <p className="text-label-2">{date}</p>
+        </div>
+        <div className="flex items-center justify-between w-full">
+          <p className="text-body-2 text-tertiary">{t('ip-address')}</p>
+          <p className="text-label-2">{ip}</p>
+        </div>
+        <div className="flex items-center justify-between w-full">
+          <p className="text-body-2 text-tertiary">{t('biometric')}</p>
           {renderBiometricStatus()}
-        </Stack>
-        <Stack direction="row" width="100%" align="center" justify="space-between">
+        </div>
+        <div className="flex items-center justify-between w-full">
           {renderAppClipInfo()}
-          <Stack direction="row" align="center" justify="center" gap={2}>
+          <div className="flex items-center justify-center gap-1">
             <IcoAppclip24 />
-            <Text variant="label-2">{appClip ? t('app-clip.yes') : t('app-clip.no')}</Text>
-          </Stack>
-        </Stack>
-      </Stack>
-    </CardContainer>
+            <p className="text-label-2">{appClip ? t('app-clip.yes') : t('app-clip.no')}</p>
+          </div>
+        </div>
+      </div>
+    </motion.div>
   );
 };
-
-const CardContainer = styled(motion(Stack))`
-  ${({ theme }) => css`
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    border-radius: ${theme.borderRadius.xl};
-    overflow: hidden;
-    padding: ${theme.spacing[7]};
-    background-color: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(5px);
-    width: 340px;
-    position: absolute;
-    box-shadow: ${theme.elevation[1]};
-    flex-direction: column;
-    gap: ${theme.spacing[6]};
-
-    ${media.greaterThan('md')`
-      border-radius: ${theme.borderRadius.lg};
-      width: 400px;
-    `}
-  `}
-`;
-
-const IconContainer = styled(motion(Stack))`
-  ${({ theme }) => css`
-    background-color: ${theme.backgroundColor.tertiary};
-    border-radius: ${theme.borderRadius.full};
-    padding: ${theme.spacing[3]};
-  `}
-`;
 
 export default DeviceCard;

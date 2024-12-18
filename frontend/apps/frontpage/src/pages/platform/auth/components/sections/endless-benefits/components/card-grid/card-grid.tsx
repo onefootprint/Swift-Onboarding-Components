@@ -2,9 +2,9 @@ import { Grid, media } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import { isMobile } from 'react-device-detect';
 import { useTranslation } from 'react-i18next';
-import FeatureCard from 'src/components/feature-card';
 import styled, { css } from 'styled-components';
 
+import FeatureCard from 'src/pages/platform/auth/components/feature-card';
 import ChargebackDisputes from './illustrations/chargeback-disputes';
 import DeviceInsights from './illustrations/device-insights';
 import EasierAccountRecovery from './illustrations/easier-account-recovery';

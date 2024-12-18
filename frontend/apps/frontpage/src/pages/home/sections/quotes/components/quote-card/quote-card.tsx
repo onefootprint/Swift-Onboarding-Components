@@ -1,9 +1,7 @@
-import { Box, Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
+import { random } from 'lodash';
 import Image from 'next/image';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
-
 import type { Companies } from '../../quotes';
 import QuoteIcon from './components/quote-icon';
 
@@ -17,93 +15,42 @@ const QuoteCard = ({ company }: QuoteCardProps) => {
   });
 
   return (
-    <CardContainer>
-      <LogoContainer>
+    <div className="flex flex-col w-full h-full border border-solid rounded gap-9 bg-primary p-7 border-tertiary">
+      <div>
         <Image
           src={`/home/quotes/${company}/logo.png`}
           alt={`${company.charAt(0).toUpperCase() + company.slice(1)}'s logo`}
           width={200}
           height={200}
+          className="object-contain w-20 h-auto"
         />
-      </LogoContainer>
-      <Stack flex={1} position="relative">
-        <PositionedQuoteIcon />
-        <Text variant="body-1" zIndex={1} paddingTop={3} tag="blockquote">
+      </div>
+      <div className="relative flex-1">
+        <QuoteIcon className="absolute top-[-4px] left-[-8px] z-0 opacity-20 transform scale-75" />
+        <blockquote className="pt-3 text-body-1 z-1">
           {t(`${company}.quote` as unknown as ParseKeys<'common'>)}&quot;
-        </Text>
-      </Stack>
-      <Stack direction="column" align="flex-start" justify="flex-start" position="relative" gap={2}>
-        <Text variant="label-1" tag="h4">
-          {t(`${company}.name` as unknown as ParseKeys<'common'>)}
-        </Text>
-        <Text variant="body-1" color="tertiary" tag="h5">
-          {t(`${company}.role` as unknown as ParseKeys<'common'>)}
-        </Text>
-        <AuthorImageContainer>
+        </blockquote>
+      </div>
+      <div className="relative flex flex-col items-start justify-start gap-2">
+        <h4 className="text-label-1">{t(`${company}.name` as unknown as ParseKeys<'common'>)}</h4>
+        <h5 className="text-body-1 text-tertiary">{t(`${company}.role` as unknown as ParseKeys<'common'>)}</h5>
+        <div
+          className="absolute bottom-0 right-0 w-16 h-16 p-1 pb-3 overflow-hidden origin-bottom-right rounded-sm shadow md:w-20 md:h-20 bg-primary"
+          style={{
+            transform: `rotate(${random(-10, 10)}deg)`,
+          }}
+        >
           <Image
             src={`/home/quotes/${company}/author.png`}
             alt={`${t(`${company}.name` as unknown as ParseKeys<'common'>)}'s headshot`}
             width={200}
             height={200}
+            className="object-cover w-full h-full rounded-xs saturate-80"
           />
-        </AuthorImageContainer>
-      </Stack>
-    </CardContainer>
+        </div>
+      </div>
+    </div>
   );
 };
-
-const CardContainer = styled(Stack)`
-  ${({ theme }) => css`
-    flex-direction: column;
-    gap: ${theme.spacing[9]};
-    width: 100%;
-    height: 100%;
-    background-color: ${theme.backgroundColor.primary};
-    border-radius: ${theme.borderRadius.default};
-    padding: ${theme.spacing[7]};
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-  `}
-`;
-
-const AuthorImageContainer = styled(Box)`
-  ${({ theme }) => css`
-    position: absolute;
-    transform: translateY(-50%) rotate(-5deg);
-    top: 50%;
-    right: 0;
-    border-radius: calc(${theme.borderRadius.default} + 2px);
-    overflow: hidden;
-    padding: ${theme.spacing[2]};
-    background-color: ${theme.backgroundColor.primary};
-    box-shadow: ${theme.elevation[1]};
-    width: 70px;
-    height: 70px;
-
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: ${theme.borderRadius.default};
-      filter: saturate(0.8);
-    }
-  `}
-`;
-
-const LogoContainer = styled(Box)`
-  img {
-    width: 80px;
-    height: auto;
-    object-fit: contain;
-  }
-`;
-
-const PositionedQuoteIcon = styled(QuoteIcon)`
-  position: absolute;
-  top: -4px;
-  left: -8px;
-  z-index: 0;
-  opacity: 0.2;
-  transform: scale(0.75);
-`;
 
 export default QuoteCard;

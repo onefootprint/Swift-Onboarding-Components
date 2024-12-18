@@ -1,8 +1,7 @@
-import { Container, Grid, media } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
 
-import SectionTitle from '../../../../components/desktop-share-post/section-title';
+import FrontpageContainer from 'src/components/frontpage-container';
+import SectionTitle from 'src/components/section-title';
 import Backtest from './cards/backtest';
 import BuildRules from './cards/build-rules';
 import DeviceInsights from './cards/device-insights';
@@ -14,47 +13,16 @@ const Verify = () => {
   });
 
   return (
-    <VerifyContainer justify="center" direction="column">
+    <FrontpageContainer className="flex flex-col items-center justify-center gap-10 pt-40 pb-32 md:py-32">
       <SectionTitle title={t('title')} subtitle={t('subtitle')} />
-      <GridContainer>
+      <div className="grid w-full grid-cols-1 gap-5 md:grid-cols-2 md:grid-rows-2">
         <BuildRules />
         <VerifyUsers />
         <DeviceInsights />
         <Backtest />
-      </GridContainer>
-    </VerifyContainer>
+      </div>
+    </FrontpageContainer>
   );
 };
-
-const GridContainer = styled(Grid.Container)`
-  ${({ theme }) => css`
-    gap: ${theme.spacing[5]};
-    grid-template-columns: repeat(1, 1fr);
-    grid-template-rows: repeat(4, auto);
-
-    ${media.greaterThan('md')`
-      gap: ${theme.spacing[7]};
-      grid-template-columns: repeat(2, 1fr);
-      grid-template-rows: repeat(2, 420px);
-      padding: ${theme.spacing[9]};
-      background-color: ${theme.backgroundColor.secondary};
-      border-radius: ${theme.borderRadius.xl};
-      overflow: hidden;
-      width: 100%;
-    `}
-  `}
-`;
-
-const VerifyContainer = styled(Container)`
-  ${({ theme }) => css`
-    max-width: 100%;
-    gap: ${theme.spacing[9]};
-    padding: ${theme.spacing[9]} 0;
-
-    ${media.greaterThan('md')`
-      padding: ${theme.spacing[11]} 0;
-    `}
-  `}
-`;
 
 export default Verify;

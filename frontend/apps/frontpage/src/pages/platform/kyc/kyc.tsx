@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
 
 import Banner from '../../../components/banner';
-import DeveloperExperience from '../../../components/developer-experience';
 import SEO from '../../../components/seo';
+import DeveloperExperience from '../components/developer-experience';
 import SplitLayoutSheet from './components/desktop-layout-sheet';
 import MobileLayoutSheet from './components/mobile-layout-sheet';
 import Hero from './components/sections/hero';

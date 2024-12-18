@@ -22,7 +22,7 @@ const PenguinBanner = ({
       <Illustration src={imgSrc} height={600} width={900} alt={title} />
       <TextContainer>
         <Title>{title}</Title>
-        <Ctas align="left" labels={{ primary: primaryButton, secondary: secondaryButton }} />
+        <Ctas labels={{ primary: primaryButton, secondary: secondaryButton }} />
       </TextContainer>
     </BannerContainer>
   </Background>

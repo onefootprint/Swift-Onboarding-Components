@@ -1,28 +1,13 @@
-import { Box, Stack } from '@onefootprint/ui';
-import styled, { css } from 'styled-components';
+import { uniqueId } from 'lodash';
 
-const NavigationBar = () => (
-  <Container direction="row" align="center" justify="flex-start" gap={3} padding={5}>
-    <Dot />
-    <Dot />
-    <Dot />
-  </Container>
-);
+const NavigationBar = () => {
+  return (
+    <div className="flex items-center justify-start w-full h-8 gap-3 p-5 border-b border-solid rounded-t-md bg-secondary border-tertiary">
+      {[...Array(3)].map(_ => (
+        <div key={uniqueId()} className="w-2 h-2 bg-[#d9d9d9] rounded-full" />
+      ))}
+    </div>
+  );
+};
 
-const Dot = styled(Box)`
-  width: 8px;
-  height: 8px;
-  background-color: #d9d9d9;
-  border-radius: 50%;
-`;
-
-const Container = styled(Stack)`
-  ${({ theme }) => css`
-    width: 100%;
-    height: 32px;
-    background-color: ${theme.backgroundColor.secondary};
-    border-radius: ${theme.borderRadius.lg} ${theme.borderRadius.lg} 0 0;
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-  `}
-`;
 export default NavigationBar;

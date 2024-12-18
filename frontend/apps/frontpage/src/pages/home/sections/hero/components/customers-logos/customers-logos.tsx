@@ -1,7 +1,7 @@
-import { IcoSparkles40 } from '@onefootprint/icons';
-import { Container, Stack, Text } from '@onefootprint/ui';
+import Image from 'next/image';
 import { useTranslation } from 'react-i18next';
 
+import FrontpageContainer from 'src/components/frontpage-container';
 import Logos from './logos';
 
 const CustomersLogos = () => {
@@ -9,15 +9,13 @@ const CustomersLogos = () => {
     keyPrefix: 'pages.home.logos-section',
   });
   return (
-    <Container direction="column" gap={9} align="center">
-      <Stack direction="column" gap={6} align="center" maxWidth="540px" textAlign="center">
-        <IcoSparkles40 color="secondary" />
-        <Text tag="h4" variant="display-4">
-          {t('title')}
-        </Text>
-      </Stack>
+    <FrontpageContainer className="flex flex-col items-center gap-9">
+      <div className="flex flex-col items-center gap-6 max-w-[540px] text-center">
+        <Image src="/home/hero/sparkles-01.svg" alt="Sparkles" width={32} height={32} />
+        <h4 className="text-display-4">{t('title')}</h4>
+      </div>
       <Logos />
-    </Container>
+    </FrontpageContainer>
   );
 };
 

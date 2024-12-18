@@ -1,7 +1,6 @@
-import { Box, Stack, Text } from '@onefootprint/ui';
-import { motion } from 'framer-motion';
+import { cx } from 'class-variance-authority';
 import type React from 'react';
-import styled, { css } from 'styled-components';
+import FloatingCard from '../floating-card';
 
 type Color = {
   name: string;
@@ -16,97 +15,47 @@ type ColorSelectionProps = {
   onChange: (value: Color['hex']) => void;
 };
 
-const CardMotionVariants = {
-  floating: {
-    y: ['0%', '-4%', '0%', '4%', '0%'],
-    x: ['0%', '-4%', '0%', '4%', '0%'],
-    rotate: ['-2deg', '3deg', '-2deg', '3deg', '-2deg'],
-    transition: {
-      x: {
-        repeat: Number.POSITIVE_INFINITY,
-        repeatType: 'loop',
-        duration: 25,
-        ease: 'easeInOut',
-      },
-      y: {
-        repeat: Number.POSITIVE_INFINITY,
-        repeatType: 'loop',
-        duration: 15,
-        ease: 'easeInOut',
-      },
-      rotate: {
-        repeat: Number.POSITIVE_INFINITY,
-        repeatType: 'mirror',
-        duration: 20,
-        ease: 'easeInOut',
-      },
-    },
-  },
+const ColorSelection: React.FC<ColorSelectionProps> = ({ onChange, title, colorList, activeHex, className }) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onChange(e.target.value);
+  };
+
+  const handleColorChange = (hex: Color['hex']) => {
+    onChange(hex);
+  };
+
+  return (
+    <FloatingCard className={className}>
+      <p className="text-label-3">{title}</p>
+      <div className="flex gap-1">
+        {colorList.map(({ name, hex }) => (
+          <div key={name} className="w-full">
+            <input
+              type="radio"
+              id={`color-${name}`}
+              name="color-selection"
+              value={hex}
+              onChange={handleChange}
+              checked={activeHex === hex}
+              className="hidden"
+            />
+            <button
+              type="button"
+              className={cx(
+                'w-full rounded-sm overflow-hidden cursor-pointer h-8 transition-outline duration-75 ease-out box-content',
+                {
+                  'outline outline-2 -outline-offset-[5px] outline-[white]': activeHex === hex,
+                },
+              )}
+              style={{ backgroundColor: hex }}
+              onClick={() => handleColorChange(hex)}
+              aria-label={`Change color to ${name}`}
+            />
+          </div>
+        ))}
+      </div>
+    </FloatingCard>
+  );
 };
-
-const ColorSelection: React.FC<ColorSelectionProps> = ({ onChange, title, colorList, activeHex, className }) => (
-  <Card className={className} variants={CardMotionVariants} initial="floating" animate="floating">
-    <Text variant="label-3">{title}</Text>
-    <Stack direction="row" inline gap={2}>
-      {colorList.map(({ name, hex }) => (
-        <Box key={name} width="100%">
-          <StyledRadio
-            type="radio"
-            id={`color-${name}`}
-            name="color-selection"
-            value={hex}
-            onChange={e => onChange(e.target.value)}
-            checked={activeHex === hex}
-          />
-          <ColorButton
-            selected={activeHex === hex}
-            color={hex}
-            onClick={() => onChange(hex)}
-            aria-label={`Change color to ${name}`}
-          />
-        </Box>
-      ))}
-    </Stack>
-  </Card>
-);
-
-const Card = styled(motion(Box))`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[3]};
-    width: ${theme.spacing[14]};
-    border-radius: ${theme.borderRadius.default};
-    box-shadow: ${theme.elevation[2]};
-    padding: ${theme.spacing[3]};
-    z-index: 2;
-    background-color: ${theme.backgroundColor.primary};
-  `}
-`;
-
-const ColorButton = styled.button<{ selected: boolean; color: string }>`
-  ${({ theme, selected, color }) => css`
-    all: unset;
-    width: 100%;
-    border-radius: ${theme.borderRadius.default};
-    overflow: hidden;
-    cursor: pointer;
-    height: ${theme.spacing[8]};
-    background-color: ${color};
-    transition: outline 0.09s ease-out;
-
-    ${
-      selected &&
-      css`
-      outline: 2px solid ${theme.backgroundColor.primary};
-      outline-offset: -4px;
-    `
-    }
-  `}
-`;
-
-const StyledRadio = styled.input`
-  display: none;
-`;
 
 export default ColorSelection;

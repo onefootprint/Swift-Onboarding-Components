@@ -1,5 +1,6 @@
-import { LinkButton, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
+
+import { LinkButton } from '@onefootprint/ui';
 
 type OutOfTheBoxProps = {
   onClick: () => void;
@@ -11,19 +12,13 @@ const OutOfTheBox = ({ onClick }: OutOfTheBoxProps) => {
   });
 
   return (
-    <Text
-      variant="label-2"
-      color="primary"
-      display="inline-flex"
-      flexWrap="wrap"
-      gap={2}
-      alignItems="center"
-      justifyContent="center"
-    >
+    <p className="flex flex-wrap items-center justify-center gap-1 text-label-2 text-primary">
       {t('first-part')}
-      <LinkButton onClick={onClick}>{t('cta')}</LinkButton>
+      <LinkButton onClick={onClick} variant="label-2">
+        {t('cta')}
+      </LinkButton>
       {t('second-part')}
-    </Text>
+    </p>
   );
 };
 

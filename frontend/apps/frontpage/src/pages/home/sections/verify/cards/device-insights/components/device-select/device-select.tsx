@@ -1,11 +1,10 @@
 import { IcoLaptop16, IcoSmartphone216 } from '@onefootprint/icons';
-import { Stack } from '@onefootprint/ui';
-import styled, { css } from 'styled-components';
+import { cx } from 'class-variance-authority';
 
 type DeviceSelectProps = {
   icon: 'phone' | 'computer';
   id: string;
-  $isActive: boolean;
+  isActive: boolean;
   onClick: (id: string) => void;
   position: {
     x: string;
@@ -13,44 +12,33 @@ type DeviceSelectProps = {
   };
 };
 
-const DeviceSelect = ({ icon = 'phone', id, $isActive, onClick, position }: DeviceSelectProps) => (
-  <Container $isActive={$isActive} onClick={() => onClick(id)} align="center" justify="center" position={position}>
-    <IconWrapper>
-      {icon === 'phone' ? (
-        <IcoSmartphone216 color={$isActive ? 'quinary' : 'primary'} />
-      ) : (
-        <IcoLaptop16 color={$isActive ? 'quinary' : 'primary'} />
+const DeviceSelect = ({ icon = 'phone', id, isActive, onClick, position }: DeviceSelectProps) => {
+  const Icon = icon === 'phone' ? IcoSmartphone216 : IcoLaptop16;
+  const IconColor = isActive ? 'quinary' : 'primary';
+  const activeClasses = {
+    'bg-accent shadow-lg': isActive,
+    'bg-primary shadow-md hover:bg-secondary hover:shadow-lg': !isActive,
+  };
+  return (
+    <button
+      type="button"
+      className={cx(
+        'absolute flex items-center justify-center w-8 h-8 rounded-t-full rounded-br-full cursor-pointer transition-all duration-100 ease-in-out',
+        activeClasses,
       )}
-    </IconWrapper>
-  </Container>
-);
-const Container = styled(Stack)<{
-  $isActive: boolean;
-  position: { x: string; y: string };
-}>`
-  ${({ $isActive, theme, position }) => css`
-    width: ${theme.spacing[8]};
-    height: ${theme.spacing[8]};
-    border-radius: 50% 50% 50% 0;
-    transform: rotate(-45deg);
-    cursor: pointer;
-    background-color: ${$isActive ? theme.backgroundColor.accent : theme.backgroundColor.primary};
-    position: absolute;
-    top: ${position.y};
-    left: ${position.x};
-    box-shadow: ${$isActive ? theme.elevation[3] : theme.elevation[2]};
-    transition: all 0.1s ease-in-out;
-
-    &:hover {
-      box-shadow: ${theme.elevation[3]};
-      background-color: ${!$isActive ? theme.backgroundColor.secondary : ''};
-    }
-  `}
-`;
-
-const IconWrapper = styled.div`
-  position: absolute;
-  transform: rotate(45deg);
-`;
+      style={{
+        top: position.y,
+        left: position.x,
+        transform: 'rotate(-45deg)',
+      }}
+      onClick={() => onClick(id)}
+      tabIndex={-1}
+    >
+      <div className="absolute transform rotate-45">
+        <Icon color={IconColor} />
+      </div>
+    </button>
+  );
+};
 
 export default DeviceSelect;

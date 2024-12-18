@@ -2,7 +2,6 @@ import { Container, Grid, Stack, Text, createFontStyles, media } from '@onefootp
 import Image from 'next/image';
 import { useTranslation } from 'react-i18next';
 import ContactButtons from 'src/components/contact-buttons/contact-buttons';
-import SectionVerticalSpacer from 'src/components/section-vertical-spacer';
 import styled, { css } from 'styled-components';
 
 const PenguinBannerAuth = () => {
@@ -12,7 +11,6 @@ const PenguinBannerAuth = () => {
 
   return (
     <Container marginTop={12} marginBottom={12}>
-      <SectionVerticalSpacer />
       <Layout minHeight="320px">
         <Stack align="center" justify="center">
           <Image src="/auth/banner/safe.png" width={256} height={195} alt="safe" />
@@ -25,7 +23,6 @@ const PenguinBannerAuth = () => {
           <ContactButtons bookADemoButton={t('book-a-demo')} signUpButton={t('sign-up-for-free')} />
         </TextContainer>
       </Layout>
-      <SectionVerticalSpacer />
     </Container>
   );
 };

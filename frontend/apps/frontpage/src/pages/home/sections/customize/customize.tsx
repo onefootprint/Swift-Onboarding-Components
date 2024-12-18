@@ -1,12 +1,11 @@
 import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
-import { Box, Container, media } from '@onefootprint/ui';
 import dynamic from 'next/dynamic';
 import type React from 'react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
 
-import SectionTitle from '../../../../components/desktop-share-post/section-title';
+import FrontpageContainer from 'src/components/frontpage-container';
+import SectionTitle from 'src/components/section-title';
 import ColorSelection from './components/color-selection';
 import CustomInput from './components/custom-input';
 import OutOfTheBox from './components/out-of-the-box/out-of-the-box';
@@ -54,64 +53,28 @@ export const Customize = () => {
   };
 
   return (
-    <SectionContainer>
+    <FrontpageContainer className="flex flex-col items-center py-16 md:py-32 gap-9">
       <SectionTitle title={t('title')} subtitle={t('subtitle')} />
-      <Box width="100%" position="relative">
-        <MockupScreen $borderRadius={borderRadius} $backgroundColor={backgroundColor} />
-        <PositionedCustomInput
+      <div className="relative w-full">
+        <MockupScreen borderRadius={borderRadius} backgroundColor={backgroundColor} />
+        <CustomInput
+          className="absolute md:bottom-1/3 md:right-10 bottom-1/3 right-2"
           title={t('components.border-radius')}
           type="number"
           onChange={handleBorderRadiusChange}
           value={borderRadius}
         />
-        <PositionedColorSelection
+        <ColorSelection
+          className="absolute origin-right right-2 md:bottom-8 md:left-1/2 bottom-1/2"
           title={t('components.button-background-color')}
           activeHex={backgroundColor}
           onChange={handleBackgroundColorChange}
           colorList={colorList}
         />
-      </Box>
+      </div>
       <OutOfTheBox onClick={handleClick} />
-    </SectionContainer>
+    </FrontpageContainer>
   );
 };
-
-const SectionContainer = styled(Container)`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: ${theme.spacing[9]};
-    padding: ${theme.spacing[11]} 0;
-
-    ${media.greaterThan('md')`
-      padding: ${theme.spacing[11]} 0;
-    `}
-  `}
-`;
-
-const PositionedCustomInput = styled(CustomInput)`
-  display: none;
-  position: absolute;
-  bottom: 15%;
-  right: 5%;
-
-  ${media.greaterThan('md')`  
-    display: block;
-    bottom: 10%;
-    right: 5%;
-    transform: rotate(10deg);
-  `}
-`;
-
-const PositionedColorSelection = styled(ColorSelection)`
-  position: absolute;
-  bottom: -5%;
-
-  ${media.greaterThan('md')`  
-    bottom: 0%;
-    left: 40%;
-  `}
-`;
 
 export default Customize;

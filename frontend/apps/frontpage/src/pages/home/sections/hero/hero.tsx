@@ -1,101 +1,72 @@
-import { Box, Container, Stack, createFontStyles, media } from '@onefootprint/ui';
+import { motion } from 'framer-motion';
+import { uniqueId } from 'lodash';
 import dynamic from 'next/dynamic';
-import Image from 'next/image';
-
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
-
 import Ctas from 'src/components/ctas';
+import FrontpageContainer from 'src/components/frontpage-container';
 import CustomersLogos from './components/customers-logos';
-
 const Screen = dynamic(() => import('./components/screen'));
+
+const letterStagger = {
+  hidden: { opacity: 0, filter: 'blur(10px)' },
+  visible: {
+    opacity: 1,
+    filter: 'blur(0px)',
+    transition: { duration: 0.1 },
+  },
+};
+
+const buttonsAppear = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { duration: 0.4, delay: 1.2 },
+  },
+};
 
 const Hero = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.home' });
 
+  const renderTextWithLetterStagger = (text: string) => {
+    return text.split('').map(char => (
+      <motion.span variants={letterStagger} key={uniqueId()}>
+        {char}
+      </motion.span>
+    ));
+  };
+
   return (
-    <>
-      <BackgroundContainer>
-        <Overflow>
-          <HeroContainer>
-            <TextContainer>
-              <Title tag="h1">{t('hero.title')}</Title>
-              <Subtitle tag="h2" textAlign="center">
-                {t('hero.subtitle')}
-              </Subtitle>
+    <div className="relative">
+      <div className="z-10 overflow-hidden">
+        <FrontpageContainer className="relative flex flex-col items-center gap-24 py-10">
+          <div className="flex flex-col items-center justify-center">
+            <motion.h1
+              initial="hidden"
+              animate="visible"
+              variants={{ visible: { transition: { staggerChildren: 0.02 } } }}
+              className="text-center max-w-[580px] text-display-2 md:text-display-1"
+            >
+              {renderTextWithLetterStagger(t('hero.title'))}
+            </motion.h1>
+            <motion.h2
+              initial="hidden"
+              animate="visible"
+              variants={{ visible: { transition: { delayChildren: 0.5, staggerChildren: 0.01 } } }}
+              className="text-center max-w-[520px] text-display-4 mt-2"
+            >
+              {renderTextWithLetterStagger(t('hero.subtitle'))}
+            </motion.h2>
+            <motion.div variants={buttonsAppear} initial="hidden" animate="visible" className="w-full mt-6">
               <Ctas />
-            </TextContainer>
-            <Screen />
-            <CustomersLogos />
-          </HeroContainer>
-        </Overflow>
-        <Background
-          src="/home/hero/background-texture.png"
-          alt="background texture"
-          height={600}
-          width={600}
-          priority
-        />
-      </BackgroundContainer>
-    </>
+            </motion.div>
+          </div>
+          <Screen />
+          <CustomersLogos />
+        </FrontpageContainer>
+      </div>
+      <div className="absolute inset-0 z-[-1] bg-[url('/home/hero/background-texture.png')] bg-cover bg-center [clip-path:polygon(0_0,100%_0,100%_50%,0_50%)] opacity-50" />
+    </div>
   );
 };
-
-const Background = styled(Image)`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 60%;
-  object-fit: cover;
-  isolation: isolate;
-  z-index: -1;
-  opacity: 0.5;
-`;
-
-const Title = styled(Box)`
-  ${createFontStyles('display-2')}
-  text-align: center;
-  max-width: 580px;
-
-  ${media.greaterThan('md')`
-    ${createFontStyles('display-1')}
-  `}
-`;
-
-const Subtitle = styled(Box)`
-  ${createFontStyles('display-4')}
-  text-align: center;
-  max-width: 520px;
-`;
-
-const Overflow = styled.div`
-  overflow: hidden;
-`;
-
-const HeroContainer = styled(Container)`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    gap: ${theme.spacing[11]};
-    padding: ${theme.spacing[9]} 0;
-    align-items: center;
-  `}
-`;
-
-const TextContainer = styled(Stack)`
-  ${({ theme }) => css`
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: ${theme.spacing[5]};
-    z-index: 1;
-  `}
-`;
-
-const BackgroundContainer = styled.div`
-  position: relative;
-`;
 
 export default Hero;
