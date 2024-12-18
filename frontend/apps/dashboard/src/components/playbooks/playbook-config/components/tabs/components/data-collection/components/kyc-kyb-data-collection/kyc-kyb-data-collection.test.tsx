@@ -139,7 +139,7 @@ describe('<KycKybDataCollection />', () => {
         },
       });
 
-      const collectBo = screen.getByRole('row', { name: 'Collect beneficial owners’ information' });
+      const collectBo = screen.getByRole('listitem', { name: 'Collect beneficial owners’ information' });
       const check = within(collectBo).getByRole('img', { name: 'Enabled' });
       expect(check).toBeInTheDocument();
     });
@@ -188,7 +188,7 @@ describe('<KycKybDataCollection />', () => {
         },
       });
 
-      const collectBo = screen.getByRole('row', { name: 'Collect beneficial owners’ information' });
+      const collectBo = screen.getByRole('listitem', { name: 'Collect beneficial owners’ information' });
       const check = within(collectBo).getByRole('img', { name: 'Enabled' });
       expect(check).toBeInTheDocument();
     });

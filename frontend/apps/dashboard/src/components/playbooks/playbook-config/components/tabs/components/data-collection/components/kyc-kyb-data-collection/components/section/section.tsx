@@ -1,40 +1,26 @@
-import { Divider, Stack, Text } from '@onefootprint/ui';
+import type { Icon } from '@onefootprint/icons';
+import { Divider } from '@onefootprint/ui';
 import type React from 'react';
 
 type BorderedSectionProps = {
   title?: string;
   children: React.ReactNode;
   variant: 'default' | 'withDivider';
+  icon?: Icon;
 };
 
-const Section = ({ title, variant, children }: BorderedSectionProps) => {
-  if (variant === 'withDivider') {
-    return (
-      <Stack direction="column" gap={4} paddingBottom={7}>
-        {!!title && (
-          <Text variant="label-2" color="primary">
-            {title}
-          </Text>
-        )}
-        <Divider variant="secondary" />
-        <Stack direction="column" gap={7}>
-          {children}
-        </Stack>
-      </Stack>
-    );
-  }
-
+const Section = ({ title, variant, children, icon: Icon }: BorderedSectionProps) => {
   return (
-    <Stack direction="column" gap={5}>
-      {!!title && (
-        <Text variant="label-2" color="primary">
-          {title}
-        </Text>
+    <div className="flex flex-col gap-3 mb-2">
+      {title && (
+        <div className="flex flex-row items-center gap-3">
+          {Icon && <Icon />}
+          <h3 className="text-label-2">{title}</h3>
+        </div>
       )}
-      <Stack direction="column" gap={7}>
-        {children}
-      </Stack>
-    </Stack>
+      {variant === 'withDivider' && <Divider variant="secondary" />}
+      <div className="flex flex-col gap-7">{children}</div>
+    </div>
   );
 };
 

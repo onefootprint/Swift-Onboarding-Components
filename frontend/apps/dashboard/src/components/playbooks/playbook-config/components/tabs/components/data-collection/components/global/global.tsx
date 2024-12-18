@@ -1,5 +1,4 @@
 import type { IdDocKind } from '@onefootprint/request-types/dashboard';
-import { Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import useIdDocList from 'src/hooks/use-id-doc-list';
 
@@ -14,32 +13,24 @@ const Global = ({ global = [], hasSelfie = false }: GlobalProps) => {
   const documentTypes = getIdDocList(global);
 
   return (
-    <Stack gap={3} direction="column">
-      <Text variant="label-2">{t('gov-docs.global.scans')}</Text>
-      {documentTypes.length === 0 ? (
-        <Text variant="body-2" color="secondary">
-          {t('gov-docs.none')}
-        </Text>
-      ) : (
-        <Text variant="body-2" tag="span">
-          <Stack direction="row" gap={3}>
-            <Text variant="body-2" tag="span" color="secondary">
-              {documentTypes.join(', ')}
-            </Text>
+    <div className="flex flex-col gap-2">
+      <p className="text-label-2 text-secondary">{t('gov-docs.global.scans')}</p>
+      <div className="flex flex-row gap-2 pl-2">
+        {documentTypes.length === 0 ? (
+          <p className="text-body-2 text-tertiary">{t('gov-docs.none')}</p>
+        ) : (
+          <div className="flex flex-row gap-2">
+            <span className="text-body-2 text-secondary">{documentTypes.join(', ')}</span>
             {hasSelfie && (
               <>
-                <Text variant="body-2" color="primary" tag="span">
-                  +
-                </Text>
-                <Text variant="body-2" color="secondary" tag="span">
-                  {t('gov-docs.selfie')}
-                </Text>
+                <span className="text-body-2 text-secondary">+</span>
+                <span className="text-body-2 text-secondary">{t('gov-docs.selfie')}</span>
               </>
             )}
-          </Stack>
-        </Text>
-      )}
-    </Stack>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 

@@ -1,5 +1,5 @@
 import type { DocumentAndCountryConfiguration } from '@onefootprint/request-types/dashboard';
-import { Divider, Stack, Text } from '@onefootprint/ui';
+import { Divider } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import CountrySpecific from '../../../country-specific';
 import Global from '../../../global';
@@ -14,14 +14,14 @@ const DocTypesAndCountries = ({ documentTypesAndCountries, hasSelfie }: DocTypes
   const { global, countrySpecific } = documentTypesAndCountries;
 
   return (
-    <Stack gap={5} direction="column">
-      <Stack gap={4} direction="column">
-        <Text variant="label-3">{t('gov-docs.title')}</Text>
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-3">
+        <p className="text-label-3 text-secondary">{t('gov-docs.title')}</p>
         <Divider variant="secondary" />
-      </Stack>
+      </div>
       <Global global={global} hasSelfie={hasSelfie} />
       <CountrySpecific countrySpecific={countrySpecific} hasSelfie={hasSelfie} />
-    </Stack>
+    </div>
   );
 };
 

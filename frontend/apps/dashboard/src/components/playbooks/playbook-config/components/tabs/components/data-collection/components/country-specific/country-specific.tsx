@@ -1,7 +1,6 @@
 import { getCountryNameFromCode } from '@onefootprint/global-constants';
 import type { CountrySpecificDocumentMapping, IdDocKind } from '@onefootprint/request-types/dashboard';
 import type { CountryCode } from '@onefootprint/types';
-import { Stack, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import useIdDocList from 'src/hooks/use-id-doc-list';
 
@@ -20,53 +19,43 @@ const CountrySpecific = ({ countrySpecific, hasSelfie }: CountrySpecificProps) =
   const acceptedDocScans = sortedCountrySpecific.map(([, docTypes]) => docTypes);
 
   return (
-    <Stack gap={3} direction="column">
-      <Text variant="label-2">{t('gov-docs.country-specific.scans')}</Text>
-      <Stack direction="row" gap={8}>
+    <div className="flex flex-col gap-2">
+      <p className="text-label-2">{t('gov-docs.country-specific.scans')}</p>
+      <div className="flex flex-row gap-6 pl-2">
         {countries.length === 0 ? (
-          <Text variant="body-2" color="secondary">
-            {t('gov-docs.country-specific.none')}
-          </Text>
+          <p className="text-body-2 text-tertiary">{t('gov-docs.country-specific.none')}</p>
         ) : (
           <>
-            <Stack direction="column" gap={2}>
+            <div className="flex flex-col gap-1">
               {countries.map(country => (
-                <Text key={country} variant="body-2" color="secondary">
+                <p key={country} className="text-body-2 text-secondary">
                   {getCountryNameFromCode(country)}
-                </Text>
+                </p>
               ))}
-            </Stack>
-            <Stack direction="column" gap={2}>
+            </div>
+            <div className="flex flex-col gap-1">
               {acceptedDocScans.map(docTypes => (
-                <Text key={docTypes.join('-')} variant="body-2">
+                <p key={docTypes.join('-')} className="text-body-2">
                   {docTypes.length > 0 ? (
-                    <Stack direction="row" gap={3}>
-                      <Text variant="body-2" color="tertiary" tag="span">
-                        {getText(docTypes).join(', ')}
-                      </Text>
+                    <div className="flex flex-row gap-2">
+                      <span className="text-tertiary">{getText(docTypes).join(', ')}</span>
                       {hasSelfie && (
                         <>
-                          <Text variant="body-2" color="secondary" tag="span">
-                            +
-                          </Text>
-                          <Text variant="body-2" color="tertiary" tag="span">
-                            {t('gov-docs.selfie')}
-                          </Text>
+                          <span className="text-secondary">+</span>
+                          <span className="text-tertiary">{t('gov-docs.selfie')}</span>
                         </>
                       )}
-                    </Stack>
+                    </div>
                   ) : (
-                    <Text variant="body-2" color="secondary" tag="span">
-                      {t('gov-docs.none')}
-                    </Text>
+                    <p className="text-body-2 text-secondary">{t('gov-docs.none')}</p>
                   )}
-                </Text>
+                </p>
               ))}
-            </Stack>
+            </div>
           </>
         )}
-      </Stack>
-    </Stack>
+      </div>
+    </div>
   );
 };
 

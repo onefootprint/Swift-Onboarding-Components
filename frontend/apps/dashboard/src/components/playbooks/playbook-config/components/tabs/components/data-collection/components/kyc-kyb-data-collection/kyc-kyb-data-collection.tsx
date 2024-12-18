@@ -1,6 +1,7 @@
 import CollectedInformation from '@/playbooks/components/collected-information';
+import { IcoBuilding16, IcoUsers16 } from '@onefootprint/icons';
 import type { OnboardingConfiguration } from '@onefootprint/request-types/dashboard';
-import { Box, Divider, Stack, Text } from '@onefootprint/ui';
+import { Divider } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import AdditionalDocs from '../additional-docs';
 import CountrySpecific from '../country-specific';
@@ -37,106 +38,101 @@ const KycKybDataCollection = ({ playbook }: KycKybDataCollectionProps) => {
   const collectBoInfo = mustCollectData.includes('business_kyced_beneficial_owners');
 
   return (
-    <Stack direction="column" gap={5}>
+    <>
       {isKYB && (
-        <Section title={t('kyb.business')} variant="withDivider">
-          <Stack direction="column" gap={8}>
-            <CollectedInformation
-              title={t('kyb.basic_information')}
-              options={{
-                businessName: mustCollectData.includes('business_name'),
-                businessAddress: mustCollectData.includes('business_address'),
-                businessBeneficialOwners: collectBoInfo,
-                businessTin: mustCollectData.includes('business_tin'),
-              }}
-            />
-            <CollectedInformation
-              title={t('kyb.other')}
-              options={{
-                businessPhoneNumber: mustCollectData.includes('business_phone_number'),
-                businessWebsite: mustCollectData.includes('business_website'),
-                businessType: mustCollectData.includes('business_corporation_type'),
-              }}
-            />
-            {hasBusinessDocumentsToCollect && <AdditionalDocs docs={businessDocumentsToCollect} />}
-          </Stack>
+        <Section title={t('kyb.business')} variant="withDivider" icon={IcoBuilding16}>
+          <CollectedInformation
+            title={t('kyb.basic_information')}
+            options={{
+              businessName: mustCollectData.includes('business_name'),
+              businessAddress: mustCollectData.includes('business_address'),
+              businessBeneficialOwners: collectBoInfo,
+              businessTin: mustCollectData.includes('business_tin'),
+            }}
+          />
+          <CollectedInformation
+            title={t('kyb.other')}
+            options={{
+              businessPhoneNumber: mustCollectData.includes('business_phone_number'),
+              businessWebsite: mustCollectData.includes('business_website'),
+              businessType: mustCollectData.includes('business_corporation_type'),
+            }}
+          />
+          {hasBusinessDocumentsToCollect && <AdditionalDocs docs={businessDocumentsToCollect} />}
         </Section>
       )}
       <Section
         title={isKYB ? t('kyb.business_beneficial_owners') : undefined}
         variant={isKYB ? 'withDivider' : 'default'}
+        icon={IcoUsers16}
       >
-        <Stack direction="column" gap={8}>
+        <CollectedInformation
+          title={t('sign-up-information')}
+          options={{
+            name: mustCollectData.includes('name'),
+            email: mustCollectData.includes('email'),
+            phoneNumber: mustCollectData.includes('phone_number'),
+            dob: mustCollectData.includes('dob'),
+            fullAddress: mustCollectData.includes('full_address'),
+          }}
+        />
+        {hasAnyRequiredAuthMethods && (
           <CollectedInformation
-            title={t('sign-up-information')}
+            title={t('otp')}
             options={{
-              name: mustCollectData.includes('name'),
-              email: mustCollectData.includes('email'),
-              phoneNumber: mustCollectData.includes('phone_number'),
-              dob: mustCollectData.includes('dob'),
-              fullAddress: mustCollectData.includes('full_address'),
+              phoneNumber: requiredAuthMethods?.includes('phone'),
+              email: requiredAuthMethods?.includes('email'),
             }}
           />
-          {hasAnyRequiredAuthMethods && (
-            <CollectedInformation
-              title={t('otp')}
-              options={{
-                phoneNumber: requiredAuthMethods?.includes('phone'),
-                email: requiredAuthMethods?.includes('email'),
-              }}
-            />
-          )}
-          {allowUsResidents ? (
-            <CollectedInformation
-              title={t('us-residents.title')}
-              options={{
-                ssn: mustCollectData.includes('us_tax_id')
-                  ? { active: true, kind: 'ssn9', optional: false }
-                  : {
-                      active: requiresSSN || optionalSSN,
-                      kind: mustCollectData.includes('ssn9') || optionalData.includes('ssn9') ? 'ssn9' : 'ssn4',
-                      optional: optionalSSN,
-                    },
-                usTaxIdAcceptable: mustCollectData.includes('us_tax_id'),
-                usLegalStatus: mustCollectData.includes('us_legal_status'),
-              }}
-            />
-          ) : (
-            <SingleItem name="usResidents" value={false} />
-          )}
-          <SingleItem name="nonUSResidents" value={allowInternationalResidents} />
-          {hasInvestorProfile && <SingleItem name="investorProfile" value={hasInvestorProfile} />}
-          {documentTypesAndCountries?.global && (
-            <Global
-              global={documentTypesAndCountries.global}
-              /** @ts-expect-error: this is deprecated */
-              hasSelfie={mustCollectData.includes('document_and_selfie')}
-            />
-          )}
-          {documentTypesAndCountries?.countrySpecific && (
-            <CountrySpecific
-              countrySpecific={documentTypesAndCountries.countrySpecific}
-              /** @ts-expect-error: this is deprecated */
-              hasSelfie={mustCollectData.includes('document_and_selfie')}
-            />
-          )}
-          {hasKYCDocsToCollect && <AdditionalDocs docs={documentsToCollect} />}
-        </Stack>
+        )}
+        {allowUsResidents ? (
+          <CollectedInformation
+            title={t('us-residents.title')}
+            options={{
+              ssn: mustCollectData.includes('us_tax_id')
+                ? { active: true, kind: 'ssn9', optional: false }
+                : {
+                    active: requiresSSN || optionalSSN,
+                    kind: mustCollectData.includes('ssn9') || optionalData.includes('ssn9') ? 'ssn9' : 'ssn4',
+                    optional: optionalSSN,
+                  },
+              usTaxIdAcceptable: mustCollectData.includes('us_tax_id'),
+              usLegalStatus: mustCollectData.includes('us_legal_status'),
+            }}
+          />
+        ) : (
+          <SingleItem name="usResidents" value={false} />
+        )}
+        <SingleItem name="nonUSResidents" value={allowInternationalResidents} />
+        {hasInvestorProfile && <SingleItem name="investorProfile" value={hasInvestorProfile} />}
+        {documentTypesAndCountries?.global && (
+          <Global
+            global={documentTypesAndCountries.global}
+            /** @ts-expect-error: this is deprecated */
+            hasSelfie={mustCollectData.includes('document_and_selfie')}
+          />
+        )}
+        {documentTypesAndCountries?.countrySpecific && (
+          <CountrySpecific
+            countrySpecific={documentTypesAndCountries.countrySpecific}
+            /** @ts-expect-error: this is deprecated */
+            hasSelfie={mustCollectData.includes('document_and_selfie')}
+          />
+        )}
+        {hasKYCDocsToCollect && <AdditionalDocs docs={documentsToCollect} />}
       </Section>
       {allowUsTerritoryResidents && (
         <footer>
-          <Box marginTop={5} marginBottom={5}>
+          <div className="mt-5 mb-5">
             <Divider variant="secondary" />
-          </Box>
-          <Text variant="label-3" color="primary">
+          </div>
+          <h4 className="text-label-3 text-primary">
             {t('us-territories.label')}{' '}
-            <Text variant="label-3" color="tertiary" tag="span">
-              {t('us-territories.content')}
-            </Text>
-          </Text>
+            <span className="text-label-3 text-tertiary">{t('us-territories.content')}</span>
+          </h4>
         </footer>
       )}
-    </Stack>
+    </>
   );
 };
 

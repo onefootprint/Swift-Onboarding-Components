@@ -1,6 +1,3 @@
-import { Stack, Text } from '@onefootprint/ui';
-import styled, { css } from 'styled-components';
-
 import type { Option } from './collected-information.types';
 import DisplayValue from './components/display-value';
 import Label from './components/label';
@@ -16,14 +13,10 @@ const CollectedInformation = ({ title, subtitle, options }: CollectedInformation
   const getLabel = useInfoLabel();
 
   return (
-    <Stack flexDirection="column" gap={4}>
-      {title && (
-        <Text variant="label-2" color="secondary">
-          {title}
-        </Text>
-      )}
+    <div className="flex flex-col gap-2">
+      {title && <h4 className="text-label-2 text-secondary">{title}</h4>}
       {options ? (
-        <Stack flexDirection="column" alignItems="center" gap={2}>
+        <ul className="flex flex-col items-center gap-1">
           {Object.entries(options).map(([name, value]) => {
             if (value == null || value === undefined) return null;
             const typedName = name as keyof Option;
@@ -31,33 +24,17 @@ const CollectedInformation = ({ title, subtitle, options }: CollectedInformation
             const label = getLabel(typedName);
 
             return (
-              // biome-ignore lint/a11y/useSemanticElements: TODO: change to <tr />
-              <OptionItem key={name} role="row" aria-label={label}>
+              <li key={name} aria-label={label} className="flex flex-row justify-start w-full gap-3">
                 <DisplayValue name={typedName} value={typedValue} />
                 <Label name={typedName} value={typedValue} />
-              </OptionItem>
+              </li>
             );
           })}
-        </Stack>
+        </ul>
       ) : null}
-      {subtitle && (
-        <Text color="secondary" variant="body-2">
-          {subtitle}
-        </Text>
-      )}
-    </Stack>
+      {subtitle && <p className="text-body-2 text-secondary">{subtitle}</p>}
+    </div>
   );
 };
-
-const OptionItem = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: row;
-    gap: ${theme.spacing[3]};
-    height: ${theme.spacing[7]};
-    justify-content: flex-start;
-    width: 100%;
-  `}
-`;
 
 export default CollectedInformation;

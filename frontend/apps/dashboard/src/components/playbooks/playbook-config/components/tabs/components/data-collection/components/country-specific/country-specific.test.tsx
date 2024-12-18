@@ -1,4 +1,3 @@
-import themes from '@onefootprint/design-tokens';
 import { customRender, screen } from '@onefootprint/test-utils';
 import { type CountryCode, SupportedIdDocTypes } from '@onefootprint/types';
 import CountrySpecific from './country-specific';
@@ -42,10 +41,10 @@ describe('CountrySpecific', () => {
       expect(argentinaDocs).toBeInTheDocument();
       const plus = screen.getByText('+');
       expect(plus).toBeInTheDocument();
-      expect(plus).toHaveStyle(`color: ${themes.light.color.secondary}`);
+      expect(plus).toHaveClass('text-secondary');
       const selfie = screen.getByText('Selfie');
       expect(selfie).toBeInTheDocument();
-      expect(selfie).toHaveStyle(`color: ${themes.light.color.tertiary}`);
+      expect(selfie).toHaveClass('text-tertiary');
     });
   });
 });

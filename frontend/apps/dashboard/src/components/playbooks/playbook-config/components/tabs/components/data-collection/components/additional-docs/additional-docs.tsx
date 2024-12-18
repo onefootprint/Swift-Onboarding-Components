@@ -1,7 +1,7 @@
-import type { FontVariant } from '@onefootprint/design-tokens';
 import { IcoCode216, IcoFileText16, IcoFlag16, IcoWriting16 } from '@onefootprint/icons';
 import type { DocumentRequestConfig, DocumentUploadSettings } from '@onefootprint/request-types/dashboard';
-import { Box, Divider, Popover, Stack, Text } from '@onefootprint/ui';
+import { Divider, LinkButton, Popover } from '@onefootprint/ui';
+import { cx } from 'class-variance-authority';
 import { useTranslation } from 'react-i18next';
 
 type AdditionalDocsProps = {
@@ -43,15 +43,15 @@ const AdditionalDocs = ({ docs, variant = 'default' }: AdditionalDocsProps) => {
   });
 
   return (
-    <Stack gap={4} flexDirection="column">
-      <Text variant="label-2">{t('title')}</Text>
+    <div className="flex flex-col gap-2">
+      <h4 className="text-label-2">{t('title')}</h4>
       {variant === 'sectioned' && (
         <>
           <Divider variant="secondary" />
-          <Text variant="label-2">{t('docs-to-collect')}</Text>
+          <p className="text-label-2 text-primary">{t('docs-to-collect')}</p>
         </>
       )}
-      <Stack paddingLeft={3} gap={3} flexDirection="column">
+      <ul className="flex flex-col gap-2 pl-2">
         {list.map(doc => (
           <DocItem
             uploadSettings={doc.uploadSettings}
@@ -62,8 +62,8 @@ const AdditionalDocs = ({ docs, variant = 'default' }: AdditionalDocsProps) => {
             requiresHumanReview={doc.requiresHumanReview}
           />
         ))}
-      </Stack>
-    </Stack>
+      </ul>
+    </div>
   );
 };
 
@@ -99,44 +99,41 @@ const PopoverContent = ({
   ];
 
   return (
-    <Stack direction="column" gap={3}>
+    <div className="flex flex-col gap-2 p-3">
       {contentItems.map(
         ({ condition, icon, text, variant }) =>
           condition && (
-            <Stack key={text} gap={4}>
-              <Box position="relative" marginTop={1}>
-                {icon}
-              </Box>
-              <Text variant={variant as FontVariant} color="secondary">
+            <div key={text} className="flex items-center w-full gap-2">
+              {icon}
+              <p
+                className={cx('text-secondary', {
+                  'text-body-3': variant === 'body-3',
+                  'text-snippet-1 text-secondary': variant === 'snippet-2',
+                })}
+              >
                 {text}
-              </Text>
-            </Stack>
+              </p>
+            </div>
           ),
       )}
-    </Stack>
+    </div>
   );
 };
 
 const DocItem = ({ label, identifier, description, requiresHumanReview, uploadSettings }: DocItemProps) => {
   const { t } = useTranslation('playbook-details', { keyPrefix: 'data-collection.additional-docs' });
   return (
-    <Stack gap={2} alignItems="center">
-      <Text variant="body-2" color="secondary">
-        {label}
-      </Text>
+    <div className="flex flex-row items-center gap-1">
+      <p className="text-body-2 text-secondary">{label}</p>
       {identifier || description || requiresHumanReview ? (
         <>
-          <Text variant="body-2" color="secondary">
-            ⋅
-          </Text>
+          <p className="text-body-2 text-secondary">⋅</p>
           <Popover.Root>
             <Popover.Trigger>
-              <Text variant="body-2" color="secondary">
-                {t('more-details')}
-              </Text>
+              <LinkButton variant="label-2">{t('more-details')}</LinkButton>
             </Popover.Trigger>
             <Popover.Portal>
-              <Popover.Content>
+              <Popover.Content asChild>
                 <PopoverContent
                   uploadSettings={uploadSettings}
                   identifier={identifier}
@@ -148,7 +145,7 @@ const DocItem = ({ label, identifier, description, requiresHumanReview, uploadSe
           </Popover.Root>
         </>
       ) : null}
-    </Stack>
+    </div>
   );
 };
 

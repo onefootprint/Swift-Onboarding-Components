@@ -1,4 +1,3 @@
-import themes from '@onefootprint/design-tokens';
 import type { IdDocKind } from '@onefootprint/request-types/dashboard';
 import { customRender, screen } from '@onefootprint/test-utils';
 import Global from './global';
@@ -21,10 +20,10 @@ describe('<Global />', () => {
       expect(docs).toBeInTheDocument();
       const plus = screen.getByText('+');
       expect(plus).toBeInTheDocument();
-      expect(plus).toHaveStyle(`color: ${themes.light.color.primary}`);
+      expect(plus).toHaveClass('text-secondary');
       const selfie = screen.getByText('Selfie');
       expect(selfie).toBeInTheDocument();
-      expect(selfie).toHaveStyle(`color: ${themes.light.color.secondary}`);
+      expect(selfie).toHaveClass('text-secondary');
     });
   });
 

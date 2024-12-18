@@ -105,7 +105,7 @@
         "description": "Scan of Social Security card or official document displaying your name and Social Security Number"
       },
       "requires-manual-review": "After upload, user will be marked for manual review",
-      "more-details": "More details",
+      "more-details": "Details",
       "collection-method": {
         "prefer-upload": "Prefer upload",
         "prefer-capture": "Prefer capture"

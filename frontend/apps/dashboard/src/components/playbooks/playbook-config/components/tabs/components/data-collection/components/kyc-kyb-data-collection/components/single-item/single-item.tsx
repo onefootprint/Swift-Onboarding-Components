@@ -1,7 +1,5 @@
 import { IcoCheckSmall24, IcoCloseSmall24 } from '@onefootprint/icons';
-import { Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
 
 export type SingleItemType = 'usResidents' | 'nonUSResidents' | 'investorProfile';
 
@@ -32,53 +30,15 @@ const SingleItem = ({ name, value }: SingleItemProps) => {
   };
 
   const item = singleItemMap[name];
-
   return (
-    <Container>
-      {item && <Text variant="label-2">{item.title}</Text>}
-      <OptionsContainer>
-        <OptionItem>
-          {value ? <IcoCheckSmall24 /> : <IcoCloseSmall24 />}
-          <Label variant="body-2" color="secondary">
-            {value ? item.enabled : item.disabled}
-          </Label>
-        </OptionItem>
-      </OptionsContainer>
-    </Container>
+    <div className="flex flex-col gap-2">
+      {item && <h4 className="text-label-2">{item.title}</h4>}
+      <div className="flex justify-start w-full h-6 gap-2">
+        {value ? <IcoCheckSmall24 /> : <IcoCloseSmall24 />}
+        <p className="text-body-2 text-secondary">{value ? item.enabled : item.disabled}</p>
+      </div>
+    </div>
   );
 };
-
-const Container = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[3]};
-  `}
-`;
-
-const OptionsContainer = styled.div`
-  ${({ theme }) => css`
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[2]};
-  `}
-`;
-
-const OptionItem = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: row;
-    gap: ${theme.spacing[3]};
-    height: ${theme.spacing[7]};
-    justify-content: flex-start;
-    width: 100%;
-  `}
-`;
-
-const Label = styled(Text)`
-  white-space: nowrap;
-  text-align: right;
-`;
 
 export default SingleItem;
