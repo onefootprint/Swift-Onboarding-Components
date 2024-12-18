@@ -55,7 +55,7 @@ pub fn create_response_pa_hit() -> pa::IdologyPaAPIResponse {
     };
     pa::IdologyPaAPIResponse {
         raw_response: PiiJsonValue::from(serde_json::to_value(&parsed_response).unwrap()),
-        parsed_response,
+        result: Ok(parsed_response),
     }
 }
 
@@ -71,7 +71,7 @@ pub fn create_response_pa_no_hit() -> pa::IdologyPaAPIResponse {
     };
     pa::IdologyPaAPIResponse {
         raw_response: PiiJsonValue::from(serde_json::to_value(&parsed_response).unwrap()),
-        parsed_response,
+        result: Ok(parsed_response),
     }
 }
 

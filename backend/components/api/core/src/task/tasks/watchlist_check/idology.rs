@@ -1,7 +1,6 @@
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
-use crate::decision::vendor::vendor_trait::VendorAPIResponse;
-use crate::decision::vendor::verification_result;
-use crate::decision::vendor::VendorAPIError;
+use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
+use crate::decision::vendor::verification_result::ShouldSaveVerificationRequest;
 use crate::decision::{
     self,
 };
@@ -11,12 +10,10 @@ use api_errors::FpError;
 use db::models::risk_signal::NewRiskSignalInfo;
 use db::models::vault::Vault;
 use db::models::verification_request::VerificationRequest;
-use db::models::verification_result::VerificationResult;
 use idv::idology::expectid::response::PaWatchlistHit;
 use idv::idology::pa::response::PaResponse;
 use idv::idology::pa::IdologyPaAPIResponse;
 use idv::idology::pa::IdologyPaRequest;
-use idv::VendorResponse;
 use newtypes::DecisionIntentId;
 use newtypes::FootprintReasonCode;
 use newtypes::ScopedVaultId;
@@ -36,9 +33,9 @@ pub async fn complete_vendor_call(
         // codes from it
         (parse_reason_codes(res.clone())?, vres_id)
     } else {
-        let (res, vres) = make_vendor_call(state, sv_id, di_id, tenant_id).await?;
-        let pa_res = PaResponse::try_from(res.response)?;
-        (parse_reason_codes(pa_res)?, vres.id)
+        let (res, vres_id) = make_vendor_call(state, sv_id, di_id, tenant_id).await?;
+        let pa_res = res.result.map_err(idv::Error::from)?;
+        (parse_reason_codes(pa_res)?, vres_id)
     };
 
     Ok(reason_codes
@@ -52,7 +49,7 @@ async fn make_vendor_call(
     sv_id: &ScopedVaultId,
     di_id: &DecisionIntentId,
     tenant_id: &TenantId,
-) -> FpResult<(VendorResponse, VerificationResult)> {
+) -> FpResult<(IdologyPaAPIResponse, VerificationResultId)> {
     // TODO: consolidate this with make_idv_vendor_call_save_vreq_vres
     let vendor_api = VendorAPI::IdologyPa;
     let svid = sv_id.clone();
@@ -80,31 +77,15 @@ async fn make_vendor_call(
         credentials: tvc.idology_credentials(),
         tenant_identifier: tvc.tenant_identifier(),
     };
-    let res: Result<IdologyPaAPIResponse, idv::idology::error::Error> =
-        state.vendor_clients.idology_pa.make_request(req).await;
-
-    let res = res
-        .map(|r| {
-            let parsed_response = r.parsed_response();
-            let raw_response = r.raw_response();
-            VendorResponse {
-                response: parsed_response,
-                raw_response,
-            }
-        })
-        .map_err(|e| e.into())
-        .map_err(|e| VendorAPIError { vendor_api, error: e });
-
+    let res = state.vendor_clients.idology_pa.make_request(req).await;
     let svid = sv_id.clone();
-    let (res, vres) = state
-        .db_query(move |conn| {
-            let uv = Vault::get(conn, &svid)?;
-            let vres = verification_result::save_vres(conn, &uv.public_key, &res, &vreq)?;
-            Ok((res, vres))
-        })
-        .await?;
+    let uv = state.db_query(move |conn| Vault::get(conn, &svid)).await?;
+    let vreq = ShouldSaveVerificationRequest::No(vreq.id);
+    let args = SaveVerificationResultArgs::new_for_idology(&res, uv.public_key, vreq);
+    let (vres_id, _) = args.save(&state.db_pool).await?;
 
-    Ok((res?, vres))
+    let res = res.map_err(idv::Error::from)?;
+    Ok((res, vres_id))
 }
 
 fn parse_reason_codes(res: PaResponse) -> FpResult<Vec<FootprintReasonCode>> {

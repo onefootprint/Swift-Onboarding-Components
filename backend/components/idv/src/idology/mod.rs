@@ -59,7 +59,7 @@ pub async fn verify_expectid(
 pub async fn standalone_pa(
     fp_http_client: &FootprintVendorHttpClient,
     request: IdologyPaRequest,
-) -> Result<serde_json::Value, IdologyError::Error> {
+) -> Result<PiiJsonValue, IdologyError::Error> {
     let IdologyPaRequest {
         idv_data,
         credentials,
@@ -85,5 +85,5 @@ pub async fn standalone_pa(
         .json::<serde_json::Value>()
         .await
         .map_err(IdologyError::ReqwestError::from)?;
-    Ok(idology_response)
+    Ok(PiiJsonValue::new(idology_response))
 }

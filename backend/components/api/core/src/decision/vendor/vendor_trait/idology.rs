@@ -64,19 +64,8 @@ impl VendorAPICall<IdologyPaRequest, IdologyPaAPIResponse, idv::idology::error::
         &self,
         request: IdologyPaRequest,
     ) -> Result<IdologyPaAPIResponse, idv::idology::error::Error> {
-        let raw_response = idv::idology::standalone_pa(self, request).await?; // TODO: this should return PiiJsonValue itself
-        let parsed_response = idv::idology::pa::response::parse_response(raw_response.clone())
-            .map_err(|e| e.into_error_with_response(raw_response.clone()))?;
-
-        parsed_response
-            .response
-            .validate()
-            .map_err(|e| e.into_error_with_response(raw_response.clone()))?;
-
-        Ok(IdologyPaAPIResponse {
-            raw_response: PiiJsonValue::new(raw_response),
-            parsed_response,
-        })
+        let raw_response = idv::idology::standalone_pa(self, request).await?;
+        Ok(IdologyPaAPIResponse::from_response(raw_response))
     }
 }
 
@@ -90,6 +79,10 @@ impl VendorAPIResponse for IdologyPaAPIResponse {
     }
 
     fn parsed_response(&self) -> ParsedResponse {
-        ParsedResponse::IDologyPa(self.parsed_response.clone())
+        match &self.result {
+            Ok(res) => ParsedResponse::IDologyPa(res.clone()),
+            // TODO: rm or fix
+            Err(_) => ParsedResponse::IncodeRawResponse(self.raw_response.clone()),
+        }
     }
 }

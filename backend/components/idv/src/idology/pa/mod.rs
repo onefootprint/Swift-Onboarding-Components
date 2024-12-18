@@ -1,4 +1,5 @@
 use self::response::PaResponse;
+use crate::idology::error::Error as IdologyError;
 use newtypes::vendor_credentials::IdologyCredentials;
 use newtypes::IdvData;
 use newtypes::PiiJsonValue;
@@ -12,10 +13,21 @@ pub struct IdologyPaRequest {
     pub tenant_identifier: String,
 }
 
-#[derive(Clone)]
 pub struct IdologyPaAPIResponse {
     pub raw_response: PiiJsonValue,
-    pub parsed_response: PaResponse,
+    pub result: Result<PaResponse, IdologyError>,
+}
+
+impl IdologyPaAPIResponse {
+    pub fn from_response(raw_response: PiiJsonValue) -> Self {
+        let result = || {
+            let parsed_response = crate::idology::pa::response::parse_response(raw_response.leak().clone())?;
+            parsed_response.response.validate()?;
+            Ok(parsed_response)
+        };
+        let result = result();
+        Self { result, raw_response }
+    }
 }
 
 #[cfg(test)]
@@ -58,7 +70,7 @@ mod test {
         )
         .await
         .unwrap();
-        let parsed_response = response::parse_response(res).unwrap();
+        let parsed_response = response::parse_response(res.into_leak()).unwrap();
         assert_eq!(
             Restriction {
                 key: Some("global.watch.list.no.match".to_owned()),
