@@ -1,6 +1,5 @@
-import { Box, Container, Stack, Text, createFontStyles, media } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
+import FrontpageContainer from 'src/components/frontpage-container';
 import CaptureAnimation from './component/capture-animation';
 
 const Hero = () => {
@@ -8,35 +7,12 @@ const Hero = () => {
     keyPrefix: 'pages.doc-scan.hero',
   });
   return (
-    <StyledContainer paddingTop={11} paddingBottom={11}>
-      <Stack direction="column" alignItems="center" justifyContent="center" gap={7} maxWidth="790px">
-        <Title tag="h1">{t('title')}</Title>
-        <Text variant="display-4" maxWidth="790px" color="secondary">
-          {t('subtitle')}
-        </Text>
-      </Stack>
+    <FrontpageContainer className="flex flex-col items-center justify-center gap-4 pt-12 md:pt-24 md:pb-32 ">
+      <h1 className="text-center text-display-2 md:text-display-1 max-w-[800px]">{t('title')}</h1>
+      <p className="text-center text-display-4 text-secondary max-w-[800px]">{t('subtitle')}</p>
       <CaptureAnimation />
-    </StyledContainer>
+    </FrontpageContainer>
   );
 };
-
-const Title = styled(Box)`
-    ${createFontStyles('display-2')}
-
-    ${media.greaterThan('md')`
-      ${createFontStyles('display-1')}
-    `}
-`;
-
-const StyledContainer = styled(Container)`
-  ${({ theme }) => css`
-    padding-top: ${theme.spacing[11]};
-    gap: ${theme.spacing[10]};
-    text-align: center;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  `}
-`;
 
 export default Hero;

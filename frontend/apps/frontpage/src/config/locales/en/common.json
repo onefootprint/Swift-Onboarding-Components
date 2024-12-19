@@ -1335,6 +1335,9 @@
     "doc-scan": {
       "html-title": "Footprint - Doc Verification",
       "html-description": "Effortless and secure document verification",
+      "illustration": {
+        "success": "Successfully verified"
+      },
       "hero": {
         "title": "Effortless and secure document verification",
         "subtitle": "Streamline user onboarding with our advanced ID document capture platform. Leverage modern technologies such as App Clip and Passkeys to ensure reliable identity verification."

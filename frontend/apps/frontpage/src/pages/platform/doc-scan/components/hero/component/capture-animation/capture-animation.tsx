@@ -1,230 +1,85 @@
+import { IcoCheckCircle40 } from '@onefootprint/icons';
 import { AnimatePresence, motion } from 'framer-motion';
-import Image from 'next/image';
-import { useState } from 'react';
-import styled, { css, keyframes } from 'styled-components';
+import { delay } from 'lodash';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
-import { IcoCheck24 } from '@onefootprint/icons';
-import { Box, Stack, Text, createFontStyles } from '@onefootprint/ui';
+const CONFIRMATION_DELAY = 4000;
 
-const DOC_SCAN_WIDTH = 400;
-const DOC_SCAN_HEIGHT = 280;
-
-const idAnimationVariants = {
-  initial: { opacity: 0, y: '-50%', x: '-50%' },
-  animate: { opacity: 1, y: '12px', x: '-50%', transition: { delay: 1, duration: 1 } },
-};
-
-const cardVariants = {
-  initial: { opacity: 0, filter: 'blur(20px)' },
-  animate: { opacity: 1, filter: 'blur(0px)' },
-  exit: { opacity: 0, filter: 'blur(20px)', transition: { duration: 1 } },
-};
-
-const counterVariants = {
-  initial: { scale: 1, x: '-50%', y: '-50%' },
-  animate: { scale: 1.3, x: '-50%', y: '-50%' },
-};
-
-const successContainerVariants = {
-  initial: { opacity: 0, filter: 'blur(20px)' },
-  animate: { opacity: 1, filter: 'blur(0px)' },
-  exit: { opacity: 0, filter: 'blur(20px)', transition: { duration: 1 } },
-};
+const Keyframes = () => (
+  <style>{`
+    @keyframes shadowAnimation {
+      0% { box-shadow: 0 0 10px var(--purple-50); background-color: var(--purple-25); }
+      50% { box-shadow: 0 0 40px var(--purple-200); background-color: var(--purple-25 / 0.5); }
+      100% { box-shadow: 0 0 10px var(--purple-50); background-color: var(--purple-25); }
+    }
+    @keyframes successAnimation {
+      0% { box-shadow: 0 0 10px var(--purple-50); background-color: var(--purple-25); }
+      50% { box-shadow: 0 0 40px var(--green-200); background-color: var(--green-25 / 0.5); }
+      100% { box-shadow: 0 0 10px var(--green-50); background-color: var(--green-25); }
+    }
+  `}</style>
+);
 
 const CaptureInformation = () => {
-  const [count, setCount] = useState(3);
-  const [counterStarted, setCounterStarted] = useState(false);
-  const [counterFinished, setCounterFinished] = useState(false);
+  const { t } = useTranslation('common', { keyPrefix: 'pages.doc-scan.illustration' });
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
-  const startCountdown = () => {
-    setCounterStarted(true);
-    const countdown = setInterval(() => {
-      setCount(prevCount => {
-        if (prevCount <= 1) {
-          clearInterval(countdown);
-          setCounterFinished(true);
-          setCounterStarted(false);
-          return 0;
-        }
-        return prevCount - 1;
-      });
-    }, 1000);
-  };
+  useEffect(() => {
+    const timer = delay(() => setShowConfirmation(true), CONFIRMATION_DELAY);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
-    <Shade>
-      <Frame
-        $isSuccess={counterFinished}
-        variants={cardVariants}
-        initial="initial"
-        animate="animate"
-        exit="exit"
-        key="countdown"
-      >
-        <AnimatePresence>
-          {counterFinished ? (
-            <SuccessContainer variants={successContainerVariants} initial="initial" animate="animate" exit="exit">
-              <IconOuterContainer>
-                <IconContainer>
-                  <IcoCheck24 color="success" />
-                </IconContainer>
-              </IconOuterContainer>
-              <Text variant="label-3" color="success">
-                ID successfully captured!
-              </Text>
-            </SuccessContainer>
-          ) : (
-            <IDContainer
-              src="/home/doc-scan/fake-id.png"
-              alt="Document Scan"
-              width={1000 / 3}
-              height={633 / 3}
-              variants={idAnimationVariants}
-              onAnimationComplete={startCountdown}
-              initial="initial"
-              animate="animate"
-            />
-          )}
-        </AnimatePresence>
-        <AnimatePresence>
-          {counterStarted && (
-            <Counter variants={counterVariants} initial="initial" animate="animate" key={count}>
-              {count}
-            </Counter>
-          )}
-        </AnimatePresence>
-      </Frame>
-    </Shade>
+    <div
+      className="relative md:h-[400px] h-[300px] w-full overflow-hidden flex items-center justify-center"
+      style={{
+        maskImage: 'linear-gradient(to bottom, transparent, black 25%, black 75%, transparent)',
+        maskType: 'alpha',
+      }}
+    >
+      <Keyframes />
+      <AnimatePresence>
+        <motion.div
+          className="p-4 mt-10 rounded-lg outline-double outline-offset-8 outline-solid outline-gray-50 max-w-[90%] mx-auto md:h-[272px] h-[212px]"
+          style={{
+            animation: `${showConfirmation ? 'successAnimation 2s ease-out forwards' : 'shadowAnimation 4s ease-out infinite'}`,
+          }}
+        >
+          <AnimatePresence>
+            {showConfirmation ? (
+              <motion.div
+                initial={{ opacity: 0, y: '-20%' }}
+                animate={{
+                  opacity: 1,
+                  y: '0',
+                  transition: { duration: 0.5, delay: 2, ease: 'easeInOut' },
+                }}
+                exit={{ y: '20%', transition: { duration: 0.5, ease: 'easeInOut' } }}
+                className="flex flex-col items-center justify-center gap-3 md:w-[380px] md:h-[240px] w-[280px] h-[180px] mx-auto"
+                key="success"
+              >
+                <IcoCheckCircle40 color="success" />
+                <h3 className="text-heading-3 text-success">{t('success')}</h3>
+              </motion.div>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0, x: '-100%' }}
+                animate={{
+                  opacity: 1,
+                  x: '0',
+                  transition: { duration: 1, ease: 'easeInOut' },
+                }}
+                exit={{ opacity: 0, x: '100%', transition: { duration: 1, ease: 'easeInOut' } }}
+                className={`flex items-center justify-center max-w-[95%] bg-[url('/home/doc-scan/fake-id.png')] bg-contain bg-center bg-no-repeat md:w-[380px] md:h-[240px] w-[280px] h-[180px] mx-auto`}
+                key="image"
+              />
+            )}
+          </AnimatePresence>
+        </motion.div>
+      </AnimatePresence>
+    </div>
   );
 };
 
-const Shade = styled(Box)`
-${({ theme }) => css`
-  mask: linear-gradient(to bottom, transparent 0%, black 10%, black 100%);
-  mask-size: 100% 100%;
-  mask-type: alpha;
-  width: ${DOC_SCAN_WIDTH}px;
-  height: ${DOC_SCAN_HEIGHT}px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: ${theme.spacing[7]} ${theme.spacing[5]} ${theme.spacing[5]} ${theme.spacing[5]};
-`}
-`;
-
-const SuccessContainer = styled(motion.div)`
-  ${({ theme }) => css`
-    display: flex;
-    gap: ${theme.spacing[5]};
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
-    height: 100%;
-    width: 100%;
-  `}
-`;
-
-const IDContainer = styled(motion(Image))`
-  position: absolute;
-`;
-
-const Counter = styled(motion.div)`
-  ${({ theme }) => css`
-    ${createFontStyles('label-1')};
-    color: ${theme.color.quinary};
-    position: absolute;
-    background-color: rgba(0, 0, 0, 0.8);
-    border-radius: ${theme.borderRadius.full};
-    width: 40px;
-    height: 40px;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 3;
-  `}
-`;
-
-const flareAnimation = keyframes`
-  0% {
-    background-position: 0% 50%;
-    filter: hue-rotate(0deg);
-  }
-  50% {
-    background-position: 100% 50%;
-    filter: hue-rotate(180deg);
-  }
-  100% {
-    background-position: 0% 50%;
-    filter: hue-rotate(360deg);
-  }
-`;
-
-const Frame = styled(motion.div)<{ $isSuccess: boolean }>`
-${({ theme, $isSuccess }) => css`
-      position: relative;
-      width: 100%;
-      height: 100%;
-      isolation: isolate;
-      border-radius: ${theme.borderRadius.xl};
-      background: ${$isSuccess ? 'linear-gradient(180deg, #E9F5F1 -56.76%, rgba(233, 245, 241, 0) 100%)' : 'radial-gradient(circle at center, rgba(255, 138, 0, 0.1), rgba(229, 46, 113, 0.05), transparent)'};
-      box-shadow: 6px 4px 12px rgba(125, 10, 120, 0.08), -8px 4px 12px rgba(10, 10, 125, 0.08), 0px 4px 4px rgba(0, 0, 0, 0.11), 0px 0px 1px rgba(0, 0, 0, 0.15);
-      ${
-        !$isSuccess &&
-        css`
-        background-size: 200% 200%;
-        animation: ${flareAnimation} 10s linear infinite;
-        background-blend-mode: soft-light, normal;
-      `
-      }
-
-    &::before {
-      content: '';
-      position: absolute;
-      box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.02), 0px 0px 4px rgba(0, 0, 0, 0.25) inset;
-      border-radius: calc(${theme.borderRadius.xl} + 8px);
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: calc(100% + 16px);
-      height: calc(100% + 16px);
-    }
-
-    @supports not (aspect-ratio: 1.6) {
-      height: 0;
-      padding-bottom: calc(100% / 1.6);
-    }
-  `}
-`;
-
-const IconContainer = styled(Stack)`
-  ${({ theme }) => css`
-    width: fit-content;
-    height: fit-content;
-    position: relative;
-    padding: ${theme.spacing[1]};
-    border-radius: ${theme.borderRadius.full};
-    align-items: center;
-    justify-content: center;
-    background-color: ${theme.backgroundColor.primary};
-    box-shadow: 7px 4.667px 42px 0px #E9F5F1, -9.333px 14px 28px 0px #E9F5F1, 0px 1px 4px 0px rgba(0, 0, 0, 0.15);
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    overflow: hidden;
-    background-blend-mode: soft-light, normal;
-    z-index: 0;
-  `}
-`;
-
-const IconOuterContainer = styled(Stack)`
-  ${({ theme }) => css`
-    width: fit-content;
-    height: fit-content;
-    padding: ${theme.spacing[3]};
-    border-radius: ${theme.borderRadius.full};
-    background-color: ${theme.backgroundColor.primary};
-    box-shadow: 0px 4.667px 4.667px 0px rgba(0, 0, 0, 0.02), 0px 0px 4.667px 0px rgba(0, 0, 0, 0.25) inset; 
-  `}
-`;
 export default CaptureInformation;
