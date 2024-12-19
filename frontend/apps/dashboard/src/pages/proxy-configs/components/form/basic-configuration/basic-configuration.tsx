@@ -42,7 +42,6 @@ const BasicConfiguration = ({ id, onSubmit, values }: StepProps) => {
           <Form.Input
             id="url"
             placeholder={t('url.placeholder')}
-            type="url"
             {...register('url', {
               required: {
                 value: true,

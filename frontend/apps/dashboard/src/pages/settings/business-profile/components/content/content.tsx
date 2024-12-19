@@ -82,7 +82,6 @@ const Content = ({ organization }: ContentProps) => {
                 <Form.Label>{t('website.label')}</Form.Label>
                 <BusinessProfileInput
                   {...register('websiteUrl')}
-                  type="url"
                   placeholder={t('website.form.placeholder')}
                   disabled={!canEdit}
                 />
@@ -138,7 +137,6 @@ const Content = ({ organization }: ContentProps) => {
                   <Form.Label>{t('support-website.label')}</Form.Label>
                   <BusinessProfileInput
                     {...register('supportWebsite')}
-                    type="url"
                     placeholder={t('support-website.form.placeholder')}
                     disabled={!canEdit}
                   />
