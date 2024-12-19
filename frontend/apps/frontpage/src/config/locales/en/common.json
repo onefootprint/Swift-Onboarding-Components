@@ -423,6 +423,12 @@
         "title": "Best onboarding tool in town",
         "subtitle": "Do not take our word for it.",
         "quote-list": {
+          "whale": {
+            "quote": "We've cut the average time it takes a renter to open and fund their Whale Security Deposit by ~50%.",
+            "name": "Jamie Petraglia",
+            "role": "CEO",
+            "company": "Flexcar"
+          },
           "apiture": {
             "quote": "Based on experience vetting and partnering with many identity-based techs, partnering with Footprint has been a breath of fresh air. In my product, IDV is critical. I want the best security net possible, configurability, trust in a reliable partner, quick support whenever asked, and a commitment to staying ahead of the bad actors. Footprint is thinking outside the box and doing things other IDV providers should have thought about years ago. Proud to stand side by side with Footprint combatting fraud.",
             "name": "Craig Pawling",

@@ -8,6 +8,7 @@ import FlexcarLogo from './flexcar';
 import Fractional from './fractional';
 import Goodfin from './goodfin';
 import GridLogo from './grid';
+import WhaleLogo from './whale';
 import WingSpan from './wingspan';
 import YieldStreet from './yieldstreet';
 
@@ -24,4 +25,5 @@ export {
   WingSpan,
   Goodfin,
   Aryeo,
+  WhaleLogo,
 };
