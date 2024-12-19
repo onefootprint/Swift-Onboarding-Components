@@ -29,7 +29,7 @@ impl VendorAPIResponse for StytchLookupResponse {
     }
 
     fn parsed_response(&self) -> ParsedResponse {
-        match &self.result {
+        match &self.parsed {
             Ok(res) => ParsedResponse::StytchLookup(res.clone()),
             // TODO: rm or fix
             Err(_) => ParsedResponse::IncodeRawResponse(self.raw_response.clone()),

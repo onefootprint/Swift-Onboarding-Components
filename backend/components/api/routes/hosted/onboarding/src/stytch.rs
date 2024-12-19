@@ -7,6 +7,7 @@ use api_core::auth::user::UserSessionContext;
 use api_core::auth::SessionContext;
 use api_core::decision;
 use api_core::decision::vendor::verification_result::SaveVerificationResultArgs;
+use api_core::decision::vendor::verification_result::ShouldSaveVerificationRequest;
 use api_core::utils::headers::TelemetryHeaders;
 use api_core::FpResult;
 use api_errors::ServerErr;
@@ -67,7 +68,7 @@ async fn post_inner(
     };
 
     let res = state.vendor_clients.stytch_lookup.make_request(req).await;
-    if let Some(Err(e)) = res.as_ref().ok().map(|r| &r.result) {
+    if let Some(Err(e)) = res.as_ref().ok().map(|r| &r.parsed) {
         tracing::warn!(?e, ?telemetry_id, "Stytch error response");
     }
 
@@ -83,9 +84,15 @@ async fn post_inner(
             let uv = Vault::get(conn, &uv_id)?;
 
             let pk = user_auth.user.public_key.clone();
-            let args = SaveVerificationResultArgs::new_for_stytch(&res, di.id.clone(), su_id.clone(), pk);
+            let vreq = ShouldSaveVerificationRequest::Yes(
+                VendorAPI::StytchLookup,
+                di.id.clone(),
+                su_id.clone(),
+                None,
+            );
+            let args = SaveVerificationResultArgs::new(&res, pk, vreq);
             let (vres, _) = args.save_sync(conn)?;
-            if let Some(res) = res.ok().and_then(|r| r.result.ok()) {
+            if let Some(res) = res.ok().and_then(|r| r.parsed.ok()) {
                 save_successful_response(conn, res, &uv_id, &su_id, telemetry, vres.id, hide_rs)?;
             }
             Ok(())

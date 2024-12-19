@@ -59,6 +59,6 @@ mod tests {
 
         let res = stytch_client.lookup(telemetry_id).await.unwrap();
         let parsed = StytchLookupResponse::from_response(res).await;
-        assert_eq!(telemetry_id, parsed.result.unwrap().telemetry_id);
+        assert_eq!(telemetry_id, parsed.parsed.unwrap().telemetry_id);
     }
 }
