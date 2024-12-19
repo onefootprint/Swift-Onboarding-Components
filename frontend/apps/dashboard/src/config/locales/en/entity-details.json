@@ -1293,7 +1293,15 @@
       }
     },
     "people": {
-      "title": "People"
+      "title": "People",
+      "table": {
+        "aria-label": "Business people",
+        "empty-state": "No associated people",
+        "header": {
+          "name": "Name",
+          "role": "Role"
+        }
+      }
     },
     "registrations": {
       "title": "Sec. of State filings",
