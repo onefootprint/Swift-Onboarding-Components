@@ -1,14 +1,12 @@
 package com.onefootprint.native_onboarding_components
 
 import com.onefootprint.native_onboarding_components.models.AuthTokenStatus
-import com.onefootprint.native_onboarding_components.models.DocumentOutcome
 import com.onefootprint.native_onboarding_components.models.FootprintAuthMethods
 import com.onefootprint.native_onboarding_components.models.FootprintAuthRequirement
 import com.onefootprint.native_onboarding_components.models.FootprintException
 import com.onefootprint.native_onboarding_components.models.FootprintL10n
 import com.onefootprint.native_onboarding_components.models.FootprintSupportedLanguage
 import com.onefootprint.native_onboarding_components.models.FootprintSupportedLocale
-import com.onefootprint.native_onboarding_components.models.OverallOutcome
 import com.onefootprint.native_onboarding_components.models.Requirements
 import com.onefootprint.native_onboarding_components.models.SandboxOutcome
 import com.onefootprint.native_onboarding_components.models.VaultData
@@ -17,15 +15,18 @@ import com.onefootprint.native_onboarding_components.utils.AuthUtils
 import com.onefootprint.native_onboarding_components.utils.RequirementUtil
 import com.onefootprint.native_onboarding_components.utils.VaultUtils
 import com.onefootprint.native_onboarding_components.utils.generateRandomString
+import io.ktor.client.engine.ProxyBuilder
+import io.ktor.client.engine.http
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.header
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.openapitools.client.models.DataIdentifier
+import org.openapitools.client.models.DocumentFixtureResult
 import org.openapitools.client.models.IdentifyChallengeResponse
 import org.openapitools.client.models.ObConfigurationKind
 import org.openapitools.client.models.PublicOnboardingConfiguration
+import org.openapitools.client.models.WorkflowFixtureResult
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -89,6 +90,9 @@ object Footprint {
             this.sessionId = sessionId
 
             FootprintQueries.initialize(httpClientConfig = {
+//                it.engine {
+//                    proxy = ProxyBuilder.http("http://192.168.68.102:9090")
+//                }
                 it.defaultRequest {
                     header("X-Fp-Session-Id", sessionId)
                     header("X-Fp-Client-Version", "${getPackage().name} ${getPackage().version}")
@@ -146,9 +150,9 @@ object Footprint {
                 }
                 this.sandboxId = sandboxId ?: generateRandomString()
                 val requiresDocument = onboardingConfig!!.requiresIdDoc
-                val overallOutcome = sandboxOutcome?.overallOutcome ?: OverallOutcome.PASS
+                val overallOutcome = sandboxOutcome?.overallOutcome ?: WorkflowFixtureResult.pass
                 val documentOutcome = if (requiresDocument) sandboxOutcome?.documentOutcome
-                    ?: DocumentOutcome.PASS else null
+                    ?: DocumentFixtureResult.pass else null
                 this.sandboxOutcome = SandboxOutcome(
                     overallOutcome = overallOutcome,
                     documentOutcome = documentOutcome

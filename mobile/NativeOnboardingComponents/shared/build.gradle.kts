@@ -25,22 +25,23 @@ kotlin {
     val xcf = XCFramework(xcframeworkName)
 
 
-    val isEmulatorOnly = project.findProperty("runIOSOnEmulatorOnly")?.toString()?.toBoolean() ?: false
+    // iOS Targets
+    val isEmulatorOnly =
+        project.findProperty("runIOSOnEmulatorOnly")?.toString()?.toBoolean() ?: false
 
-    println("isEmulatorOnly: "+isEmulatorOnly)
+    println("isEmulatorOnly: $isEmulatorOnly")
 
-    val list = if (isEmulatorOnly) {
+    // Dynamically add iOS targets
+    val iosTargets = if (isEmulatorOnly) {
         listOf(iosSimulatorArm64())
     } else {
         listOf(iosX64(), iosArm64(), iosSimulatorArm64())
     }
 
-    println("list: "+list)
-
-    list.forEach {
-        it.binaries.framework {
+    iosTargets.forEach { target ->
+        target.binaries.framework {
             baseName = xcframeworkName
-            binaryOption("bundleId", "com.onefootprint.${xcframeworkName}")
+            binaryOption("bundleId", "com.onefootprint.$xcframeworkName")
             xcf.add(this)
             isStatic = true
         }
@@ -74,10 +75,8 @@ kotlin {
 
             api(libs.kotlinx.datetime)
         }
-        iosMain {
-            dependencies {
-                api(libs.ktor.client.ios)
-            }
+        iosMain.dependencies {
+            api(libs.ktor.client.ios)
         }
     }
 }

@@ -19,7 +19,8 @@ class FootprintException(
         FORMAT_ERROR,
         NOT_ALLOWED,
         WEBVIEW_ERROR,
-        UI_ERROR
+        UI_ERROR,
+        SDK_ERROR
     }
 
     // Override the toString() method to include kind, message, and context (if available)

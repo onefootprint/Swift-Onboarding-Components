@@ -109,6 +109,21 @@ const updateModernRawUserDataRequest = async (dir: string) => {
   });
 };
 
+const updateSdkArgs = async (dir: string) => {
+  const verifyPath = path.join(dir, 'src/commonMain/kotlin/org/openapitools/client/models/sdkArgsVerifyV1.kt');
+  const sdkPath = path.join(dir, 'src/commonMain/kotlin/org/openapitools/client/models/SdkArgs.kt');
+  let fileContent = await fs.readFile(verifyPath, 'utf8');
+  fileContent = fileContent.replace(/SdkArgsVerifyV1/g, 'SdkArgs');
+  await fs.writeFile(sdkPath, fileContent);
+};
+
+const updateVerifyV1SdkArgs = async (dir: string) => {
+  const verifyPath = path.join(dir, 'src/commonMain/kotlin/org/openapitools/client/models/VerifyV1SdkArgs.kt');
+  let fileContent = await fs.readFile(verifyPath, 'utf8');
+  fileContent = fileContent.replace(/userData: kotlin\.String\?/, 'userData: ModernUserDecryptResponse?');
+  await fs.writeFile(verifyPath, fileContent);
+};
+
 export const updateKotlin = async (dir: string) => {
   await updateCollectedDataOption(dir);
   await updateDataIdentifierVarNaming(dir);
@@ -117,4 +132,6 @@ export const updateKotlin = async (dir: string) => {
   await updateOnboardingRequirementCollectDocument(dir);
   await updateOnboardingRequirementDataClasses(dir);
   await updateModernRawUserDataRequest(dir);
+  await updateSdkArgs(dir);
+  await updateVerifyV1SdkArgs(dir);
 };

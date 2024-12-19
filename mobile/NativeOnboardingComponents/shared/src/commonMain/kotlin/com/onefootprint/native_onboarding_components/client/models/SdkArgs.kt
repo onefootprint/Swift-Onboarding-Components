@@ -15,20 +15,14 @@
 
 package org.openapitools.client.models
 
-import org.openapitools.client.models.RenderV1SdkArgs
-import org.openapitools.client.models.SdkArgsAuthV1
-import org.openapitools.client.models.SdkArgsFormV1
-import org.openapitools.client.models.SdkArgsRenderV1
-import org.openapitools.client.models.SdkArgsUpdateAuthMethodsV1
-import org.openapitools.client.models.SdkArgsVerifyResultV1
-import org.openapitools.client.models.SdkArgsVerifyV1
+import org.openapitools.client.models.VerifyV1SdkArgs
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * BE VERY CAREFUL CHANGING THESE.  Old versions of Footprint.js may be sending old versions of this struct.  When making a breaking change to the struct, you should add a new version of the struct to this  enum variant.
+ * 
  *
  * @param `data` 
  * @param kind 
@@ -37,7 +31,7 @@ import kotlinx.serialization.encoding.*
 
 data class SdkArgs (
 
-    @SerialName(value = "data") @Required val `data`: RenderV1SdkArgs,
+    @SerialName(value = "data") @Required val `data`: VerifyV1SdkArgs,
 
     @SerialName(value = "kind") @Required val kind: SdkArgs.Kind
 
@@ -46,11 +40,11 @@ data class SdkArgs (
     /**
      * 
      *
-     * Values: render_v1
+     * Values: verify_v1
      */
     @Serializable
     enum class Kind(val value: kotlin.String) {
-        @SerialName(value = "render_v1") render_v1("render_v1");
+        @SerialName(value = "verify_v1") verify_v1("verify_v1");
     }
 
 }

@@ -61,7 +61,7 @@ data class VerifyV1SdkArgs (
 
     @SerialName(value = "should_relay_to_components") val shouldRelayToComponents: kotlin.Boolean? = null,
 
-    @SerialName(value = "user_data") val userData: kotlin.String? = null
+    @SerialName(value = "user_data") val userData: ModernUserDecryptResponse? = null
 
 ) {
 

@@ -14,6 +14,7 @@ import org.openapitools.client.models.IdentifyChallengeResponse
 import org.openapitools.client.models.IdentifyScope
 import org.openapitools.client.models.ObConfigurationKind
 import org.openapitools.client.models.PublicOnboardingConfiguration
+import org.openapitools.client.models.WorkflowFixtureResult
 
 internal class VerificationResponseInternal(
     val authToken: String,
@@ -192,7 +193,7 @@ internal object AuthUtils {
         challenge: IdentifyChallengeResponse?,
         challengeResponse: String,
         onboardingConfig: PublicOnboardingConfiguration?,
-        overallOutcome: OverallOutcome?
+        overallOutcome: WorkflowFixtureResult?
     ): VerificationResponseInternal {
         if (onboardingConfig == null) {
             throw FootprintException(

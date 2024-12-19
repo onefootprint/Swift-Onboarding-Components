@@ -1,13 +1,11 @@
 package com.onefootprint.native_onboarding_components.hosted
 
-import android.app.Activity
-import android.content.Intent
 import com.onefootprint.native_onboarding_components.models.VerificationResponse
 
-actual class PlatformContext(val activity: Activity)
+actual class PlatformContext( )
 
 internal actual fun getActivityClassName(context: PlatformContext): String {
-    return context.activity::class.java.name
+    return "test"
 }
 
 internal actual fun handleSdkArgsToken(
@@ -15,17 +13,12 @@ internal actual fun handleSdkArgsToken(
     context: PlatformContext,
     token: String
 ) {
-    val url = FootprintHostedInternal.instance.getUrl(config, token)
-    val activity = context.activity
-
-    val intent = Intent(activity, HostedLauncherActivity::class.java)
-    intent.putExtra("FOOTPRINT_VERIFICATION_FLOW_URL", url.toString())
-    activity.startActivity(intent)
+    // TODO
 }
+
 
 object FootprintHosted {
     suspend fun launchIdentify(
-        context: Activity,
         email: String? = null,
         phone: String? = null,
         onCancel: (() -> Unit)? = null,
@@ -34,7 +27,7 @@ object FootprintHosted {
         appearance: FootprintAppearance? = null
     ) {
         return FootprintHostedCommon.launchIdentify(
-            PlatformContext(context),
+            PlatformContext(),
             email,
             phone,
             onCancel,
@@ -43,16 +36,14 @@ object FootprintHosted {
             appearance
         )
     }
-
     suspend fun handoff(
-        context: Activity,
         onComplete: ((validationToken: String) -> Unit)? = null,
         onCancel: (() -> Unit)? = null,
         onError: ((error: String) -> Unit)? = null,
         appearance: FootprintAppearance? = null
     ) {
         return FootprintHostedCommon.handoff(
-            PlatformContext(context),
+            PlatformContext(),
             onComplete,
             onCancel,
             onError,

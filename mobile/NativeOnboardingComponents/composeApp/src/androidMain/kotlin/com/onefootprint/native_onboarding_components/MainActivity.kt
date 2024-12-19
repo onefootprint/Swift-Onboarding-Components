@@ -151,7 +151,7 @@ fun Init(
                         publicKey = "pb_test_Nza8oVYDBlrIqrQrNCbKRB",
 //                        authToken = "utok_MhyAZwlmbZVLaxH6Kr7aeBe564fi13buhp",
                         sandboxOutcome = SandboxOutcome(
-                            overallOutcome = OverallOutcome.FAIL
+                            overallOutcome = OverallOutcome.fail
                         )
                     )
 
@@ -186,8 +186,8 @@ fun IdentifyEmailPhone(
     setNextStep: (step: Step) -> Unit,
     context: Activity
 ) {
-    var email by remember { mutableStateOf("") }
-    var phone by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("sandbox@onefootprint.com") }
+    var phone by remember { mutableStateOf("+15555550100") }
     var emailError by remember { mutableStateOf(false) }
     var phoneError by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()

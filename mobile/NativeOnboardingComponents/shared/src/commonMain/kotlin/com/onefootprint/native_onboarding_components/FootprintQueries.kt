@@ -2,11 +2,11 @@ package com.onefootprint.native_onboarding_components
 
 import com.onefootprint.native_onboarding_components.models.FootprintException
 import com.onefootprint.native_onboarding_components.models.HttpError
-import com.onefootprint.native_onboarding_components.models.OverallOutcome
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.call.body
 import org.openapitools.client.apis.IdentifyApi
 import org.openapitools.client.apis.OnboardingApi
+import org.openapitools.client.apis.SdkArgsApi
 import org.openapitools.client.apis.UserApi
 import org.openapitools.client.apis.VaultApi
 import org.openapitools.client.models.ChallengeKind
@@ -21,6 +21,7 @@ import org.openapitools.client.models.IdentifyResponse
 import org.openapitools.client.models.IdentifyScope
 import org.openapitools.client.models.IdentifyVerifyRequest
 import org.openapitools.client.models.IdentifyVerifyResponse
+import org.openapitools.client.models.LogBody
 import org.openapitools.client.models.LoginChallengeRequest
 import org.openapitools.client.models.ModernRawUserDataRequest
 import org.openapitools.client.models.ModernUserDecryptResponse
@@ -30,6 +31,7 @@ import org.openapitools.client.models.PostOnboardingRequest
 import org.openapitools.client.models.ProcessRequest
 import org.openapitools.client.models.PublicOnboardingConfiguration
 import org.openapitools.client.models.RequestedTokenScope
+import org.openapitools.client.models.SdkArgs
 import org.openapitools.client.models.SignupChallengeRequest
 import org.openapitools.client.models.SignupChallengeRequestEmail
 import org.openapitools.client.models.WorkflowFixtureResult
@@ -39,12 +41,14 @@ internal object FootprintQueries {
     private var identifyApi: IdentifyApi = IdentifyApi()
     private var userApi: UserApi = UserApi()
     private var vaultApi: VaultApi = VaultApi()
+    private var sdkArgsApi: SdkArgsApi = SdkArgsApi()
 
     fun initialize(httpClientConfig: ((HttpClientConfig<*>) -> Unit)) {
         this.onboardingApi = OnboardingApi(httpClientConfig = httpClientConfig)
         this.identifyApi = IdentifyApi(httpClientConfig = httpClientConfig)
         this.userApi = UserApi(httpClientConfig = httpClientConfig)
         this.vaultApi = VaultApi(httpClientConfig = httpClientConfig)
+        this.sdkArgsApi = SdkArgsApi(httpClientConfig = httpClientConfig)
     }
 
     suspend fun getOnboardingConfig(
@@ -227,18 +231,11 @@ internal object FootprintQueries {
 
     suspend fun initOnboarding(
         authToken: String,
-        overallOutcome: OverallOutcome?
+        overallOutcome: WorkflowFixtureResult?
     ): OnboardingResponse {
         val response = onboardingApi.hostedOnboardingPost(
             postOnboardingRequest = PostOnboardingRequest(
-                fixtureResult = when (overallOutcome) {
-                    OverallOutcome.PASS -> WorkflowFixtureResult.pass
-                    OverallOutcome.FAIL -> WorkflowFixtureResult.fail
-                    OverallOutcome.STEP_UP -> WorkflowFixtureResult.step_up
-                    OverallOutcome.MANUAL_REVIEW -> WorkflowFixtureResult.manual_review
-                    OverallOutcome.USE_RULES_OUTCOME -> WorkflowFixtureResult.use_rules_outcome
-                    else -> null
-                }
+                fixtureResult = overallOutcome
             ),
             xFpAuthorization = authToken
         )
@@ -335,18 +332,11 @@ internal object FootprintQueries {
         return response.body()
     }
 
-    suspend fun process(authToken: String, overallOutcome: OverallOutcome? = null) {
+    suspend fun process(authToken: String, overallOutcome: WorkflowFixtureResult? = null) {
         val response = onboardingApi.hostedOnboardingProcessPost(
             xFpAuthorization = authToken,
             processRequest = ProcessRequest(
-                fixtureResult = when (overallOutcome) {
-                    OverallOutcome.PASS -> WorkflowFixtureResult.pass
-                    OverallOutcome.FAIL -> WorkflowFixtureResult.fail
-                    OverallOutcome.STEP_UP -> WorkflowFixtureResult.step_up
-                    OverallOutcome.MANUAL_REVIEW -> WorkflowFixtureResult.manual_review
-                    OverallOutcome.USE_RULES_OUTCOME -> WorkflowFixtureResult.use_rules_outcome
-                    else -> null
-                }
+                fixtureResult = overallOutcome
             )
         )
 
@@ -354,6 +344,34 @@ internal object FootprintQueries {
             val error = response.response.body<HttpError>()
             throw FootprintException(
                 kind = FootprintException.ErrorKind.ONBOARDING_ERROR,
+                message = error.message,
+                supportId = error.supportId
+            )
+        }
+    }
+
+    suspend fun createSDKArgs(sdkArgs: SdkArgs): String {
+        val response = this.sdkArgsApi.orgSdkArgsPost(sdkArgs = sdkArgs)
+
+        if (!response.success) {
+            val error = response.response.body<HttpError>()
+            throw FootprintException(
+                kind = FootprintException.ErrorKind.SDK_ERROR,
+                message = error.message,
+                supportId = error.supportId
+            )
+        }
+
+        return response.body().token
+    }
+
+    suspend fun sendTelemetry(logBody: LogBody) {
+        val response = this.sdkArgsApi.orgSdkTelemetryPost(logBody = logBody)
+
+        if (!response.success) {
+            val error = response.response.body<HttpError>()
+            throw FootprintException(
+                kind = FootprintException.ErrorKind.SDK_ERROR,
                 message = error.message,
                 supportId = error.supportId
             )
