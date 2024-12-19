@@ -1,6 +1,7 @@
 import type { PostsOrPages } from '@tryghost/content-api';
 
 import configureGhost from '../../config/initializers/ghost';
+import { getGeneratedPosts } from './local-posts';
 
 const ghost = configureGhost();
 
@@ -22,11 +23,16 @@ export enum SlugByPostType {
 }
 
 export async function getInitialPosts(type?: PostType) {
-  const posts = await ghost.posts.browse({
-    limit: 'all',
-    include: ['tags', 'authors'],
-  });
-  return filterPosts(posts, type);
+  const [ghostPosts, generatedPosts] = await Promise.all([
+    ghost.posts.browse({
+      limit: 'all',
+      include: ['tags', 'authors'],
+    }),
+    getGeneratedPosts(),
+  ]);
+
+  const allPosts = [...ghostPosts, ...generatedPosts] as PostsOrPages;
+  return filterPosts(allPosts, type);
 }
 
 export async function getAllPosts(type?: PostType) {
@@ -66,9 +72,17 @@ const filterPosts = <T extends PostsOrPages>(posts: T, type?: PostType) => {
 
 export async function getPostBySlug(slug: string) {
   try {
-    const post = await ghost.posts.read({ slug }, { formats: ['html'], include: ['tags', 'authors'] });
-    return post;
-  } catch (_) {
-    return null;
+    const ghostPost = await ghost.posts.read({ slug }, { formats: ['html'], include: ['tags', 'authors'] });
+    return ghostPost;
+  } catch (error) {
+    console.error('Error fetching ghost post:', error);
+    try {
+      const generatedPosts = await getGeneratedPosts();
+      const generatedPost = generatedPosts.find(post => post.slug === slug);
+      return generatedPost || null;
+    } catch (error) {
+      console.error('Error fetching generated post:', error);
+      return null;
+    }
   }
 }

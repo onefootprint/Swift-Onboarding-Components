@@ -1,0 +1,48 @@
+**Footprint: Revolutionizing Identity Verification and Onboarding with Cutting-Edge Technology**
+
+In the ever-evolving landscape of digital identity verification, Footprint stands out as a pioneer, providing a comprehensive platform that streamlines onboarding, ensures accurate identity verification, and safeguards sensitive user data. With its robust suite of tools and innovative approaches, Footprint is poised to revolutionize the way businesses approach identity verification and onboarding.
+
+**Core Product Offerings and Capabilities**
+
+Footprint's platform is built around several key components:
+
+1. **Onboarding Controls**: Fine-grained controls that enable businesses to require attestable user experiences, collect additional forms of identification, and perform enhanced device checks to ensure the human behind the computer is who they claim to be.
+2. **User Behavior and Device Insights**: Automated suspicious behavioral analysis that detects anomalous behavior, such as typing hesitancy, copy-paste for sensitive fields, devices on bad reputation networks, and more.
+3. **Additional Verifications**: Enhanced document validation, motor vehicle history, and non-documentary verifications for Mexico and Canada.
+4. **Duplicate & Synthetic Fraud**: Advanced detection of duplicate and synthetic identities, including selfie duplicate detection and identity data de-duplication.
+5. **Vaulting and Onboarding**: Seamless integration of onboarding with vaulting, enabling businesses to securely store sensitive user data and access it with a single identifier (fp_id).
+
+**Key Differentiators from Competitors**
+
+Footprint's unique approach sets it apart from competitors:
+
+1. **Triple Binding Identity**: Footprint verifies the person behind the screen, their device, and their phone number, ensuring a robust and accurate identity verification process.
+2. **App Clips and Passkeys**: Leveraging native device experiences and strong cryptography, Footprint provides a secure and user-friendly onboarding experience.
+3. **Device Attestation**: Footprint utilizes Apple and Google's device attestation frameworks to detect and prevent fraud, raising the cost of fraud for adversaries.
+
+**Technical Innovations and Unique Approaches**
+
+Footprint's innovative approach to identity verification and onboarding includes:
+
+1. **Passkeys**: A cryptographic public key bound to the user's verified identity, enabling secure and phishing-resistant authentication.
+2. **App Clips and Instant Apps**: Native device experiences that foster trust and verify the person behind the screen.
+3. **Device Check and SafetyNet**: Leveraging Apple and Google's anti-fraud frameworks to detect and prevent fraud.
+
+**Benefits and Value Propositions**
+
+Footprint's platform offers numerous benefits to businesses:
+
+1. **Streamlined Onboarding**: Efficient and user-friendly onboarding experience that reduces friction and increases conversion rates.
+2. **Accurate Identity Verification**: Robust and accurate identity verification process that prevents fraud and ensures compliance.
+3. **Secure Data Storage**: Seamless integration of onboarding with vaulting, enabling secure storage of sensitive user data.
+4. **Fraud Prevention**: Advanced detection of duplicate and synthetic identities, preventing fraud and minimizing costs.
+
+**Industry Problems Solved**
+
+Footprint's platform addresses several pressing industry problems:
+
+1. **Identity Fraud**: Footprint's triple binding identity approach and device attestation frameworks prevent identity fraud and ensure accurate identity verification.
+2. **Onboarding Friction**: Footprint's streamlined onboarding experience reduces friction and increases conversion rates.
+3. **Data Security**: Footprint's seamless integration of onboarding with vaulting ensures secure storage of sensitive user data.
+
+In conclusion, Footprint is a pioneering platform that revolutionizes identity verification and onboarding with cutting-edge technology. Its robust suite of tools, innovative approaches, and technical innovations provide a comprehensive solution to businesses, ensuring accurate identity verification, secure data storage, and streamlined onboarding. With Footprint, businesses can confidently onboard customers, prevent fraud, and ensure compliance, ultimately driving growth and success.
