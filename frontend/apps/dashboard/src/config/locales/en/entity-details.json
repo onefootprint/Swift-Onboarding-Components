@@ -1310,6 +1310,24 @@
         "active": "Active",
         "inactive": "Inactive"
       },
+      "filters": {
+        "trigger": "Filter by state",
+        "title": "Apply filters",
+        "states": {
+          "label": "States"
+        },
+        "reset": "Clear filters",
+        "cta": "Apply"
+      },
+      "table": {
+        "aria-label": "Secretary of State filings",
+        "empty-state": "No filings",
+        "header": {
+          "state": "State",
+          "file-date": "File date",
+          "status": "Status"
+        }
+      },
       "dialog": {
         "title": "Secretary of State filing",
         "status-details": {
