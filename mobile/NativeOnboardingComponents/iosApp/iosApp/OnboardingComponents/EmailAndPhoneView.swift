@@ -23,6 +23,13 @@ struct EmailAndPhoneView: View {
                         shouldNavigateToNextView = true
                         isLoading = false
                     } catch {
+                        print("Error creating challenge: \(error)")
+                        print("is FootprintException \(isFootprintException(error))")
+                        if isFootprintException(error), let fpException = extractFootprintException(error) {
+                            if(fpException.kind == .inlineOtpNotSupported) {
+                                print("This is an inline OTP not supported issue")
+                            }
+                        }
 //                        if let footprintError = error as? FootprintError {
 //                            switch footprintError.kind {
 //                            case .inlineOtpNotSupported:
