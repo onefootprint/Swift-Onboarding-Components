@@ -403,3 +403,4 @@ define_newtype_id!(
     String,
     "Identifier for an access request"
 );
+define_newtype_id!(TenantMetricId, String, "Identifier for a tenant metric");

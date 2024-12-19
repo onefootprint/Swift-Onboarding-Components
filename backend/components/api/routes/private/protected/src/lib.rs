@@ -6,6 +6,7 @@ mod org;
 mod samba;
 mod sandbox_tenant;
 mod task;
+mod tenant_metrics;
 mod token_reveal;
 mod verification_checks;
 mod webhooks;
@@ -32,7 +33,8 @@ pub fn configure(config: &mut web::ServiceConfig) {
         .service(org::update_business_info)
         .service(samba::create_samba_order)
         .service(verification_checks::update_verification_checks)
-        .service(org::get_business_info);
+        .service(org::get_business_info)
+        .service(tenant_metrics::set_metrics);
     backfill::configure(config);
 }
 

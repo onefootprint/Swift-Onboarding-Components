@@ -22,10 +22,10 @@ mod roles;
 mod rules;
 mod sdk_args;
 mod sdk_telemetry;
+mod tenant_metrics;
 mod tenant_tag;
 mod vault_dr;
 mod webhook_portal;
-
 use api_core::web::ServiceConfig;
 
 pub fn routes(config: &mut ServiceConfig) {
@@ -59,6 +59,7 @@ pub fn routes(config: &mut ServiceConfig) {
         .service(frequent_notes::delete)
         .service(tenant_tag::get)
         .service(tenant_tag::post)
+        .service(tenant_metrics::get)
         .service(tenant_tag::delete);
 
     playbooks::routes(config);

@@ -1451,6 +1451,18 @@ diesel::table! {
 diesel::table! {
     use diesel::sql_types::*;
 
+    tenant_metrics (id) {
+        id -> Text,
+        tenant_id -> Text,
+        data -> Jsonb,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+
     tenant_role (id) {
         id -> Text,
         tenant_id -> Nullable<Text>,
@@ -2029,6 +2041,7 @@ diesel::joinable!(tenant_compliance_partnership -> partner_tenant (partner_tenan
 diesel::joinable!(tenant_compliance_partnership -> tenant (tenant_id));
 diesel::joinable!(tenant_frequent_note -> tenant (tenant_id));
 diesel::joinable!(tenant_ios_app_meta -> tenant (tenant_id));
+diesel::joinable!(tenant_metrics -> tenant (tenant_id));
 diesel::joinable!(tenant_role -> partner_tenant (partner_tenant_id));
 diesel::joinable!(tenant_role -> tenant (tenant_id));
 diesel::joinable!(tenant_rolebinding -> partner_tenant (partner_tenant_id));
@@ -2155,6 +2168,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     tenant_compliance_partnership,
     tenant_frequent_note,
     tenant_ios_app_meta,
+    tenant_metrics,
     tenant_role,
     tenant_rolebinding,
     tenant_tag,

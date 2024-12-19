@@ -71,6 +71,7 @@ pub mod tenant_client_config;
 pub mod tenant_compliance_partnership;
 pub mod tenant_frequent_note;
 pub mod tenant_ios_app_meta;
+pub mod tenant_metrics;
 pub mod tenant_role;
 pub mod tenant_rolebinding;
 pub mod tenant_tag;
