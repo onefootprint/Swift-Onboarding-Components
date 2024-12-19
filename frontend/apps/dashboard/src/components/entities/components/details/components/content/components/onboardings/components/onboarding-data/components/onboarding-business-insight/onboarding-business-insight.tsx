@@ -22,7 +22,7 @@ const OnboardingBusinessInsight = ({
   onboardingId,
   vault,
 }: OnboardingBusinessInsightProps) => {
-  const { t } = useTranslation('entity-details', { keyPrefix: 'onboardings.business-insight' });
+  const { t } = useTranslation('entity-details', { keyPrefix: 'onboardings.business-shared' });
   const { data: vaultData, update: updateVault } = vault;
 
   return isDecrypted ? (

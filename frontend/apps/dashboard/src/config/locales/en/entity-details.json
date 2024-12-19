@@ -1255,17 +1255,41 @@
       "title": "User data",
       "decrypt-all": "Decrypt all"
     },
-    "business-insight": {
-      "encrypted": "For security reasons, you must decrypt all before viewing these details."
+    "business-shared": {
+      "encrypted": "For security reasons, you must decrypt all before viewing these details.",
+      "tags": {
+        "verified": "Verified",
+        "not-verified": "Not verified",
+        "submitted": "Submitted",
+        "not-submitted": "Not submitted"
+      }
     },
     "business-details": {
       "title": "Business details",
       "name": {
         "title": "Business name",
-        "filing-sources": "{{stateAbbrev}} - SOS"
+        "filing-sources": "{{stateAbbrev}} - SOS",
+        "table": {
+          "aria-label": "Business names",
+          "empty-state": "No names",
+          "header": {
+            "name": "Name",
+            "type": "Type",
+            "notes": "Notes"
+          },
+          "source": "Source: {{sources}}",
+          "legal": "Legal",
+          "dba": "Doing business as"
+        }
       },
       "details": {
-        "title": "Other business details"
+        "title": "Other business details",
+        "formation-date": "Formation date",
+        "formation-state": "Formation state",
+        "tin": "TIN (EIN)",
+        "entity-type": "Entity type",
+        "phone-number": "Phone number",
+        "website": "Website"
       }
     },
     "people": {

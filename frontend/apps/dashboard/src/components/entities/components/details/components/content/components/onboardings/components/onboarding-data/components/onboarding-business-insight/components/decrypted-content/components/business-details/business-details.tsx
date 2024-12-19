@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import Subsection from '../../../../../subsection';
 import type { FormattedDetails, FormattedName } from '../../../../onboarding-business-insight.types';
+import BusinessNameList from './components/business-name-list';
 
 type BusinessDetailsProps = {
   names: FormattedName[];
@@ -13,7 +14,7 @@ const BusinessDetails = ({ names, details }: BusinessDetailsProps) => {
   return (
     <div className="flex flex-col gap-6">
       <Subsection title={t('name.title')}>
-        <span>{names.length}</span>
+        <BusinessNameList data={names} />
       </Subsection>
       <Subsection title={t('details.title')} hasDivider>
         <span>{details?.formationDate}</span>
