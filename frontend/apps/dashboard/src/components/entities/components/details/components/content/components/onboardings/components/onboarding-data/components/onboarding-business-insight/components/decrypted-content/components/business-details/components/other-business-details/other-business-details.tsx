@@ -9,10 +9,11 @@ type OtherBusinessDetailsProps = {
   data: FormattedDetails;
 };
 
-const OtherBusinessDetails = ({ data }: OtherBusinessDetailsProps) => {
+const OtherBusinessDetails = ({
+  data: { formationDate, formationState, tin, entityType, phoneNumbers, website },
+}: OtherBusinessDetailsProps) => {
   const { t } = useTranslation('entity-details', { keyPrefix: 'onboardings' });
   const detailT = useOtherDetailText();
-  const { formationDate, formationState, tin, entityType, phoneNumbers, website } = data;
 
   const renderBadge = (isVerified: boolean | undefined) => {
     if (isUndefined(isVerified)) return null;

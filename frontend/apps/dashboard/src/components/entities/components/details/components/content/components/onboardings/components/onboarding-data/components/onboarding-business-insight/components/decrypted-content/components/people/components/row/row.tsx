@@ -8,9 +8,8 @@ type RowProps = {
   person: FormattedPerson;
 };
 
-const Row = ({ person }: RowProps) => {
+const Row = ({ person: { name, role, submitted, associationVerified, sources } }: RowProps) => {
   const { t } = useTranslation('entity-details', { keyPrefix: 'onboardings' });
-  const { name, role, submitted, associationVerified, sources } = person;
 
   return (
     <>

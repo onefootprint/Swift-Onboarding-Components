@@ -11,9 +11,8 @@ type RowProps = {
   onOpen: (id: string) => void;
 };
 
-const Row = ({ businessName, onOpen }: RowProps) => {
+const Row = ({ businessName: { name, sources, sourceSOSFilingId, submitted, verified, kind }, onOpen }: RowProps) => {
   const { t } = useTranslation('entity-details', { keyPrefix: 'onboardings' });
-  const { name, sources, sourceSOSFilingId, submitted, verified, kind } = businessName;
 
   const getKindText = () => {
     if (kind === 'dba') return t('business-details.name.table.dba');

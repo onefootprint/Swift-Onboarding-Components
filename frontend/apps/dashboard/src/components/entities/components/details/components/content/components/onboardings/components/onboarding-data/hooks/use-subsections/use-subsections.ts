@@ -20,7 +20,7 @@ export type Subsection =
   | 'business-details'
   | 'people'
   | 'registrations'
-  | 'watchlists'
+  | 'watchlist'
   | 'offices';
 type SubsectionMap = Partial<Record<Subsection, { title: string; iconComponent: Icon; isBusinessInsight?: boolean }>>;
 
@@ -62,8 +62,8 @@ const useSubsections = (onboarding: EntityOnboarding, riskSignals: RiskSignal[] 
       iconComponent: IcoFileText16,
       isBusinessInsight: true,
     },
-    watchlists: {
-      title: t('watchlists.title'),
+    watchlist: {
+      title: t('watchlist.title'),
       iconComponent: IcoEye16,
       isBusinessInsight: true,
     },

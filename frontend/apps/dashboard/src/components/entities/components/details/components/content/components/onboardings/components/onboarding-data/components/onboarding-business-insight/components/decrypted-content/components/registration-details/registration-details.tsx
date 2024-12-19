@@ -18,10 +18,8 @@ export type RegistrationDetailsProps = {
   onClose: () => void;
 };
 
-const RegistrationDetails = ({ registration, onClose }: RegistrationDetailsProps) => {
-  const { t } = useTranslation('entity-details', { keyPrefix: 'onboardings.registrations' });
-  const statusT = useRegistrationStatusText();
-  const {
+const RegistrationDetails = ({
+  registration: {
     state,
     status,
     jurisdiction,
@@ -33,7 +31,11 @@ const RegistrationDetails = ({ registration, onClose }: RegistrationDetailsProps
     registrationDate,
     fileNumber,
     source,
-  } = registration;
+  },
+  onClose,
+}: RegistrationDetailsProps) => {
+  const { t } = useTranslation('entity-details', { keyPrefix: 'onboardings.registrations' });
+  const statusT = useRegistrationStatusText();
 
   return (
     <Dialog onClose={onClose} open title={t('title')}>

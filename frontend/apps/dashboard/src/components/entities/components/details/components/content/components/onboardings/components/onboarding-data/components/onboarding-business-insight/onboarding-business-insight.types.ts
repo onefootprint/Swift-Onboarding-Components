@@ -4,7 +4,6 @@ import type {
   InsightTin,
   InsightWebsite,
   Officer,
-  WatchlistHit,
 } from '@onefootprint/request-types/dashboard';
 
 export type FormattedAddress = InsightAddress & { id: string };
@@ -57,8 +56,20 @@ export type FormattedWatchlist = {
   watchlist: {
     [screenedEntityName: string]: {
       kind: 'business' | 'person';
-      hits: WatchlistHit[];
+      hits: FormattedWatchlistHit[];
     };
   };
   hitCount: number;
+};
+
+export type FormattedWatchlistHit = {
+  agency: string;
+  agencyAbbr: string;
+  agencyInformationUrl: string;
+  agencyListUrl: string;
+  entityAliases: Array<string>;
+  entityName: string;
+  listCountry: string;
+  listName: string;
+  url: string;
 };
