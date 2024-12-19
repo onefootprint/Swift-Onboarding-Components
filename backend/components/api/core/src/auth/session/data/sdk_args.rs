@@ -4,7 +4,9 @@ use db::models::appearance::Appearance;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::tenant::Tenant;
 use db::models::tenant_client_config::TenantClientConfig;
-use newtypes::DataIdentifier;
+use newtypes::impl_modern_map_apiv2_schema;
+use newtypes::BootstrapKey;
+use newtypes::DataIdentifier as DI;
 use newtypes::DocumentFixtureResult;
 use newtypes::EncryptedVaultPrivateKey;
 use newtypes::PiiJsonValue;
@@ -16,10 +18,31 @@ use newtypes::SessionAuthToken;
 use newtypes::WorkflowFixtureResult;
 use paperclip::actix::Apiv2Schema;
 use std::collections::HashMap;
+use std::str::FromStr;
 use strum_macros::Display;
 use strum_macros::EnumDiscriminants;
 
-pub type UserDataV1 = HashMap<String, PiiJsonValue>;
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Default)]
+#[serde(transparent)]
+/// NOTE: this doesn't yet validate that the keys are valid BootstrapKeys
+pub struct BootstrapDataV1(pub HashMap<String, PiiJsonValue>);
+impl_modern_map_apiv2_schema!(
+    BootstrapDataV1,
+    BootstrapKey,
+    "Key-value map of bootstrap data. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/integrate/bootstrap-data#boostraping-kyb-data).",
+    { "id.first_name": "Jane", "id.last_name": "Doe" }
+);
+
+impl BootstrapDataV1 {
+    /// Soft validates that UserDataV1 keys are all valid. Eventually this will become a hard
+    /// validation
+    pub fn validate_keys(&self) {
+        for k in self.0.keys().filter(|k| BootstrapKey::from_str(k).is_err()) {
+            // TODO: turn into hard error
+            tracing::warn!(key=%k, "Invalid bootstrap data key provided");
+        }
+    }
+}
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema)]
 pub struct L10nV1 {
@@ -44,7 +67,8 @@ pub struct VerifyV1SdkArgs {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub public_key: Option<PublishablePlaybookKey>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub user_data: Option<UserDataV1>,
+    // TODO: ideally we rename this to bootstrap_data, but it's a breaking change to the client
+    pub user_data: Option<BootstrapDataV1>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub options: Option<VerifyV1Options>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -79,7 +103,8 @@ pub struct AuthV1SdkArgs {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub public_key: Option<PublishablePlaybookKey>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub user_data: Option<UserDataV1>,
+    // TODO: ideally we rename this to bootstrap_data, but it's a breaking change to the client
+    pub user_data: Option<BootstrapDataV1>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub options: Option<AuthV1Options>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -119,7 +144,7 @@ pub struct FormV1SdkArgs {
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema)]
 pub struct RenderV1SdkArgs {
-    pub id: DataIdentifier,
+    pub id: DI,
     pub auth_token: PiiString,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub label: Option<String>,
@@ -159,6 +184,9 @@ impl ValidateSdkArgs for VerifyV1SdkArgs {
         if self.auth_token.is_none() && self.public_key.is_none() {
             return BadRequestInto("Either auth token or public key must be provided");
         }
+        if let Some(user_data) = self.user_data.as_ref() {
+            user_data.validate_keys();
+        }
 
         let show_completion_page = self
             .options
@@ -178,6 +206,9 @@ impl ValidateSdkArgs for AuthV1SdkArgs {
             .map(|pk| pk.to_string())
             .unwrap_or("None".into());
         tracing::info!(%public_key, "Auth args");
+        if let Some(user_data) = self.user_data.as_ref() {
+            user_data.validate_keys();
+        }
         if self.public_key.is_none() {
             return BadRequestInto("Public key must be provided");
         }

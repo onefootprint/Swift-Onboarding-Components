@@ -19,6 +19,7 @@
 //!   `IDK::LastName`.
 
 mod bank_data_kind;
+mod bootstrap_key;
 mod business_data_kind;
 mod card_data_kind;
 mod collected_data;
@@ -33,6 +34,7 @@ mod investor_profile_kind;
 mod kv_data_key;
 mod validation;
 pub use self::bank_data_kind::*;
+pub use self::bootstrap_key::*;
 pub use self::business_data_kind::*;
 pub use self::card_data_kind::*;
 pub use self::collected_data::*;

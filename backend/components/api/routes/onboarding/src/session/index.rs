@@ -4,7 +4,7 @@ use crate::utils::session::AuthSession;
 use crate::State;
 use api_core::auth::session::onboarding::OnboardingSession;
 use api_core::auth::session::onboarding::OnboardingSessionTrustedMetadata;
-use api_core::auth::session::sdk_args::UserDataV1;
+use api_core::auth::session::sdk_args::BootstrapDataV1;
 use api_core::auth::tenant::TenantApiKeyGated;
 use api_core::auth::tenant::TenantGuard;
 use api_errors::BadRequestInto;
@@ -32,7 +32,7 @@ pub struct CreateOnboardingSessionRequest {
     #[serde(default)]
     #[openapi(example = r#"{"id.first_name": "Jane", "id.last_name": "Doe"}"#)]
     #[openapi(optional)]
-    pub bootstrap_data: UserDataV1,
+    pub bootstrap_data: BootstrapDataV1,
     /// Allow the user to re-onboard onto this playbook even if they have already onboarded onto
     /// it. Defaults to false.
     // TODO: this is really weird that the default here is different from user-specific sessions
@@ -77,6 +77,7 @@ pub async fn post(
         allow_reonboard,
         business_external_id,
     } = request.into_inner();
+    bootstrap_data.validate_keys();
 
     let sealing_key = state.session_sealing_key.clone();
     let (token, session) = state

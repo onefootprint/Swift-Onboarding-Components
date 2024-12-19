@@ -2839,7 +2839,7 @@
                         "type": "string"
                     },
                     "user_data": {
-                        "type": "object"
+                        "$ref": "#/components/schemas/BootstrapDataV1"
                     }
                 }
             },
@@ -2979,6 +2979,140 @@
                     "op",
                     "uuid"
                 ]
+            },
+            "BootstrapDataV1": {
+                "example": {
+                    "id.first_name": "Jane",
+                    "id.last_name": "Doe"
+                },
+                "description": "Key-value map of bootstrap data. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/integrate/bootstrap-data#boostraping-kyb-data).",
+                "type": "object",
+                "properties": {
+                    "business.address_line1": {
+                        "type": "string"
+                    },
+                    "business.address_line2": {
+                        "type": "string"
+                    },
+                    "business.city": {
+                        "type": "string"
+                    },
+                    "business.corporation_type": {
+                        "type": "string"
+                    },
+                    "business.country": {
+                        "type": "string"
+                    },
+                    "business.dba": {
+                        "type": "string"
+                    },
+                    "business.formation_date": {
+                        "type": "string"
+                    },
+                    "business.formation_state": {
+                        "type": "string"
+                    },
+                    "business.name": {
+                        "type": "string"
+                    },
+                    "business.phone_number": {
+                        "type": "string"
+                    },
+                    "business.primary_owner_stake": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "business.secondary_beneficial_owners": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    },
+                    "business.state": {
+                        "type": "string"
+                    },
+                    "business.tin": {
+                        "type": "string"
+                    },
+                    "business.website": {
+                        "type": "string"
+                    },
+                    "business.zip": {
+                        "type": "string"
+                    },
+                    "id.address_line1": {
+                        "type": "string"
+                    },
+                    "id.address_line2": {
+                        "type": "string"
+                    },
+                    "id.citizenships": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Iso3166TwoDigitCountryCode"
+                        }
+                    },
+                    "id.city": {
+                        "type": "string"
+                    },
+                    "id.country": {
+                        "type": "string"
+                    },
+                    "id.dob": {
+                        "type": "string"
+                    },
+                    "id.drivers_license_number": {
+                        "type": "string"
+                    },
+                    "id.drivers_license_state": {
+                        "type": "string"
+                    },
+                    "id.email": {
+                        "type": "string"
+                    },
+                    "id.first_name": {
+                        "type": "string"
+                    },
+                    "id.itin": {
+                        "type": "string"
+                    },
+                    "id.last_name": {
+                        "type": "string"
+                    },
+                    "id.middle_name": {
+                        "type": "string"
+                    },
+                    "id.nationality": {
+                        "type": "string"
+                    },
+                    "id.phone_number": {
+                        "type": "string"
+                    },
+                    "id.ssn4": {
+                        "type": "string"
+                    },
+                    "id.ssn9": {
+                        "type": "string"
+                    },
+                    "id.state": {
+                        "type": "string"
+                    },
+                    "id.us_legal_status": {
+                        "type": "string"
+                    },
+                    "id.us_tax_id": {
+                        "type": "string"
+                    },
+                    "id.visa_expiration_date": {
+                        "type": "string"
+                    },
+                    "id.visa_kind": {
+                        "type": "string"
+                    },
+                    "id.zip": {
+                        "type": "string"
+                    }
+                }
             },
             "BusinessOnboardingResponse": {
                 "type": "object",
@@ -7372,7 +7506,7 @@
                 "type": "object",
                 "properties": {
                     "bootstrap_data": {
-                        "type": "object"
+                        "$ref": "#/components/schemas/BootstrapDataV1"
                     }
                 },
                 "required": [
@@ -8393,7 +8527,7 @@
                         "type": "boolean"
                     },
                     "user_data": {
-                        "type": "object"
+                        "$ref": "#/components/schemas/BootstrapDataV1"
                     }
                 }
             },

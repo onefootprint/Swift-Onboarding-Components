@@ -1,6 +1,6 @@
 use api_core::auth::ob_config::ObSessionAuth;
 use api_core::auth::session::onboarding::OnboardingSession;
-use api_core::auth::session::sdk_args::UserDataV1;
+use api_core::auth::session::sdk_args::BootstrapDataV1;
 use api_core::types::ApiResponse;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
@@ -8,7 +8,7 @@ use paperclip::actix::Apiv2Response;
 
 #[derive(serde::Serialize, Debug, Apiv2Response, macros::JsonResponder)]
 pub struct OnboardingSessionResponse {
-    pub bootstrap_data: UserDataV1,
+    pub bootstrap_data: BootstrapDataV1,
 }
 
 #[api_v2_operation(

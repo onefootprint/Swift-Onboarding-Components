@@ -4450,6 +4450,140 @@
                     "email"
                 ]
             },
+            "BootstrapDataV1": {
+                "example": {
+                    "id.first_name": "Jane",
+                    "id.last_name": "Doe"
+                },
+                "description": "Key-value map of bootstrap data. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/integrate/bootstrap-data#boostraping-kyb-data).",
+                "type": "object",
+                "properties": {
+                    "business.address_line1": {
+                        "type": "string"
+                    },
+                    "business.address_line2": {
+                        "type": "string"
+                    },
+                    "business.city": {
+                        "type": "string"
+                    },
+                    "business.corporation_type": {
+                        "type": "string"
+                    },
+                    "business.country": {
+                        "type": "string"
+                    },
+                    "business.dba": {
+                        "type": "string"
+                    },
+                    "business.formation_date": {
+                        "type": "string"
+                    },
+                    "business.formation_state": {
+                        "type": "string"
+                    },
+                    "business.name": {
+                        "type": "string"
+                    },
+                    "business.phone_number": {
+                        "type": "string"
+                    },
+                    "business.primary_owner_stake": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "business.secondary_beneficial_owners": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    },
+                    "business.state": {
+                        "type": "string"
+                    },
+                    "business.tin": {
+                        "type": "string"
+                    },
+                    "business.website": {
+                        "type": "string"
+                    },
+                    "business.zip": {
+                        "type": "string"
+                    },
+                    "id.address_line1": {
+                        "type": "string"
+                    },
+                    "id.address_line2": {
+                        "type": "string"
+                    },
+                    "id.citizenships": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Iso3166TwoDigitCountryCode"
+                        }
+                    },
+                    "id.city": {
+                        "type": "string"
+                    },
+                    "id.country": {
+                        "type": "string"
+                    },
+                    "id.dob": {
+                        "type": "string"
+                    },
+                    "id.drivers_license_number": {
+                        "type": "string"
+                    },
+                    "id.drivers_license_state": {
+                        "type": "string"
+                    },
+                    "id.email": {
+                        "type": "string"
+                    },
+                    "id.first_name": {
+                        "type": "string"
+                    },
+                    "id.itin": {
+                        "type": "string"
+                    },
+                    "id.last_name": {
+                        "type": "string"
+                    },
+                    "id.middle_name": {
+                        "type": "string"
+                    },
+                    "id.nationality": {
+                        "type": "string"
+                    },
+                    "id.phone_number": {
+                        "type": "string"
+                    },
+                    "id.ssn4": {
+                        "type": "string"
+                    },
+                    "id.ssn9": {
+                        "type": "string"
+                    },
+                    "id.state": {
+                        "type": "string"
+                    },
+                    "id.us_legal_status": {
+                        "type": "string"
+                    },
+                    "id.us_tax_id": {
+                        "type": "string"
+                    },
+                    "id.visa_expiration_date": {
+                        "type": "string"
+                    },
+                    "id.visa_kind": {
+                        "type": "string"
+                    },
+                    "id.zip": {
+                        "type": "string"
+                    }
+                }
+            },
             "Business": {
                 "description": "Basic information about a business",
                 "type": "object",
@@ -4753,12 +4887,19 @@
                         "type": "boolean"
                     },
                     "bootstrap_data": {
-                        "example": {
-                            "id.first_name": "Jane",
-                            "id.last_name": "Doe"
-                        },
-                        "description": "Optionally, any user or business bootstrap data that you would like to pass into the\n onboarding flow.\n For information on what fields are available to bootstrap and their data formats, see [here](https://docs.onefootprint.com/articles/integrate/bootstrap-data).",
-                        "type": "object"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/BootstrapDataV1"
+                            },
+                            {
+                                "example": {
+                                    "id.first_name": "Jane",
+                                    "id.last_name": "Doe"
+                                },
+                                "description": "Optionally, any user or business bootstrap data that you would like to pass into the\n onboarding flow.\n For information on what fields are available to bootstrap and their data formats, see [here](https://docs.onefootprint.com/articles/integrate/bootstrap-data).",
+                                "type": "object"
+                            }
+                        ]
                     },
                     "business_external_id": {
                         "example": null,
@@ -6330,6 +6471,261 @@
                 "required": [
                     "<key>",
                     "<value>"
+                ]
+            },
+            "Iso3166TwoDigitCountryCode": {
+                "description": "list of valid iso3166-alpha-2 country codes, from https://datahub.io/core/country-codes#data\n eventually we should maybe just pony up and pay for the subscription to iso: https://www.iso.org/publication/PUB500001.html\n Channel islands does not have a country code",
+                "type": "string",
+                "enum": [
+                    "TW",
+                    "AF",
+                    "AL",
+                    "DZ",
+                    "AS",
+                    "AD",
+                    "AO",
+                    "AI",
+                    "AQ",
+                    "AG",
+                    "AR",
+                    "AM",
+                    "AW",
+                    "AU",
+                    "AT",
+                    "AZ",
+                    "BS",
+                    "BH",
+                    "BD",
+                    "BB",
+                    "BY",
+                    "BE",
+                    "BZ",
+                    "BJ",
+                    "BM",
+                    "BT",
+                    "BO",
+                    "BQ",
+                    "BA",
+                    "BW",
+                    "BV",
+                    "BR",
+                    "IO",
+                    "VG",
+                    "BN",
+                    "BG",
+                    "BF",
+                    "BI",
+                    "CV",
+                    "KH",
+                    "CM",
+                    "CA",
+                    "KY",
+                    "CF",
+                    "TD",
+                    "CL",
+                    "CN",
+                    "HK",
+                    "MO",
+                    "CX",
+                    "CC",
+                    "CO",
+                    "KM",
+                    "CG",
+                    "CK",
+                    "CR",
+                    "HR",
+                    "CU",
+                    "CW",
+                    "CY",
+                    "CZ",
+                    "CI",
+                    "KP",
+                    "CD",
+                    "DK",
+                    "DJ",
+                    "DM",
+                    "DO",
+                    "EC",
+                    "EG",
+                    "SV",
+                    "GQ",
+                    "ER",
+                    "EE",
+                    "SZ",
+                    "ET",
+                    "FK",
+                    "FO",
+                    "FJ",
+                    "FI",
+                    "FR",
+                    "GF",
+                    "PF",
+                    "TF",
+                    "GA",
+                    "GM",
+                    "GE",
+                    "DE",
+                    "GH",
+                    "GI",
+                    "GR",
+                    "GL",
+                    "GD",
+                    "GP",
+                    "GU",
+                    "GT",
+                    "GG",
+                    "GN",
+                    "GW",
+                    "GY",
+                    "HT",
+                    "HM",
+                    "VA",
+                    "HN",
+                    "HU",
+                    "IS",
+                    "IN",
+                    "ID",
+                    "IR",
+                    "IQ",
+                    "IE",
+                    "IM",
+                    "IL",
+                    "IT",
+                    "JM",
+                    "JP",
+                    "JE",
+                    "JO",
+                    "KZ",
+                    "KE",
+                    "KI",
+                    "KW",
+                    "KG",
+                    "LA",
+                    "LV",
+                    "LB",
+                    "LS",
+                    "LR",
+                    "LY",
+                    "LI",
+                    "LT",
+                    "LU",
+                    "MG",
+                    "MW",
+                    "MY",
+                    "MV",
+                    "ML",
+                    "MT",
+                    "MH",
+                    "MQ",
+                    "MR",
+                    "MU",
+                    "YT",
+                    "MX",
+                    "FM",
+                    "MC",
+                    "MN",
+                    "ME",
+                    "MS",
+                    "MA",
+                    "MZ",
+                    "MM",
+                    "NA",
+                    "NR",
+                    "NP",
+                    "NL",
+                    "NC",
+                    "NZ",
+                    "NI",
+                    "NE",
+                    "NG",
+                    "NU",
+                    "NF",
+                    "MP",
+                    "NO",
+                    "OM",
+                    "PK",
+                    "PW",
+                    "PA",
+                    "PG",
+                    "PY",
+                    "PE",
+                    "PH",
+                    "PN",
+                    "PL",
+                    "PT",
+                    "PR",
+                    "QA",
+                    "KR",
+                    "MD",
+                    "RO",
+                    "RU",
+                    "RW",
+                    "RE",
+                    "BL",
+                    "SH",
+                    "KN",
+                    "LC",
+                    "MF",
+                    "PM",
+                    "VC",
+                    "WS",
+                    "SM",
+                    "ST",
+                    "SA",
+                    "SN",
+                    "RS",
+                    "SC",
+                    "SL",
+                    "SG",
+                    "SX",
+                    "SK",
+                    "SI",
+                    "SB",
+                    "SO",
+                    "ZA",
+                    "GS",
+                    "SS",
+                    "ES",
+                    "LK",
+                    "PS",
+                    "SD",
+                    "SR",
+                    "SJ",
+                    "SE",
+                    "CH",
+                    "SY",
+                    "TJ",
+                    "TH",
+                    "MK",
+                    "TL",
+                    "TG",
+                    "TK",
+                    "TO",
+                    "TT",
+                    "TN",
+                    "TR",
+                    "TM",
+                    "TC",
+                    "TV",
+                    "UG",
+                    "UA",
+                    "AE",
+                    "GB",
+                    "TZ",
+                    "UM",
+                    "VI",
+                    "US",
+                    "UY",
+                    "UZ",
+                    "VU",
+                    "VE",
+                    "VN",
+                    "WF",
+                    "EH",
+                    "YE",
+                    "ZM",
+                    "ZW",
+                    "AX"
                 ]
             },
             "LabelKind": {

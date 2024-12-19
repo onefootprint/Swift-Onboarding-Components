@@ -1,4 +1,4 @@
-use super::sdk_args::UserDataV1;
+use super::sdk_args::BootstrapDataV1;
 use newtypes::BoId;
 use newtypes::ExternalId;
 use newtypes::ObConfigurationId;
@@ -17,7 +17,7 @@ pub struct DeprecatedOnboardingSession {
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub struct OnboardingSession {
     pub key: PublishablePlaybookKey,
-    pub bootstrap_data: UserDataV1,
+    pub bootstrap_data: BootstrapDataV1,
     #[serde(default)]
     pub trusted_metadata: OnboardingSessionTrustedMetadata,
 }
