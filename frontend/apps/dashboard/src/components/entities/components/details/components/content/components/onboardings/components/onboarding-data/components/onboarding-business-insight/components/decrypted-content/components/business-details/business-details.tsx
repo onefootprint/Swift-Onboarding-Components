@@ -8,6 +8,7 @@ import type {
 } from '../../../../onboarding-business-insight.types';
 import RegistrationDetails from '../registration-details';
 import BusinessNameList from './components/business-name-list';
+import OtherBusinessDetails from './components/other-business-details';
 
 type BusinessDetailsProps = {
   names: FormattedName[];
@@ -35,7 +36,7 @@ const BusinessDetails = ({ names, details, registrations }: BusinessDetailsProps
           <BusinessNameList data={names} onOpen={handleOpen} />
         </Subsection>
         <Subsection title={t('details.title')} hasDivider>
-          <span>{details?.formationDate}</span>
+          <OtherBusinessDetails data={details} />
         </Subsection>
       </div>
       {!!openRegistration && <RegistrationDetails registration={openRegistration} onClose={handleClose} />}
