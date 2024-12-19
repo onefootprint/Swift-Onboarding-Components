@@ -4,6 +4,7 @@ use crate::decision::vendor::into_fp_error;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
+use crate::decision::vendor::verification_result::ShouldSaveVerificationRequest;
 use crate::decision::vendor::AdditionalIdentityDocumentVerificationHelper;
 use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::VaultWrapper;
@@ -492,20 +493,19 @@ pub async fn run_samba_create_order(
     };
 
     // save
-    let args = SaveVerificationResultArgs::new_for_samba(
-        &res,
+    let vreq = ShouldSaveVerificationRequest::Yes(
+        vendor_api,
         di.id.clone(),
         di.scoped_vault_id.clone(),
-        vw.vault.public_key.clone(),
-        vendor_api,
         doc_id.clone(),
     );
+    let args = SaveVerificationResultArgs::new(&res, vw.vault.public_key.clone(), vreq);
 
     let (vres, _) = args.save(&state.db_pool).await?;
 
     let resp = res?;
     // check we got a successful_response
-    let create_order_response = resp.result.into_success().map_err(into_fp_error)?;
+    let create_order_response = resp.parsed.map_err(into_fp_error)?;
 
     state
         .db_transaction(move |conn| {

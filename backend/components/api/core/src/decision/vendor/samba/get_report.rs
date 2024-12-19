@@ -1,6 +1,7 @@
 use crate::decision::vendor::into_fp_error;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
+use crate::decision::vendor::verification_result::ShouldSaveVerificationRequest;
 use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::DataRequestSource;
 use crate::utils::vault_wrapper::FingerprintedDataRequest;
@@ -82,18 +83,17 @@ pub async fn get_samba_report(state: &State, webhook: SambaWebhook, kind: SambaO
                 .make_request(request)
                 .await;
             // save
-            let args = SaveVerificationResultArgs::new_for_samba(
-                &res,
+            let vreq = ShouldSaveVerificationRequest::Yes(
+                VendorAPI::SambaLicenseValidationGetReport,
                 di.id.clone(),
                 di.scoped_vault_id.clone(),
-                vw.vault.public_key.clone(),
-                VendorAPI::SambaLicenseValidationGetReport,
                 order.document_id.clone(),
             );
+            let args = SaveVerificationResultArgs::new(&res, vw.vault.public_key.clone(), vreq);
             let (vres, _) = args.save(&state.db_pool).await?;
 
             let resp = res?;
-            let _ = resp.result.into_success().map_err(into_fp_error)?;
+            let _ = resp.parsed.map_err(into_fp_error)?;
             (vres.id, None)
         }
         SambaOrderKind::ActivityHistory => {
@@ -104,18 +104,17 @@ pub async fn get_samba_report(state: &State, webhook: SambaWebhook, kind: SambaO
                 .samba_get_activity_history_report
                 .make_request(request)
                 .await;
-            let args = SaveVerificationResultArgs::new_for_samba(
-                &res,
+            let vreq = ShouldSaveVerificationRequest::Yes(
+                VendorAPI::SambaActivityHistoryGetReport,
                 di.id.clone(),
                 di.scoped_vault_id.clone(),
-                vw.vault.public_key.clone(),
-                VendorAPI::SambaActivityHistoryGetReport,
                 order.document_id.clone(),
             );
+            let args = SaveVerificationResultArgs::new(&res, vw.vault.public_key.clone(), vreq);
             let (vres, _) = args.save(&state.db_pool).await?;
             let resp = res?;
             let raw = resp.raw_response.clone();
-            let _ = resp.result.into_success().map_err(into_fp_error)?;
+            let _ = resp.parsed.map_err(into_fp_error)?;
             let data =
                 compute_vault_data_for_activity_history(state, raw, false, &di.scoped_vault_id).await?;
 
