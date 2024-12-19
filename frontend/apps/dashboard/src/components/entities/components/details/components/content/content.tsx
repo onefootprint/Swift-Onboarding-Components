@@ -72,11 +72,9 @@ const Content = () => {
             <BusinessInsights />
           </Box>
         )}
-        {!isFirmEmployee && kind === EntityKind.person && (
-          <Box marginBottom={9}>
-            <RiskSignals />
-          </Box>
-        )}
+        <Box marginBottom={9}>
+          <RiskSignals />
+        </Box>
         {!shownSeqno && kind === EntityKind.person && (
           <Box marginBottom={9}>
             <DuplicateData />
