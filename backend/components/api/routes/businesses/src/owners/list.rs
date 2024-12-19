@@ -52,7 +52,7 @@ pub async fn get(
 
     let results = bos
         .into_iter()
-        .sorted_by_key(|(a, _)| a.kind)
+        .sorted_by_key(|(bo, _)| (bo.kind, bo.created_at))
         .map(api_wire_types::BusinessOwner::from_db)
         .collect();
     let response = BusinessOwnersListResponse::ok_no_count(results, next_page);
