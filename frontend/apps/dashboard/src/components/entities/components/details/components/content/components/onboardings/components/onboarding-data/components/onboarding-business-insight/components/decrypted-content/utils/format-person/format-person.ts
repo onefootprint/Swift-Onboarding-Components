@@ -1,6 +1,7 @@
 import type { InsightPerson } from '@onefootprint/request-types/dashboard';
 import upperFirst from 'lodash/upperFirst';
-import { EMPTY_VALUE, type FormattedPerson } from '../../../../onboarding-business-insight.types';
+import { EMPTY_VALUE } from '../../../../constants';
+import type { FormattedPerson } from '../../../../onboarding-business-insight.types';
 
 const formatPerson = (person: InsightPerson): FormattedPerson => {
   const { name, role, submitted, associationVerified, sources } = person;

@@ -1,7 +1,8 @@
 import type { InsightRegistration } from '@onefootprint/request-types/dashboard';
 import { format } from 'date-fns';
 import capitalize from 'lodash/capitalize';
-import { EMPTY_VALUE, type FormattedRegistration } from '../../../../onboarding-business-insight.types';
+import { EMPTY_VALUE } from '../../../../constants';
+import type { FormattedRegistration } from '../../../../onboarding-business-insight.types';
 import { formatState } from '../format-state';
 
 const formatRegistration = (filing: InsightRegistration, id: string): FormattedRegistration => {

@@ -19,7 +19,7 @@ export type Subsection =
   | 'user-data'
   | 'business-details'
   | 'people'
-  | 'sos-filings'
+  | 'registrations'
   | 'watchlists'
   | 'offices';
 type SubsectionMap = Partial<Record<Subsection, { title: string; iconComponent: Icon; isBusinessInsight?: boolean }>>;
@@ -57,8 +57,8 @@ const useSubsections = (onboarding: EntityOnboarding, riskSignals: RiskSignal[] 
       iconComponent: IcoUsers16,
       isBusinessInsight: true,
     },
-    'sos-filings': {
-      title: t('sos-filings.title'),
+    registrations: {
+      title: t('registrations.title'),
       iconComponent: IcoFileText16,
       isBusinessInsight: true,
     },
@@ -87,6 +87,9 @@ const useSubsections = (onboarding: EntityOnboarding, riskSignals: RiskSignal[] 
       }
       if (subsection === 'rules') {
         return onboarding.ruleSetResults && onboarding.ruleSetResults.length > 0;
+      }
+      if (subsection === 'business-details') {
+        return onboarding.seqno && onboarding.seqno > 0;
       }
       return true;
     }),

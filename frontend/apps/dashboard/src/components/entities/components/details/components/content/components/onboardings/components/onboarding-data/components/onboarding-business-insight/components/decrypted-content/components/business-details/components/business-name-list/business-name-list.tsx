@@ -5,9 +5,10 @@ import Row from './components/row';
 
 type BusinessNameListProps = {
   data: FormattedName[];
+  onOpen: (id: string) => void;
 };
 
-const BusinessNameList = ({ data }: BusinessNameListProps) => {
+const BusinessNameList = ({ data, onOpen }: BusinessNameListProps) => {
   const { t } = useTranslation('entity-details', { keyPrefix: 'onboardings.business-details.name.table' });
 
   const columns = [
@@ -15,7 +16,7 @@ const BusinessNameList = ({ data }: BusinessNameListProps) => {
     { text: t('header.type'), width: '50%' },
   ];
 
-  const renderTr = ({ item }: TableRow<FormattedName>) => <Row businessName={item} />;
+  const renderTr = ({ item }: TableRow<FormattedName>) => <Row businessName={item} onOpen={onOpen} />;
 
   return (
     <Table<FormattedName>

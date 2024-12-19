@@ -7,8 +7,6 @@ import type {
   WatchlistHit,
 } from '@onefootprint/request-types/dashboard';
 
-export const EMPTY_VALUE = '-';
-
 export type FormattedAddress = InsightAddress & { id: string };
 
 export type FormattedDetails = {

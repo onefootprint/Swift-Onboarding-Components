@@ -19,7 +19,7 @@ const DecryptedContent = ({ onboardingId, selectedSubsection }: DecryptedContent
       {isPending && <Loading />}
       {error && <ErrorComponent error={error} />}
       {(insights?.names || insights?.details) && selectedSubsection === 'business-details' && (
-        <BusinessDetails names={insights.names} details={insights.details} />
+        <BusinessDetails names={insights.names} details={insights.details} registrations={insights.registrations} />
       )}
     </>
   );
