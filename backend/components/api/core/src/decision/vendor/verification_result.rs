@@ -267,10 +267,9 @@ mod test {
 
         let res: FpResult<U> = mock_client.make_request(req).await;
 
-        let res = res.map(|r| r.into_vendor_response()).map_err(|e| VendorAPIError {
-            vendor_api,
-            error: e.into(),
-        });
+        let res = res
+            .map(|r| r.into_vendor_response())
+            .map_err(|error| VendorAPIError { vendor_api, error });
 
         let FixtureData {
             wf, v: uv, sv: su, ..

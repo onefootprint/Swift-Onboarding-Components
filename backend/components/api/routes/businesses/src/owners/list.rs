@@ -12,6 +12,7 @@ use api_core::State;
 use db::models::business_owner::BusinessOwner;
 use db::models::business_owner::BusinessOwnerQuery;
 use db::models::scoped_vault::ScopedVault;
+use itertools::Itertools;
 use newtypes::preview_api;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
@@ -51,6 +52,7 @@ pub async fn get(
 
     let results = bos
         .into_iter()
+        .sorted_by_key(|(a, _)| a.kind)
         .map(api_wire_types::BusinessOwner::from_db)
         .collect();
     let response = BusinessOwnersListResponse::ok_no_count(results, next_page);

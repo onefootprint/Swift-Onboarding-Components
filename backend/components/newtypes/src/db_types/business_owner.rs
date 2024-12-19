@@ -67,3 +67,14 @@ pub enum BusinessOwnerSource {
 }
 
 crate::util::impl_enum_string_diesel!(BusinessOwnerSource);
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_business_owner_kind_ord() {
+        assert!(BusinessOwnerKind::Primary < BusinessOwnerKind::Secondary);
+    }
+}

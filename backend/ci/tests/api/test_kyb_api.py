@@ -186,7 +186,8 @@ def test_link_bos(sandbox_tenant, sandbox_user):
     post(f"businesses/{fp_bid}/owners", data, sandbox_tenant.sk.key)
     body = get(f"businesses/{fp_bid}/owners", None, sandbox_tenant.sk.key)
     assert len(body["data"]) == 1
-    assert body["data"][0]["fp_id"] == fp_id
+    bo = body["data"][0]
+    assert bo["fp_id"] == fp_id
 
     # Check that BO ownership stake is vaulted
     fields = get(f"businesses/{fp_bid}/vault", None, sandbox_tenant.sk.key)
@@ -224,6 +225,17 @@ def test_link_bos(sandbox_tenant, sandbox_user):
         body["message"]
         == "The provided user is already an owner of the provided business"
     )
+
+    # Can add a secondary BO
+    data = {
+        "id.first_name": "Piip",
+        "id.last_name": "Businessowner the Second",
+    }
+    body = post("users", data, sandbox_tenant.sk.key)
+    fp_id2 = body["id"]
+    data = dict(fp_id=body["id"], ownership_stake=50)
+    post(f"businesses/{fp_bid}/owners", data, sandbox_tenant.sk.key)
+    owners = get(f"businesses/{fp_bid}/owners", None, sandbox_tenant.sk.key)['data']
 
     # Cannot add an owner to a user vault
     data = dict(fp_id=fp_id, ownership_stake=50)
