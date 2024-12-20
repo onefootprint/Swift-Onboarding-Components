@@ -1,5 +1,5 @@
 import fs from 'fs';
-import glob from 'glob';
+import { glob } from 'glob';
 import matter from 'gray-matter';
 import kebabCase from 'lodash/kebabCase';
 import readingTime from 'reading-time';
@@ -47,17 +47,6 @@ const replaceContent = (content: string) => {
   return outputLines.join('\n');
 };
 
-const getFilesPath = (filesPath: string): Promise<string[]> =>
-  new Promise((resolve, reject) => {
-    glob(filesPath, (err, contentPaths) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(contentPaths);
-      }
-    });
-  });
-
 type BasicArticle = {
   content: string;
   data: {
@@ -66,7 +55,7 @@ type BasicArticle = {
 };
 
 export const getAllMarkdownFiles = async <TArticle extends BasicArticle>(relativePath: string): Promise<TArticle[]> => {
-  const contentPaths = await getFilesPath(relativePath);
+  const contentPaths = await glob(relativePath);
   return Promise.all(
     contentPaths.map(async contentPath => {
       try {
