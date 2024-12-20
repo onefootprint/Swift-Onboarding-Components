@@ -286,45 +286,46 @@ class FormManager: ObservableObject {
         }
     }
     
- 
+    
     func getVaultData() -> VaultData {
-        var data: [DataIdentifier : Any] = [:]
-        
-        for key in fieldsUsed {
-            switch key {
-            case "idEmail":
-                data[DataIdentifier.idemail] = idEmail.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idEmail
-            case "idPhoneNumber":
-                data[DataIdentifier.idphonenumber] = idPhoneNumber.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idPhoneNumber
-            case "idDob":
-                data[DataIdentifier.iddob] = idDob.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idDob
-            case "idSsn4":
-                data[DataIdentifier.idssn4] = idSsn4.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idSsn4
-            case "idSsn9":
-                data[DataIdentifier.idssn9] = idSsn9.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idSsn9
-            case "idFirstName":
-                data[DataIdentifier.idfirstname] = idFirstName.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idFirstName
-            case "idLastName":
-                data[DataIdentifier.idlastname] = idLastName.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idLastName
-            case "idMiddleName":
-                data[DataIdentifier.idmiddlename] = idMiddleName.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idMiddleName
-            case "idCountry":
-                data[DataIdentifier.idcountry] = idCountry.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idCountry
-            case "idState":
-                data[DataIdentifier.idstate] = idState.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idState
-            case "idCity":
-                data[DataIdentifier.idcity] = idCity.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idCity
-            case "idZip":
-                data[DataIdentifier.idzip] = idZip.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idZip
-            case "idAddressLine1":
-                data[DataIdentifier.idaddressline1] = idAddressLine1.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idAddressLine1
-            case "idAddressLine2":
-                data[DataIdentifier.idaddressline2] = idAddressLine2.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idAddressLine2
-            default:
-                break
-            }
-        }
-        return VaultData.init(data: data)
+        return VaultData(
+            idFirstName: idFirstName.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idFirstName,
+            idMiddleName: idMiddleName.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idMiddleName,
+            idLastName: idLastName.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idLastName,
+            idDob: idDob.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idDob,
+            idSsn4: idSsn4.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idSsn4,
+            idSsn9: idSsn9.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idSsn9,
+            idUsTaxId: nil,
+            idAddressLine1: idAddressLine1.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idAddressLine1,
+            idAddressLine2: idAddressLine2.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idAddressLine2,
+            idCity: idCity.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idCity,
+            idState: idState.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idState,
+            idZip: idZip.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idZip,
+            idCountry: idCountry.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idCountry,
+            idEmail: idEmail.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idEmail,
+            idPhoneNumber: idPhoneNumber.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idPhoneNumber,
+            idUsLegalStatus: nil,
+            idVisaKind: nil,
+            idVisaExpirationDate: nil,
+            idCitizenships: nil,
+            idNationality: nil,
+            idDriversLicenseNumber: nil,
+            idDriversLicenseState: nil,
+            idItin: nil,
+            investorProfileEmploymentStatus: nil,
+            investorProfileOccupation: nil,
+            investorProfileEmployer: nil,
+            investorProfileAnnualIncome: nil,
+            investorProfileNetWorth: nil,
+            investorProfileInvestmentGoals: nil,
+            investorProfileRiskTolerance: nil,
+            investorProfileDeclarations: nil,
+            investorProfileBrokerageFirmEmployer: nil,
+            investorProfileSeniorExecutiveSymbols: nil,
+            investorProfileFamilyMemberNames: nil,
+            investorProfilePoliticalOrganization: nil,
+            investorProfileFundingSources: nil
+        )
     }
     
     func getErrorByFieldName(fieldName: FpFieldName) -> String? {

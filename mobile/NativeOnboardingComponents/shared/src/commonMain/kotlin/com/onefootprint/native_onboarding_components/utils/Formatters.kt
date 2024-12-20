@@ -150,42 +150,42 @@ internal object Formatters {
     }
 
     fun formatBeforeSave(data: VaultData, locale: FootprintSupportedLocale): VaultData {
-        val dataMap = data.asMap().toMutableMap()
-        var dob = dataMap[DataIdentifier.idDob]
-        var visaExpiration = dataMap[DataIdentifier.idVisaExpirationDate]
+        var dob = data.idDob
+        var visaExpiration = data.idVisaExpirationDate
 
-        if (dob != null && dob is String) {
+        if (dob != null) {
             dob = strInputToUSDate(locale, dob)
             dob = fromUsDateToISO8601(dob)
-            dataMap[DataIdentifier.idDob] = dob
         }
 
-        if (visaExpiration != null && visaExpiration is String) {
+        if (visaExpiration != null) {
             visaExpiration = strInputToUSDate(locale, visaExpiration)
             visaExpiration = fromUsDateToISO8601(visaExpiration)
-            dataMap[DataIdentifier.idVisaExpirationDate] = visaExpiration
         }
 
-        return VaultData(dataMap)
+        return data.getUpdatedVaultData(
+            idDob = dob,
+            idVisaExpirationDate = visaExpiration
+        )
     }
 
     fun formatAfterDecryption(data: VaultData, locale: FootprintSupportedLocale): VaultData {
-        val dataMap = data.asMap().toMutableMap()
-        var dob = dataMap[DataIdentifier.idDob]
-        var visaExpiration = dataMap[DataIdentifier.idVisaExpirationDate]
+        var dob = data.idDob
+        var visaExpiration = data.idVisaExpirationDate
 
-        if (dob != null && dob is String) {
+        if (dob != null) {
             dob = fromISO8601ToUsDate(dob)
             dob = fromUsDateToStringInput(locale, dob)
-            dataMap[DataIdentifier.idDob] = dob
         }
 
-        if (visaExpiration != null && visaExpiration is String) {
+        if (visaExpiration != null) {
             visaExpiration = fromISO8601ToUsDate(visaExpiration)
             visaExpiration = fromUsDateToStringInput(locale, visaExpiration)
-            dataMap[DataIdentifier.idVisaExpirationDate] = visaExpiration
         }
 
-        return VaultData(dataMap)
+        return data.getUpdatedVaultData(
+            idDob = dob,
+            idVisaExpirationDate = visaExpiration
+        )
     }
 }

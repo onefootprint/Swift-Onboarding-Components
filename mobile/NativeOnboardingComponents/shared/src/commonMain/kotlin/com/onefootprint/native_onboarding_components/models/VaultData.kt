@@ -1,277 +1,296 @@
 package com.onefootprint.native_onboarding_components.models
 
 import org.openapitools.client.models.DataIdentifier
+import org.openapitools.client.models.InvestorProfileDeclaration
+import org.openapitools.client.models.InvestorProfileFundingSource
+import org.openapitools.client.models.InvestorProfileInvestmentGoal
 import org.openapitools.client.models.Iso3166TwoDigitCountryCode
 import org.openapitools.client.models.ModernRawUserDataRequest
 import org.openapitools.client.models.ModernUserDecryptResponse
 
-class VaultData(private val data: Map<DataIdentifier, Any?>) {
+class VaultData(
+    val idFirstName: String? = null,
+    val idMiddleName: String? = null,
+    val idLastName: String? = null,
+    val idDob: String? = null,
+    val idSsn4: String? = null,
+    val idSsn9: String? = null,
+    val idUsTaxId: String? = null,
+    val idAddressLine1: String? = null,
+    val idAddressLine2: String? = null,
+    val idCity: String? = null,
+    val idState: String? = null,
+    val idZip: String? = null,
+    val idCountry: String? = null,
+    val idEmail: String? = null,
+    val idPhoneNumber: String? = null,
+    val idUsLegalStatus: String? = null,
+    val idVisaKind: String? = null,
+    val idVisaExpirationDate: String? = null,
+    val idCitizenships: List<Iso3166TwoDigitCountryCode>? = null,
+    val idNationality: String? = null,
+    val idDriversLicenseNumber: String? = null,
+    val idDriversLicenseState: String? = null,
+    val idItin: String? = null,
+    val investorProfileEmploymentStatus: String? = null,
+    val investorProfileOccupation: String? = null,
+    val investorProfileEmployer: String? = null,
+    val investorProfileAnnualIncome: String? = null,
+    val investorProfileNetWorth: String? = null,
+    val investorProfileInvestmentGoals: List<InvestorProfileInvestmentGoal>? = null,
+    val investorProfileRiskTolerance: String? = null,
+    val investorProfileDeclarations: List<InvestorProfileDeclaration>? = null,
+    val investorProfileBrokerageFirmEmployer: String? = null,
+    val investorProfileSeniorExecutiveSymbols: List<String>? = null,
+    val investorProfileFamilyMemberNames: List<String>? = null,
+    val investorProfilePoliticalOrganization: String? = null,
+    val investorProfileFundingSources: List<InvestorProfileFundingSource>? = null
+) {
     companion object {
-        private val allowedIdentifiers = setOf(
-            DataIdentifier.idFirstName,
-            DataIdentifier.idMiddleName,
-            DataIdentifier.idLastName,
-            DataIdentifier.idDob,
-            DataIdentifier.idSsn4,
-            DataIdentifier.idSsn9,
-            DataIdentifier.idUsTaxId,
-            DataIdentifier.idAddressLine1,
-            DataIdentifier.idAddressLine2,
-            DataIdentifier.idCity,
-            DataIdentifier.idState,
-            DataIdentifier.idZip,
-            DataIdentifier.idCountry,
-            DataIdentifier.idEmail,
-            DataIdentifier.idPhoneNumber,
-            DataIdentifier.idNationality,
-            DataIdentifier.idUsLegalStatus,
-            DataIdentifier.idVisaKind,
-            DataIdentifier.idVisaExpirationDate,
-            DataIdentifier.idCitizenships,
-            DataIdentifier.idDriversLicenseNumber,
-            DataIdentifier.idDriversLicenseState,
-            DataIdentifier.idItin
-        )
-
         internal fun fromModernUserDecryptResponse(from: ModernUserDecryptResponse): VaultData {
-            val data = mutableMapOf<DataIdentifier, Any>()
-            val idFirstName = from.idFirstName
-            val idMiddleName = from.idMiddleName
-            val idLastName = from.idLastName
-            val idDob = from.idDob
-            val idSsn4 = from.idSsn4
-            val idSsn9 = from.idSsn9
-            val idUsTaxId = from.idUsTaxId
-            val idAddressLine1 = from.idAddressLine1
-            val idAddressLine2 = from.idAddressLine2
-            val idCity = from.idCity
-            val idState = from.idState
-            val idZip = from.idZip
-            val idCountry = from.idCountry
-            val idEmail = from.idEmail
-            val idPhoneNumber = from.idPhoneNumber
-            val idUsLegalStatus = from.idUsLegalStatus
-            val idVisaKind = from.idVisaKind
-            val idVisaExpirationDate = from.idVisaExpirationDate
-            val idCitizenships = from.idCitizenships
-            val idNationality = from.idNationality
-            val idDriversLicenseNumber = from.idDriversLicenseNumber
-            val idDriversLicenseState = from.idDriversLicenseState
-            val idItin = from.idItin
             return VaultData(
-                mapOf(
-                    DataIdentifier.idFirstName to idFirstName,
-                    DataIdentifier.idMiddleName to idMiddleName,
-                    DataIdentifier.idLastName to idLastName,
-                    DataIdentifier.idDob to idDob,
-                    DataIdentifier.idSsn4 to idSsn4,
-                    DataIdentifier.idSsn9 to idSsn9,
-                    DataIdentifier.idUsTaxId to idUsTaxId,
-                    DataIdentifier.idAddressLine1 to idAddressLine1,
-                    DataIdentifier.idAddressLine2 to idAddressLine2,
-                    DataIdentifier.idCity to idCity,
-                    DataIdentifier.idState to idState,
-                    DataIdentifier.idZip to idZip,
-                    DataIdentifier.idCountry to idCountry,
-                    DataIdentifier.idEmail to idEmail,
-                    DataIdentifier.idPhoneNumber to idPhoneNumber,
-                    DataIdentifier.idUsLegalStatus to idUsLegalStatus,
-                    DataIdentifier.idVisaKind to idVisaKind,
-                    DataIdentifier.idVisaExpirationDate to idVisaExpirationDate,
-                    DataIdentifier.idCitizenships to idCitizenships,
-                    DataIdentifier.idNationality to idNationality,
-                    DataIdentifier.idDriversLicenseNumber to idDriversLicenseNumber,
-                    DataIdentifier.idDriversLicenseState to idDriversLicenseState,
-                    DataIdentifier.idItin to idItin
-                )
+                idFirstName = from.idFirstName,
+                idMiddleName = from.idMiddleName,
+                idLastName = from.idLastName,
+                idDob = from.idDob,
+                idSsn4 = from.idSsn4,
+                idSsn9 = from.idSsn9,
+                idUsTaxId = from.idUsTaxId,
+                idAddressLine1 = from.idAddressLine1,
+                idAddressLine2 = from.idAddressLine2,
+                idCity = from.idCity,
+                idState = from.idState,
+                idZip = from.idZip,
+                idCountry = from.idCountry,
+                idEmail = from.idEmail,
+                idPhoneNumber = from.idPhoneNumber,
+                idUsLegalStatus = from.idUsLegalStatus,
+                idVisaKind = from.idVisaKind,
+                idVisaExpirationDate = from.idVisaExpirationDate,
+                idCitizenships = from.idCitizenships,
+                idNationality = from.idNationality,
+                idDriversLicenseNumber = from.idDriversLicenseNumber,
+                idDriversLicenseState = from.idDriversLicenseState,
+                idItin = from.idItin,
+                investorProfileEmploymentStatus = from.investorProfileEmploymentStatus,
+                investorProfileOccupation = from.investorProfileOccupation,
+                investorProfileEmployer = from.investorProfileEmployer,
+                investorProfileAnnualIncome = from.investorProfileAnnualIncome,
+                investorProfileNetWorth = from.investorProfileNetWorth,
+                investorProfileInvestmentGoals = from.investorProfileInvestmentGoals,
+                investorProfileRiskTolerance = from.investorProfileRiskTolerance,
+                investorProfileDeclarations = from.investorProfileDeclarations,
+                investorProfileBrokerageFirmEmployer = from.investorProfileBrokerageFirmEmployer,
+                investorProfileSeniorExecutiveSymbols = from.investorProfileSeniorExecutiveSymbols,
+                investorProfileFamilyMemberNames = from.investorProfileFamilyMemberNames,
+                investorProfilePoliticalOrganization = from.investorProfilePoliticalOrganization,
+                investorProfileFundingSources = from.investorProfileFundingSources
             )
         }
     }
 
-    init {
-        val invalidKeys = data.keys.filter { it !in allowedIdentifiers }
-        require(invalidKeys.isEmpty()) {
-            "VaultData contains invalid/unsupported keys: $invalidKeys"
-        }
-    }
+    // Expose as map
+    fun asMap(): Map<DataIdentifier, Any?> = mapOf(
+        DataIdentifier.idFirstName to idFirstName,
+        DataIdentifier.idMiddleName to idMiddleName,
+        DataIdentifier.idLastName to idLastName,
+        DataIdentifier.idDob to idDob,
+        DataIdentifier.idSsn4 to idSsn4,
+        DataIdentifier.idSsn9 to idSsn9,
+        DataIdentifier.idUsTaxId to idUsTaxId,
+        DataIdentifier.idAddressLine1 to idAddressLine1,
+        DataIdentifier.idAddressLine2 to idAddressLine2,
+        DataIdentifier.idCity to idCity,
+        DataIdentifier.idState to idState,
+        DataIdentifier.idZip to idZip,
+        DataIdentifier.idCountry to idCountry,
+        DataIdentifier.idEmail to idEmail,
+        DataIdentifier.idPhoneNumber to idPhoneNumber,
+        DataIdentifier.idUsLegalStatus to idUsLegalStatus,
+        DataIdentifier.idVisaKind to idVisaKind,
+        DataIdentifier.idVisaExpirationDate to idVisaExpirationDate,
+        DataIdentifier.idCitizenships to idCitizenships,
+        DataIdentifier.idNationality to idNationality,
+        DataIdentifier.idDriversLicenseNumber to idDriversLicenseNumber,
+        DataIdentifier.idDriversLicenseState to idDriversLicenseState,
+        DataIdentifier.idItin to idItin,
+        DataIdentifier.investorProfileEmploymentStatus to investorProfileEmploymentStatus,
+        DataIdentifier.investorProfileOccupation to investorProfileOccupation,
+        DataIdentifier.investorProfileEmployer to investorProfileEmployer,
+        DataIdentifier.investorProfileAnnualIncome to investorProfileAnnualIncome,
+        DataIdentifier.investorProfileNetWorth to investorProfileNetWorth,
+        DataIdentifier.investorProfileInvestmentGoals to investorProfileInvestmentGoals,
+        DataIdentifier.investorProfileRiskTolerance to investorProfileRiskTolerance,
+        DataIdentifier.investorProfileDeclarations to investorProfileDeclarations,
+        DataIdentifier.investorProfileBrokerageFirmEmployer to investorProfileBrokerageFirmEmployer,
+        DataIdentifier.investorProfileSeniorExecutiveSymbols to investorProfileSeniorExecutiveSymbols,
+        DataIdentifier.investorProfileFamilyMemberNames to investorProfileFamilyMemberNames,
+        DataIdentifier.investorProfilePoliticalOrganization to investorProfilePoliticalOrganization,
+        DataIdentifier.investorProfileFundingSources to investorProfileFundingSources
+    )
 
-    // Expose the validated map
-    fun asMap(): Map<DataIdentifier, Any?> = data
-
-    internal fun toModernRawUserDataRequest(): ModernRawUserDataRequest{
-        val idFirstName = data[DataIdentifier.idFirstName]
-        val idMiddleName = data[DataIdentifier.idMiddleName]
-        val idLastName = data[DataIdentifier.idLastName]
-        val idDob = data[DataIdentifier.idDob]
-        val idSsn4 = data[DataIdentifier.idSsn4]
-        val idSsn9 = data[DataIdentifier.idSsn9]
-        val idUsTaxId = data[DataIdentifier.idUsTaxId]
-        val idAddressLine1 = data[DataIdentifier.idAddressLine1]
-        val idAddressLine2 = data[DataIdentifier.idAddressLine2]
-        val idCity = data[DataIdentifier.idCity]
-        val idState = data[DataIdentifier.idState]
-        val idZip = data[DataIdentifier.idZip]
-        val idCountry = data[DataIdentifier.idCountry]
-        val idEmail = data[DataIdentifier.idEmail]
-        val idPhoneNumber = data[DataIdentifier.idPhoneNumber]
-        val idUsLegalStatus = data[DataIdentifier.idUsLegalStatus]
-        val idVisaKind = data[DataIdentifier.idVisaKind]
-        val idVisaExpirationDate = data[DataIdentifier.idVisaExpirationDate]
-        val idCitizenships = data[DataIdentifier.idCitizenships]
-        val idNationality = data[DataIdentifier.idNationality]
-        val idDriversLicenseNumber = data[DataIdentifier.idDriversLicenseNumber]
-        val idDriversLicenseState = data[DataIdentifier.idDriversLicenseState]
-        val idItin = data[DataIdentifier.idItin]
+    internal fun toModernRawUserDataRequest(): ModernRawUserDataRequest {
         val modernRawUserDataRequest = ModernRawUserDataRequest(
-            idFirstName = when (idFirstName) {
-                is String -> idFirstName.ifEmpty { null }
-                null -> null
-                else -> throw IllegalArgumentException("Expected idFirstName to be a String")
-            },
-            idLastName = when (idLastName) {
-                is String -> idLastName.ifEmpty { null }
-                null -> null
-                else -> throw IllegalArgumentException("Expected idLastName to be a String")
-            },
-            idMiddleName = when (idMiddleName) {
-                is String -> idMiddleName.ifEmpty { null }
-                null -> null
-                else -> throw IllegalArgumentException("Expected idMiddleName to be a String")
-            },
-            idDob = when (idDob) {
-                is String -> idDob.ifEmpty { null }
-                null -> null
-                else -> throw IllegalArgumentException("Expected idDob to be a String")
-            },
-            idSsn4 = when (idSsn4) {
-                is String -> idSsn4.ifEmpty { null }
-                null -> null
-                else -> throw IllegalArgumentException("Expected idSsn4 to be a String")
-            },
-            idSsn9 = when (idSsn9) {
-                is String -> idSsn9.ifEmpty { null }
-                null -> null
-                else -> throw IllegalArgumentException("Expected idSsn9 to be a String")
-            },
-            idUsTaxId = when (idUsTaxId) {
-                is String -> idUsTaxId.ifEmpty { null }
-                null -> null
-                else -> throw IllegalArgumentException("Expected idUsTaxId to be a String")
-            },
-            idAddressLine1 = when (idAddressLine1) {
-                is String -> idAddressLine1.ifEmpty { null }
-                null -> null
-                else -> throw IllegalArgumentException("Expected idAddressLine1 to be a String")
-            },
-            idAddressLine2 = when (idAddressLine2) {
-                is String -> idAddressLine2.ifEmpty { null }
-                null -> null
-                else -> throw IllegalArgumentException("Expected idAddressLine2 to be a String")
-            },
-            idCity = when (idCity) {
-                is String -> idCity.ifEmpty { null }
-                null -> null
-                else -> throw IllegalArgumentException("Expected idCity to be a String")
-            },
-            idState = when (idState) {
-                is String -> idState.ifEmpty { null }
-                null -> null
-                else -> throw IllegalArgumentException("Expected idState to be a String")
-            },
-            idZip = when (idZip) {
-                is String -> idZip.ifEmpty { null }
-                null -> null
-                else -> throw IllegalArgumentException("Expected idZip to be a String")
-            },
-            idCountry = when (idCountry) {
-                is String -> idCountry.ifEmpty { null }
-                null -> null
-                else -> throw IllegalArgumentException("Expected idCountry to be a String")
-            },
-            idEmail = when (idEmail) {
-                is String -> idEmail.ifEmpty { null }
-                null -> null
-                else -> throw IllegalArgumentException("Expected idEmail to be a String")
-            },
-            idPhoneNumber = when (idPhoneNumber) {
-                is String -> idPhoneNumber.ifEmpty { null }
-                null -> null
-                else -> throw IllegalArgumentException("Expected idPhoneNumber to be a String")
-            },
-            idUsLegalStatus = when (idUsLegalStatus) {
-                is String -> idUsLegalStatus.ifEmpty { null }
-                null -> null
-                else -> throw IllegalArgumentException("Expected idUsLegalStatus to be a String")
-            },
-            idVisaKind = when (idVisaKind) {
-                is String -> idVisaKind.ifEmpty { null }
-                null -> null
-                else -> throw IllegalArgumentException("Expected idVisaKind to be a String")
-            },
-            idVisaExpirationDate = when (idVisaExpirationDate) {
-                is String -> idVisaExpirationDate.ifEmpty { null }
-                null -> null
-                else -> throw IllegalArgumentException("Expected idVisaExpirationDate to be a String")
-            },
-            idCitizenships = when {
-                idCitizenships is List<*> && idCitizenships.all { it is Iso3166TwoDigitCountryCode } -> {
-                    @Suppress("UNCHECKED_CAST") // We've just checked that all elements are of the correct type
-                    idCitizenships as List<Iso3166TwoDigitCountryCode>
-                }
-                idCitizenships == null -> null
-                else -> throw IllegalArgumentException("Expected idCitizenships to be a List<Iso3166TwoDigitCountryCode>")
-            },
-            idNationality = when (idNationality) {
-                is String -> idNationality.ifEmpty { null }
-                null -> null
-                else -> throw IllegalArgumentException("Expected idNationality to be a Iso3166TwoDigitCountryCode")
-            },
-            idDriversLicenseNumber = when (idDriversLicenseNumber) {
-                is String -> idDriversLicenseNumber.ifEmpty { null }
-                null -> null
-                else -> throw IllegalArgumentException("Expected idDriversLicenseNumber to be a String")
-            },
-            idDriversLicenseState = when (idDriversLicenseState) {
-                is String -> idDriversLicenseState.ifEmpty { null }
-                null -> null
-                else -> throw IllegalArgumentException("Expected idDriversLicenseState to be a String")
-            },
-            idItin = when (idItin) {
-                is String -> idItin.ifEmpty { null }
-                null -> null
-                else -> throw IllegalArgumentException("Expected idItin to be a String")
-            }
+            idFirstName = idFirstName,
+            idMiddleName = idMiddleName,
+            idLastName = idLastName,
+            idDob = idDob,
+            idSsn4 = idSsn4,
+            idSsn9 = idSsn9,
+            idUsTaxId = idUsTaxId,
+            idAddressLine1 = idAddressLine1,
+            idAddressLine2 = idAddressLine2,
+            idCity = idCity,
+            idState = idState,
+            idZip = idZip,
+            idCountry = idCountry,
+            idEmail = idEmail,
+            idPhoneNumber = idPhoneNumber,
+            idUsLegalStatus = idUsLegalStatus,
+            idVisaKind = idVisaKind,
+            idVisaExpirationDate = idVisaExpirationDate,
+            idCitizenships = idCitizenships,
+            idNationality = idNationality,
+            idDriversLicenseNumber = idDriversLicenseNumber,
+            idDriversLicenseState = idDriversLicenseState,
+            idItin = idItin,
+            investorProfileEmploymentStatus = investorProfileEmploymentStatus,
+            investorProfileOccupation = investorProfileOccupation,
+            investorProfileEmployer = investorProfileEmployer,
+            investorProfileAnnualIncome = investorProfileAnnualIncome,
+            investorProfileNetWorth = investorProfileNetWorth,
+            investorProfileInvestmentGoals = investorProfileInvestmentGoals,
+            investorProfileRiskTolerance = investorProfileRiskTolerance,
+            investorProfileDeclarations = investorProfileDeclarations,
+            investorProfileBrokerageFirmEmployer = investorProfileBrokerageFirmEmployer,
+            investorProfileSeniorExecutiveSymbols = investorProfileSeniorExecutiveSymbols,
+            investorProfileFamilyMemberNames = investorProfileFamilyMemberNames,
+            investorProfilePoliticalOrganization = investorProfilePoliticalOrganization,
+            investorProfileFundingSources = investorProfileFundingSources
         )
         return modernRawUserDataRequest
     }
 
-    // getters for all the fields
-    val idFirstName: String? get() = data[DataIdentifier.idFirstName] as? String
-    val idMiddleName: String? get() = data[DataIdentifier.idMiddleName] as? String
-    val idLastName: String? get() = data[DataIdentifier.idLastName] as? String
-    val idDob: String? get() = data[DataIdentifier.idDob] as? String
-    val idSsn4: String? get() = data[DataIdentifier.idSsn4] as? String
-    val idSsn9: String? get() = data[DataIdentifier.idSsn9] as? String
-    val idUsTaxId: String? get() = data[DataIdentifier.idUsTaxId] as? String
-    val idAddressLine1: String? get() = data[DataIdentifier.idAddressLine1] as? String
-    val idAddressLine2: String? get() = data[DataIdentifier.idAddressLine2] as? String
-    val idCity: String? get() = data[DataIdentifier.idCity] as? String
-    val idState: String? get() = data[DataIdentifier.idState] as? String
-    val idZip: String? get() = data[DataIdentifier.idZip] as? String
-    val idCountry: String? get() = data[DataIdentifier.idCountry] as? String
-    val idEmail: String? get() = data[DataIdentifier.idEmail] as? String
-    val idPhoneNumber: String? get() = data[DataIdentifier.idPhoneNumber] as? String
-    val idUsLegalStatus: String? get() = data[DataIdentifier.idUsLegalStatus] as? String
-    val idVisaKind: String? get() = data[DataIdentifier.idVisaKind] as? String
-    val idVisaExpirationDate: String? get() = data[DataIdentifier.idVisaExpirationDate] as? String
-    val idCitizenships: List<Iso3166TwoDigitCountryCode>? get() = data[DataIdentifier.idCitizenships] as? List<Iso3166TwoDigitCountryCode>
-    val idNationality: String? get() = data[DataIdentifier.idNationality] as? String
-    val idDriversLicenseNumber: String? get() = data[DataIdentifier.idDriversLicenseNumber] as? String
-    val idDriversLicenseState: String? get() = data[DataIdentifier.idDriversLicenseState] as? String
-    val idItin: String? get() = data[DataIdentifier.idItin] as? String
-
+    // to avoid unintentional modification of the original object, we return a new object with the updated values
+    // this way tenants can't accidentally modify vault data
+    internal fun getUpdatedVaultData(
+        idFirstName: String? = this.idFirstName,
+        idMiddleName: String? = this.idMiddleName,
+        idLastName: String? = this.idLastName,
+        idDob: String? = this.idDob,
+        idSsn4: String? = this.idSsn4,
+        idSsn9: String? = this.idSsn9,
+        idUsTaxId: String? = this.idUsTaxId,
+        idAddressLine1: String? = this.idAddressLine1,
+        idAddressLine2: String? = this.idAddressLine2,
+        idCity: String? = this.idCity,
+        idState: String? = this.idState,
+        idZip: String? = this.idZip,
+        idCountry: String? = this.idCountry,
+        idEmail: String? = this.idEmail,
+        idPhoneNumber: String? = this.idPhoneNumber,
+        idUsLegalStatus: String? = this.idUsLegalStatus,
+        idVisaKind: String? = this.idVisaKind,
+        idVisaExpirationDate: String? = this.idVisaExpirationDate,
+        idCitizenships: List<Iso3166TwoDigitCountryCode>? = this.idCitizenships,
+        idNationality: String? = this.idNationality,
+        idDriversLicenseNumber: String? = this.idDriversLicenseNumber,
+        idDriversLicenseState: String? = this.idDriversLicenseState,
+        idItin: String? = this.idItin,
+        investorProfileEmploymentStatus: String? = this.investorProfileEmploymentStatus,
+        investorProfileOccupation: String? = this.investorProfileOccupation,
+        investorProfileEmployer: String? = this.investorProfileEmployer,
+        investorProfileAnnualIncome: String? = this.investorProfileAnnualIncome,
+        investorProfileNetWorth: String? = this.investorProfileNetWorth,
+        investorProfileInvestmentGoals: List<InvestorProfileInvestmentGoal>? = this.investorProfileInvestmentGoals,
+        investorProfileRiskTolerance: String? = this.investorProfileRiskTolerance,
+        investorProfileDeclarations: List<InvestorProfileDeclaration>? = this.investorProfileDeclarations,
+        investorProfileBrokerageFirmEmployer: String? = this.investorProfileBrokerageFirmEmployer,
+        investorProfileSeniorExecutiveSymbols: List<String>? = this.investorProfileSeniorExecutiveSymbols,
+        investorProfileFamilyMemberNames: List<String>? = this.investorProfileFamilyMemberNames,
+        investorProfilePoliticalOrganization: String? = this.investorProfilePoliticalOrganization,
+        investorProfileFundingSources: List<InvestorProfileFundingSource>? = this.investorProfileFundingSources
+    ): VaultData {
+        return VaultData(
+            idFirstName = idFirstName,
+            idMiddleName = idMiddleName,
+            idLastName = idLastName,
+            idDob = idDob,
+            idSsn4 = idSsn4,
+            idSsn9 = idSsn9,
+            idUsTaxId = idUsTaxId,
+            idAddressLine1 = idAddressLine1,
+            idAddressLine2 = idAddressLine2,
+            idCity = idCity,
+            idState = idState,
+            idZip = idZip,
+            idCountry = idCountry,
+            idEmail = idEmail,
+            idPhoneNumber = idPhoneNumber,
+            idUsLegalStatus = idUsLegalStatus,
+            idVisaKind = idVisaKind,
+            idVisaExpirationDate = idVisaExpirationDate,
+            idCitizenships = idCitizenships,
+            idNationality = idNationality,
+            idDriversLicenseNumber = idDriversLicenseNumber,
+            idDriversLicenseState = idDriversLicenseState,
+            idItin = idItin,
+            investorProfileEmploymentStatus = investorProfileEmploymentStatus,
+            investorProfileOccupation = investorProfileOccupation,
+            investorProfileEmployer = investorProfileEmployer,
+            investorProfileAnnualIncome = investorProfileAnnualIncome,
+            investorProfileNetWorth = investorProfileNetWorth,
+            investorProfileInvestmentGoals = investorProfileInvestmentGoals,
+            investorProfileRiskTolerance = investorProfileRiskTolerance,
+            investorProfileDeclarations = investorProfileDeclarations,
+            investorProfileBrokerageFirmEmployer = investorProfileBrokerageFirmEmployer,
+            investorProfileSeniorExecutiveSymbols = investorProfileSeniorExecutiveSymbols,
+            investorProfileFamilyMemberNames = investorProfileFamilyMemberNames,
+            investorProfilePoliticalOrganization = investorProfilePoliticalOrganization,
+            investorProfileFundingSources = investorProfileFundingSources
+        )
+    }
 
     override fun toString(): String {
-        return "VaultData(data=$data)"
+        // show the value if not null, otherwise omit the key
+        return "VaultData(" +
+                (if (idFirstName != null) "idFirstName=$idFirstName, " else "") +
+                (if (idMiddleName != null) "idMiddleName=$idMiddleName, " else "") +
+                (if (idLastName != null) "idLastName=$idLastName, " else "") +
+                (if (idDob != null) "idDob=$idDob, " else "") +
+                (if (idSsn4 != null) "idSsn4=$idSsn4, " else "") +
+                (if (idSsn9 != null) "idSsn9=$idSsn9, " else "") +
+                (if (idUsTaxId != null) "idUsTaxId=$idUsTaxId, " else "") +
+                (if (idAddressLine1 != null) "idAddressLine1=$idAddressLine1, " else "") +
+                (if (idAddressLine2 != null) "idAddressLine2=$idAddressLine2, " else "") +
+                (if (idCity != null) "idCity=$idCity, " else "") +
+                (if (idState != null) "idState=$idState, " else "") +
+                (if (idZip != null) "idZip=$idZip, " else "") +
+                (if (idCountry != null) "idCountry=$idCountry, " else "") +
+                (if (idEmail != null) "idEmail=$idEmail, " else "") +
+                (if (idPhoneNumber != null) "idPhoneNumber=$idPhoneNumber, " else "") +
+                (if (idUsLegalStatus != null) "idUsLegalStatus=$idUsLegalStatus, " else "") +
+                (if (idVisaKind != null) "idVisaKind=$idVisaKind, " else "") +
+                (if (idVisaExpirationDate != null) "idVisaExpirationDate=$idVisaExpirationDate, " else "") +
+                (if (idCitizenships != null) "idCitizenships=$idCitizenships, " else "") +
+                (if (idNationality != null) "idNationality=$idNationality, " else "") +
+                (if (idDriversLicenseNumber != null) "idDriversLicenseNumber=$idDriversLicenseNumber, " else "") +
+                (if (idDriversLicenseState != null) "idDriversLicenseState=$idDriversLicenseState, " else "") +
+                (if (idItin != null) "idItin=$idItin, " else "") +
+                (if (investorProfileEmploymentStatus != null) "investorProfileEmploymentStatus=$investorProfileEmploymentStatus, " else "") +
+                (if (investorProfileOccupation != null) "investorProfileOccupation=$investorProfileOccupation, " else "") +
+                (if (investorProfileEmployer != null) "investorProfileEmployer=$investorProfileEmployer, " else "") +
+                (if (investorProfileAnnualIncome != null) "investorProfileAnnualIncome=$investorProfileAnnualIncome, " else "") +
+                (if (investorProfileNetWorth != null) "investorProfileNetWorth=$investorProfileNetWorth, " else "") +
+                (if (investorProfileInvestmentGoals != null) "investorProfileInvestmentGoals=$investorProfileInvestmentGoals, " else "") +
+                (if (investorProfileRiskTolerance != null) "investorProfileRiskTolerance=$investorProfileRiskTolerance, " else "") +
+                (if (investorProfileDeclarations != null) "investorProfileDeclarations=$investorProfileDeclarations, " else "") +
+                (if (investorProfileBrokerageFirmEmployer != null) "investorProfileBrokerageFirmEmployer=$investorProfileBrokerageFirmEmployer, " else "") +
+                (if (investorProfileSeniorExecutiveSymbols != null) "investorProfileSeniorExecutiveSymbols=$investorProfileSeniorExecutiveSymbols, " else "") +
+                (if (investorProfileFamilyMemberNames != null) "investorProfileFamilyMemberNames=$investorProfileFamilyMemberNames, " else "") +
+                (if (investorProfilePoliticalOrganization != null
+                ) "investorProfilePoliticalOrganization=$investorProfilePoliticalOrganization, " else "") +
+                (if (investorProfileFundingSources != null) "investorProfileFundingSources=$investorProfileFundingSources, " else "") +
+                ")"
     }
 }

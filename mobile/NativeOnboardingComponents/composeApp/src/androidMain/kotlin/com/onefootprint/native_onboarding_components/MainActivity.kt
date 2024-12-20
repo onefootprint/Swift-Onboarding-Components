@@ -37,6 +37,9 @@ import com.onefootprint.native_onboarding_components.models.SandboxOutcome
 import com.onefootprint.native_onboarding_components.models.VaultData
 import kotlinx.coroutines.launch
 import org.openapitools.client.models.DataIdentifier
+import org.openapitools.client.models.InvestorProfileDeclaration
+import org.openapitools.client.models.InvestorProfileFundingSource
+import org.openapitools.client.models.InvestorProfileInvestmentGoal
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -458,15 +461,11 @@ fun BasicInfo(
                     DataIdentifier.idLastName,
                     DataIdentifier.idDob
                 )
-            ).asMap()
-            firstName =
-                if (vaultData[DataIdentifier.idFirstName] is String) vaultData[DataIdentifier.idFirstName] as String else ""
-            middleName =
-                if (vaultData[DataIdentifier.idMiddleName] is String) vaultData[DataIdentifier.idMiddleName] as String else ""
-            lastName =
-                if (vaultData[DataIdentifier.idLastName] is String) vaultData[DataIdentifier.idLastName] as String else ""
-            dob =
-                if (vaultData[DataIdentifier.idDob] is String) vaultData[DataIdentifier.idDob] as String else ""
+            )
+            firstName = vaultData.idFirstName ?: ""
+            middleName = vaultData.idMiddleName ?: ""
+            lastName = vaultData.idLastName ?: ""
+            dob = vaultData.idDob ?: ""
         } catch (e: Exception) {
             println("Error retrieving vault data: ${e.message}")
         }
@@ -633,12 +632,10 @@ fun BasicInfo(
                         try {
                             Footprint.vault(
                                 VaultData(
-                                    mapOf(
-                                        DataIdentifier.idFirstName to firstName,
-                                        DataIdentifier.idMiddleName to middleName,
-                                        DataIdentifier.idLastName to lastName,
-                                        DataIdentifier.idDob to dob
-                                    )
+                                    idFirstName = firstName.ifEmpty { null },
+                                    idMiddleName = middleName.ifEmpty { null },
+                                    idLastName = lastName.ifEmpty { null },
+                                    idDob = dob.ifEmpty { null },
                                 )
                             )
                             setNextStep(Step.ADDRESS)
@@ -731,19 +728,13 @@ fun Address(
                     DataIdentifier.idZip,
                     DataIdentifier.idCountry
                 )
-            ).asMap()
-            addressLine1 =
-                if (vaultData[DataIdentifier.idAddressLine1] is String) vaultData[DataIdentifier.idAddressLine1] as String else ""
-            addressLine2 =
-                if (vaultData[DataIdentifier.idAddressLine2] is String) vaultData[DataIdentifier.idAddressLine2] as String else ""
-            city =
-                if (vaultData[DataIdentifier.idCity] is String) vaultData[DataIdentifier.idCity] as String else ""
-            state =
-                if (vaultData[DataIdentifier.idState] is String) vaultData[DataIdentifier.idState] as String else ""
-            zip =
-                if (vaultData[DataIdentifier.idZip] is String) vaultData[DataIdentifier.idZip] as String else ""
-            country =
-                if (vaultData[DataIdentifier.idCountry] is String) vaultData[DataIdentifier.idCountry] as String else ""
+            )
+            addressLine1 = vaultData.idAddressLine1 ?: ""
+            addressLine2 = vaultData.idAddressLine2 ?: ""
+            city = vaultData.idCity ?: ""
+            state = vaultData.idState ?: ""
+            zip = vaultData.idZip ?: ""
+            country = vaultData.idCountry ?: ""
         } catch (e: Exception) {
             println("Error retrieving vault data: ${e.message}")
         }
@@ -952,14 +943,12 @@ fun Address(
                         try {
                             Footprint.vault(
                                 VaultData(
-                                    mapOf(
-                                        DataIdentifier.idAddressLine1 to addressLine1,
-                                        DataIdentifier.idAddressLine2 to addressLine2,
-                                        DataIdentifier.idCity to city,
-                                        DataIdentifier.idState to state,
-                                        DataIdentifier.idZip to zip,
-                                        DataIdentifier.idCountry to country
-                                    )
+                                    idAddressLine1 = addressLine1.ifEmpty { null },
+                                    idAddressLine2 = addressLine2.ifEmpty { null },
+                                    idCity = city.ifEmpty { null },
+                                    idState = state.ifEmpty { null },
+                                    idZip = zip.ifEmpty { null },
+                                    idCountry = country.ifEmpty { null }
                                 )
                             )
                             setNextStep(Step.SSN)
@@ -1083,9 +1072,7 @@ fun SSN(
                             // You can use the SSN in the vaulting process, like in other screens
                             Footprint.vault(
                                 VaultData(
-                                    mapOf(
-                                        DataIdentifier.idSsn9 to ssn
-                                    )
+                                    idSsn9 = ssn.ifEmpty { null }
                                 )
                             )
                             setNextStep(Step.COMPLETE)
