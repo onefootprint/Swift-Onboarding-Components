@@ -1,6 +1,4 @@
-import type { OrgAuthLoginRequest, OrgAuthLoginResponse } from '@onefootprint/types';
-import { OrgAuthLoginTarget } from '@onefootprint/types';
-import { Box, useToast } from '@onefootprint/ui';
+import { useToast } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +6,7 @@ import useLoggedOutStorage from 'src/hooks/use-logged-out-storage';
 import useSession from 'src/hooks/use-session';
 
 import { type RequestError, useRequestError } from '@onefootprint/request';
+import type { OrgLoginResponse } from '@onefootprint/request-types/dashboard';
 import { useState } from 'react';
 import DomainInUse, { type ConflictingTenantDomainErrorContext } from './components/domain-in-use';
 import Loading from './components/loading';
@@ -40,46 +39,48 @@ const Auth = () => {
 
   useWorkosParams({
     onCodeFound: (code: string) => {
-      const requestData: OrgAuthLoginRequest = {
+      const requestData = {
         code,
         requestOrgId: data?.orgId,
-        loginTarget: OrgAuthLoginTarget.TenantDashboard,
       };
-      loginMutation.mutate(requestData, {
-        onSuccess: async ({
-          authToken,
-          isFirstLogin,
-          requiresOnboarding,
-          createdNewTenant,
-          isMissingRequestedOrg,
-        }: OrgAuthLoginResponse) => {
-          await logIn({
-            auth: authToken,
-            meta: {
-              isFirstLogin,
-              requiresOnboarding,
-              createdNewTenant,
-            },
-          });
-          waitForAnimation(() => {
-            if (isMissingRequestedOrg) {
-              toast.show({
-                title: t('missing-access.title'),
-                description: t('missing-access.description'),
-                variant: 'error',
-              });
+      loginMutation.mutate(
+        { body: requestData },
+        {
+          onSuccess: async ({
+            authToken,
+            createdNewTenant,
+            isFirstLogin,
+            isMissingRequestedOrg,
+            requiresOnboarding,
+          }: OrgLoginResponse) => {
+            await logIn({
+              auth: authToken,
+              meta: {
+                isFirstLogin,
+                requiresOnboarding,
+                createdNewTenant,
+              },
+            });
+            waitForAnimation(() => {
+              if (isMissingRequestedOrg) {
+                toast.show({
+                  title: t('missing-access.title'),
+                  description: t('missing-access.description'),
+                  variant: 'error',
+                });
+              }
+              router.push(requiresOnboarding ? '/onboarding' : onLoginUrl);
+              resetLoggedOutStorage();
+            });
+          },
+          onError: (e: RequestError) => {
+            if (getErrorCode(e) === 'E129') {
+              const context = getErrorContext(e) as ConflictingTenantDomainErrorContext;
+              setConflictingTenantErrorContext(context);
             }
-            router.push(requiresOnboarding ? '/onboarding' : onLoginUrl);
-            resetLoggedOutStorage();
-          });
+          },
         },
-        onError: (e: RequestError) => {
-          if (getErrorCode(e) === 'E129') {
-            const context = getErrorContext(e) as ConflictingTenantDomainErrorContext;
-            setConflictingTenantErrorContext(context);
-          }
-        },
-      });
+      );
     },
     onCodeNotFound: () => {
       toast.show({
@@ -115,9 +116,9 @@ const Auth = () => {
       <Head>
         <title>{t('page-title')}</title>
       </Head>
-      <Box aria-label={t('loading-aria-label')} aria-busy>
+      <div aria-label={t('loading-aria-label')} aria-busy>
         <Loading />
-      </Box>
+      </div>
     </>
   );
 };

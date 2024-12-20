@@ -1,20 +1,10 @@
+import { postOrgAuthLoginMutation } from '@onefootprint/axios/dashboard';
 import type { RequestError } from '@onefootprint/request';
-import request, { useRequestError } from '@onefootprint/request';
-import type { OrgAuthLoginRequest, OrgAuthLoginResponse } from '@onefootprint/types';
+import { useRequestError } from '@onefootprint/request';
 import { useToast } from '@onefootprint/ui';
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'react-i18next';
-
-const login = async (data: OrgAuthLoginRequest) => {
-  const response = await request<OrgAuthLoginResponse>({
-    method: 'POST',
-    url: '/org/auth/login',
-    data,
-  });
-
-  return response.data;
-};
 
 const useLogin = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.auth' });
@@ -23,7 +13,7 @@ const useLogin = () => {
   const { getErrorCode } = useRequestError();
 
   return useMutation({
-    mutationFn: login,
+    ...postOrgAuthLoginMutation(),
     onError(e: RequestError): void {
       if (getErrorCode(e) === 'E129') {
         // Will be handled in the parent component
