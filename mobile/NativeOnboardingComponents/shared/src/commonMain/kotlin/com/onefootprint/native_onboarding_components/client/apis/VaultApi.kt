@@ -19,7 +19,6 @@ import org.openapitools.client.models.HostedUserDecryptRequest
 import org.openapitools.client.models.ModernBusinessDecryptResponse
 import org.openapitools.client.models.ModernRawBusinessDataRequest
 import org.openapitools.client.models.ModernRawUserDataRequest
-import org.openapitools.client.models.ModernUserDecryptResponse
 import org.openapitools.client.models.UserDecryptRequest
 
 import org.openapitools.client.infrastructure.*
@@ -159,10 +158,10 @@ open class VaultApi : ApiClient {
      * Decrypts the specified list of fields from the provided vault.
      * @param hostedUserDecryptRequest 
      * @param xFpAuthorization Short-lived auth token for a user. Issued by identify and contains scopes to perform specific user actions. (optional)
-     * @return ModernUserDecryptResponse
+     * @return ModernRawUserDataRequest
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun hostedUserVaultDecryptPost(hostedUserDecryptRequest: HostedUserDecryptRequest, xFpAuthorization: kotlin.String? = null): HttpResponse<ModernUserDecryptResponse> {
+    open suspend fun hostedUserVaultDecryptPost(hostedUserDecryptRequest: HostedUserDecryptRequest, xFpAuthorization: kotlin.String? = null): HttpResponse<ModernRawUserDataRequest> {
 
         val localVariableAuthNames = listOf<String>("userToken")
 

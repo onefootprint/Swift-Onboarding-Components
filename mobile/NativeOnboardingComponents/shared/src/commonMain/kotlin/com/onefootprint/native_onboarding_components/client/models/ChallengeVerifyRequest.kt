@@ -15,8 +15,6 @@
 
 package org.openapitools.client.models
 
-import org.openapitools.client.models.Inviter
-import org.openapitools.client.models.ModernRawUserDataRequest
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
@@ -25,19 +23,18 @@ import kotlinx.serialization.encoding.*
 /**
  * 
  *
- * @param invitedData 
- * @param inviter 
- * @param name 
+ * @param challengeToken Opaque challenge state token
+ * @param challengeResponse Required for challenges other than SMS link
  */
 @Serializable
 
-data class HostedBusinessDetail (
+data class ChallengeVerifyRequest (
 
-    @SerialName(value = "invited_data") @Required val invitedData: ModernRawUserDataRequest,
+    /* Opaque challenge state token */
+    @SerialName(value = "challenge_token") @Required val challengeToken: kotlin.String,
 
-    @SerialName(value = "inviter") @Required val inviter: Inviter,
-
-    @SerialName(value = "name") @Required val name: kotlin.String
+    /* Required for challenges other than SMS link */
+    @SerialName(value = "challenge_response") val challengeResponse: kotlin.String? = null
 
 ) {
 

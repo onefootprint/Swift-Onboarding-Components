@@ -21,6 +21,7 @@ import org.openapitools.client.models.FingerprintVisitRequest
 import org.openapitools.client.models.HostedValidateResponse
 import org.openapitools.client.models.NeuroIdentityIdResponse
 import org.openapitools.client.models.OnboardingResponse
+import org.openapitools.client.models.OnboardingResultResponse
 import org.openapitools.client.models.OnboardingSessionResponse
 import org.openapitools.client.models.OnboardingStatusResponse
 import org.openapitools.client.models.PostBusinessOnboardingRequest
@@ -112,6 +113,40 @@ open class OnboardingApi : ApiClient {
         val localVariableConfig = RequestConfig<kotlin.Any?>(
             RequestMethod.POST,
             "/hosted/onboarding/authorize",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = true,
+        )
+
+        return request(
+            localVariableConfig,
+            localVariableBody,
+            localVariableAuthNames
+        ).wrap()
+    }
+
+
+    /**
+     * 
+     * Returns the workflow&#39;s status. Only available for demo tenants and POS tenants.
+     * @param xFpAuthorization Short-lived auth token for a user during bifrost. Issued by identify and contains scopes to perform specific user actions. (optional)
+     * @return OnboardingResultResponse
+     */
+    @Suppress("UNCHECKED_CAST")
+    open suspend fun hostedOnboardingAvisResultPost(xFpAuthorization: kotlin.String? = null): HttpResponse<OnboardingResultResponse> {
+
+        val localVariableAuthNames = listOf<String>("userOnboardingToken")
+
+        val localVariableBody = 
+            io.ktor.client.utils.EmptyContent
+
+        val localVariableQuery = mutableMapOf<String, List<String>>()
+        val localVariableHeaders = mutableMapOf<String, String>()
+        xFpAuthorization?.apply { localVariableHeaders["X-Fp-Authorization"] = this.toString() }
+
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.POST,
+            "/hosted/onboarding/avis_result",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = true,

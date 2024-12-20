@@ -105,6 +105,12 @@ const updateModernRawUserDataRequest = async (dir: string) => {
       // Remove any consecutive empty lines
       .replace(/(\r?\n){2,}/g, '\n\n')
       .trim();
+
+    fileContent = fileContent.replace(
+      /(?<!\w)data class ModernRawUserDataRequest/g,
+      'open data class ModernRawUserDataRequest',
+    );
+
     await fs.writeFile(filePath, fileContent);
   });
 };

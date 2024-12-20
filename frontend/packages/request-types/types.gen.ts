@@ -787,13 +787,13 @@ export type HostedBusinessDetail = {
   /**
    * The basic data provided for the user accepting this invitation.
    */
-  invitedData: ModernUserDecryptResponse;
+  invitedData: ModernRawUserDataRequest;
   inviter: Inviter;
   name: string;
 };
 export type HostedBusinessOwner = {
   createdAt: string;
-  decryptedData: ModernUserDecryptResponse;
+  decryptedData: ModernRawUserDataRequest;
   /**
    * True if a user has already started onboarding as this beneficial owner. In this case, the
    * data below comes directly from that user's vault.
@@ -3733,7 +3733,7 @@ export type PostHostedUserVaultDecryptData = {
     'X-Fp-Authorization'?: string;
   };
 };
-export type PostHostedUserVaultDecryptResponse = ModernUserDecryptResponse;
+export type PostHostedUserVaultDecryptResponse = ModernRawUserDataRequest;
 export type PostHostedUserVaultDecryptError = unknown;
 export type PostHostedUserVaultValidateData = {
   /**
@@ -4452,7 +4452,7 @@ export type $OpenApiTs = {
         /**
          * OK
          */
-        '200': ModernUserDecryptResponse;
+        '200': ModernRawUserDataRequest;
       };
     };
   };

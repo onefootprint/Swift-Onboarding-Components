@@ -16,7 +16,7 @@
 package org.openapitools.client.models
 
 import org.openapitools.client.models.DataIdentifier
-import org.openapitools.client.models.ModernUserDecryptResponse
+import org.openapitools.client.models.ModernRawUserDataRequest
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
@@ -41,7 +41,7 @@ data class HostedBusinessOwner (
 
     @SerialName(value = "created_at") @Required val createdAt: kotlinx.datetime.Instant,
 
-    @SerialName(value = "decrypted_data") @Required val decryptedData: ModernUserDecryptResponse,
+    @SerialName(value = "decrypted_data") @Required val decryptedData: ModernRawUserDataRequest,
 
     /* True if a user has already started onboarding as this beneficial owner. In this case, the  data below comes directly from that user's vault. */
     @SerialName(value = "has_linked_user") @Required val hasLinkedUser: kotlin.Boolean,

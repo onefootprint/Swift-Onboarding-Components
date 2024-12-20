@@ -140,6 +140,10 @@ export const updateOpenApi = async (filePath: string, tempPath: string) => {
     { regex: /Dashboard Token/g, value: 'dashboardToken' },
     { regex: /Firm Employee Assume Token/g, value: 'firmEmployeeAssumeToken' },
     { regex: /Secret API Key/g, value: 'secretApiKey' },
+    {
+      regex: /#\/components\/schemas\/ModernUserDecryptResponse/g,
+      value: '#/components/schemas/ModernRawUserDataRequest',
+    },
   ];
 
   const updatedContent = replaceContent(openAPIContent, replacements);

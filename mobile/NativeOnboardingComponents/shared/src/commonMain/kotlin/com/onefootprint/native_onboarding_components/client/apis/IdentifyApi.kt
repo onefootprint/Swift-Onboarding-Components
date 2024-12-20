@@ -15,10 +15,15 @@
 
 package org.openapitools.client.apis
 
+import org.openapitools.client.models.ChallengeRequest
+import org.openapitools.client.models.ChallengeVerifyRequest
 import org.openapitools.client.models.GetVerifyContactInfoResponse
 import org.openapitools.client.models.IdentifyChallengeResponse
 import org.openapitools.client.models.IdentifyRequest
+import org.openapitools.client.models.IdentifyRequirementsResponse
 import org.openapitools.client.models.IdentifyResponse
+import org.openapitools.client.models.IdentifySessionRequest
+import org.openapitools.client.models.IdentifySessionResponse
 import org.openapitools.client.models.IdentifyVerifyRequest
 import org.openapitools.client.models.IdentifyVerifyResponse
 import org.openapitools.client.models.KbaResponse
@@ -199,6 +204,222 @@ open class IdentifyApi : ApiClient {
         ).wrap()
     }
 
+
+
+    /**
+     * 
+     * Sends a challenge to the phone number or email saved in this identify session and returns an HTTP 200
+     * @param challengeRequest 
+     * @param xFpAuthorization Short-lived auth token for an identify session. (optional)
+     * @return IdentifyChallengeResponse
+     */
+    @Suppress("UNCHECKED_CAST")
+    open suspend fun hostedIdentifySessionChallengePost(challengeRequest: ChallengeRequest, xFpAuthorization: kotlin.String? = null): HttpResponse<IdentifyChallengeResponse> {
+
+        val localVariableAuthNames = listOf<String>("Identify Token")
+
+        val localVariableBody = challengeRequest
+
+        val localVariableQuery = mutableMapOf<String, List<String>>()
+        val localVariableHeaders = mutableMapOf<String, String>()
+        xFpAuthorization?.apply { localVariableHeaders["X-Fp-Authorization"] = this.toString() }
+
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.POST,
+            "/hosted/identify/session/challenge",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = true,
+        )
+
+        return jsonRequest(
+            localVariableConfig,
+            localVariableBody,
+            localVariableAuthNames
+        ).wrap()
+    }
+
+
+
+    /**
+     * 
+     * Verifies the response to a challenge
+     * @param challengeVerifyRequest 
+     * @param xFpAuthorization Short-lived auth token for an identify session. (optional)
+     * @return kotlin.String
+     */
+    @Suppress("UNCHECKED_CAST")
+    open suspend fun hostedIdentifySessionChallengeVerifyPost(challengeVerifyRequest: ChallengeVerifyRequest, xFpAuthorization: kotlin.String? = null): HttpResponse<kotlin.String> {
+
+        val localVariableAuthNames = listOf<String>("Identify Token")
+
+        val localVariableBody = challengeVerifyRequest
+
+        val localVariableQuery = mutableMapOf<String, List<String>>()
+        val localVariableHeaders = mutableMapOf<String, String>()
+        xFpAuthorization?.apply { localVariableHeaders["X-Fp-Authorization"] = this.toString() }
+
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.POST,
+            "/hosted/identify/session/challenge/verify",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = true,
+        )
+
+        return jsonRequest(
+            localVariableConfig,
+            localVariableBody,
+            localVariableAuthNames
+        ).wrap()
+    }
+
+
+
+    /**
+     * 
+     * Creates an identify session token.
+     * @param identifySessionRequest 
+     * @param xSandboxId When provided, creates a sandbox user with the provided sandbox ID. Sandbox IDs allow you to create multiple users with the same contact info. In order to log in using an existing sandbox user, you can provide its Sandbox ID in the Footprint flow.              (optional)
+     * @param xFpIsBootstrap Provide &#x60;true&#x60; if the data in the request is bootstrap data. (optional)
+     * @param xFpIsComponentsSdk When a non-empty value is provided, indicates that the request is originating from the components SDK (optional)
+     * @param xKybBoToken Token to initialize KYC of a business owner. Uniquely identifies a business and beneficial owner. (optional)
+     * @param xOnboardingConfigKey Long-lived, publishable key representing an onboarding configuration. You can create and view your credentials in the dashboard. (optional)
+     * @return IdentifySessionResponse
+     */
+    @Suppress("UNCHECKED_CAST")
+    open suspend fun hostedIdentifySessionPost(identifySessionRequest: IdentifySessionRequest, xSandboxId: kotlin.String? = null, xFpIsBootstrap: kotlin.Boolean? = null, xFpIsComponentsSdk: kotlin.Boolean? = null, xKybBoToken: kotlin.String? = null, xOnboardingConfigKey: kotlin.String? = null): HttpResponse<IdentifySessionResponse> {
+
+        val localVariableAuthNames = listOf<String>("businessOwnerToken", "onboardingConfigToken", "onboardingConfigPublishableKey")
+
+        val localVariableBody = identifySessionRequest
+
+        val localVariableQuery = mutableMapOf<String, List<String>>()
+        val localVariableHeaders = mutableMapOf<String, String>()
+        xSandboxId?.apply { localVariableHeaders["X-Sandbox-Id"] = this.toString() }
+        xFpIsBootstrap?.apply { localVariableHeaders["X-Fp-Is-Bootstrap"] = this.toString() }
+        xFpIsComponentsSdk?.apply { localVariableHeaders["X-Fp-Is-Components-Sdk"] = this.toString() }
+        xKybBoToken?.apply { localVariableHeaders["X-Kyb-Bo-Token"] = this.toString() }
+        xOnboardingConfigKey?.apply { localVariableHeaders["X-Onboarding-Config-Key"] = this.toString() }
+
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.POST,
+            "/hosted/identify/session",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = true,
+        )
+
+        return jsonRequest(
+            localVariableConfig,
+            localVariableBody,
+            localVariableAuthNames
+        ).wrap()
+    }
+
+
+
+    /**
+     * 
+     * Returns the list of requirements for an identify session.
+     * @param xFpAuthorization Short-lived auth token for an identify session. (optional)
+     * @return IdentifyRequirementsResponse
+     */
+    @Suppress("UNCHECKED_CAST")
+    open suspend fun hostedIdentifySessionRequirementsGet(xFpAuthorization: kotlin.String? = null): HttpResponse<IdentifyRequirementsResponse> {
+
+        val localVariableAuthNames = listOf<String>("Identify Token")
+
+        val localVariableBody = 
+            io.ktor.client.utils.EmptyContent
+
+        val localVariableQuery = mutableMapOf<String, List<String>>()
+        val localVariableHeaders = mutableMapOf<String, String>()
+        xFpAuthorization?.apply { localVariableHeaders["X-Fp-Authorization"] = this.toString() }
+
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.GET,
+            "/hosted/identify/session/requirements",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = true,
+        )
+
+        return request(
+            localVariableConfig,
+            localVariableBody,
+            localVariableAuthNames
+        ).wrap()
+    }
+
+
+    /**
+     * 
+     * Updates the data stored in this identify session.
+     * @param modernRawUserDataRequest Key-value map of data to add to the user&#39;s vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).
+     * @param xFpAuthorization Short-lived auth token for an identify session. (optional)
+     * @return kotlin.String
+     */
+    @Suppress("UNCHECKED_CAST")
+    open suspend fun hostedIdentifySessionVaultPatch(modernRawUserDataRequest: ModernRawUserDataRequest, xFpAuthorization: kotlin.String? = null): HttpResponse<kotlin.String> {
+
+        val localVariableAuthNames = listOf<String>("Identify Token")
+
+        val localVariableBody = modernRawUserDataRequest
+
+        val localVariableQuery = mutableMapOf<String, List<String>>()
+        val localVariableHeaders = mutableMapOf<String, String>()
+        xFpAuthorization?.apply { localVariableHeaders["X-Fp-Authorization"] = this.toString() }
+
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.PATCH,
+            "/hosted/identify/session/vault",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = true,
+        )
+
+        return jsonRequest(
+            localVariableConfig,
+            localVariableBody,
+            localVariableAuthNames
+        ).wrap()
+    }
+
+
+
+    /**
+     * 
+     * Verifies that all identify requirements have been met.
+     * @param xFpAuthorization Short-lived auth token for an identify session. (optional)
+     * @return IdentifyVerifyResponse
+     */
+    @Suppress("UNCHECKED_CAST")
+    open suspend fun hostedIdentifySessionVerifyPost(xFpAuthorization: kotlin.String? = null): HttpResponse<IdentifyVerifyResponse> {
+
+        val localVariableAuthNames = listOf<String>("Identify Token")
+
+        val localVariableBody = 
+            io.ktor.client.utils.EmptyContent
+
+        val localVariableQuery = mutableMapOf<String, List<String>>()
+        val localVariableHeaders = mutableMapOf<String, String>()
+        xFpAuthorization?.apply { localVariableHeaders["X-Fp-Authorization"] = this.toString() }
+
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.POST,
+            "/hosted/identify/session/verify",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = true,
+        )
+
+        return request(
+            localVariableConfig,
+            localVariableBody,
+            localVariableAuthNames
+        ).wrap()
+    }
 
 
     /**

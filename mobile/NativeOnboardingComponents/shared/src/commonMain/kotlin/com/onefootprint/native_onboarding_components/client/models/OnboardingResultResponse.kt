@@ -15,8 +15,7 @@
 
 package org.openapitools.client.models
 
-import org.openapitools.client.models.Inviter
-import org.openapitools.client.models.ModernRawUserDataRequest
+import org.openapitools.client.models.OnboardingStatus
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
@@ -25,19 +24,16 @@ import kotlinx.serialization.encoding.*
 /**
  * 
  *
- * @param invitedData 
- * @param inviter 
- * @param name 
+ * @param requiresManualReview 
+ * @param status 
  */
 @Serializable
 
-data class HostedBusinessDetail (
+data class OnboardingResultResponse (
 
-    @SerialName(value = "invited_data") @Required val invitedData: ModernRawUserDataRequest,
+    @SerialName(value = "requires_manual_review") @Required val requiresManualReview: kotlin.Boolean,
 
-    @SerialName(value = "inviter") @Required val inviter: Inviter,
-
-    @SerialName(value = "name") @Required val name: kotlin.String
+    @SerialName(value = "status") @Required val status: OnboardingStatus
 
 ) {
 

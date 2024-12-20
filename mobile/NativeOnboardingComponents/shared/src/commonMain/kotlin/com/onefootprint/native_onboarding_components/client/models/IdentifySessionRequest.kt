@@ -15,7 +15,7 @@
 
 package org.openapitools.client.models
 
-import org.openapitools.client.models.Inviter
+import org.openapitools.client.models.IdentifyScope
 import org.openapitools.client.models.ModernRawUserDataRequest
 
 import kotlinx.serialization.*
@@ -25,19 +25,16 @@ import kotlinx.serialization.encoding.*
 /**
  * 
  *
- * @param invitedData 
- * @param inviter 
- * @param name 
+ * @param `data` 
+ * @param scope 
  */
 @Serializable
 
-data class HostedBusinessDetail (
+data class IdentifySessionRequest (
 
-    @SerialName(value = "invited_data") @Required val invitedData: ModernRawUserDataRequest,
+    @SerialName(value = "data") @Required val `data`: ModernRawUserDataRequest,
 
-    @SerialName(value = "inviter") @Required val inviter: Inviter,
-
-    @SerialName(value = "name") @Required val name: kotlin.String
+    @SerialName(value = "scope") @Required val scope: IdentifyScope
 
 ) {
 

@@ -27,8 +27,8 @@ import kotlinx.serialization.encoding.*
  * @param challengeKind 
  * @param challengeToken 
  * @param timeBeforeRetryS 
- * @param token Auth token to pass to the verify call
  * @param biometricChallengeJson 
+ * @param token Auth token to pass to the verify call
  */
 @Serializable
 
@@ -40,10 +40,10 @@ data class UserChallengeData (
 
     @SerialName(value = "time_before_retry_s") @Required val timeBeforeRetryS: kotlin.Long,
 
-    /* Auth token to pass to the verify call */
-    @SerialName(value = "token") @Required val token: kotlin.String,
+    @SerialName(value = "biometric_challenge_json") val biometricChallengeJson: kotlin.String? = null,
 
-    @SerialName(value = "biometric_challenge_json") val biometricChallengeJson: kotlin.String? = null
+    /* Auth token to pass to the verify call */
+    @SerialName(value = "token") val token: kotlin.String? = null
 
 ) {
 

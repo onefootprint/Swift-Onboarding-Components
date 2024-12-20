@@ -53,6 +53,7 @@ open class ApiClient(
         mapOf(
                 "Async contact info verification token" to ApiKeyAuth("header", "X-Fp-Authorization"), 
                 "businessOwnerToken" to ApiKeyAuth("header", "X-Kyb-Bo-Token"), 
+                "Identify Token" to ApiKeyAuth("header", "X-Fp-Authorization"), 
                 "integrationTestingUserOnboardingToken" to ApiKeyAuth("header", "X-Fp-Authorization"), 
                 "onboardingConfigPublishableKey" to ApiKeyAuth("header", "X-Onboarding-Config-Key"), 
                 "onboardingConfigToken" to ApiKeyAuth("header", "X-Onboarding-Config-Key"), 

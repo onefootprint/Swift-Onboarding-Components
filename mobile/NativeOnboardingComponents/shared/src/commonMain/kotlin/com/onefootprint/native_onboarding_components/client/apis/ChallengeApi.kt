@@ -15,7 +15,6 @@
 
 package org.openapitools.client.apis
 
-import org.openapitools.client.models.AuthRequirementsResponse
 import org.openapitools.client.models.UserChallengeRequest
 import org.openapitools.client.models.UserChallengeResponse
 import org.openapitools.client.models.UserChallengeVerifyRequest
@@ -45,40 +44,6 @@ open class ChallengeApi : ApiClient {
         baseUrl: String,
         httpClient: HttpClient
     ): super(baseUrl = baseUrl, httpClient = httpClient)
-
-    /**
-     * 
-     * Returns the set of auth requirements to satisfy the auth portion of the playbook in the provided session
-     * @param xFpAuthorization Short-lived auth token for a user. Issued by identify and contains scopes to perform specific user actions. (optional)
-     * @return AuthRequirementsResponse
-     */
-    @Suppress("UNCHECKED_CAST")
-    open suspend fun hostedUserAuthRequirementsGet(xFpAuthorization: kotlin.String? = null): HttpResponse<AuthRequirementsResponse> {
-
-        val localVariableAuthNames = listOf<String>("userToken")
-
-        val localVariableBody = 
-            io.ktor.client.utils.EmptyContent
-
-        val localVariableQuery = mutableMapOf<String, List<String>>()
-        val localVariableHeaders = mutableMapOf<String, String>()
-        xFpAuthorization?.apply { localVariableHeaders["X-Fp-Authorization"] = this.toString() }
-
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/hosted/user/auth_requirements",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
-
-        return request(
-            localVariableConfig,
-            localVariableBody,
-            localVariableAuthNames
-        ).wrap()
-    }
-
 
     /**
      * 
