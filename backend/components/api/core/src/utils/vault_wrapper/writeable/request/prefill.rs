@@ -30,6 +30,7 @@ use std::marker::PhantomData;
 /// result to save data to the destination SV, so we may have old or missing portable data.
 /// This is necessary since we must asynchronously compute the fingerprints before locking the
 /// vault
+#[derive(Debug, Default)]
 pub struct PrefillData {
     pub data: Vec<NewVaultData>,
     pub(in super::super) fingerprints: Fingerprints,

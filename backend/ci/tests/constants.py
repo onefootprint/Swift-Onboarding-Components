@@ -130,6 +130,8 @@ ID_DATA = {
     "id.us_legal_status": "citizen",
 }
 
+ID_DATA_CLEANED = {k: v.strip() for k, v in ID_DATA.items()}
+
 BUSINESS_DATA = {
     "business.name": "Foobar Inc",  # We'll add a random suffix to this
     "business.dba": "Barfoo Inc",

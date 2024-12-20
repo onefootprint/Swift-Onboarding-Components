@@ -20,7 +20,7 @@ use newtypes::FingerprintScope;
 use newtypes::Locked;
 use std::collections::HashMap;
 
-#[derive(Debug, Clone, derive_more::Deref)]
+#[derive(Debug, Clone, derive_more::Deref, Default)]
 pub(in super::super) struct Fingerprints {
     #[deref]
     fps: Vec<(FingerprintSalt, Fingerprint)>,

@@ -8,6 +8,7 @@ use crate::State;
 use api_core::auth::ob_config::ObConfigAuth;
 use api_core::auth::session::user::NewUserSessionContext;
 use api_core::auth::session::user::TokenCreationPurpose;
+use api_core::auth::user::load_auth_events;
 use api_core::types::ApiResponse;
 use api_core::utils::actix::OptionalJson;
 use api_core::utils::onboarding::create_biz_wfl_if_not_exists;
@@ -15,6 +16,7 @@ use api_core::utils::onboarding::get_or_create_user_workflow;
 use api_core::utils::onboarding::CommonWfArgs;
 use api_core::utils::onboarding::CreateUserWfArgs;
 use api_core::utils::vault_wrapper::Any;
+use api_core::utils::vault_wrapper::PrefillData;
 use api_core::utils::vault_wrapper::PrefillKind;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_wire_types::hosted::onboarding::OnboardingResponse;
@@ -24,6 +26,7 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow::Workflow;
 use db::models::workflow_request::WorkflowRequest;
+use newtypes::AuthEventKind;
 use newtypes::VerificationCheckKind;
 use newtypes::WorkflowSource;
 use paperclip::actix::api_v2_operation;
@@ -48,28 +51,56 @@ pub async fn post(
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     let PostOnboardingRequest { fixture_result } = request.into_inner().unwrap_or_default();
 
+    let auth_events = user_auth.auth_events.clone();
+
     let scoped_user_id = (user_auth.su_id.clone()).ok_or(AuthError::MissingScopedUser)?;
     let uv_id = user_auth.user.id.clone();
     let pk_obc_id = ob_pk_auth.map(|ob_pk| ob_pk.ob_config().id.clone());
     let obc_id = (user_auth.obc_id.clone().or(pk_obc_id)).ok_or(OnboardingError::NoPlaybook)?;
-    let (scoped_user, playbook, ob_config, portable_vw) = state
+    let (scoped_user, playbook, ob_config, portable_vw, auth_events) = state
         .db_query(move |conn| {
             let su = ScopedVault::get(conn, (&scoped_user_id, &uv_id))?;
             // Check that the ob configuration is still active
             let (playbook, ob_config) = ObConfiguration::get_enabled(conn, &obc_id)?;
             let portable_vw = VaultWrapper::<Any>::build_portable(conn, &su.vault_id)?;
-            Ok((su, playbook, ob_config, portable_vw))
+
+            let auth_events = load_auth_events(conn, &auth_events)?;
+
+            Ok((su, playbook, ob_config, portable_vw, auth_events))
         })
         .await?;
 
-    let prefill_data = portable_vw
-        .get_data_to_prefill(
-            &state,
-            &playbook,
-            &ob_config,
-            PrefillKind::Onboarding(&scoped_user),
-        )
-        .await?;
+    // Only prefill data if the user used a strong auth method.
+    //
+    // SMS is not strong auth due to risk of SIM swapping and phone number recycling.
+    //
+    // It might be desirable to have SMS+KBA be considered "strong auth", but currently we only
+    // allow KBA on the phone number DI, which doesn't represent useful KBA if you've successfully
+    // completed SMS OTP.
+    tracing::info!(
+        fp_id = %scoped_user.fp_id,
+        auth_events = ?user_auth.auth_events,
+        "Evaluating prefill"
+    );
+
+    let session_has_strong_auth = auth_events
+        .iter()
+        .any(|(ae, _)| matches!(ae.kind, AuthEventKind::Email | AuthEventKind::Passkey));
+    let prefill_data = if session_has_strong_auth {
+        tracing::info!("Prefilling data because session has strong auth");
+        portable_vw
+            .get_data_to_prefill(
+                &state,
+                &playbook,
+                &ob_config,
+                PrefillKind::Onboarding(&scoped_user),
+            )
+            .await?
+    } else {
+        tracing::info!("Not prefilling data because session lacks strong auth");
+        PrefillData::default()
+    };
+
 
     let insight_event = CreateInsightEvent::from(insights);
     let session_key = state.session_sealing_key.clone();

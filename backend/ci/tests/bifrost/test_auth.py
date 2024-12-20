@@ -114,22 +114,66 @@ def test_auth_onto_onboarded_user(sandbox_user, auth_playbook, sandbox_tenant):
     assert not any(i["source"] == "prefill" for i in body["data"])
 
 
-def test_multi_tenant_auth(sandbox_user, foo_sandbox_tenant, must_collect_data):
+@pytest.mark.parametrize(
+    "register_auth_methods",
+    [
+        ["phone", "email"],
+        ["phone"],
+        ["email"],
+    ],
+)
+@pytest.mark.parametrize("login_auth_kind", ["sms", "email", "biometric"])
+def test_multi_tenant_auth(
+    sandbox_tenant,
+    foo_sandbox_tenant,
+    must_collect_data,
+    register_auth_methods,
+    login_auth_kind,
+):
     """
-    Test onboarding onto a second tenant via an auth playbook
+    Test onboarding onto a second tenant via an auth & KYC playbook
     """
-    auth_playbook = create_ob_config(
-        foo_sandbox_tenant, "Auth playbook", ["phone_number", "email"], kind="auth"
+
+    # Skip a few parameter combinations that don't allow for login.
+    if login_auth_kind == "sms" and "phone" not in register_auth_methods:
+        return
+    if login_auth_kind == "email" and "email" not in register_auth_methods:
+        return
+
+    # Create a user at sandbox_tenant.
+    # Can't use the default OBC since it has no required auth methods (implicitly just phone)
+    sandbox_tenant_ob_config = create_ob_config(
+        sandbox_tenant,
+        "First tenant playbook",
+        must_collect_data,
+        required_auth_methods=register_auth_methods,
     )
-    playbook = create_ob_config(foo_sandbox_tenant, "My product", must_collect_data)
+    bifrost = BifrostClient.new_user(sandbox_tenant_ob_config)
+    sandbox_user = bifrost.run()
+
+    # Create playbooks for foo_sandbox_tenant
+    auth_playbook = create_ob_config(
+        foo_sandbox_tenant,
+        "Auth playbook",
+        ["phone_number", "email"],
+        kind="auth",
+        required_auth_methods=register_auth_methods,
+    )
+    playbook = create_ob_config(
+        foo_sandbox_tenant,
+        "My product",
+        must_collect_data,
+        required_auth_methods=register_auth_methods,
+    )
 
     #
     # First, onboard the user onto an auth playbook at Foo tenant
     #
 
     auth_token = IdentifyClient.from_user(sandbox_user, playbook=auth_playbook).login(
-        kind="biometric", scope="auth"
+        kind=login_auth_kind, scope="auth"
     )
+
     body = post("/hosted/onboarding/validate", None, auth_token)
 
     # And validate it via the backend API
@@ -139,14 +183,22 @@ def test_multi_tenant_auth(sandbox_user, foo_sandbox_tenant, must_collect_data):
     fp_id = validate_response["user_auth"]["fp_id"]
     assert fp_id != sandbox_user.fp_id
 
-    # Make sure we prefilled phone and email when this user one-click authed
+    # Make sure we prefilled login methods (phone and email) when this user one-click authed
     body = get(f"entities/{fp_id}", None, *foo_sandbox_tenant.db_auths)
     assert body["status"] == "none"
-    assert set(i["identifier"] for i in body["data"] if i["source"] == "prefill") == {
-        "id.verified_phone_number",
+
+    login_method_dis = {
         "id.phone_number",
         "id.email",
+    } | {
+        {"phone": "id.verified_phone_number", "email": "id.verified_email"}[method]
+        for method in register_auth_methods
     }
+
+    assert (
+        set(i["identifier"] for i in body["data"] if i["source"] == "prefill")
+        == login_method_dis
+    )
 
     #
     # Now, onboard the user onto a KYC playbook at the new tenant at Foo tenant
@@ -158,34 +210,49 @@ def test_multi_tenant_auth(sandbox_user, foo_sandbox_tenant, must_collect_data):
 
     # For now, we won't have implicit auth here because the user token has permission to see
     # portable data at other tenants that foo_sandbox_tenant does not have
-    auth_token = IdentifyClient.from_token(auth_token).login()
+    auth_token = IdentifyClient.from_token(
+        auth_token, webauthn=sandbox_user.client.webauthn_device
+    ).login(kind=login_auth_kind)
+
     bifrost = BifrostClient.raw_auth(
         playbook, auth_token, sandbox_user.client.sandbox_id
     )
     bifrost.run()
 
-    # Make sure we prefill the remaining data when they onboard
+    # If the user authenticated with a strong auth method, prefill the
+    # remaining data when they onboard.
+    expect_data_prefill = login_auth_kind in ["email", "biometric"]
+
     body = get(f"entities/{fp_id}", None, *foo_sandbox_tenant.db_auths)
     assert body["status"] == "pass"
-    assert set(i["identifier"] for i in body["data"] if i["source"] == "prefill") >= {
-        "id.phone_number",
-        "id.email",
-        "id.first_name",
-        "id.address_line1",
-    }
+    expected_dis = login_method_dis | (
+        {
+            "id.first_name",
+            "id.address_line1",
+        }
+        if expect_data_prefill
+        else set()
+    )
+    assert (
+        set(i["identifier"] for i in body["data"] if i["source"] == "prefill")
+        >= expected_dis
+    )
 
     # And make sure the timeline events show we prefilled phone + email and then later prefilled
-    # the rest
+    # the rest (if user data prefill prefill happened)
     body = get(f"entities/{fp_id}/timeline", None, *foo_sandbox_tenant.db_auths)
     prefill_events = [
         i["event"]["data"]
         for i in body["data"]
         if i["event"]["kind"] == "data_collected" and i["event"]["data"]["is_prefill"]
     ]
-    assert set(prefill_events[0]["attributes"]) == {
-        "full_address",
-        "name",
-        "dob",
-        "ssn9",
-    }
-    assert set(prefill_events[1]["attributes"]) == {"phone_number", "email"}
+    if expect_data_prefill:
+        assert set(prefill_events[0]["attributes"]) == {
+            "full_address",
+            "name",
+            "dob",
+            "ssn9",
+        }
+        assert set(prefill_events[1]["attributes"]) == {"phone_number", "email"}
+    else:
+        assert set(prefill_events[0]["attributes"]) == {"phone_number", "email"}

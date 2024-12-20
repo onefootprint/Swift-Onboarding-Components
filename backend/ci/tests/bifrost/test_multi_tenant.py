@@ -25,11 +25,15 @@ def dual_onboarded_user(sandbox_tenant, foo_sandbox_tenant):
     fp_id = sandbox_user.fp_id
 
     #
-    # Then onboard them onto foo_sandbox_tenant
+    # Then onboard them onto foo_sandbox_tenant. Use a passkey to make it a
+    # one-click onboard with prefilled data.
     #
     sandbox_id = bifrost.sandbox_id
     foo_bifrost = BifrostClient.login_user(
-        foo_sandbox_tenant.default_ob_config, sandbox_id
+        foo_sandbox_tenant.default_ob_config,
+        sandbox_id,
+        auth_kind="biometric",
+        webauthn=sandbox_user.client.webauthn_device,
     )
 
     # Before the user finishes onboarding to foo_sandbox_tenant, the tenant shouldn't be able to
@@ -73,9 +77,9 @@ def dual_onboarded_user(sandbox_tenant, foo_sandbox_tenant):
 
 def test_fp_id(dual_onboarded_user):
     # Make sure the fp_ids are different
-    assert dual_onboarded_user.fp_id != dual_onboarded_user.foo_fp_id, (
-        "Onboarding onto different tenants should give different fp_id"
-    )
+    assert (
+        dual_onboarded_user.fp_id != dual_onboarded_user.foo_fp_id
+    ), "Onboarding onto different tenants should give different fp_id"
 
 
 def test_prefill_timeline_events(
@@ -258,9 +262,7 @@ def test_one_click_with_kba(sandbox_tenant, foo_sandbox_tenant):
     new_token = FpAuth(body["token"])
 
     # Now, we can initiate an email challenge
-    auth_token = IdentifyClient.from_token(new_token).login(
-        kind="email"
-    )
+    auth_token = IdentifyClient.from_token(new_token).login(kind="email")
     bifrost = BifrostClient.raw_auth(obc, auth_token, sandbox_id)
     foo_user = bifrost.run()
     assert foo_user.fp_id != sandbox_user.fp_id

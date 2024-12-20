@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from tests.types import ObConfiguration
 from tests.utils import post, get
 from tests.constants import (
@@ -7,6 +8,15 @@ from tests.constants import (
     TEST_URL,
 )
 from tests.headers import FpAuth, SandboxId
+
+
+@dataclass
+class ForbiddenChallengeKindError(Exception):
+    requested_kind: str
+    available_kinds: list
+
+    def __str__(self):
+        return f"Requested challenge kind {self.requested_kind} is not in available challenge kinds: {self.available_kinds}"
 
 
 class IdentifyClient:
@@ -54,6 +64,7 @@ class IdentifyClient:
         self,
         playbook: ObConfiguration,
         sandbox_id,
+        # The webauthn device that can be used for biometric login challenges,
         webauthn=None,
         phone_number=FIXTURE_PHONE_NUMBER,
         email=FIXTURE_EMAIL,
@@ -104,7 +115,11 @@ class IdentifyClient:
             headers.append(self._auth_token)
         body = post("hosted/identify", data, *headers)
         assert body["user"]
-        assert kind in body["user"]["available_challenge_kinds"]
+
+        available_ch_kinds = body["user"]["available_challenge_kinds"]
+        if kind not in available_ch_kinds:
+            raise ForbiddenChallengeKindError(kind, available_ch_kinds)
+
         token = FpAuth(body["user"]["token"])
 
         # Issue the login challenge

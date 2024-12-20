@@ -34,7 +34,8 @@ class BifrostClient:
     FIXTURE_EMAIl
     """
 
-    def for_fpid(ob_config, fp_id, sandbox_id, token_kwargs=None, **kwargs):
+    @classmethod
+    def for_fpid(cls, ob_config, fp_id, sandbox_id, token_kwargs=None, **kwargs):
         """
         Create a user-specific session for the provided fp_id.
         """
@@ -43,26 +44,48 @@ class BifrostClient:
         body = post(f"users/{fp_id}/token", data, key)
         auth_token = FpAuth(body["token"])
         auth_token = IdentifyClient.from_token(auth_token).login()
-        return BifrostClient(ob_config, auth_token, sandbox_id, **kwargs)
+        return cls(ob_config, auth_token, sandbox_id, **kwargs)
 
-    def raw_auth(ob_config, auth_token, sandbox_id, **kwargs):
+    @classmethod
+    def raw_auth(cls, ob_config, auth_token, sandbox_id, **kwargs):
         """
         Create an instance of BifrostClient that uses the provided auth token, skipping the identify flow in
         favor of the provided auth.
         """
-        return BifrostClient(ob_config, auth_token, sandbox_id, **kwargs)
+        return cls(ob_config, auth_token, sandbox_id, **kwargs)
 
-    def login_user(ob_config, sandbox_id, override_ob_config_auth=None, **kwargs):
+    @classmethod
+    def login_user(
+        cls,
+        ob_config,
+        sandbox_id,
+        override_ob_config_auth=None,
+        auth_kind=None,
+        webauthn=None,
+        **kwargs,
+    ):
         """
         Create an instance of BifrostClient that inherits the user with the provided phone number.
         """
-        auth = IdentifyClient(
-            ob_config, sandbox_id, override_playbook_auth=override_ob_config_auth
-        ).login()
-        return BifrostClient(ob_config, auth, sandbox_id, **kwargs)
+        identify_kwargs = {}
+        if webauthn is not None:
+            identify_kwargs["webauthn"] = webauthn
 
+        login_kwargs = {}
+        if auth_kind is not None:
+            login_kwargs["kind"] = auth_kind
+
+        auth = IdentifyClient(
+            ob_config,
+            sandbox_id,
+            override_playbook_auth=override_ob_config_auth,
+            **identify_kwargs,
+        ).login(**login_kwargs)
+        return cls(ob_config, auth, sandbox_id, **kwargs)
+
+    @classmethod
     def new_user(
-        ob_config, override_sandbox_id=None, override_ob_config_auth=None, **kwargs
+        cls, ob_config, override_sandbox_id=None, override_ob_config_auth=None, **kwargs
     ):
         """
         Create an instance of BifrostClient that creates a new sandbox user with the fixture phone number
@@ -71,7 +94,7 @@ class BifrostClient:
         auth_token = IdentifyClient(
             ob_config, sandbox_id, override_playbook_auth=override_ob_config_auth
         ).create_user()
-        return BifrostClient(ob_config, auth_token, sandbox_id, **kwargs)
+        return cls(ob_config, auth_token, sandbox_id, **kwargs)
 
     def __init__(
         self,
