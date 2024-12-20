@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { sixDigitChallenger } from '../utils/commands';
+import { clickOnContinue, sixDigitChallenger } from '../utils/commands';
 
 const iframeSelector = 'iframe[name^="footprint-iframe-"]';
 const authAppUrl = process.env.E2E_AUTH_BASE_URL || 'http://localhost:3011';
@@ -25,12 +25,16 @@ test('Auth with sandbox email #ci', async ({ browserName, isMobile, page }) => {
     .click();
 
   const frame = page.frameLocator(iframeSelector);
+
+  await page.waitForLoadState();
+
+  // Edit the sandbox ID
   const sandBoxEdit = frame.getByLabel('Edit');
   await expect(sandBoxEdit).toBeAttached();
   await sandBoxEdit.first().click();
-
   await frame.getByPlaceholder('Enter test ID').fill('4nIf1LTzo8h7q');
   await frame.getByLabel('Save').first().click();
+  await clickOnContinue(frame);
 
   const emailEl = frame.getByLabel(/email/i);
   await emailEl.waitFor({ state: 'attached', timeout });

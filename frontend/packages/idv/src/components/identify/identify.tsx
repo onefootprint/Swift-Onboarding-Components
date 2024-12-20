@@ -5,7 +5,7 @@ import CollectEmail from './components/collect-email';
 import CollectPhone from './components/collect-phone';
 import { IdentifyLogin } from './components/identify-login';
 import Init from './components/init';
-import { type DoneArgs, IdentifyVariant, type InitArgs } from './identify.types';
+import type { DoneArgs, InitArgs } from './identify.types';
 import loadNextRequirement from './utils/load-requirements';
 import { type NextAction, getInitialState } from './utils/reducer';
 import { reducer } from './utils/reducer';
@@ -31,8 +31,7 @@ const Identify = ({ onDone, initArgs }: IdentifyProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const isInRollout = useIsInRollout(initArgs.config?.orgId);
 
-  // TODO: before supporting auth, need the auth app to select sandbox ID
-  if (initArgs.initialAuthToken || !isInRollout || initArgs.variant !== IdentifyVariant.verify) {
+  if (initArgs.initialAuthToken || !isInRollout) {
     // If this tenant is not rolled out to use the new Identify signup flow, fall back to legacy Identify component.
     // Or, if the Identify flow is initialized with an initialAuthToken, fall back to our legacy IdentifyLogin component that handles login.
     const machineArgs = { ...restOfInitArgs, email: state.email, phoneNumber: state.phoneNumber };

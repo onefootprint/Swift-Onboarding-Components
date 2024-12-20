@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { verifyPhoneNumber } from '../utils/commands';
+import { clickOnContinue, verifyPhoneNumber } from '../utils/commands';
 
 const iframeSelector = 'iframe[name^="footprint-iframe-"]';
 const authAppUrl = process.env.E2E_AUTH_BASE_URL || 'http://localhost:3011';
@@ -27,6 +27,9 @@ test('Auth with email, fill phone number, verify phone #ci', async ({ browserNam
     .click();
 
   const frame = page.frameLocator(iframeSelector);
+
+  await page.waitForLoadState();
+  await clickOnContinue(frame);
 
   const emailEl = frame.getByLabel(/email/i);
   await emailEl.waitFor({ state: 'attached', timeout });

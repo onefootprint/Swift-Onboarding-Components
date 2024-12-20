@@ -41,7 +41,19 @@ export const SandboxOutcomeContainer = ({ config, collectTestId }: SandboxOutcom
         <Stack gap={5} flexDirection="column">
           <OverallOutcomeSelect config={config} />
           {shouldShowIdDocOutcome && <IdDocOutcomeSelect allowRealOutcome={allowRealOutcome} />}
-          {collectTestId && <TestIdInput />}
+          {collectTestId && (
+            <Stack
+              flexDirection="column"
+              justifyContent="flex-end"
+              borderStyle="dashed"
+              borderTopWidth={1}
+              paddingTop={5}
+              borderColor="tertiary"
+              gap={3}
+            >
+              <TestIdInput />
+            </Stack>
+          )}
         </Stack>
       </Box>
       <Button fullWidth type="submit" disabled={!!errors?.testID} size="large">

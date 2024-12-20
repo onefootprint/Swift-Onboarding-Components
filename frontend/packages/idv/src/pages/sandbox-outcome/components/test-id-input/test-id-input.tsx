@@ -36,15 +36,7 @@ const TestIdInput = () => {
   };
 
   return (
-    <Stack
-      flexDirection="column"
-      justifyContent="flex-end"
-      borderStyle="dashed"
-      borderTopWidth={1}
-      paddingTop={5}
-      borderColor="tertiary"
-      gap={3}
-    >
+    <>
       <Stack justifyContent="space-between" alignItems="center">
         <label htmlFor="testID">
           <Text variant="label-3">{t('test-id.label')}</Text>
@@ -111,7 +103,7 @@ const TestIdInput = () => {
         </Stack>
       </Stack>
       <Hint hasError={!!errors?.testID}>{getHint()}</Hint>
-    </Stack>
+    </>
   );
 };
 

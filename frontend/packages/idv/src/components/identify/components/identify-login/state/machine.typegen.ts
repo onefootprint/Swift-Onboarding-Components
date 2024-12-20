@@ -19,7 +19,6 @@ export interface Typegen0 {
     assignIdentifyResult: 'identifyResult';
     assignIdentifyToken: 'kbaSucceeded';
     assignPhoneNumber: 'phoneAdded';
-    assignSandboxId: 'sandboxIdChanged';
     resetIdentifyState: 'navigatedToPrevPage';
     resetPhone: 'navigatedToPrevPage';
     resetToLoginWithNewAccount: 'loginWithDifferentAccount';

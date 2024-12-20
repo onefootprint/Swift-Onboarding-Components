@@ -148,8 +148,11 @@
           }
         },
         "test-id": {
+          "title": "Establecer un ID de prueba",
+          "subtitle": "Los usuarios de prueba deben tener un ID de prueba único.",
+          "continue": "Continuar",
           "label": "ID de prueba",
-          "description": "Puede iniciar sesión con un usuario de sandbox previamente creado utilizando el mismo ID que usó en esa sesión.",
+          "description": "Puede iniciar sesión con un usuario de prueba previamente creado utilizando el mismo ID que usó en esa sesión.",
           "placeholder": "Ingrese ID de prueba",
           "hint": "No use caracteres especiales ni espacios.",
           "errors": {

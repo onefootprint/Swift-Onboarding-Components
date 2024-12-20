@@ -148,6 +148,9 @@
           }
         },
         "test-id": {
+          "title": "Set a Test ID",
+          "subtitle": "Sandbox users must have a unique Test ID.",
+          "continue": "Continue",
           "label": "Test ID",
           "description": "You can log into a previously created sandbox user by using the Test ID from that corresponding session.",
           "placeholder": "Enter test ID",

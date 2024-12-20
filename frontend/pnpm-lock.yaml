@@ -96,6 +96,9 @@ importers:
       react-dom:
         specifier: ^18
         version: 18.3.1(react@18.3.1)
+      react-hook-form:
+        specifier: ^7.52.2
+        version: 7.53.0(react@18.3.1)
       react-i18next:
         specifier: ^15.0.3
         version: 15.0.3(i18next@23.16.0)(react-dom@18.3.1)(react@18.3.1)

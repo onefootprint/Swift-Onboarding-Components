@@ -160,9 +160,6 @@ const createIdentifyMachine = (args: LoginInitialArgs) =>
               // Otherwise, proceed to see if we can find the user by phone
               { target: 'phoneIdentification', actions: ['assignIdentifyResult'] },
             ],
-            sandboxIdChanged: {
-              actions: ['assignSandboxId'],
-            },
           },
         },
         phoneIdentification: {
@@ -360,10 +357,6 @@ const createIdentifyMachine = (args: LoginInitialArgs) =>
           context.identify = {};
           context.bootstrapData = {};
           context.challenge = {};
-          return context;
-        }),
-        assignSandboxId: assign((context, { payload }) => {
-          context.sandboxId = payload.sandboxId || context.sandboxId;
           return context;
         }),
       },
