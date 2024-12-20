@@ -1,4 +1,4 @@
-export { formatAddresses } from './format-addresses';
+export { formatAddress } from './format-address';
 export { formatState } from './format-state';
 export { formatDetails } from './format-details';
 export { formatName } from './format-name';

@@ -1375,7 +1375,13 @@
       }
     },
     "offices": {
-      "title": "Offices"
+      "title": "Offices",
+      "empty": "No data",
+      "no-satellite-image": "Satellite image unavailable",
+      "notes": "Notes",
+      "usps": "USPS",
+      "deliverable": "Deliverable",
+      "not-deliverable": "Not deliverable"
     }
   },
   "business-insights": {

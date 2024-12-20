@@ -24,7 +24,7 @@ const OnboardingRiskSignals = ({ riskSignals }: OnboardingRiskSignalsProps) => {
               </span>
               <div className="flex flex-col gap-1">
                 {signals.map(signal => (
-                  <RiskSignalItem riskSignal={signal} />
+                  <RiskSignalItem key={signal.id} riskSignal={signal} />
                 ))}
               </div>
             </div>
