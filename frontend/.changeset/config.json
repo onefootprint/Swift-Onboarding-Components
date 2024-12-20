@@ -20,7 +20,7 @@
     "@onefootprint/storybook-utils",
     "@onefootprint/test-utils",
     "@onefootprint/ui",
-    "pos",
+    "pos-avis",
     "auth",
     "bifrost",
     "components",
