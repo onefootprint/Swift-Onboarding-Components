@@ -1,6 +1,7 @@
 use crate::session::requirements::get_requirements;
 use crate::State;
 use api_core::auth::session::user::AssociatedAuthEventKind;
+use api_core::auth::session::user::UserSessionBuilder;
 use api_core::auth::user::allowed_user_scopes;
 use api_core::auth::user::IdentifyAuthContext;
 use api_core::errors::business::BusinessError;
@@ -48,7 +49,9 @@ pub async fn post(
     let ae_kinds = identify.auth_events.iter().map(|(ae, _)| ae.kind).collect_vec();
     let scope = identify.scope;
     let scopes = allowed_user_scopes(ae_kinds, scope.into(), is_explicit_auth);
-    let session = (identify.user_session).update(Default::default(), scopes, scope.into(), None)?;
+    let session = UserSessionBuilder::from_existing(&identify.user_session, scope.into())?
+        .add_scopes(scopes)
+        .finish()?;
     let session_key = state.session_sealing_key.clone();
     let auth_token = state
         .db_transaction(move |conn| {

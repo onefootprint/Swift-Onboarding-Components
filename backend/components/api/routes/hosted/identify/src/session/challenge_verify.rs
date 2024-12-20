@@ -2,7 +2,8 @@ use crate::ChallengeData;
 use crate::ChallengeState;
 use crate::State;
 use api_core::auth::session::user::AssociatedAuthEvent;
-use api_core::auth::session::user::TokenCreationPurpose;
+use api_core::auth::session::user::TokenCreationPurpose::IdentifySessionChallengeVerify;
+use api_core::auth::session::user::UserSessionBuilder;
 use api_core::auth::session::UpdateSession;
 use api_core::auth::user::IdentifyAuthContext;
 use api_core::types::ApiResponse;
@@ -147,10 +148,10 @@ pub async fn post(
                 }
             };
 
-            let purpose = TokenCreationPurpose::IdentifySessionChallengeVerify;
-            let ae = Some(AssociatedAuthEvent::explicit(auth_event.id));
             let identify_session =
-                (identify.user_session.session.clone()).update(Default::default(), vec![], purpose, ae)?;
+                UserSessionBuilder::from_existing(&identify.user_session, IdentifySessionChallengeVerify)?
+                    .add_auth_events(vec![AssociatedAuthEvent::explicit(auth_event.id)])
+                    .finish()?;
             identify.update_session(conn, &session_key, identify_session)?;
 
             Ok(())

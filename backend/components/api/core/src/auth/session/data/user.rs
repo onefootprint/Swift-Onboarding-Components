@@ -3,6 +3,7 @@ use super::AuthSessionData;
 use crate::errors::user::UserError;
 use crate::FpResult;
 use api_errors::BadRequestInto;
+use itertools::chain;
 use itertools::Itertools;
 use newtypes::AuthEventId;
 use newtypes::AuthMethodKind;
@@ -184,7 +185,7 @@ impl AssociatedAuthEvent {
     }
 }
 
-pub struct NewUserSessionArgs {
+pub struct UserSessionBuilder {
     pub user_vault_id: VaultId,
     pub context: NewUserSessionContext,
     pub purposes: Vec<TokenCreationPurpose>,
@@ -192,15 +193,54 @@ pub struct NewUserSessionArgs {
     pub auth_events: Vec<AssociatedAuthEvent>,
 }
 
-impl UserSession {
-    pub fn make(args: NewUserSessionArgs) -> FpResult<AuthSessionData> {
-        let NewUserSessionArgs {
+impl UserSessionBuilder {
+    pub fn new(user_vault_id: VaultId, purposes: Vec<TokenCreationPurpose>) -> Self {
+        Self {
+            user_vault_id,
+            purposes,
+            scopes: vec![],
+            auth_events: vec![],
+            context: NewUserSessionContext::default(),
+        }
+    }
+
+    /// Given an existing UserSession, creates a new UserSessionBuilder with all context derived
+    /// from the existing session.
+    pub fn from_existing(
+        session: &UserSession,
+        purpose: TokenCreationPurpose,
+    ) -> FpResult<UserSessionBuilder> {
+        session.validate_not_derived_from_components()?;
+        let context = NewUserSessionContext {
+            metadata: Some(session.metadata.clone()),
+            su_id: session.su_id.clone(),
+            sb_id: session.sb_id.clone(),
+            bo_id: session.bo_id.clone(),
+            obc_id: session.obc_id.clone(),
+            wf_id: session.wf_id.clone(),
+            biz_wf_id: session.biz_wf_id.clone(),
+            wfr_id: session.wfr_id.clone(),
+            kba: session.kba.clone(),
+            identify_scope: session.identify_scope,
+        };
+        let args = UserSessionBuilder {
+            user_vault_id: session.user_vault_id.clone(),
+            purposes: chain!(session.purposes.clone(), vec![purpose]).collect(),
+            context,
+            scopes: session.scopes.clone(),
+            auth_events: session.auth_events.clone(),
+        };
+        Ok(args)
+    }
+
+    pub fn finish(self) -> FpResult<AuthSessionData> {
+        let Self {
             user_vault_id,
             context,
             purposes,
             scopes,
             auth_events,
-        } = args;
+        } = self;
         if scopes.iter().any(|s| matches!(s, UserAuthScope::SignUp)) && context.su_id.is_none() {
             return Err(UserError::InvalidAuthSession(
                 "Cannot create session with SignUp scope without su_id".into(),
@@ -220,7 +260,7 @@ impl UserSession {
             identify_scope,
         } = context;
         let metadata = metadata.unwrap_or_default();
-        let session = AuthSessionData::User(Self {
+        let session = AuthSessionData::User(UserSession {
             user_vault_id,
             purposes,
             su_id,
@@ -239,18 +279,40 @@ impl UserSession {
         Ok(session)
     }
 
-    pub fn update(
-        &self,
-        new_ctx: NewUserSessionContext,
-        new_scopes: Vec<UserAuthScope>,
-        new_purpose: TokenCreationPurpose,
-        new_auth_event: Option<AssociatedAuthEvent>,
-    ) -> FpResult<AuthSessionData> {
-        self.validate_not_derived_from_components()?;
-        let old = self.clone();
-        // Merge context, scopes, and auth factors and create a new session with these merged fields
+    pub fn add_auth_events(self, new_auth_events: Vec<AssociatedAuthEvent>) -> Self {
+        Self {
+            auth_events: chain!(self.auth_events.clone(), new_auth_events).collect(),
+            ..self
+        }
+    }
+
+    pub fn add_scopes(self, new_scopes: Vec<UserAuthScope>) -> Self {
+        Self {
+            scopes: chain!(self.scopes.clone(), new_scopes).collect(),
+            ..self
+        }
+    }
+
+    pub fn replace_scopes(self, new_scopes: Vec<UserAuthScope>) -> FpResult<Self> {
+        if new_scopes.iter().any(|s| !self.scopes.contains(s)) {
+            // The only use case of this today is to request a token with _fewer_ scopes.
+            // It could be dangerous to allow a user to request a token with _more_ scopes,
+            // particularly for tokens given to the components SDK that intentially have
+            // fewer scopes than their auth methods allow.
+            // Do not remove this validation unless you know what you're doing.
+            return BadRequestInto("Cannot use reduce_scopes to add additional scopes");
+        }
+        Ok(Self {
+            scopes: new_scopes,
+            ..self
+        })
+    }
+
+    // TODO: use smaller methods for updating pieces of the context
+    pub fn with_context(self, new_ctx: NewUserSessionContext) -> Self {
+        let old = self.context;
         let context = NewUserSessionContext {
-            metadata: new_ctx.metadata.or(Some(old.metadata)),
+            metadata: new_ctx.metadata.or(old.metadata),
             su_id: new_ctx.su_id.or(old.su_id),
             sb_id: new_ctx.sb_id.or(old.sb_id),
             bo_id: new_ctx.bo_id.or(old.bo_id),
@@ -261,55 +323,11 @@ impl UserSession {
             kba: new_ctx.kba.into_iter().chain(old.kba).unique().collect(),
             identify_scope: new_ctx.identify_scope.or(old.identify_scope),
         };
-        let scopes = old.scopes.into_iter().chain(new_scopes).unique().collect();
-        let auth_events = old.auth_events.into_iter().chain(new_auth_event).collect();
-        let args = NewUserSessionArgs {
-            user_vault_id: old.user_vault_id,
-            purposes: old.purposes.into_iter().chain(Some(new_purpose)).collect(),
-            context,
-            scopes,
-            auth_events,
-        };
-        UserSession::make(args)
+        Self { context, ..self }
     }
+}
 
-    pub fn reduce_scopes(
-        &self,
-        new_scopes: Vec<UserAuthScope>,
-        new_purpose: TokenCreationPurpose,
-    ) -> FpResult<AuthSessionData> {
-        self.validate_not_derived_from_components()?;
-        let old = self.clone();
-        let context = NewUserSessionContext {
-            metadata: Some(old.metadata),
-            su_id: old.su_id,
-            sb_id: old.sb_id,
-            bo_id: old.bo_id,
-            obc_id: old.obc_id,
-            wf_id: old.wf_id,
-            biz_wf_id: old.biz_wf_id,
-            wfr_id: old.wfr_id,
-            kba: old.kba,
-            identify_scope: old.identify_scope,
-        };
-        if new_scopes.iter().any(|s| !old.scopes.contains(s)) {
-            // The only use case of this today is to request a token with _fewer_ scopes.
-            // It could be dangerous to allow a user to request a token with _more_ scopes,
-            // particularly for tokens given to the components SDK that intentially have
-            // fewer scopes than their auth methods allow.
-            // Do not remove this validation unless you know what you're doing.
-            return BadRequestInto("Cannot use reduce_scopes to add additional scopes");
-        }
-        let args = NewUserSessionArgs {
-            user_vault_id: old.user_vault_id,
-            purposes: old.purposes.into_iter().chain(Some(new_purpose)).collect(),
-            context,
-            scopes: new_scopes,
-            auth_events: old.auth_events,
-        };
-        UserSession::make(args)
-    }
-
+impl UserSession {
     /// We don't want to allow any token given to the components SDK to ever be used to derive
     /// a new auth token.
     fn validate_not_derived_from_components(&self) -> FpResult<()> {

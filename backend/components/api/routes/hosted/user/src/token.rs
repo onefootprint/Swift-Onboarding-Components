@@ -1,5 +1,6 @@
 use crate::auth::user::UserAuthContext;
 use api_core::auth::session::user::AssociatedAuthEventKind;
+use api_core::auth::session::user::UserSessionBuilder;
 use api_core::auth::user::allowed_user_scopes;
 use api_core::auth::user::load_auth_events;
 use api_core::auth::Any;
@@ -62,8 +63,9 @@ pub async fn post(
                 // Do not remove this validation unless you know what you're doing.
                 return BadRequestInto("Cannot request additional scopes");
             }
-            let purpose = requested_scope.into();
-            let session = user_auth.reduce_scopes(new_scopes, purpose)?;
+            let session = UserSessionBuilder::from_existing(&user_auth, requested_scope.into())?
+                .replace_scopes(new_scopes)?
+                .finish()?;
             let (token, expires_at) = user_auth.create_derived(conn, &session_key, session, None)?;
             Ok((token, expires_at))
         })

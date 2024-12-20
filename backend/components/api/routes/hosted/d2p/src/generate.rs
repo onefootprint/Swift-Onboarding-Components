@@ -2,8 +2,8 @@ use crate::auth::user::UserAuthContext;
 use crate::utils::session::HandoffRecord;
 use crate::utils::session::JsonSession;
 use crate::State;
-use api_core::auth::session::user::NewUserSessionContext;
 use api_core::auth::session::user::TokenCreationPurpose;
+use api_core::auth::session::user::UserSessionBuilder;
 use api_core::auth::IsGuardMet;
 use api_core::types::ApiResponse;
 use api_wire_types::D2pGenerateRequest;
@@ -34,13 +34,9 @@ pub async fn handler(
     let auth_token = state
         .db_query(move |conn| {
             let limit_ttl = Duration::minutes(30);
-            let args = NewUserSessionContext::default();
-            let session = user_auth.update(
-                args,
-                vec![UserAuthScope::Handoff],
-                TokenCreationPurpose::Handoff,
-                None,
-            )?;
+            let session = UserSessionBuilder::from_existing(&user_auth, TokenCreationPurpose::Handoff)?
+                .add_scopes(vec![UserAuthScope::Handoff])
+                .finish()?;
             let (auth_token, expires_at) =
                 user_auth.create_derived(conn, &session_key, session, Some(limit_ttl))?;
             // Also keep track of the status of the handoff session. We use a JsonSession keyed on

@@ -4,10 +4,9 @@ use crate::IdentifyLookupId;
 use crate::UserAuthMethodsContext;
 use api_core::auth::ob_config::ObConfigAuth;
 use api_core::auth::session::user::AssociatedAuthEvent;
-use api_core::auth::session::user::NewUserSessionArgs;
 use api_core::auth::session::user::NewUserSessionContext;
 use api_core::auth::session::user::TokenCreationPurpose;
-use api_core::auth::session::user::UserSession;
+use api_core::auth::session::user::UserSessionBuilder;
 use api_core::auth::user::allowed_user_scopes;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
@@ -132,7 +131,9 @@ pub async fn post(
         // If the user was identified by an auth token, mutate the existing auth token with any metadata
         // from the onboarding session token
         let scopes = user_auth.scopes.clone();
-        let session = user_auth.update(ob_config_auth_context, vec![], scope.into(), None)?;
+        let session = UserSessionBuilder::from_existing(&user_auth, scope.into())?
+            .with_context(ob_config_auth_context)
+            .finish()?;
         let session_key = state.session_sealing_key.clone();
         let (auth_token, _) = state
             .db_query(move |conn| user_auth.create_derived(conn, &session_key, session, None))
@@ -222,32 +223,32 @@ pub(super) async fn create_identified_token(
         .db_query(move |conn| {
             let identify_session_scope = (matches!(purpose, TokenCreationPurpose::IdentifySession))
                 .then_some(UserAuthScope::IdentifySession);
-            let purposes = chain!(
-                Some(purpose),
-                // TODO we should migrate the BO tokens to use these new un-authed, identified tokens.
-                // Then the purpose here would come from the SecondayBo token. But for now, we'll just
-                // manually add this purpose to keep track of when the auth session is for a secondary BO.
-                (context.bo_id.is_some()).then_some(TokenCreationPurpose::SecondaryBo),
-            )
-            .collect();
             let ae_kinds = explicit_auth_events.iter().map(|ae| ae.kind).collect_vec();
             let explicit_auth = !explicit_auth_events.is_empty();
             let scopes = allowed_user_scopes(ae_kinds, scope.into(), explicit_auth);
             let scopes = chain!(scopes, identify_session_scope).collect_vec();
-            let auth_events = explicit_auth_events
+
+            let purposes = chain!(
+                // TODO we should migrate the BO tokens to use these new un-authed, identified tokens.
+                // Then the purpose here would come from the SecondayBo token. But for now, we'll just
+                // manually add this purpose to keep track of when the auth session is for a secondary BO.
+                (context.bo_id.is_some()).then_some(TokenCreationPurpose::SecondaryBo),
+                Some(purpose),
+            )
+            .collect();
+
+            let aes = explicit_auth_events
                 .into_iter()
                 .map(|ae| AssociatedAuthEvent::explicit(ae.id))
                 .collect_vec();
-            let args = NewUserSessionArgs {
-                user_vault_id: v_id,
-                purposes,
-                context,
-                scopes: scopes.clone(),
-                auth_events,
-            };
-            let data = UserSession::make(args)?;
+
+            let session = UserSessionBuilder::new(v_id, purposes)
+                .with_context(context)
+                .add_scopes(scopes.clone())
+                .add_auth_events(aes)
+                .finish()?;
             let duration = scope.token_ttl();
-            let (token, session) = AuthSession::create_sync(conn, &session_key, data, duration)?;
+            let (token, session) = AuthSession::create_sync(conn, &session_key, session, duration)?;
             Ok((token, session, scopes))
         })
         .await?;

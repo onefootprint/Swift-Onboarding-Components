@@ -8,6 +8,7 @@ use crate::State;
 use api_core::auth::ob_config::ObConfigAuth;
 use api_core::auth::session::user::NewUserSessionContext;
 use api_core::auth::session::user::TokenCreationPurpose;
+use api_core::auth::session::user::UserSessionBuilder;
 use api_core::auth::user::load_auth_events;
 use api_core::types::ApiResponse;
 use api_core::utils::actix::OptionalJson;
@@ -154,7 +155,9 @@ pub async fn post(
                 obc_id: user_auth.obc_id.is_none().then_some(obc.id.clone()),
                 ..Default::default()
             };
-            let session = user_auth.update(args, vec![], TokenCreationPurpose::AddWorkflow, None)?;
+            let session = UserSessionBuilder::from_existing(&user_auth, TokenCreationPurpose::AddWorkflow)?
+                .with_context(args)
+                .finish()?;
             let (auth_token, _) = user_auth.create_derived(conn, &session_key, session.clone(), None)?;
             // We need to keep mutating the existing session for backwards compatibility,
             // but we should deprecate this eventually

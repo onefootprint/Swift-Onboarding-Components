@@ -3,6 +3,7 @@ use crate::ChallengeState;
 use crate::State;
 use api_core::auth::session::user::AssociatedAuthEvent;
 use api_core::auth::session::user::NewUserSessionContext;
+use api_core::auth::session::user::UserSessionBuilder;
 use api_core::auth::user::allowed_user_scopes;
 use api_core::auth::user::CheckedUserAuthContext;
 use api_core::auth::user::UserAuthContext;
@@ -290,7 +291,11 @@ pub async fn post(
                 su_id,
                 ..Default::default()
             };
-            let session = user_auth.update(context, scopes, scope.into(), Some(ae))?;
+            let session = UserSessionBuilder::from_existing(&user_auth, scope.into())?
+                .with_context(context)
+                .add_scopes(scopes)
+                .add_auth_events(vec![ae])
+                .finish()?;
             let (token, _) =
                 user_auth.create_derived(conn, &session_key, session, Some(scope.token_ttl()))?;
 

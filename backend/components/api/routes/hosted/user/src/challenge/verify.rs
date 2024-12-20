@@ -2,7 +2,8 @@ use super::RegisterChallengeData;
 use crate::challenge::RegisterChallenge;
 use crate::State;
 use api_core::auth::session::user::AssociatedAuthEvent;
-use api_core::auth::session::user::TokenCreationPurpose;
+use api_core::auth::session::user::TokenCreationPurpose::RegisterAuthMethod;
+use api_core::auth::session::user::UserSessionBuilder;
 use api_core::auth::user::CheckedUserAuthContext;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::user::UserAuthScope;
@@ -135,10 +136,9 @@ pub async fn post(
             };
             let ae = AuthEvent::save(args, conn)?;
 
-            // TODO: maybe one day we want to save whether the auth event is a login or registration event
-            let ae = AssociatedAuthEvent::explicit(ae.id);
-            let purpose = TokenCreationPurpose::RegisterAuthMethod;
-            let session = user_auth.update(Default::default(), vec![], purpose, Some(ae))?;
+            let session = UserSessionBuilder::from_existing(&user_auth, RegisterAuthMethod)?
+                .add_auth_events(vec![AssociatedAuthEvent::explicit(ae.id)])
+                .finish()?;
             let (auth_token, _) = user_auth.create_derived(conn, &session_key, session, None)?;
 
             Ok(auth_token)

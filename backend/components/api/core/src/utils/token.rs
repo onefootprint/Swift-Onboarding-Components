@@ -3,10 +3,9 @@ use super::vault_wrapper::Any;
 use super::vault_wrapper::TenantVw;
 use crate::auth::session::onboarding::OnboardingSessionTrustedMetadata;
 use crate::auth::session::user::AssociatedAuthEvent;
-use crate::auth::session::user::NewUserSessionArgs;
 use crate::auth::session::user::NewUserSessionContext;
 use crate::auth::session::user::TokenCreationPurpose;
-use crate::auth::session::user::UserSession;
+use crate::auth::session::user::UserSessionBuilder;
 use crate::errors::onboarding::OnboardingError;
 use crate::FpResult;
 use api_errors::BadRequest;
@@ -141,15 +140,12 @@ pub fn create_token(
         metadata: Some(metadata),
         ..Default::default()
     };
-    let args = NewUserSessionArgs {
-        user_vault_id: su.vault_id.clone(),
-        purposes: vec![purpose],
-        context,
-        scopes,
-        auth_events,
-    };
-    let data = UserSession::make(args)?;
-    let (token, session) = AuthSession::create_sync(conn, session_key, data, duration)?;
+    let session = UserSessionBuilder::new(su.vault_id.clone(), vec![purpose])
+        .with_context(context)
+        .add_scopes(scopes)
+        .add_auth_events(auth_events)
+        .finish()?;
+    let (token, session) = AuthSession::create_sync(conn, session_key, session, duration)?;
     let result = CreateTokenResult { token, session, wfr };
     Ok(result)
 }

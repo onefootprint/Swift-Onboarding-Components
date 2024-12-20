@@ -1,6 +1,7 @@
 use crate::State;
 use api_core::auth::session::user::NewUserSessionContext;
 use api_core::auth::session::user::TokenCreationPurpose;
+use api_core::auth::session::user::UserSessionBuilder;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
 use api_core::types::ApiResponse;
@@ -74,7 +75,9 @@ pub async fn post(
                 kba: successful_kba,
                 ..Default::default()
             };
-            let session = user_auth.update(context, vec![], TokenCreationPurpose::Kba, None)?;
+            let session = UserSessionBuilder::from_existing(&user_auth, TokenCreationPurpose::Kba)?
+                .with_context(context)
+                .finish()?;
             let (token, _) = user_auth.create_derived(conn, &session_key, session, None)?;
             Ok(token)
         })
