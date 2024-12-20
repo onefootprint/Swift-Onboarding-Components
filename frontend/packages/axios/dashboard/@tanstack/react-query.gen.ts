@@ -67,6 +67,7 @@ import type {
   GetOrgAuthRolesData,
   GetOrgClientSecurityConfigData,
   GetOrgData,
+  GetOrgFootprintWrappedData,
   GetOrgFrequentNotesData,
   GetOrgInvoicePreviewData,
   GetOrgListsByIdTimelineData,
@@ -427,6 +428,7 @@ import {
   getOrgAuthGoogleOauth,
   getOrgAuthRoles,
   getOrgClientSecurityConfig,
+  getOrgFootprintWrapped,
   getOrgFrequentNotes,
   getOrgInvoicePreview,
   getOrgLists,
@@ -2734,6 +2736,25 @@ export const patchOrgClientSecurityConfigMutation = (options?: Partial<Options<P
     },
   };
   return mutationOptions;
+};
+
+export const getOrgFootprintWrappedQueryKey = (options?: Options<GetOrgFootprintWrappedData>) => [
+  createQueryKey('getOrgFootprintWrapped', options),
+];
+
+export const getOrgFootprintWrappedOptions = (options?: Options<GetOrgFootprintWrappedData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getOrgFootprintWrapped({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getOrgFootprintWrappedQueryKey(options),
+  });
 };
 
 export const getOrgFrequentNotesQueryKey = (options: Options<GetOrgFrequentNotesData>) => [

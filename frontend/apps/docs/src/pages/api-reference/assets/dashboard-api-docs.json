@@ -5050,6 +5050,24 @@
                 ]
             }
         },
+        "/org/footprint_wrapped": {
+            "get": {
+                "tags": [
+                    "Org",
+                    "Private"
+                ],
+                "description": "Lists the footprint wrapped metrics for a tenant.",
+                "responses": {},
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
+                    }
+                ]
+            }
+        },
         "/org/frequent_notes": {
             "get": {
                 "tags": [

@@ -137,6 +137,7 @@ import type {
   GetOrgClientSecurityConfigResponse,
   GetOrgData,
   GetOrgError,
+  GetOrgFootprintWrappedData,
   GetOrgFrequentNotesData,
   GetOrgFrequentNotesError,
   GetOrgFrequentNotesResponse,
@@ -1664,6 +1665,18 @@ export const patchOrgClientSecurityConfig = <ThrowOnError extends boolean = fals
   >({
     ...options,
     url: '/org/client_security_config',
+  });
+};
+
+/**
+ * Lists the footprint wrapped metrics for a tenant.
+ */
+export const getOrgFootprintWrapped = <ThrowOnError extends boolean = false>(
+  options?: Options<GetOrgFootprintWrappedData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<void, unknown, ThrowOnError>({
+    ...options,
+    url: '/org/footprint_wrapped',
   });
 };
 

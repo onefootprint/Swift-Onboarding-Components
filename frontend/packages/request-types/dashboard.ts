@@ -9007,6 +9007,14 @@ export type PatchOrgClientSecurityConfigData = {
 };
 export type PatchOrgClientSecurityConfigResponse = OrgClientSecurityConfig;
 export type PatchOrgClientSecurityConfigError = unknown;
+export type GetOrgFootprintWrappedData = {
+  headers?: {
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
+};
 export type GetOrgFrequentNotesData = {
   headers?: {
     /**
@@ -10970,6 +10978,11 @@ export type $OpenApiTs = {
          */
         '200': OrgClientSecurityConfig;
       };
+    };
+  };
+  '/org/footprint_wrapped': {
+    get: {
+      req: GetOrgFootprintWrappedData;
     };
   };
   '/org/frequent_notes': {

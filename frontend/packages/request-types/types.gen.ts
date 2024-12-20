@@ -29,7 +29,7 @@ export type AuthV1SdkArgs = {
   l10N?: L10nV1;
   options?: AuthV1Options;
   publicKey?: string;
-  userData?: UserDataV1;
+  userData?: BootstrapDataV1;
 };
 export type AuthorizeFields = {
   collectedData: Array<CollectedDataOption>;
@@ -63,6 +63,52 @@ export type BatchHostedBusinessOwnerRequestUpdate = {
   uuid: string;
 };
 export type op3 = 'update';
+/**
+ * Key-value map of bootstrap data. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/integrate/bootstrap-data#boostraping-kyb-data).
+ */
+export type BootstrapDataV1 = {
+  'business.address_line1'?: string;
+  'business.address_line2'?: string;
+  'business.city'?: string;
+  'business.corporation_type'?: string;
+  'business.country'?: string;
+  'business.dba'?: string;
+  'business.formation_date'?: string;
+  'business.formation_state'?: string;
+  'business.name'?: string;
+  'business.phone_number'?: string;
+  'business.primary_owner_stake'?: number;
+  'business.secondary_beneficial_owners'?: Array<{
+    [key: string]: unknown;
+  }>;
+  'business.state'?: string;
+  'business.tin'?: string;
+  'business.website'?: string;
+  'business.zip'?: string;
+  'id.address_line1'?: string;
+  'id.address_line2'?: string;
+  'id.citizenships'?: Array<Iso3166TwoDigitCountryCode>;
+  'id.city'?: string;
+  'id.country'?: string;
+  'id.dob'?: string;
+  'id.drivers_license_number'?: string;
+  'id.drivers_license_state'?: string;
+  'id.email'?: string;
+  'id.first_name'?: string;
+  'id.itin'?: string;
+  'id.last_name'?: string;
+  'id.middle_name'?: string;
+  'id.nationality'?: string;
+  'id.phone_number'?: string;
+  'id.ssn4'?: string;
+  'id.ssn9'?: string;
+  'id.state'?: string;
+  'id.us_legal_status'?: string;
+  'id.us_tax_id'?: string;
+  'id.visa_expiration_date'?: string;
+  'id.visa_kind'?: string;
+  'id.zip'?: string;
+};
 export type BusinessOnboardingResponse = {
   authToken: string;
   isNewBusiness: boolean;
@@ -1996,7 +2042,7 @@ export type OnboardingResultResponse = {
   status: OnboardingStatus;
 };
 export type OnboardingSessionResponse = {
-  bootstrapData: UserDataV1;
+  bootstrapData: BootstrapDataV1;
 };
 export type OnboardingStatus = 'pass' | 'fail' | 'incomplete' | 'pending' | 'none';
 export type OnboardingStatusResponse = {
@@ -2516,52 +2562,6 @@ export type UserDataIdentifier<T extends string = string> =
   | `bank.${T}.ach_account_id`
   | `bank.${T}.account_type`
   | `bank.${T}.fingerprint`;
-/**
- * Key-value map of bootstrap data. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/integrate/bootstrap-data#boostraping-kyb-data).
- */
-export type UserDataV1 = {
-  'business.address_line1'?: string;
-  'business.address_line2'?: string;
-  'business.city'?: string;
-  'business.corporation_type'?: string;
-  'business.country'?: string;
-  'business.dba'?: string;
-  'business.formation_date'?: string;
-  'business.formation_state'?: string;
-  'business.name'?: string;
-  'business.phone_number'?: string;
-  'business.primary_owner_stake'?: number;
-  'business.secondary_beneficial_owners'?: Array<{
-    [key: string]: unknown;
-  }>;
-  'business.state'?: string;
-  'business.tin'?: string;
-  'business.website'?: string;
-  'business.zip'?: string;
-  'id.address_line1'?: string;
-  'id.address_line2'?: string;
-  'id.citizenships'?: Array<Iso3166TwoDigitCountryCode>;
-  'id.city'?: string;
-  'id.country'?: string;
-  'id.dob'?: string;
-  'id.drivers_license_number'?: string;
-  'id.drivers_license_state'?: string;
-  'id.email'?: string;
-  'id.first_name'?: string;
-  'id.itin'?: string;
-  'id.last_name'?: string;
-  'id.middle_name'?: string;
-  'id.nationality'?: string;
-  'id.phone_number'?: string;
-  'id.ssn4'?: string;
-  'id.ssn9'?: string;
-  'id.state'?: string;
-  'id.us_legal_status'?: string;
-  'id.us_tax_id'?: string;
-  'id.visa_expiration_date'?: string;
-  'id.visa_kind'?: string;
-  'id.zip'?: string;
-};
 export type UserDecryptRequest = {
   /**
    * List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`,
@@ -2605,7 +2605,7 @@ export type VerifyV1SdkArgs = {
   publicKey?: string;
   sandboxId?: string;
   shouldRelayToComponents?: boolean;
-  userData?: UserDataV1;
+  userData?: BootstrapDataV1;
 };
 export type WorkflowFixtureResult = 'fail' | 'pass' | 'manual_review' | 'step_up' | 'use_rules_outcome';
 export type WorkflowRequestConfig = WorkflowRequestConfigOnboard | WorkflowRequestConfigDocument;

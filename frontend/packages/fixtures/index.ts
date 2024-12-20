@@ -12,6 +12,7 @@ import type {
   BatchHostedBusinessOwnerRequestCreate,
   BatchHostedBusinessOwnerRequestDelete,
   BatchHostedBusinessOwnerRequestUpdate,
+  BootstrapDataV1,
   BusinessOnboardingResponse,
   ChallengeKind,
   ChallengeRequest,
@@ -99,8 +100,10 @@ import type {
   KbaResponse,
   L10n,
   L10nV1,
+  Language,
   LiteIdentifyRequest,
   LiteIdentifyResponse,
+  Locale,
   LogBody,
   LoginChallengeRequest,
   ModernBusinessDecryptResponse,
@@ -152,7 +155,6 @@ import type {
   UserChallengeVerifyRequest,
   UserChallengeVerifyResponse,
   UserDataIdentifier,
-  UserDataV1,
   UserDecryptRequest,
   VerifyResultV1SdkArgs,
   VerifyV1Options,
@@ -1187,6 +1189,56 @@ export const getBatchHostedBusinessOwnerRequestUpdate = (
       op: 'update',
       ownershipStake: 93636283,
       uuid: 'cd880eee-5d6f-4f43-bfeb-1ab0e5c4e456',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getBootstrapDataV1 = (
+  props: Partial<BootstrapDataV1>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): BootstrapDataV1 =>
+  deepmerge<BootstrapDataV1>(
+    {
+      'business.address_line1': '8486 Crooks Plain Suite 229',
+      'business.address_line2': '58928 Gottlieb Shores Apt. 156',
+      'business.city': 'Addisonchester',
+      'business.corporation_type': 'veniam aute id occaecat quis',
+      'business.country': 'Vanuatu',
+      'business.dba': 'dolor quis aliqua',
+      'business.formation_date': 'commodo culpa non proident tempor',
+      'business.formation_state': 'New Hampshire',
+      'business.name': 'Mae Hermann MD',
+      'business.phone_number': '+16267049528',
+      'business.primary_owner_stake': -85085615,
+      'business.secondary_beneficial_owners': [],
+      'business.state': 'North Dakota',
+      'business.tin': 'minim sed aliquip do est',
+      'business.website': 'https://acidic-account.biz',
+      'business.zip': '06367',
+      'id.address_line1': '6611 Western Avenue Suite 662',
+      'id.address_line2': '770 Deven Rapid Suite 574',
+      'id.citizenships': ['ET', 'BV', 'UA'],
+      'id.city': 'East Camilaville',
+      'id.country': 'Guernsey',
+      'id.dob': 'bfb50695-a09c-470f-883a-f7c4f6e5d514',
+      'id.drivers_license_number': '21cce4e1-7d4d-4424-a779-fb4a5cd6cc9f',
+      'id.drivers_license_state': 'Kentucky',
+      'id.email': 'missouri.wisoky8@gmail.com',
+      'id.first_name': 'Soledad',
+      'id.itin': 'd2b7a2d2-a9b0-4341-a5d8-d33062d2a83e',
+      'id.last_name': 'Block',
+      'id.middle_name': 'Jasmine Moen',
+      'id.nationality': '2abfb57e-20d8-428b-a8f4-de3fd949de2c',
+      'id.phone_number': '+18196238953',
+      'id.ssn4': '0622806f-2776-4b82-8a12-9f39c4846733',
+      'id.ssn9': '288fdfd6-483e-4d67-9ae6-0e80573c4276',
+      'id.state': 'Missouri',
+      'id.us_legal_status': '43200820-f53a-4e7b-86d0-597b90a1d8b6',
+      'id.us_tax_id': 'fb4322f8-b400-40a4-a821-d255830e392e',
+      'id.visa_expiration_date': 'f1092e46-adfd-47b2-914e-c7352c532e3d',
+      'id.visa_kind': '8cf13acd-44c3-4163-90d9-a26aa2384b01',
+      'id.zip': '99030-8971',
     },
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
@@ -3186,6 +3238,7 @@ export const getL10nV1 = (
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+export const getLanguage = (props: Language): Language => props ?? 'es';
 
 export const getLiteIdentifyRequest = (
   props: Partial<LiteIdentifyRequest>,
@@ -3211,6 +3264,7 @@ export const getLiteIdentifyResponse = (
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+export const getLocale = (props: Locale): Locale => props ?? 'es-MX';
 
 export const getLogBody = (
   props: Partial<LogBody>,
@@ -4614,56 +4668,6 @@ export const getUserChallengeVerifyResponse = (
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 export const getUserDataIdentifier = (props: UserDataIdentifier): UserDataIdentifier => props ?? 'card.*.expiration';
-
-export const getUserDataV1 = (
-  props: Partial<UserDataV1>,
-  options: { overwriteArray: boolean } = { overwriteArray: true },
-): UserDataV1 =>
-  deepmerge<UserDataV1>(
-    {
-      'business.address_line1': '7959 Sincere Villages Suite 305',
-      'business.address_line2': '315 Prospect Street Suite 651',
-      'business.city': 'Ursulastad',
-      'business.corporation_type': 'esse enim amet culpa',
-      'business.country': 'Iceland',
-      'business.dba': 'ad elit laborum sint',
-      'business.formation_date': 'amet',
-      'business.formation_state': 'Tennessee',
-      'business.name': 'Sherry Collier',
-      'business.phone_number': '+19309861088',
-      'business.primary_owner_stake': -91885983,
-      'business.secondary_beneficial_owners': [],
-      'business.state': 'Colorado',
-      'business.tin': 'Duis aute',
-      'business.website': 'https://skeletal-character.name/',
-      'business.zip': '82379',
-      'id.address_line1': '710 Commercial Street Suite 727',
-      'id.address_line2': '52612 Ismael Meadows Apt. 515',
-      'id.citizenships': ['MY', 'NP', 'NR'],
-      'id.city': 'North Penelope',
-      'id.country': 'Gabon',
-      'id.dob': '1ab63762-3769-4782-aa67-06f674d2cee7',
-      'id.drivers_license_number': '25a96bba-788b-4d7d-a8d5-979d30b6a9e9',
-      'id.drivers_license_state': 'Maryland',
-      'id.email': 'emmanuel.sporer75@gmail.com',
-      'id.first_name': 'Destany',
-      'id.itin': '7e6fc47b-0eaf-4f0a-82ac-94161c997e73',
-      'id.last_name': 'Wiegand',
-      'id.middle_name': 'Dan Zemlak-Parisian',
-      'id.nationality': 'e427bad3-51dc-4974-a0f0-3bc0685111be',
-      'id.phone_number': '+17475171408',
-      'id.ssn4': '6041c607-cac8-46ff-b220-c339f83073bc',
-      'id.ssn9': '8cd17837-f98b-4a42-b66a-087b5dfdf816',
-      'id.state': 'West Virginia',
-      'id.us_legal_status': '9132ac11-309b-4769-ba37-7827249bbe0a',
-      'id.us_tax_id': '85760fb3-af28-4700-9cc5-a9ca9eeff943',
-      'id.visa_expiration_date': 'f7171707-75bd-4fe1-aaf9-22780ba888bd',
-      'id.visa_kind': '2bf2a742-3a2b-4c6d-8900-b83bc5af40ac',
-      'id.zip': '22540-2992',
-    },
-    props,
-    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
-  );
 
 export const getUserDecryptRequest = (
   props: Partial<UserDecryptRequest>,
