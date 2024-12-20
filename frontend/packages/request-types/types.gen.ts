@@ -1213,9 +1213,10 @@ export type L10n = {
   locale?: string;
 };
 export type L10nV1 = {
-  language?: string;
-  locale?: string;
+  language?: Language;
+  locale?: Locale;
 };
+export type Language = 'en' | 'es';
 export type LiteIdentifyRequest = {
   email?: string;
   phoneNumber?: string;
@@ -1223,6 +1224,7 @@ export type LiteIdentifyRequest = {
 export type LiteIdentifyResponse = {
   userFound: boolean;
 };
+export type Locale = 'en-US' | 'es-MX';
 export type LogBody = {
   logLevel?: string;
   logMessage?: string;

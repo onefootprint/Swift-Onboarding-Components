@@ -47,9 +47,30 @@ impl BootstrapDataV1 {
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema)]
 pub struct L10nV1 {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub locale: Option<String>,
+    pub locale: Option<Locale>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub language: Option<String>,
+    pub language: Option<Language>,
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema)]
+pub enum Locale {
+    #[serde(rename = "en-US")]
+    EnUs,
+    #[serde(rename = "es-MX")]
+    EsMx,
+    #[serde(untagged)]
+    #[openapi(skip)]
+    Other(String),
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema)]
+#[serde(rename_all = "snake_case")]
+pub enum Language {
+    En,
+    Es,
+    #[serde(untagged)]
+    #[openapi(skip)]
+    Other(String),
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema)]
@@ -187,6 +208,12 @@ impl ValidateSdkArgs for VerifyV1SdkArgs {
         if let Some(user_data) = self.user_data.as_ref() {
             user_data.validate_keys();
         }
+        if let Some(Language::Other(language)) = self.l10n.as_ref().and_then(|l| l.language.as_ref()) {
+            tracing::warn!(%language, "Invalid language variant");
+        }
+        if let Some(Locale::Other(locale)) = self.l10n.as_ref().and_then(|l| l.locale.as_ref()) {
+            tracing::warn!(%locale, "Invalid locale variant");
+        }
 
         let show_completion_page = self
             .options
@@ -211,6 +238,12 @@ impl ValidateSdkArgs for AuthV1SdkArgs {
         }
         if self.public_key.is_none() {
             return BadRequestInto("Public key must be provided");
+        }
+        if let Some(Language::Other(language)) = self.l10n.as_ref().and_then(|l| l.language.as_ref()) {
+            tracing::warn!(%language, "Invalid language variant");
+        }
+        if let Some(Locale::Other(locale)) = self.l10n.as_ref().and_then(|l| l.locale.as_ref()) {
+            tracing::warn!(%locale, "Invalid locale variant");
         }
         Ok(())
     }

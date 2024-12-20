@@ -5185,12 +5185,19 @@
                 "type": "object",
                 "properties": {
                     "language": {
-                        "type": "string"
+                        "$ref": "#/components/schemas/Language"
                     },
                     "locale": {
-                        "type": "string"
+                        "$ref": "#/components/schemas/Locale"
                     }
                 }
+            },
+            "Language": {
+                "type": "string",
+                "enum": [
+                    "en",
+                    "es"
+                ]
             },
             "LiteIdentifyRequest": {
                 "type": "object",
@@ -5212,6 +5219,13 @@
                 },
                 "required": [
                     "user_found"
+                ]
+            },
+            "Locale": {
+                "type": "string",
+                "enum": [
+                    "en-US",
+                    "es-MX"
                 ]
             },
             "LogBody": {
