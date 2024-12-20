@@ -32,6 +32,10 @@ pub enum UserAuthScope {
 
     /// Granted when the auth token was generated using explicit (not implicit) auth
     ExplicitAuth,
+
+    /// Granted to tokens created for the identify session. Allows hitting the identify session
+    /// APIs.
+    IdentifySession,
 }
 
 #[cfg(test)]

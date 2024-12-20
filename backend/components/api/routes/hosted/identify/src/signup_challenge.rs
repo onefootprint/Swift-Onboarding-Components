@@ -6,7 +6,7 @@ use crate::IdentifyChallengeContext;
 use crate::IdentifyLookupId;
 use crate::State;
 use api_core::auth::ob_config::ObConfigAuth;
-use api_core::auth::ob_config::ObConfigAuthTrait;
+use api_core::auth::session::user::NewUserSessionContext;
 use api_core::errors::error_with_code::ErrorWithCode;
 use api_core::errors::user::UserError;
 use api_core::telemetry::RootSpan;
@@ -100,9 +100,13 @@ pub async fn post(
         if !can_initiate_signup_challenge {
             // There's already a duplicate vault. Create the auth token that allows sending a
             // login challenge
-            let uv_id = vw.vault.id.clone();
+            let context = NewUserSessionContext {
+                su_id: sv.map(|sv| sv.id),
+                ..ob_context.ob_config_auth_context()
+            };
+            let purpose = scope.into();
             let (token, _, _) =
-                create_identified_token(&state, uv_id, sv, scope, vec![], Some(ob_context.clone())).await?;
+                create_identified_token(&state, &vw.vault.id, context, scope, purpose, vec![]).await?;
             return Err(ErrorWithCode::ExistingVault(Some(token)).into());
         }
     }
@@ -124,10 +128,17 @@ pub async fn post(
             Ok((uv.into_inner(), sv.into_inner(), root_span))
         })
         .await?;
-    let ctx = get_user_auth_methods(&state, sv.id.clone(), &[]).await?;
-    let uv_id = uv.id.clone();
+
+    // Create an identified auth token for the new vault
+    let context = NewUserSessionContext {
+        su_id: Some(sv.id.clone()),
+        ..ob_context.ob_config_auth_context()
+    };
+    let purpose = scope.into();
     let (token, session, _) =
-        create_identified_token(&state, uv_id, Some(sv), scope, vec![], Some(ob_context.clone())).await?;
+        create_identified_token(&state, &uv.id, context, scope, purpose, vec![]).await?;
+
+    // Initiate the challenge
     let tenant = Some(ob_context.tenant());
     let args = InitiateChallengeArgs {
         challenge_kind,
@@ -136,7 +147,9 @@ pub async fn post(
         user_session: Some(session),
         insight_headers,
     };
+    let ctx = get_user_auth_methods(&state, sv.id.clone(), &[]).await?;
     let response = initiate_challenge(&state, ctx, args).await?;
+
     // Since these errors return an HTTP 200, log something special on the root span if there's an error
     match response.error {
         Some(_) => root_span.record("meta", "error"),

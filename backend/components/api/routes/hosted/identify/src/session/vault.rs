@@ -38,7 +38,7 @@ pub async fn patch(
         updates, deletions, ..
     } = PatchDataRequest::clean_and_validate(request, args)?;
 
-    let sv_id = &identify.placeholder_su_id;
+    let sv_id = &identify.scoped_user.id;
     let updates = FingerprintedDataRequest::build(&state, updates, sv_id).await?;
 
     let phone = updates.get(&IDK::PhoneNumber.into());
@@ -53,7 +53,7 @@ pub async fn patch(
         return Err(UserError::FixtureCIInLive.into());
     }
 
-    let sv_id = identify.placeholder_su_id.clone();
+    let sv_id = identify.scoped_user.id.clone();
     state
         .db_transaction(move |conn| {
             let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &sv_id)?;

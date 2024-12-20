@@ -3,6 +3,7 @@ use crate::identify::serialize_auth_methods;
 use crate::GetIdentifyChallengeArgs;
 use crate::IdentifyChallengeContext;
 use crate::IdentifyLookupId;
+use api_core::auth::session::user::NewUserSessionContext;
 use api_core::auth::user::IdentifyAuthContext;
 use api_core::telemetry::RootSpan;
 use api_core::types::ApiResponse;
@@ -48,7 +49,7 @@ pub(super) async fn get_requirements(
     identify: IdentifyAuthContext,
     root_span: RootSpan,
 ) -> FpResult<Vec<IdentifyRequirement>> {
-    let su_id = identify.placeholder_su_id.clone();
+    let su_id = identify.scoped_user.id.clone();
     // The VW in the identify session is purely a placeholder for vault data in the event that we end up
     // making a new user.
     let placeholder_vw = state
@@ -71,7 +72,7 @@ pub(super) async fn get_requirements(
     };
     let ctx = crate::get_identify_challenge_context(state, args).await?;
     if let Some(ctx) = ctx {
-        if ctx.ctx.vw.vault.id != identify.placeholder_uv_id {
+        if ctx.ctx.vw.vault.id != placeholder_vw.vault.id {
             // We've located an existing user other than the one created in this identify session.
             // Short-circuit and return a login requirement
             return login_challenge_requirements(state, ctx, identify).await;
@@ -106,7 +107,7 @@ pub(super) async fn get_requirements(
         .sorted_by_key(challenge_priority)
         .filter(|am| {
             !aes.iter()
-                .any(|ae| AuthMethodKind::try_from(ae.kind).is_ok_and(|x| x == *am))
+                .any(|(ae, _)| AuthMethodKind::try_from(ae.kind).is_ok_and(|x| x == *am))
         })
         .map(|am| IdentifyRequirement::Challenge {
             auth_method: am,
@@ -134,13 +135,18 @@ async fn login_challenge_requirements(
         vw,
     } = ctx;
 
-    let tenant = identify.tenant.clone();
+    let scope = identify.scope;
+    let purpose = scope.into();
+    let context = NewUserSessionContext {
+        su_id: sv.map(|sv| sv.id),
+        ..identify.ob_config_auth_context()
+    };
     let (token, _, token_scopes) =
-        create_identified_token(state, vw.vault.id, sv, identify.scope, vec![], Some(identify)).await?;
+        create_identified_token(state, &vw.vault.id, context, scope, purpose, vec![]).await?;
     let scrubbed_phone = ams.iter().find_map(|am| am.phone()).map(|p| p.scrubbed());
 
     let (has_syncable_passkey, available_challenge_kinds, auth_methods) =
-        serialize_auth_methods(ams, Some(&tenant));
+        serialize_auth_methods(ams, Some(&identify.tenant));
 
     let user = IdentifiedUser {
         token,

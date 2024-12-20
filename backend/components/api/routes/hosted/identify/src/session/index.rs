@@ -1,13 +1,13 @@
+use crate::identify::create_identified_token;
 use api_core::auth::ob_config::ObConfigAuth;
-use api_core::auth::ob_config::ObConfigAuthTrait;
-use api_core::auth::session::identify::IdentifySession;
+use api_core::auth::session::user::NewUserSessionContext;
+use api_core::auth::session::user::TokenCreationPurpose;
 use api_core::errors::challenge::ChallengeError;
 use api_core::telemetry::RootSpan;
 use api_core::types::ApiResponse;
 use api_core::utils::headers::IsBootstrapHeader;
 use api_core::utils::headers::IsComponentsSdk;
 use api_core::utils::headers::SandboxId;
-use api_core::utils::session::AuthSession;
 use api_core::utils::vault_wrapper::FingerprintedDataRequest;
 use api_core::utils::vault_wrapper::VaultContext;
 use api_core::utils::vault_wrapper::VaultWrapper;
@@ -81,26 +81,19 @@ pub async fn post(
         sources: source.into(),
     };
 
-    let session_key = state.session_sealing_key.clone();
-    let token = state
+    let (uv, su) = state
         .db_transaction(move |conn| {
             let (uv, su, _) = VaultWrapper::create_unverified(conn, ctx, &root_span, None)?;
-
-            let duration = scope.token_ttl();
-            let data = IdentifySession {
-                placeholder_uv_id: uv.into_inner().id,
-                placeholder_su_id: su.into_inner().id,
-                obc_id: ob_context.ob_config().id.clone(),
-                scope,
-                auth_event_ids: vec![],
-                metadata: ob_context.trusted_metadata(),
-                business_info: ob_context.business_info(),
-                kba: vec![],
-            };
-            let (token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
-            Ok(token)
+            Ok((uv.into_inner(), su.into_inner()))
         })
         .await?;
+    let purpose = TokenCreationPurpose::IdentifySession;
+    let context = NewUserSessionContext {
+        su_id: Some(su.id),
+        identify_scope: Some(scope),
+        ..ob_context.ob_config_auth_context()
+    };
+    let (token, _, _) = create_identified_token(&state, &uv.id, context, scope, purpose, vec![]).await?;
     let response = IdentifySessionResponse { token };
     Ok(response)
 }

@@ -3,7 +3,6 @@ use crate::IdentifyChallengeContext;
 use crate::IdentifyLookupId;
 use crate::UserAuthMethodsContext;
 use api_core::auth::ob_config::ObConfigAuth;
-use api_core::auth::ob_config::ObConfigAuthTrait;
 use api_core::auth::session::user::AssociatedAuthEvent;
 use api_core::auth::session::user::NewUserSessionArgs;
 use api_core::auth::session::user::NewUserSessionContext;
@@ -26,7 +25,6 @@ use api_wire_types::IdentifyId;
 use api_wire_types::IdentifyRequest;
 use api_wire_types::IdentifyResponse;
 use db::models::auth_event::AuthEvent;
-use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use itertools::chain;
 use itertools::Itertools;
@@ -129,16 +127,12 @@ pub async fn post(
         vw,
     } = ctx;
 
+    let ob_config_auth_context = ob_context.map(|c| c.ob_config_auth_context()).unwrap_or_default();
     let (token, token_scopes) = if let Some(user_auth) = user_auth {
         // If the user was identified by an auth token, mutate the existing auth token with any metadata
         // from the onboarding session token
-        let metadata = ob_context.as_ref().and_then(|obc| obc.trusted_metadata());
-        let args = NewUserSessionContext {
-            metadata,
-            ..Default::default()
-        };
         let scopes = user_auth.scopes.clone();
-        let session = user_auth.update(args, vec![], scope.into(), None)?;
+        let session = user_auth.update(ob_config_auth_context, vec![], scope.into(), None)?;
         let session_key = state.session_sealing_key.clone();
         let (auth_token, _) = state
             .db_query(move |conn| user_auth.create_derived(conn, &session_key, session, None))
@@ -146,8 +140,13 @@ pub async fn post(
         (auth_token, scopes)
     } else {
         // Otherwise, make a new identified token
+        let purpose = scope.into();
+        let context = NewUserSessionContext {
+            su_id: sv.map(|sv| sv.id),
+            ..ob_config_auth_context
+        };
         let (token, _, scopes) =
-            create_identified_token(&state, vw.vault.id, sv, scope, vec![], ob_context).await?;
+            create_identified_token(&state, &vw.vault.id, context, scope, purpose, vec![]).await?;
         (token, scopes)
     };
 
@@ -210,45 +209,31 @@ pub(super) fn serialize_auth_methods(
 /// complete the auth.
 pub(super) async fn create_identified_token(
     state: &State,
-    v_id: VaultId,
-    sv: Option<ScopedVault>,
+    v_id: &VaultId,
+    context: NewUserSessionContext,
     scope: IdentifyScope,
+    purpose: TokenCreationPurpose,
     explicit_auth_events: Vec<AuthEvent>,
-    ob_context: Option<impl ObConfigAuthTrait>,
 ) -> FpResult<(SessionAuthToken, AuthSession, Vec<UserAuthScope>)> {
     let session_key = state.session_sealing_key.clone();
+    let v_id = v_id.clone();
     // Add metadata from the onboarding session token
-    let metadata = ob_context.as_ref().and_then(|obc| obc.trusted_metadata());
     let token = state
         .db_query(move |conn| {
-            let biz_info = ob_context.as_ref().and_then(|obc| obc.business_info());
-            let t = ob_context.as_ref().map(|obc| obc.tenant());
-            let (bo_id, sb_id, biz_wf_id) = if let Some((biz_info, t)) = biz_info.zip(t) {
-                let sb = ScopedVault::get(conn, (&biz_info.bv_id, &t.id))?;
-                (Some(biz_info.bo_id), Some(sb.id), Some(biz_info.biz_wf_id))
-            } else {
-                (None, None, None)
-            };
+            let identify_session_scope = (matches!(purpose, TokenCreationPurpose::IdentifySession))
+                .then_some(UserAuthScope::IdentifySession);
             let purposes = chain!(
-                Some(scope.into()),
+                Some(purpose),
                 // TODO we should migrate the BO tokens to use these new un-authed, identified tokens.
                 // Then the purpose here would come from the SecondayBo token. But for now, we'll just
                 // manually add this purpose to keep track of when the auth session is for a secondary BO.
-                bo_id.is_some().then_some(TokenCreationPurpose::SecondaryBo),
+                (context.bo_id.is_some()).then_some(TokenCreationPurpose::SecondaryBo),
             )
             .collect();
-            let context = NewUserSessionContext {
-                su_id: sv.map(|sv| sv.id),
-                sb_id,
-                bo_id,
-                biz_wf_id,
-                obc_id: ob_context.map(|obc| obc.ob_config().id.clone()),
-                metadata,
-                ..Default::default()
-            };
             let ae_kinds = explicit_auth_events.iter().map(|ae| ae.kind).collect_vec();
             let explicit_auth = !explicit_auth_events.is_empty();
             let scopes = allowed_user_scopes(ae_kinds, scope.into(), explicit_auth);
+            let scopes = chain!(scopes, identify_session_scope).collect_vec();
             let auth_events = explicit_auth_events
                 .into_iter()
                 .map(|ae| AssociatedAuthEvent::explicit(ae.id))

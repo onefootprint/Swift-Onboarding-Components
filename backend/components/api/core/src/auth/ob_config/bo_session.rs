@@ -8,6 +8,7 @@ use crate::FpResult;
 use db::models::business_owner::BusinessOwner;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::playbook::Playbook;
+use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::PgConn;
 use newtypes::ObConfigurationKind;
@@ -26,6 +27,7 @@ pub struct ParsedBoSession {
     pub playbook: Playbook,
     pub ob_config: ObConfiguration,
     pub bo: BusinessOwner,
+    pub sb: ScopedVault,
     pub data: BoSession,
 }
 
@@ -56,6 +58,7 @@ impl ExtractableAuthSession for ParsedBoSession {
         let tenant = Tenant::get(conn, &playbook.tenant_id)?;
 
         let bo = BusinessOwner::get(conn, &data.bo_id)?;
+        let sb = ScopedVault::get(conn, (&bo.business_vault_id, &tenant.id))?;
         // Note: the bo may or may not have a populated user_vault_id
 
         tracing::info!(tenant_id=%tenant.id, ob_config_id=%ob_config.id, bo_id=%bo.id, user_vault_id=%format!("{:?}", bo.user_vault_id), "kyb session authenticated");
@@ -65,6 +68,7 @@ impl ExtractableAuthSession for ParsedBoSession {
             playbook,
             ob_config,
             bo,
+            sb,
             data,
         })
     }

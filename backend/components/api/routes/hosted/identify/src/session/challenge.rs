@@ -45,7 +45,7 @@ pub async fn post(
     }
 
     let ChallengeRequest { challenge_kind } = request.into_inner();
-    let su = identify.su.clone();
+    let su = identify.scoped_user.clone();
     let tenant = identify.data.tenant.clone();
     let ctx = get_user_auth_methods(&state, su.id.clone(), &[]).await?;
     let args = InitiateChallengeArgs {

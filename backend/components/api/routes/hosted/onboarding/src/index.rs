@@ -6,7 +6,6 @@ use crate::errors::onboarding::OnboardingError;
 use crate::utils::headers::InsightHeaders;
 use crate::State;
 use api_core::auth::ob_config::ObConfigAuth;
-use api_core::auth::ob_config::ObConfigAuthTrait;
 use api_core::auth::session::user::NewUserSessionContext;
 use api_core::auth::session::user::TokenCreationPurpose;
 use api_core::types::ApiResponse;

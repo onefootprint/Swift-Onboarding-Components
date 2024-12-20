@@ -1,6 +1,8 @@
 use crate::ChallengeData;
 use crate::ChallengeState;
 use crate::State;
+use api_core::auth::session::user::AssociatedAuthEvent;
+use api_core::auth::session::user::TokenCreationPurpose;
 use api_core::auth::session::UpdateSession;
 use api_core::auth::user::IdentifyAuthContext;
 use api_core::types::ApiResponse;
@@ -89,7 +91,7 @@ pub async fn post(
             let VerifiedCredential::ContactInfo(verified_data, ci_dl_id, ci_kind) = verified_credential;
             // For bifrost logins that already have a SV (created in the signup challenge or via
             // API) we can mark the contact info as OTP verified
-            let vw = VaultWrapper::<Person>::lock_for_onboarding(conn, &identify.placeholder_su_id)?;
+            let vw = VaultWrapper::<Person>::lock_for_onboarding(conn, &identify.scoped_user.id)?;
 
             // The contact info used for identifying the user may be from a different
             // tenant if we're onboarding to a new tenant.
@@ -115,7 +117,7 @@ pub async fn post(
                 }
             }
 
-            let sv = ScopedVault::lock(conn, &identify.placeholder_su_id)?;
+            let sv = ScopedVault::lock(conn, &identify.scoped_user.id)?;
             let auth_event = match ae_result {
                 AuthEventResult::Create(kind) => {
                     // Record the new auth event
@@ -123,7 +125,7 @@ pub async fn post(
                     let sv_txn = DataLifetime::new_sv_txn(conn, sv)?;
 
                     let ae_args = NewAuthEventArgs {
-                        vault_id: identify.placeholder_uv_id.clone(),
+                        vault_id: identify.user_session.user.id.clone(),
                         sv_txn: Some(sv_txn),
                         insight_event_id: Some(insight.id),
                         kind,
@@ -145,8 +147,11 @@ pub async fn post(
                 }
             };
 
-            let identify_session = identify.data.session.clone().add_auth_event(auth_event.id);
-            identify.update_session(conn, &session_key, identify_session.into())?;
+            let purpose = TokenCreationPurpose::IdentifySessionChallengeVerify;
+            let ae = Some(AssociatedAuthEvent::explicit(auth_event.id));
+            let identify_session =
+                (identify.user_session.session.clone()).update(Default::default(), vec![], purpose, ae)?;
+            identify.update_session(conn, &session_key, identify_session)?;
 
             Ok(())
         })
@@ -163,7 +168,7 @@ async fn on_contact_info_verify(
     lifetime_id: DataLifetimeId,
     cik: ContactInfoKind,
 ) -> FpResult<VerifiedCredential> {
-    let args = ValidateArgs::for_bifrost(identify.uv.is_live);
+    let args = ValidateArgs::for_bifrost(identify.user_session.user.is_live);
     let data = HashMap::from_iter([(cik.verified_di(), contact_info)]);
     // The vault should already have `id.phone_number` or `id.email`, let's not derive it here.
     let data = DataRequest::clean_and_validate_str(data, args)?

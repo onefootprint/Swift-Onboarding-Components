@@ -13,7 +13,7 @@ def biometric_sandbox_user_auth(sandbox_user):
     return IdentifyClient.from_token(
         sandbox_user.client.auth_token,
         webauthn=sandbox_user.client.webauthn_device,
-        expected_scopes={"sign_up", "vault_data", "explicit_auth"},
+        expected_scopes={"identify_session", "sign_up", "vault_data", "explicit_auth"},
     ).login(kind="biometric", scope="onboarding")
 
 

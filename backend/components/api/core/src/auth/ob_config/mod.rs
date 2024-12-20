@@ -2,8 +2,7 @@ mod bo_session;
 mod ob_public_key;
 mod pb_token;
 
-use super::session::identify::BusinessInfo;
-use super::session::onboarding::OnboardingSessionTrustedMetadata;
+use super::session::user::NewUserSessionContext;
 use super::Either;
 pub use bo_session::*;
 use db::models::ob_configuration::ObConfiguration;
@@ -24,26 +23,9 @@ impl ObConfigAuth {
             Either::Right(Either::Right(a)) => &a.playbook,
         }
     }
-}
 
-
-pub trait ObConfigAuthTrait: Send + 'static {
     /// The ob configuration associated with this auth method
-    fn ob_config(&self) -> &ObConfiguration;
-
-    /// The tenant associated with this auth method
-    fn tenant(&self) -> &Tenant;
-
-    /// Returns onboarding session metadata, if the current `ObConfigAuth` is an onboarding session
-    /// token.
-    fn trusted_metadata(&self) -> Option<OnboardingSessionTrustedMetadata>;
-
-    /// Info on the business for secondary BO flows.
-    fn business_info(&self) -> Option<BusinessInfo>;
-}
-
-impl ObConfigAuthTrait for ObConfigAuth {
-    fn ob_config(&self) -> &ObConfiguration {
+    pub fn ob_config(&self) -> &ObConfiguration {
         match self {
             Either::Left(a) => &a.ob_config,
             Either::Right(Either::Left(a)) => &a.ob_config,
@@ -51,7 +33,8 @@ impl ObConfigAuthTrait for ObConfigAuth {
         }
     }
 
-    fn tenant(&self) -> &Tenant {
+    /// The tenant associated with this auth method
+    pub fn tenant(&self) -> &Tenant {
         match self {
             Either::Left(a) => &a.tenant,
             Either::Right(Either::Left(a)) => &a.tenant,
@@ -59,24 +42,32 @@ impl ObConfigAuthTrait for ObConfigAuth {
         }
     }
 
-    fn trusted_metadata(&self) -> Option<OnboardingSessionTrustedMetadata> {
-        match self {
-            Either::Right(Either::Left(a)) => Some(a.data.data.trusted_metadata.clone()),
+    /// Computes all arguments on NewUserSessionContext that do not pertain to the user. These are
+    /// the fields that originate from ObConfigAuth.
+    pub fn ob_config_auth_context(&self) -> NewUserSessionContext {
+        let (bo_id, sb_id, biz_wf_id) = match self {
+            Either::Right(Either::Right(bo_session)) => (
+                Some(bo_session.bo.id.clone()),
+                Some(bo_session.sb.id.clone()),
+                Some(bo_session.data.data.biz_wf_id.clone()),
+            ),
+            _ => Default::default(),
+        };
+        let metadata = match self {
+            Either::Right(Either::Left(ob_session)) => Some(ob_session.data.data.trusted_metadata.clone()),
             _ => None,
-        }
-    }
-
-    fn business_info(&self) -> Option<BusinessInfo> {
-        match self {
-            Either::Right(Either::Right(a)) => {
-                let info = BusinessInfo {
-                    bo_id: a.bo.id.clone(),
-                    bv_id: a.bo.business_vault_id.clone(),
-                    biz_wf_id: a.data.data.biz_wf_id.clone(),
-                };
-                Some(info)
-            }
-            _ => None,
+        };
+        NewUserSessionContext {
+            obc_id: Some(self.ob_config().id.clone()),
+            // Business info
+            sb_id,
+            bo_id,
+            biz_wf_id,
+            // Metadata, from onboarding session tokens
+            metadata,
+            // We omit any user fields
+            su_id: None,
+            ..Default::default()
         }
     }
 }

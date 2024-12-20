@@ -58,6 +58,8 @@ pub struct UserSession {
     pub kba: Vec<DataIdentifier>,
     #[serde(default)]
     pub metadata: OnboardingSessionTrustedMetadata,
+    /// For an identify session token, the requested scope
+    pub identify_scope: Option<IdentifyScope>,
 }
 
 #[derive(Default)]
@@ -72,6 +74,7 @@ pub struct NewUserSessionContext {
     pub wfr_id: Option<WorkflowRequestId>,
     pub kba: Vec<DataIdentifier>,
     pub metadata: Option<OnboardingSessionTrustedMetadata>,
+    pub identify_scope: Option<IdentifyScope>,
 }
 
 /// Enumerate all the possible places in which a user auth token can be created.
@@ -93,6 +96,10 @@ pub enum TokenCreationPurpose {
     AddWorkflow,
     /// New login method created in POST /hosted/user/challenge/verify
     RegisterAuthMethod,
+    /// Created for an identify session
+    IdentifySession,
+    /// Created after verifying a challenge in an identify session
+    IdentifySessionChallengeVerify,
     /// This token was created to onboard a secondary BO in a multi-KYC playbook
     SecondaryBo,
     ApiOnboard,
@@ -138,6 +145,8 @@ impl TokenCreationPurpose {
             | Self::AddWorkflow
             | Self::RegisterAuthMethod
             | Self::SecondaryBo
+            | Self::IdentifySession
+            | Self::IdentifySessionChallengeVerify
             | Self::Kba => false,
         }
     }
@@ -208,6 +217,7 @@ impl UserSession {
             wfr_id,
             kba,
             metadata,
+            identify_scope,
         } = context;
         let metadata = metadata.unwrap_or_default();
         let session = AuthSessionData::User(Self {
@@ -224,6 +234,7 @@ impl UserSession {
             auth_events,
             kba,
             metadata,
+            identify_scope,
         });
         Ok(session)
     }
@@ -248,6 +259,7 @@ impl UserSession {
             biz_wf_id: new_ctx.biz_wf_id.or(old.biz_wf_id),
             wfr_id: new_ctx.wfr_id.or(old.wfr_id),
             kba: new_ctx.kba.into_iter().chain(old.kba).unique().collect(),
+            identify_scope: new_ctx.identify_scope.or(old.identify_scope),
         };
         let scopes = old.scopes.into_iter().chain(new_scopes).unique().collect();
         let auth_events = old.auth_events.into_iter().chain(new_auth_event).collect();
@@ -278,6 +290,7 @@ impl UserSession {
             biz_wf_id: old.biz_wf_id,
             wfr_id: old.wfr_id,
             kba: old.kba,
+            identify_scope: old.identify_scope,
         };
         if new_scopes.iter().any(|s| !old.scopes.contains(s)) {
             // The only use case of this today is to request a token with _fewer_ scopes.
