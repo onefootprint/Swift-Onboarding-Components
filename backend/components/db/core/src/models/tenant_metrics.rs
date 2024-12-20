@@ -57,7 +57,7 @@ impl TenantMetrics {
     #[tracing::instrument("TenantMetrics::get", skip_all)]
     pub fn get(conn: &mut PgConn, id: &TenantId) -> FpResult<Self> {
         let result = tenant_metrics::table
-            .filter(tenant_metrics::id.eq(id))
+            .filter(tenant_metrics::tenant_id.eq(id))
             .first(conn)?;
         Ok(result)
     }
