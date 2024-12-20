@@ -2,6 +2,7 @@ use crate::identify::create_identified_token;
 use api_core::auth::ob_config::ObConfigAuth;
 use api_core::auth::session::user::NewUserSessionContext;
 use api_core::auth::session::user::TokenCreationPurpose;
+use api_core::auth::session::user::UserSessionBuilder;
 use api_core::errors::challenge::ChallengeError;
 use api_core::telemetry::RootSpan;
 use api_core::types::ApiResponse;
@@ -19,6 +20,7 @@ use newtypes::put_data_request::PatchDataRequest;
 use newtypes::DataLifetimeSource;
 use newtypes::IdentifyScope;
 use newtypes::ObConfigurationKind;
+use newtypes::UserAuthScope;
 use newtypes::ValidateArgs;
 use paperclip::actix;
 use paperclip::actix::api_v2_operation;
@@ -87,13 +89,16 @@ pub async fn post(
             Ok((uv.into_inner(), su.into_inner()))
         })
         .await?;
-    let purpose = TokenCreationPurpose::IdentifySession;
+
     let context = NewUserSessionContext {
         su_id: Some(su.id),
         identify_scope: Some(scope),
         ..ob_context.ob_config_auth_context()
     };
-    let (token, _, _) = create_identified_token(&state, &uv.id, context, scope, purpose, vec![]).await?;
+    let session = UserSessionBuilder::new(uv.id, vec![TokenCreationPurpose::IdentifySession])
+        .with_context(context)
+        .add_scopes(vec![UserAuthScope::IdentifySession]);
+    let (token, _) = create_identified_token(&state, session, scope).await?;
     let response = IdentifySessionResponse { token };
     Ok(response)
 }

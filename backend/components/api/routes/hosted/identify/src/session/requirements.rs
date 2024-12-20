@@ -4,6 +4,7 @@ use crate::GetIdentifyChallengeArgs;
 use crate::IdentifyChallengeContext;
 use crate::IdentifyLookupId;
 use api_core::auth::session::user::NewUserSessionContext;
+use api_core::auth::session::user::UserSessionBuilder;
 use api_core::auth::user::IdentifyAuthContext;
 use api_core::telemetry::RootSpan;
 use api_core::types::ApiResponse;
@@ -135,14 +136,13 @@ async fn login_challenge_requirements(
         vw,
     } = ctx;
 
-    let scope = identify.scope;
-    let purpose = scope.into();
     let context = NewUserSessionContext {
         su_id: sv.map(|sv| sv.id),
         ..identify.ob_config_auth_context()
     };
-    let (token, _, token_scopes) =
-        create_identified_token(state, &vw.vault.id, context, scope, purpose, vec![]).await?;
+    let session =
+        UserSessionBuilder::new(vw.vault.id.clone(), vec![identify.scope.into()]).with_context(context);
+    let (token, _) = create_identified_token(state, session, identify.scope).await?;
     let scrubbed_phone = ams.iter().find_map(|am| am.phone()).map(|p| p.scrubbed());
 
     let (has_syncable_passkey, available_challenge_kinds, auth_methods) =
@@ -150,7 +150,7 @@ async fn login_challenge_requirements(
 
     let user = IdentifiedUser {
         token,
-        token_scopes,
+        token_scopes: vec![],
         available_challenge_kinds,
         auth_methods,
         has_syncable_passkey,

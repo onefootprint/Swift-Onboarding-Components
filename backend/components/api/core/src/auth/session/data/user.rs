@@ -65,6 +65,7 @@ pub struct UserSession {
 
 #[derive(Default)]
 /// The nullable options in UserSession
+/// TODO: could probably rm this in favor of the .with_xxx() builder semantics
 pub struct NewUserSessionContext {
     pub su_id: Option<ScopedVaultId>,
     pub sb_id: Option<ScopedVaultId>,
