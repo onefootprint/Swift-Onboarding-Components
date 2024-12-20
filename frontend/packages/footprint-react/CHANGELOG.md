@@ -1,5 +1,11 @@
 # @onefootprint/footprint-react
 
+## 9.0.0
+
+### Major Changes
+
+- 6b34aebc0d: Drop support for react v17 and support react 19
+
 ## 8.0.0
 
 ### Major Changes
