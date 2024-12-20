@@ -29,5 +29,19 @@
       "new-vaults": "New vaults"
     }
   },
-  "error": "Please <refresh>refresh</refresh> this page."
+  "error": "Please <refresh>refresh</refresh> this page.",
+  "wrapped": {
+    "title": "Your 2024 Footprint Wrapped! 🎉",
+    "id-illustration-alt": "ID illustration",
+    "gift-illustration-alt": "Percy with gift",
+    "loading-text": "Loading...",
+    "thank-you-text": "Thank you for being an incredible partner and part of our journey this year!",
+    "download": "Download your 2024 Footprint Wrapped",
+    "businesses-onboarded": "Businesses onboarded",
+    "documents-collected": "Documents collected",
+    "passkeys-registered": "Passkeys registered",
+    "step-ups-generated": "Step-ups generated",
+    "users-onboarded": "Users onboarded",
+    "verification-rate-improvement": "Verification rate improvement"
+  }
 }
