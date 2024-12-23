@@ -1,4 +1,5 @@
 import { createFontStyles, media } from '@onefootprint/ui';
+import DOMPurify from 'dompurify';
 import styled, { css } from 'styled-components';
 
 type ChangelogContentProps = {
@@ -6,8 +7,8 @@ type ChangelogContentProps = {
 };
 
 const HtmlContent = ({ html }: ChangelogContentProps) => (
-  // biome-ignore lint/security/noDangerouslySetInnerHtml: <explanation>
-  <Content dangerouslySetInnerHTML={{ __html: html }} />
+  // biome-ignore lint/security/noDangerouslySetInnerHtml: Sanitized with DOMPurify
+  <Content dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html) }} /> // nosemgrep
 );
 
 const Content = styled.div`
