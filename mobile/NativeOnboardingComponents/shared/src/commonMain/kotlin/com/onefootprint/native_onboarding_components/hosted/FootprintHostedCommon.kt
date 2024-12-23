@@ -23,6 +23,7 @@ internal expect fun getActivityClassName(context: PlatformContext): String
 internal object FootprintHostedCommon {
     suspend fun launchIdentify(
         context: PlatformContext,
+        scheme: String,
         email: String? = null,
         phone: String? = null,
         onCancel: (() -> Unit)? = null,
@@ -88,8 +89,6 @@ internal object FootprintHostedCommon {
 
         val activityClassName = getActivityClassName(context)
 
-        println("> activityClassName: $activityClassName")
-
         val userData = FootprintBootstrapData(
             idEmail = email,
             idPhoneNumber = phone,
@@ -111,10 +110,9 @@ internal object FootprintHostedCommon {
             isAuthPlaybook = configKind == ObConfigurationKind.auth,
             shouldRelayToComponents = true,
             isComponentSdk = true,
-            sessionId = sessionId
+            sessionId = sessionId,
+            scheme = scheme
         )
-
-        println("> config: $config")
 
         FootprintHostedInternal.init(
             context = context,
@@ -124,6 +122,7 @@ internal object FootprintHostedCommon {
 
     suspend fun handoff(
         context: PlatformContext,
+        scheme: String,
         onComplete: ((validationToken: String) -> Unit)? = null,
         onCancel: (() -> Unit)? = null,
         onError: ((error: String) -> Unit)? = null,
@@ -165,7 +164,8 @@ internal object FootprintHostedCommon {
             isAuthPlaybook = false,
             shouldRelayToComponents = false,
             isComponentSdk = true,
-            sessionId = sessionId
+            sessionId = sessionId,
+            scheme = scheme
         )
         FootprintHostedInternal.init(
             context = context,

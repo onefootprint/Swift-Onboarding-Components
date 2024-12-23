@@ -1,6 +1,6 @@
 package com.onefootprint.native_onboarding_components.models
+
 import kotlinx.serialization.*
-import kotlinx.serialization.json.JsonElement
 
 /**
  * @param code
@@ -11,7 +11,7 @@ import kotlinx.serialization.json.JsonElement
  * @param context
  */
 @Serializable
-internal data class HttpError (
+internal data class VaultError (
     @SerialName(value = "code") @Required val code: kotlin.String? = null,
 
     @SerialName(value = "message") @Required val message: kotlin.String,
@@ -22,6 +22,6 @@ internal data class HttpError (
 
     @SerialName(value = "location") val location: kotlin.String? = null,
 
-    @SerialName(value = "context") val context: JsonElement? = null
+    @SerialName(value = "context") val context: Map<String, String>? = null
 ) {}
 

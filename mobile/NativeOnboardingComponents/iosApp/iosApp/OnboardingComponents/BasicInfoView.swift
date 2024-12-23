@@ -120,6 +120,7 @@ struct BasicInfoView: View {
             }
             catch {
                 print("Generic Error!: \(error)")
+                handleHandoff()
             }
             isLoading = false
         }
@@ -139,27 +140,27 @@ struct BasicInfoView: View {
     }
 
     private func handleHandoff() {
-        // TODO: implement the hosted solution
         Task {
-//            do {
-//                try await FootprintHosted.handoff(
-//                    onCancel: {
-//                        print("Handoff was canceled by the user")
-//                        errorMessage = "Verification was canceled. Please try again."
-//                    },
-//                    onComplete: { validationToken in
-//                        print("Handoff completed successfully with token: \(validationToken)")
-//                        showSuccessView = true // Navigate to success view on completion
-//                    },
-//                    onError: { error in
-//                        print("Error occurred during handoff: \(error)")
-//                        errorMessage = "An error occurred during verification. Please try again."
-//                    }
-//                )
-//            } catch {
-//                print("Error during handoff: \(error)")
-//                errorMessage = "An error occurred during verification. Please try again."
-//            }
+            do {
+                try await FootprintHosted.shared.handoff(
+                    onComplete: { validationToken in
+                        print("Handoff completed successfully with token: \(validationToken)")
+                        showSuccessView = true // Navigate to success view on completion
+                    },
+                    onCancel: {
+                        print("Handoff was canceled by the user")
+                        errorMessage = "Verification was canceled. Please try again."
+                    },
+                    onError: { error in
+                        print("Error occurred during handoff: \(error)")
+                        errorMessage = "An error occurred during verification. Please try again."
+                    },
+                    appearance: nil
+                )
+            } catch {
+                print("Error during handoff: \(error)")
+                errorMessage = "An error occurred during verification. Please try again."
+            }
         }
     }
 

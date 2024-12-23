@@ -14,6 +14,7 @@ typealias FootprintBootstrapData = BootstrapDataV1
 internal data class FootprintConfiguration(
     @Transient val redirectActivityName: String? = null,
     @Transient val sessionId: String? = null,
+    @Transient val scheme: String? = null,
     @SerialName("public_key") val publicKey: String? = null,
     @SerialName("auth_token") val authToken: String? = null,
     @SerialName("user_data") val bootstrapData: FootprintBootstrapData? = null,

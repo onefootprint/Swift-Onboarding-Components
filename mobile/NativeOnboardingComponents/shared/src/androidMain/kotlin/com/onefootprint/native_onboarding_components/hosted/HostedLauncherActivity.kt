@@ -7,18 +7,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.lifecycle.lifecycleScope
-import io.ktor.http.Url
 import kotlinx.coroutines.launch
 import java.lang.Exception
-
-internal sealed class SessionResult {
-    data object Canceled : SessionResult()
-    class Complete(val validationToken: String) : SessionResult()
-    class OnAuthenticationComplete(val authToken: String, val vaultingToken: String) :
-        SessionResult()
-
-    data object Error : SessionResult()
-}
 
 sealed class VerificationStatus {
     data class Success(val validationToken: String) : VerificationStatus() {
@@ -97,7 +87,7 @@ internal class HostedLauncherActivity : ComponentActivity() {
     }
 
     private suspend fun handleResultFromUrl(url: String) {
-        when (val sessionResult = parseResultFromUrl(url)) {
+        when (val sessionResult = FootprintHostedInternal.instance.parseResultFromUrl(url)) {
             is SessionResult.Canceled -> {
                 config?.onCancel?.invoke()
                 startDestinationActivity(VerificationStatus.Canceled)
@@ -120,35 +110,10 @@ internal class HostedLauncherActivity : ComponentActivity() {
                     handleError("Error: Validation token is null.")
                 }
             }
-
             is SessionResult.Error -> handleError("Error parsing redirect URL.")
         }
     }
 
-
-    private fun parseResultFromUrl(url: String): SessionResult {
-        return try {
-            val parsedUrl = Url(url)
-            val queryParams = parsedUrl.parameters
-
-            val authTokenFromUrl = queryParams["auth_token"]
-            val vaultingTokenFromUrl = queryParams["components_vault_token"]
-
-            when {
-                "canceled" in queryParams -> SessionResult.Canceled
-                queryParams["validation_token"] != null -> SessionResult.Complete(queryParams["validation_token"]!!)
-                authTokenFromUrl != null && vaultingTokenFromUrl != null -> {
-                    SessionResult.OnAuthenticationComplete(
-                        authToken = authTokenFromUrl,
-                        vaultingToken = vaultingTokenFromUrl
-                    )
-                }
-                else -> SessionResult.Error
-            }
-        } catch (e: Exception) {
-            SessionResult.Error
-        }
-    }
 
     private suspend fun handleError(error: String, shouldRedirect: Boolean = false) {
         errorManager?.log(error)

@@ -35,6 +35,7 @@ object FootprintHosted {
     ) {
         return FootprintHostedCommon.launchIdentify(
             PlatformContext(context),
+            "com.onefootprint.android-onboarding-components",
             email,
             phone,
             onCancel,
@@ -53,6 +54,7 @@ object FootprintHosted {
     ) {
         return FootprintHostedCommon.handoff(
             PlatformContext(context),
+            "com.onefootprint.android-onboarding-components",
             onComplete,
             onCancel,
             onError,

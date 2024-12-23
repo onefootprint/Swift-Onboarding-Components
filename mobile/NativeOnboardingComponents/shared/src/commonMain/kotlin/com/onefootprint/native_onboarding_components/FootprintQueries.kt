@@ -2,6 +2,7 @@ package com.onefootprint.native_onboarding_components
 
 import com.onefootprint.native_onboarding_components.models.FootprintException
 import com.onefootprint.native_onboarding_components.models.HttpError
+import com.onefootprint.native_onboarding_components.models.VaultError
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.call.body
 import org.openapitools.client.apis.IdentifyApi
@@ -292,7 +293,7 @@ internal object FootprintQueries {
             xFpAuthorization = authToken
         )
         if (!response.success) {
-            val error = response.response.body<HttpError>()
+            val error = response.response.body<VaultError>()
             throw FootprintException(
                 kind = FootprintException.ErrorKind.VAULTING_ERROR,
                 message = error.message,

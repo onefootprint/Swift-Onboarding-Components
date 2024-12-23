@@ -30,32 +30,33 @@ struct EmailAndPhoneView: View {
                                 print("This is an inline OTP not supported issue")
                             }
                         }
-//                        if let footprintError = error as? FootprintError {
-//                            switch footprintError.kind {
-//                            case .inlineOtpNotSupported:
-//                                try await Footprint.shared.launchIdentify(
-//                                    email: vaultData.idEmail,
-//                                    phone: vaultData.idPhoneNumber,
-//                                    onCancel: {
-//                                        print("User cancelled hosted identity flow")
-//                                    },
-//                                    onAuthenticated: { response in
-//                                        print("Hosted identity flow completed: \(response)")
-//                                        shouldNavigateToNextView = true
-//                                        isLoading = false
-//                                        otpComplete = true
-//                                    },
-//                                    onError: { error in
-//                                        print("Error occurred: \(error)")
-//                                    }
-//                                )
-//                                
-//                            default:
-//                                print("Error occurred: \(error)")
-//                                shouldNavigateToNextView = false
-//                                isLoading = false
-//                            }
-//                        }
+                        if let footprintError = error as? FootprintError {
+                            switch footprintError.kind {
+                            case .inlineOtpNotSupported:
+                                try await FootprintHosted.shared.launchIdentify(                                    
+                                    email: vaultData.idEmail,
+                                    phone: vaultData.idPhoneNumber,
+                                    onCancel: {
+                                        print("User cancelled hosted identity flow")
+                                    },
+                                    onAuthenticated: { response in
+                                        print("Hosted identity flow completed: \(response)")
+                                        shouldNavigateToNextView = true
+                                        isLoading = false
+                                        otpComplete = true
+                                    },
+                                    onError: { error in
+                                        print("Error occurred: \(error)")
+                                    },
+                                    appearance: nil
+                                )
+                                
+                            default:
+                                print("Error occurred: \(error)")
+                                shouldNavigateToNextView = false
+                                isLoading = false
+                            }
+                        }
                     }
                 }
             },

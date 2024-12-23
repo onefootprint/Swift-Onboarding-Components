@@ -2,6 +2,7 @@ package com.onefootprint.native_onboarding_components.hosted
 
 import FootprintErrorManager
 import com.onefootprint.native_onboarding_components.FootprintQueries
+import com.onefootprint.native_onboarding_components.getPackage
 import io.ktor.http.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -10,6 +11,15 @@ import org.openapitools.client.models.SdkArgs
 import org.openapitools.client.models.VerifyV1Options
 import org.openapitools.client.models.VerifyV1SdkArgs
 import kotlin.Exception
+
+internal sealed class SessionResult {
+    data object Canceled : SessionResult()
+    class Complete(val validationToken: String) : SessionResult()
+    class OnAuthenticationComplete(val authToken: String, val vaultingToken: String) :
+        SessionResult()
+
+    data object Error : SessionResult()
+}
 
 internal object FootprintSdkMetadata {
     const val bifrostBaseUrl: String = "id.onefootprint.com"
@@ -78,7 +88,7 @@ internal class FootprintHostedInternal private constructor() {
             // Adding query parameters
             parameters.append(
                 "redirect_url",
-                "com.onefootprint.android-onboarding-components://"
+                config.scheme + "://"
             )
             if (!config.sessionId.isNullOrEmpty()) parameters.append(
                 "xfpsessionid",
@@ -100,7 +110,30 @@ internal class FootprintHostedInternal private constructor() {
         }.build()
 
         return url.toString()
+    }
 
+    fun parseResultFromUrl(url: String): SessionResult {
+        return try {
+            val parsedUrl = Url(url)
+            val queryParams = parsedUrl.parameters
+
+            val authTokenFromUrl = queryParams["auth_token"]
+            val vaultingTokenFromUrl = queryParams["components_vault_token"]
+
+            when {
+                "canceled" in queryParams -> SessionResult.Canceled
+                queryParams["validation_token"] != null -> SessionResult.Complete(queryParams["validation_token"]!!)
+                authTokenFromUrl != null && vaultingTokenFromUrl != null -> {
+                    SessionResult.OnAuthenticationComplete(
+                        authToken = authTokenFromUrl,
+                        vaultingToken = vaultingTokenFromUrl
+                    )
+                }
+                else -> SessionResult.Error
+            }
+        } catch (e: Exception) {
+            SessionResult.Error
+        }
     }
 
     internal suspend fun start() {

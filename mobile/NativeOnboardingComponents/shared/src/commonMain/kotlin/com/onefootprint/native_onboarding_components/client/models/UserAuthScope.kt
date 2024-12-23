@@ -21,7 +21,7 @@ import kotlinx.serialization.*
 /**
  * 
  *
- * Values: sign_up,auth,basic_profile,sensitive_profile,handoff,vault_data,explicit_auth
+ * Values: sign_up,auth,basic_profile,sensitive_profile,handoff,vault_data,explicit_auth,identify_session
  */
 @Serializable
 enum class UserAuthScope(val value: kotlin.String) {
@@ -45,7 +45,10 @@ enum class UserAuthScope(val value: kotlin.String) {
     vault_data("vault_data"),
 
     @SerialName(value = "explicit_auth")
-    explicit_auth("explicit_auth");
+    explicit_auth("explicit_auth"),
+
+    @SerialName(value = "identify_session")
+    identify_session("identify_session");
 
     /**
      * Override [toString()] to avoid using the enum variable name as the value, and instead use
