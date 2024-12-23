@@ -1,7 +1,6 @@
 use crate::auth::user::UserAuthScope;
 use crate::utils::headers::InsightHeaders;
 use crate::State;
-use api_core::auth::session::user::NewUserSessionContext;
 use api_core::auth::session::user::TokenCreationPurpose;
 use api_core::auth::session::user::UserSessionBuilder;
 use api_core::auth::session::UpdateSession;
@@ -84,13 +83,8 @@ pub async fn post(
             create_biz_wfl_if_not_exists(conn, &biz_wf, &user_auth.workflow)?;
 
             // Update auth token with new identifiers
-            let args = NewUserSessionContext {
-                biz_wf_id: Some(biz_wf.id),
-                sb_id: Some(biz_wf.scoped_vault_id),
-                ..Default::default()
-            };
             let session = UserSessionBuilder::from_existing(&user_auth, TokenCreationPurpose::AddWorkflow)?
-                .with_context(args)
+                .replace_biz_info(biz_wf.id, biz_wf.scoped_vault_id)
                 .finish()?;
             let (auth_token, _) = user_auth.create_derived(conn, &session_key, session.clone(), None)?;
             // We need to keep mutating the existing session for backwards compatibility,

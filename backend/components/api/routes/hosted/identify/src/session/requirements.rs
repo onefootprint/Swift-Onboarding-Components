@@ -3,7 +3,6 @@ use crate::identify::serialize_auth_methods;
 use crate::GetIdentifyChallengeArgs;
 use crate::IdentifyChallengeContext;
 use crate::IdentifyLookupId;
-use api_core::auth::session::user::NewUserSessionContext;
 use api_core::auth::session::user::UserSessionBuilder;
 use api_core::auth::user::IdentifyAuthContext;
 use api_core::telemetry::RootSpan;
@@ -136,12 +135,9 @@ async fn login_challenge_requirements(
         vw,
     } = ctx;
 
-    let context = NewUserSessionContext {
-        su_id: sv.map(|sv| sv.id),
-        ..identify.ob_config_auth_context()
-    };
-    let session =
-        UserSessionBuilder::new(vw.vault.id.clone(), vec![identify.scope.into()]).with_context(context);
+    let session = UserSessionBuilder::new(vw.vault.id.clone(), vec![identify.scope.into()])
+        .replace_su_id(sv.map(|sv| sv.id))
+        .replace_ob_config_auth_context(identify.ob_config_auth_context());
     let (token, _) = create_identified_token(state, session, identify.scope).await?;
     let scrubbed_phone = ams.iter().find_map(|am| am.phone()).map(|p| p.scrubbed());
 

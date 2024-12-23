@@ -1,5 +1,4 @@
 use crate::State;
-use api_core::auth::session::user::NewUserSessionContext;
 use api_core::auth::session::user::TokenCreationPurpose;
 use api_core::auth::session::user::UserSessionBuilder;
 use api_core::auth::user::UserAuthContext;
@@ -71,12 +70,8 @@ pub async fn post(
     let session_key = state.session_sealing_key.clone();
     let token = state
         .db_transaction(move |conn| {
-            let context = NewUserSessionContext {
-                kba: successful_kba,
-                ..Default::default()
-            };
             let session = UserSessionBuilder::from_existing(&user_auth, TokenCreationPurpose::Kba)?
-                .with_context(context)
+                .add_kba(successful_kba)
                 .finish()?;
             let (token, _) = user_auth.create_derived(conn, &session_key, session, None)?;
             Ok(token)

@@ -2,7 +2,6 @@ use crate::ChallengeData;
 use crate::ChallengeState;
 use crate::State;
 use api_core::auth::session::user::AssociatedAuthEvent;
-use api_core::auth::session::user::NewUserSessionContext;
 use api_core::auth::session::user::UserSessionBuilder;
 use api_core::auth::user::allowed_user_scopes;
 use api_core::auth::user::CheckedUserAuthContext;
@@ -287,12 +286,8 @@ pub async fn post(
             // Create a new token derived from the provided one, adding new scopes and context
             let scopes = allowed_user_scopes(vec![event.kind], scope.into(), true);
             let ae = AssociatedAuthEvent::explicit(event.id);
-            let context = NewUserSessionContext {
-                su_id,
-                ..Default::default()
-            };
             let session = UserSessionBuilder::from_existing(&user_auth, scope.into())?
-                .with_context(context)
+                .replace_su_id(su_id)
                 .add_scopes(scopes)
                 .add_auth_events(vec![ae])
                 .finish()?;

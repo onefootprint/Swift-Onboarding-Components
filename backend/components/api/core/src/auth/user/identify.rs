@@ -2,7 +2,7 @@ use super::load_auth_events;
 use super::ParsedUserSessionContext;
 use super::UserSessionContext;
 use crate::auth::session::user::AssociatedAuthEventKind;
-use crate::auth::session::user::NewUserSessionContext;
+use crate::auth::session::user::ObConfigAuthFields;
 use crate::auth::session::AllowSessionUpdate;
 use crate::auth::session::AuthSessionData;
 use crate::auth::session::ExtractableAuthSession;
@@ -112,19 +112,16 @@ impl ExtractableAuthSession for IdentifySessionContext {
 pub type IdentifyAuthContext = SessionContext<IdentifySessionContext>;
 
 impl IdentifyAuthContext {
-    /// Computes all arguments on NewUserSessionContext that originate from ob config auth. This is
+    /// Computes all arguments for a user session that originate from ob config auth. This is
     /// used to issue a token for a new user, but with the same context from the ob config auth.
-    pub fn ob_config_auth_context(&self) -> NewUserSessionContext {
-        NewUserSessionContext {
+    pub fn ob_config_auth_context(&self) -> ObConfigAuthFields {
+        ObConfigAuthFields {
             obc_id: Some(self.obc.id.clone()),
+            metadata: Some(self.user_session.metadata.clone()),
             // Business info
             bo_id: self.user_session.bo_id.clone(),
             sb_id: self.scoped_business.as_ref().map(|sb| sb.id.clone()),
             biz_wf_id: self.user_session.biz_wf_id.clone(),
-            metadata: Some(self.user_session.metadata.clone()),
-            // We omit any user fields
-            su_id: None,
-            ..Default::default()
         }
     }
 }

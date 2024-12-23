@@ -6,7 +6,6 @@ use crate::errors::onboarding::OnboardingError;
 use crate::utils::headers::InsightHeaders;
 use crate::State;
 use api_core::auth::ob_config::ObConfigAuth;
-use api_core::auth::session::user::NewUserSessionContext;
 use api_core::auth::session::user::TokenCreationPurpose;
 use api_core::auth::session::user::UserSessionBuilder;
 use api_core::auth::user::load_auth_events;
@@ -150,14 +149,15 @@ pub async fn post(
             }
 
             // Update auth token with new identifiers
-            let args = NewUserSessionContext {
-                wf_id: user_auth.wf_id.is_none().then_some(user_wf.id),
-                obc_id: user_auth.obc_id.is_none().then_some(obc.id.clone()),
-                ..Default::default()
-            };
-            let session = UserSessionBuilder::from_existing(&user_auth, TokenCreationPurpose::AddWorkflow)?
-                .with_context(args)
-                .finish()?;
+            let mut session =
+                UserSessionBuilder::from_existing(&user_auth, TokenCreationPurpose::AddWorkflow)?;
+            if session.wf_id.is_none() {
+                session = session.replace_wf_id(Some(user_wf.id));
+            }
+            if session.obc_id.is_none() {
+                session = session.replace_obc_id(Some(obc.id.clone()));
+            }
+            let session = session.finish()?;
             let (auth_token, _) = user_auth.create_derived(conn, &session_key, session.clone(), None)?;
             // We need to keep mutating the existing session for backwards compatibility,
             // but we should deprecate this eventually

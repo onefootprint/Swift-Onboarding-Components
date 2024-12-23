@@ -2,7 +2,7 @@ mod bo_session;
 mod ob_public_key;
 mod pb_token;
 
-use super::session::user::NewUserSessionContext;
+use super::session::user::ObConfigAuthFields;
 use super::Either;
 pub use bo_session::*;
 use db::models::ob_configuration::ObConfiguration;
@@ -42,32 +42,18 @@ impl ObConfigAuth {
         }
     }
 
-    /// Computes all arguments on NewUserSessionContext that do not pertain to the user. These are
-    /// the fields that originate from ObConfigAuth.
-    pub fn ob_config_auth_context(&self) -> NewUserSessionContext {
-        let (bo_id, sb_id, biz_wf_id) = match self {
-            Either::Right(Either::Right(bo_session)) => (
-                Some(bo_session.bo.id.clone()),
-                Some(bo_session.sb.id.clone()),
-                Some(bo_session.data.data.biz_wf_id.clone()),
-            ),
-            _ => Default::default(),
-        };
-        let metadata = match self {
-            Either::Right(Either::Left(ob_session)) => Some(ob_session.data.data.trusted_metadata.clone()),
-            _ => None,
-        };
-        NewUserSessionContext {
-            obc_id: Some(self.ob_config().id.clone()),
-            // Business info
-            sb_id,
-            bo_id,
-            biz_wf_id,
-            // Metadata, from onboarding session tokens
-            metadata,
-            // We omit any user fields
-            su_id: None,
-            ..Default::default()
+    /// Computes all arguments for a user session that originate from ob config auth.
+    pub fn ob_config_auth_context(&self) -> ObConfigAuthFields {
+        let mut result = ObConfigAuthFields::default();
+        if let Either::Right(Either::Right(bo_session)) = self {
+            result.bo_id = Some(bo_session.bo.id.clone());
+            result.sb_id = Some(bo_session.sb.id.clone());
+            result.biz_wf_id = Some(bo_session.data.data.biz_wf_id.clone());
         }
+        if let Either::Right(Either::Left(ob_session)) = self {
+            result.metadata = Some(ob_session.data.data.trusted_metadata.clone());
+        }
+        result.obc_id = Some(self.ob_config().id.clone());
+        result
     }
 }

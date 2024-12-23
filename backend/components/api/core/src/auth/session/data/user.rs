@@ -63,22 +63,6 @@ pub struct UserSession {
     pub identify_scope: Option<IdentifyScope>,
 }
 
-#[derive(Default)]
-/// The nullable options in UserSession
-/// TODO: could probably rm this in favor of the .with_xxx() builder semantics
-pub struct NewUserSessionContext {
-    pub su_id: Option<ScopedVaultId>,
-    pub sb_id: Option<ScopedVaultId>,
-    pub bo_id: Option<BoId>,
-    pub obc_id: Option<ObConfigurationId>,
-    pub wf_id: Option<WorkflowId>,
-    pub biz_wf_id: Option<WorkflowId>,
-    pub wfr_id: Option<WorkflowRequestId>,
-    pub kba: Vec<DataIdentifier>,
-    pub metadata: Option<OnboardingSessionTrustedMetadata>,
-    pub identify_scope: Option<IdentifyScope>,
-}
-
 /// Enumerate all the possible places in which a user auth token can be created.
 /// This is essentially a union of IdentifyScope and UserTokenKind
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
@@ -186,23 +170,40 @@ impl AssociatedAuthEvent {
     }
 }
 
+#[derive(Default)]
+/// The list of fields on a UserSession that are derived from an ObConfigAuth.
+pub struct ObConfigAuthFields {
+    pub bo_id: Option<BoId>,
+    pub sb_id: Option<ScopedVaultId>,
+    pub biz_wf_id: Option<WorkflowId>,
+    pub obc_id: Option<ObConfigurationId>,
+    pub metadata: Option<OnboardingSessionTrustedMetadata>,
+}
+
+#[derive(derive_more::Deref, derive_more::DerefMut)]
 pub struct UserSessionBuilder {
-    pub user_vault_id: VaultId,
-    pub context: NewUserSessionContext,
-    pub purposes: Vec<TokenCreationPurpose>,
-    pub scopes: Vec<UserAuthScope>,
-    pub auth_events: Vec<AssociatedAuthEvent>,
+    inner: UserSession,
 }
 
 impl UserSessionBuilder {
     pub fn new(user_vault_id: VaultId, purposes: Vec<TokenCreationPurpose>) -> Self {
-        Self {
+        let inner = UserSession {
             user_vault_id,
             purposes,
             scopes: vec![],
             auth_events: vec![],
-            context: NewUserSessionContext::default(),
-        }
+            su_id: None,
+            sb_id: None,
+            bo_id: None,
+            obc_id: None,
+            wf_id: None,
+            biz_wf_id: None,
+            wfr_id: None,
+            kba: vec![],
+            metadata: OnboardingSessionTrustedMetadata::default(),
+            identify_scope: None,
+        };
+        Self { inner }
     }
 
     /// Given an existing UserSession, creates a new UserSessionBuilder with all context derived
@@ -212,89 +213,34 @@ impl UserSessionBuilder {
         purpose: TokenCreationPurpose,
     ) -> FpResult<UserSessionBuilder> {
         session.validate_not_derived_from_components()?;
-        let context = NewUserSessionContext {
-            metadata: Some(session.metadata.clone()),
-            su_id: session.su_id.clone(),
-            sb_id: session.sb_id.clone(),
-            bo_id: session.bo_id.clone(),
-            obc_id: session.obc_id.clone(),
-            wf_id: session.wf_id.clone(),
-            biz_wf_id: session.biz_wf_id.clone(),
-            wfr_id: session.wfr_id.clone(),
-            kba: session.kba.clone(),
-            identify_scope: session.identify_scope,
-        };
-        let args = UserSessionBuilder {
-            user_vault_id: session.user_vault_id.clone(),
-            purposes: chain!(session.purposes.clone(), vec![purpose]).collect(),
-            context,
-            scopes: session.scopes.clone(),
-            auth_events: session.auth_events.clone(),
-        };
-        Ok(args)
+        let mut inner = session.clone();
+        inner.purposes.push(purpose);
+        Ok(Self { inner })
     }
 
     pub fn finish(self) -> FpResult<AuthSessionData> {
-        let Self {
-            user_vault_id,
-            context,
-            purposes,
-            scopes,
-            auth_events,
-        } = self;
-        if scopes.iter().any(|s| matches!(s, UserAuthScope::SignUp)) && context.su_id.is_none() {
+        if self.scopes.iter().any(|s| matches!(s, UserAuthScope::SignUp)) && self.su_id.is_none() {
             return Err(UserError::InvalidAuthSession(
                 "Cannot create session with SignUp scope without su_id".into(),
             )
             .into());
         }
-        let NewUserSessionContext {
-            su_id,
-            sb_id,
-            bo_id,
-            obc_id,
-            wf_id,
-            biz_wf_id,
-            wfr_id,
-            kba,
-            metadata,
-            identify_scope,
-        } = context;
-        let metadata = metadata.unwrap_or_default();
-        let session = AuthSessionData::User(UserSession {
-            user_vault_id,
-            purposes,
-            su_id,
-            sb_id,
-            bo_id,
-            obc_id,
-            wf_id,
-            biz_wf_id,
-            wfr_id,
-            scopes,
-            auth_events,
-            kba,
-            metadata,
-            identify_scope,
-        });
+        let Self { inner } = self;
+        let session = AuthSessionData::User(inner);
         Ok(session)
     }
 
-    pub fn add_auth_events(self, new_auth_events: Vec<AssociatedAuthEvent>) -> Self {
-        Self {
-            auth_events: chain!(self.auth_events.clone(), new_auth_events).collect(),
-            ..self
-        }
+    pub fn add_auth_events(mut self, new_auth_events: Vec<AssociatedAuthEvent>) -> Self {
+        self.auth_events = chain!(self.auth_events.clone(), new_auth_events).collect();
+        self
     }
 
-    pub fn add_scopes(self, new_scopes: Vec<UserAuthScope>) -> Self {
-        Self {
-            scopes: chain!(self.scopes.clone(), new_scopes).collect(),
-            ..self
-        }
+    pub fn add_scopes(mut self, new_scopes: Vec<UserAuthScope>) -> Self {
+        self.scopes = chain!(self.scopes.clone(), new_scopes).collect();
+        self
     }
 
-    pub fn replace_scopes(self, new_scopes: Vec<UserAuthScope>) -> FpResult<Self> {
+    pub fn replace_scopes(mut self, new_scopes: Vec<UserAuthScope>) -> FpResult<Self> {
         if new_scopes.iter().any(|s| !self.scopes.contains(s)) {
             // The only use case of this today is to request a token with _fewer_ scopes.
             // It could be dangerous to allow a user to request a token with _more_ scopes,
@@ -303,28 +249,48 @@ impl UserSessionBuilder {
             // Do not remove this validation unless you know what you're doing.
             return BadRequestInto("Cannot use reduce_scopes to add additional scopes");
         }
-        Ok(Self {
-            scopes: new_scopes,
-            ..self
-        })
+        self.scopes = new_scopes;
+        Ok(self)
     }
 
-    // TODO: use smaller methods for updating pieces of the context
-    pub fn with_context(self, new_ctx: NewUserSessionContext) -> Self {
-        let old = self.context;
-        let context = NewUserSessionContext {
-            metadata: new_ctx.metadata.or(old.metadata),
-            su_id: new_ctx.su_id.or(old.su_id),
-            sb_id: new_ctx.sb_id.or(old.sb_id),
-            bo_id: new_ctx.bo_id.or(old.bo_id),
-            obc_id: new_ctx.obc_id.or(old.obc_id),
-            wf_id: new_ctx.wf_id.or(old.wf_id),
-            biz_wf_id: new_ctx.biz_wf_id.or(old.biz_wf_id),
-            wfr_id: new_ctx.wfr_id.or(old.wfr_id),
-            kba: new_ctx.kba.into_iter().chain(old.kba).unique().collect(),
-            identify_scope: new_ctx.identify_scope.or(old.identify_scope),
-        };
-        Self { context, ..self }
+    pub fn replace_su_id(mut self, su_id: Option<ScopedVaultId>) -> Self {
+        self.su_id = su_id;
+        self
+    }
+
+    pub fn add_kba(mut self, kba: Vec<DataIdentifier>) -> Self {
+        self.kba = chain!(self.kba.clone(), kba).unique().collect();
+        self
+    }
+
+    pub fn replace_wf_id(mut self, wf_id: Option<WorkflowId>) -> Self {
+        self.wf_id = wf_id;
+        self
+    }
+
+    pub fn replace_obc_id(mut self, obc_id: Option<ObConfigurationId>) -> Self {
+        self.obc_id = obc_id;
+        self
+    }
+
+    pub fn replace_identify_scope(mut self, identify_scope: Option<IdentifyScope>) -> Self {
+        self.identify_scope = identify_scope;
+        self
+    }
+
+    pub fn replace_biz_info(mut self, biz_wf_id: WorkflowId, sb_id: ScopedVaultId) -> Self {
+        self.biz_wf_id = Some(biz_wf_id);
+        self.sb_id = Some(sb_id);
+        self
+    }
+
+    pub fn replace_ob_config_auth_context(mut self, new_ctx: ObConfigAuthFields) -> Self {
+        self.sb_id = new_ctx.sb_id;
+        self.bo_id = new_ctx.bo_id;
+        self.obc_id = new_ctx.obc_id;
+        self.biz_wf_id = new_ctx.biz_wf_id;
+        self.metadata = new_ctx.metadata.unwrap_or(self.metadata.clone());
+        self
     }
 }
 

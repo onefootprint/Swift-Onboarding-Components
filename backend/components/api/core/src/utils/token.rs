@@ -1,9 +1,7 @@
 use super::session::AuthSession;
 use super::vault_wrapper::Any;
 use super::vault_wrapper::TenantVw;
-use crate::auth::session::onboarding::OnboardingSessionTrustedMetadata;
 use crate::auth::session::user::AssociatedAuthEvent;
-use crate::auth::session::user::NewUserSessionContext;
 use crate::auth::session::user::TokenCreationPurpose;
 use crate::auth::session::user::UserSessionBuilder;
 use crate::errors::onboarding::OnboardingError;
@@ -127,24 +125,16 @@ pub fn create_token(
         ),
     };
 
-    let metadata = OnboardingSessionTrustedMetadata {
-        allow_reonboard,
-        ..Default::default()
-    };
-    let context = NewUserSessionContext {
-        su_id: Some(su.id.clone()),
-        sb_id,
-        obc_id,
-        wf_id: wf.map(|wf| wf.id.clone()),
-        wfr_id: wfr.as_ref().map(|wfr| wfr.id.clone()),
-        metadata: Some(metadata),
-        ..Default::default()
-    };
-    let session = UserSessionBuilder::new(su.vault_id.clone(), vec![purpose])
-        .with_context(context)
+    let mut session = UserSessionBuilder::new(su.vault_id.clone(), vec![purpose])
         .add_scopes(scopes)
-        .add_auth_events(auth_events)
-        .finish()?;
+        .add_auth_events(auth_events);
+    session.su_id = Some(su.id.clone());
+    session.sb_id = sb_id;
+    session.obc_id = obc_id;
+    session.wf_id = wf.map(|wf| wf.id.clone());
+    session.wfr_id = wfr.as_ref().map(|wfr| wfr.id.clone());
+    session.metadata.allow_reonboard = allow_reonboard;
+    let session = session.finish()?;
     let (token, session) = AuthSession::create_sync(conn, session_key, session, duration)?;
     let result = CreateTokenResult { token, session, wfr };
     Ok(result)

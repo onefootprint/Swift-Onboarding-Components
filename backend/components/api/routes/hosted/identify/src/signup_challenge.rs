@@ -6,7 +6,6 @@ use crate::IdentifyChallengeContext;
 use crate::IdentifyLookupId;
 use crate::State;
 use api_core::auth::ob_config::ObConfigAuth;
-use api_core::auth::session::user::NewUserSessionContext;
 use api_core::auth::session::user::UserSessionBuilder;
 use api_core::errors::error_with_code::ErrorWithCode;
 use api_core::errors::user::UserError;
@@ -101,12 +100,9 @@ pub async fn post(
         if !can_initiate_signup_challenge {
             // There's already a duplicate vault. Create the auth token that allows sending a
             // login challenge
-            let context = NewUserSessionContext {
-                su_id: sv.map(|sv| sv.id),
-                ..ob_context.ob_config_auth_context()
-            };
-            let session =
-                UserSessionBuilder::new(vw.vault.id.clone(), vec![scope.into()]).with_context(context);
+            let session = UserSessionBuilder::new(vw.vault.id.clone(), vec![scope.into()])
+                .replace_su_id(sv.map(|sv| sv.id))
+                .replace_ob_config_auth_context(ob_context.ob_config_auth_context());
             let (token, _) = create_identified_token(&state, session, scope).await?;
             return Err(ErrorWithCode::ExistingVault(Some(token)).into());
         }
@@ -131,11 +127,9 @@ pub async fn post(
         .await?;
 
     // Create an identified auth token for the new vault
-    let context = NewUserSessionContext {
-        su_id: Some(sv.id.clone()),
-        ..ob_context.ob_config_auth_context()
-    };
-    let session = UserSessionBuilder::new(uv.id, vec![scope.into()]).with_context(context);
+    let session = UserSessionBuilder::new(uv.id, vec![scope.into()])
+        .replace_su_id(Some(sv.id.clone()))
+        .replace_ob_config_auth_context(ob_context.ob_config_auth_context());
     let (token, session) = create_identified_token(&state, session, scope).await?;
 
     // Initiate the challenge

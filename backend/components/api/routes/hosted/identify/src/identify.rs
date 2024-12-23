@@ -3,7 +3,6 @@ use crate::IdentifyChallengeContext;
 use crate::IdentifyLookupId;
 use crate::UserAuthMethodsContext;
 use api_core::auth::ob_config::ObConfigAuth;
-use api_core::auth::session::user::NewUserSessionContext;
 use api_core::auth::session::user::TokenCreationPurpose;
 use api_core::auth::session::user::UserSessionBuilder;
 use api_core::auth::user::UserAuthContext;
@@ -120,14 +119,15 @@ pub async fn post(
         vw,
     } = ctx;
 
-    let ob_config_auth_context = ob_context.map(|c| c.ob_config_auth_context()).unwrap_or_default();
     let (token, token_scopes) = if let Some(user_auth) = user_auth {
         // If the user was identified by an auth token, mutate the existing auth token with any metadata
         // from the onboarding session token
         let scopes = user_auth.scopes.clone();
-        let session = UserSessionBuilder::from_existing(&user_auth, scope.into())?
-            .with_context(ob_config_auth_context)
-            .finish()?;
+        let mut session = UserSessionBuilder::from_existing(&user_auth, scope.into())?;
+        if let Some(ob_context) = ob_context.as_ref() {
+            session = session.replace_ob_config_auth_context(ob_context.ob_config_auth_context());
+        }
+        let session = session.finish()?;
         let session_key = state.session_sealing_key.clone();
         let (auth_token, _) = state
             .db_query(move |conn| user_auth.create_derived(conn, &session_key, session, None))
@@ -135,11 +135,11 @@ pub async fn post(
         (auth_token, scopes)
     } else {
         // Otherwise, make a new identified token
-        let context = NewUserSessionContext {
-            su_id: sv.map(|sv| sv.id),
-            ..ob_config_auth_context
-        };
-        let session = UserSessionBuilder::new(vw.vault.id.clone(), vec![scope.into()]).with_context(context);
+        let mut session = UserSessionBuilder::new(vw.vault.id.clone(), vec![scope.into()])
+            .replace_su_id(sv.map(|sv| sv.id));
+        if let Some(ob_context) = ob_context.as_ref() {
+            session = session.replace_ob_config_auth_context(ob_context.ob_config_auth_context());
+        }
         let (token, _) = create_identified_token(&state, session, scope).await?;
         (token, vec![])
     };
@@ -211,7 +211,7 @@ pub(super) async fn create_identified_token(
     let token = state
         .db_query(move |conn| {
             // TODO: put this in util for .with_ob_config_auth_context()
-            if session.context.bo_id.is_some() {
+            if session.bo_id.is_some() {
                 // TODO we should migrate the BO tokens to use un-authed, identified tokens.
                 // Then the purpose here would come from the SecondayBo token. But for now, we'll just
                 // manually add this purpose to keep track of when the auth session is for a secondary BO.
