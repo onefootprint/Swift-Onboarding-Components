@@ -43,7 +43,6 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
             'business.zip': biz.zipCode,
             'business.country': biz.country,
             'business.formation_date': biz.formationDate,
-            'document.custom.trust_document': '1',
 
             'id.first_name': id.firstName,
             'id.last_name': id.lastName,

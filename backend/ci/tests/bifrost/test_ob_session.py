@@ -16,7 +16,7 @@ def test_onboarding_token(sandbox_tenant):
             key=sandbox_tenant.default_ob_config.key.value,
             bootstrap_data={
                 **ID_DATA,
-                "business.owners": [
+                "business.secondary_owners": [
                     {"first_name": "Piip", "last_name": "Penguin"},
                     {"first_name": "Percy", "last_name": "Penguin"},
                 ],

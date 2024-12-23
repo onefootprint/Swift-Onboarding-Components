@@ -1211,7 +1211,7 @@ export const getBootstrapDataV1 = (
       'business.name': 'Mae Hermann MD',
       'business.phone_number': '+16267049528',
       'business.primary_owner_stake': -85085615,
-      'business.secondary_beneficial_owners': [],
+      'business.secondary_owners': [],
       'business.state': 'North Dakota',
       'business.tin': 'minim sed aliquip do est',
       'business.website': 'https://acidic-account.biz',

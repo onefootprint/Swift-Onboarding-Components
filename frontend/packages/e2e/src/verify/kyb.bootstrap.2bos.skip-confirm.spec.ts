@@ -26,7 +26,7 @@ const userData = encodeURIComponent(
     'business.primary_owner_stake': 100,
 
     'business.name': BUSINESS.name,
-    'business.as': BUSINESS.as,
+    'business.dba': BUSINESS.dba,
     'business.tin': BUSINESS.tin,
     'business.phone_number': `+1${BUSINESS.bo2Phone}`,
     'business.address_line1': PERSONAL.addressLine1,

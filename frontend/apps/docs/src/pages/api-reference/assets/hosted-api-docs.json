@@ -3022,7 +3022,7 @@
                         "type": "integer",
                         "format": "int64"
                     },
-                    "business.secondary_beneficial_owners": {
+                    "business.secondary_owners": {
                         "type": "array",
                         "items": {
                             "type": "object"

@@ -78,7 +78,7 @@ export type BootstrapDataV1 = {
   'business.name'?: string;
   'business.phone_number'?: string;
   'business.primary_owner_stake'?: number;
-  'business.secondary_beneficial_owners'?: Array<{
+  'business.secondary_owners'?: Array<{
     [key: string]: unknown;
   }>;
   'business.state'?: string;

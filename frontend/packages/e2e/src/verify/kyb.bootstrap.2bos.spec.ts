@@ -69,7 +69,7 @@ test('Completes KYB flow with two beneficial owners having equal stakes #ci', as
 
   await fillBasicDataKYB(frame, {
     businessName: BUSINESS.name,
-    businessNameOptional: BUSINESS.as,
+    businessNameOptional: BUSINESS.dba,
     userTIN: BUSINESS.tin,
   })
     .then(() => clickOnContinue(frame))
@@ -83,7 +83,7 @@ test('Completes KYB flow with two beneficial owners having equal stakes #ci', as
     .then(() => page.waitForLoadState());
 
   await expect(frame.getByText(BUSINESS.name).first()).toBeAttached();
-  await expect(frame.getByText(BUSINESS.as).first()).toBeAttached();
+  await expect(frame.getByText(BUSINESS.dba).first()).toBeAttached();
 
   await expect(frame.getByText('0%').first()).toBeAttached();
   await frame.getByTestId('beneficial-owners').getByRole('button', { name: 'Edit' }).click();

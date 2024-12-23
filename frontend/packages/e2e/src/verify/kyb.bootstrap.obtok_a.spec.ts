@@ -33,7 +33,6 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
         body: JSON.stringify({
           key: pbKey,
           bootstrap_data: {
-            'document.custom.trust_document': '1',
             'id.address_line1': id.addressLine1,
             'id.address_line2': id.addressLine2,
             'id.city': id.city,
@@ -90,7 +89,7 @@ test('KYB pbtok_ session with id.xxx #ci', async ({ page, isMobile }) => {
 
   await fillBasicDataKYB(frame, {
     businessName: BUSINESS.name,
-    businessNameOptional: BUSINESS.as,
+    businessNameOptional: BUSINESS.dba,
     userTIN: BUSINESS.tin,
   });
   await clickOnContinue(frame);

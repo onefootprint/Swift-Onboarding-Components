@@ -17,8 +17,8 @@ pub enum BootstrapKey {
 pub enum AdditionalBootstrapKey {
     #[strum(serialize = "business.primary_owner_stake")]
     BusinessPrimaryOwnerStake,
-    #[strum(serialize = "business.secondary_beneficial_owners")]
-    BusinessSecondaryBeneficialOwners,
+    #[strum(serialize = "business.secondary_owners")]
+    BusinessSecondaryOwners,
 }
 
 impl AdditionalBootstrapKey {
@@ -26,7 +26,7 @@ impl AdditionalBootstrapKey {
         match self {
             Self::BusinessPrimaryOwnerStake => i64::raw_schema(),
             // TODO this is incorrect, but we want to migrate the representation anyways
-            Self::BusinessSecondaryBeneficialOwners => Vec::<serde_json::Value>::raw_schema(),
+            Self::BusinessSecondaryOwners => Vec::<serde_json::Value>::raw_schema(),
         }
     }
 }
@@ -125,11 +125,11 @@ mod test {
             .iter()
             .any(|x| x.starts_with("business.beneficial_owners.")));
         assert!(examples.contains(&"business.primary_owner_stake".to_string()));
-        assert!(examples.contains(&"business.secondary_beneficial_owners".to_string()));
+        assert!(examples.contains(&"business.secondary_owners".to_string()));
     }
 
     #[test_case("business.primary_owner_stake")]
-    #[test_case("business.secondary_beneficial_owners")]
+    #[test_case("business.secondary_owners")]
     #[test_case("id.first_name")]
     fn test_serialization(value: &str) {
         let key: BootstrapKey = value.parse().unwrap();

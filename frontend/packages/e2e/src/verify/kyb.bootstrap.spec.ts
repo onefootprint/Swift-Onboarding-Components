@@ -28,7 +28,7 @@ const userData = encodeURIComponent(
     'id.state': PERSONAL.state,
     'id.zip': PERSONAL.zipCode,
     'business.name': BUSINESS.name,
-    'business.dba': BUSINESS.as,
+    'business.dba': BUSINESS.dba,
     'business.tin': BUSINESS.tin,
     'business.corporation_type': BUSINESS.corporationType,
     'business.website': BUSINESS.website,
@@ -95,13 +95,13 @@ test('KYB bootstrap #ci', async ({ page, isMobile }) => {
   await page.waitForLoadState();
 
   await frame.getByLabel('Business name').first().fill(BUSINESS.name);
-  await frame.getByLabel('Doing Business As (optional)').first().fill(BUSINESS.as);
+  await frame.getByLabel('Doing Business As (optional)').first().fill(BUSINESS.dba);
 
   await frame.getByTestId('basic-data').getByRole('button', { name: 'Save' }).click();
   await page.waitForLoadState();
 
   await expect(frame.getByText(BUSINESS.name).first()).toBeAttached();
-  await expect(frame.getByText(BUSINESS.as).first()).toBeAttached();
+  await expect(frame.getByText(BUSINESS.dba).first()).toBeAttached();
   await expect(frame.getByText('•••••••••').first()).toBeAttached();
 
   await frame.getByTestId('identity-section').getByRole('button', { name: 'Edit' }).click();

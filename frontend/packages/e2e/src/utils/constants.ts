@@ -25,7 +25,7 @@ export const BUSINESS = {
 
   addressLine1: '1 Hayes St',
   addressLine2: 'Ap 201',
-  as: 'QDS Technologies',
+  dba: 'QDS Technologies',
   city: 'San Francisco',
   corporationType: 'unknown',
   country: 'US',
