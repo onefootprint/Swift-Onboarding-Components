@@ -13,5 +13,4 @@ export { default as Header } from './header';
 export { default as Notes } from './notes';
 export { default as OtherInsights } from './other-insights';
 export { default as PinnedNotes } from './pinned-notes';
-export { default as RiskSignals } from './risk-signals';
 export { default as Vault } from './vault';

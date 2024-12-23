@@ -2,8 +2,8 @@ import useRiskSignalsFilters from '@/entities/components/details/hooks/use-risk-
 import type { RiskSignal } from '@onefootprint/request-types/dashboard';
 import { Divider } from '@onefootprint/ui';
 import { cva } from 'class-variance-authority';
-import isSentilinkSignal from '../../../../../../../risk-signals/utils/is-sentilink-signal';
-import useRiskSignalSeverityText from '../../../../hooks/use-risk-signal-severity-text';
+import useRiskSignalSeverityText from './hooks/use-risk-signal-severity-text';
+import isSentilinkSignal from './utils/is-sentilink-signal';
 
 type RiskSignalItemProps = {
   riskSignal: RiskSignal;

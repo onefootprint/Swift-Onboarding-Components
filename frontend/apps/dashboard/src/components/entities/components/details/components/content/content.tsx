@@ -19,7 +19,6 @@ import {
   HistoricalBar,
   OtherInsights,
   PinnedNotes,
-  RiskSignals,
   Vault,
 } from './components';
 import BusinessInsights from './components/business-insights';
@@ -72,9 +71,6 @@ const Content = () => {
             <BusinessInsights />
           </Box>
         )}
-        <Box marginBottom={9}>
-          <RiskSignals />
-        </Box>
         {!shownSeqno && kind === EntityKind.person && (
           <Box marginBottom={9}>
             <DuplicateData />

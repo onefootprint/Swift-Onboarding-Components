@@ -11,7 +11,6 @@ import useEntityLiveness from './use-entity-auth-events';
 import useEntityId from './use-entity-id';
 import useEntityOtherInsights from './use-entity-other-insights';
 import useEntityOwnedBusinesses from './use-entity-owned-businesses';
-import useEntityRiskSignals from './use-entity-risk-signals';
 import useEntitySeqno from './use-entity-seqno';
 import useEntityTags from './use-entity-tags';
 import useEntityTimeline from './use-entity-timeline';
@@ -25,7 +24,6 @@ const useEntityInitialData = () => {
   const entityTimelineQuery = useEntityTimeline(id);
   // TODO: fix the types
   const entityVaultQuery = useEntityVault(id, entityQuery.data as Entity);
-  const entityRiskSignalsQuery = useEntityRiskSignals(id, seqno);
   const entityLivenessQuery = useEntityLiveness(id);
   const entityAnnotations = useEntityAnnotations(id);
   const entityOtherInsights = useEntityOtherInsights(id);
@@ -47,7 +45,6 @@ const useEntityInitialData = () => {
       (entityVaultQuery.isPending && !entityQuery.isError) ||
       entityQuery.isPending ||
       entityTimelineQuery.isPending ||
-      entityRiskSignalsQuery.isPending ||
       entityLivenessQuery.isPending ||
       entityAnnotations.isPending ||
       entityOtherInsights.isPending ||
