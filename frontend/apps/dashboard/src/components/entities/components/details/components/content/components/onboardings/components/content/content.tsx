@@ -26,9 +26,9 @@ const Content = ({ onboardings }: ContentProps) => {
   };
 
   return (
-    <fieldset className="flex flex-col justify-between w-full h-fit border border-solid rounded border-tertiary">
+    <fieldset className="flex flex-col justify-between w-full border border-solid rounded h-fit border-tertiary">
       <header className="flex justify-between px-5 py-2 border-b border-solid rounded-t bg-secondary border-tertiary max-h-40px">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <p className="text-primary text-label-3">
             {playbookName} {timestamp && t('timestamp', { timestamp: getTimestampText(timestamp) })}
           </p>

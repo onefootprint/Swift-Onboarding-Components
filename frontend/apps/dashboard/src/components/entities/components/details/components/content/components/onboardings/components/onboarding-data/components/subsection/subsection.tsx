@@ -7,17 +7,13 @@ type SubsectionProps = {
   hasDivider?: boolean;
   rightComponent?: React.ReactNode;
   children: React.ReactNode;
+  className?: string;
 };
 
-const Subsection = ({ title, hasDivider, rightComponent, children }: SubsectionProps) => (
-  <div
-    className={cx('flex flex-col', {
-      'gap-2': hasDivider,
-      'gap-4': !hasDivider,
-    })}
-  >
-    <div className="flex justify-between items-center">
-      <span className="text-heading-5">{title}</span>
+const Subsection = ({ title, hasDivider, rightComponent, children, className }: SubsectionProps) => (
+  <div className={cx('flex flex-col min-h-full gap-2', className)}>
+    <div className="flex items-center justify-between">
+      <span className="text-label-2">{title}</span>
       {rightComponent}
     </div>
     {hasDivider && <Divider variant="secondary" className="mb-1" />}

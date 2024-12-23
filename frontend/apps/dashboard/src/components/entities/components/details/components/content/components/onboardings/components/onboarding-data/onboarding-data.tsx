@@ -48,12 +48,12 @@ const OnboardingData = ({ onboarding }: OnboardingDataProps) => {
   }, [riskSignals, onboarding.ruleSetResults]);
 
   if (Object.keys(subsections).length === 0) {
-    return <p className="text-body-3 p-5">{t('empty')}</p>;
+    return <p className="p-5 text-body-3">{t('empty')}</p>;
   }
 
   return (
     <div className="min-h-[500px] max-h-[500px] flex flex-1 overflow-hidden">
-      <div className="flex flex-col gap-1 w-[200px] border-r border-solid border-tertiary py-5 px-3 flex-shrink-0">
+      <nav className="flex flex-col w-[200px] border-r border-solid border-tertiary py-4 px-2 flex-shrink-0">
         {Object.entries(subsections).map(([name, { title, iconComponent }]) => (
           <SidebarItem
             key={name}
@@ -63,8 +63,8 @@ const OnboardingData = ({ onboarding }: OnboardingDataProps) => {
             title={title}
           />
         ))}
-      </div>
-      <div className="p-6 flex-1 overflow-y-auto">
+      </nav>
+      <div className="flex-1 px-6 py-5 overflow-y-auto">
         {selectedSubsection === 'risk-signals' && (
           <OnboardingRiskSignals riskSignals={groupRiskSignals(riskSignals ?? [])} />
         )}

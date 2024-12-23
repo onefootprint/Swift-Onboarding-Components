@@ -70,43 +70,41 @@ const MapComponent = ({ markers, selectedAddress, onSelect }: MapProps) => {
   }, [selectedAddress?.latitude, selectedAddress?.longitude, markers]);
 
   return (
-    <div className="flex w-full h-full">
-      <MapboxMap
-        ref={mapRef}
-        mapboxAccessToken={MAP_BOX_TOKEN}
-        mapStyle={isDark ? 'mapbox://styles/mapbox/dark-v11' : 'mapbox://styles/mapbox/streets-v12'}
-        style={{ width: '100%', height: '100%' }}
-        initialViewState={
-          selectedAddress?.latitude && selectedAddress?.longitude
-            ? {
-                latitude: selectedAddress.latitude,
-                longitude: selectedAddress.longitude,
-                zoom: DEFAULT_ZOOM,
-              }
-            : {
-                latitude: FALLBACK_LATITUDE,
-                longitude: FALLBACK_LONGITUDE,
-                zoom: MIN_ZOOM,
-              }
-        }
-        maxZoom={MAX_ZOOM}
-        minZoom={MIN_ZOOM}
-      >
-        {markers.map(marker => (
-          <Marker
-            key={marker.props.id}
-            longitude={marker.props.longitude}
-            latitude={marker.props.latitude}
-            anchor="bottom"
-            className={cx({ 'z-20': marker.props.isSelected, 'z-0': !marker.props.isSelected })}
-          >
-            {React.cloneElement(marker, {
-              onClick: () => handleMarkerClick(marker.props),
-            })}
-          </Marker>
-        ))}
-      </MapboxMap>
-    </div>
+    <MapboxMap
+      ref={mapRef}
+      mapboxAccessToken={MAP_BOX_TOKEN}
+      mapStyle={isDark ? 'mapbox://styles/mapbox/dark-v11' : 'mapbox://styles/mapbox/streets-v12'}
+      style={{ width: '100%', height: '100%' }}
+      initialViewState={
+        selectedAddress?.latitude && selectedAddress?.longitude
+          ? {
+              latitude: selectedAddress.latitude,
+              longitude: selectedAddress.longitude,
+              zoom: DEFAULT_ZOOM,
+            }
+          : {
+              latitude: FALLBACK_LATITUDE,
+              longitude: FALLBACK_LONGITUDE,
+              zoom: MIN_ZOOM,
+            }
+      }
+      maxZoom={MAX_ZOOM}
+      minZoom={MIN_ZOOM}
+    >
+      {markers.map(marker => (
+        <Marker
+          key={marker.props.id}
+          longitude={marker.props.longitude}
+          latitude={marker.props.latitude}
+          anchor="bottom"
+          className={cx({ 'z-20': marker.props.isSelected, 'z-0': !marker.props.isSelected })}
+        >
+          {React.cloneElement(marker, {
+            onClick: () => handleMarkerClick(marker.props),
+          })}
+        </Marker>
+      ))}
+    </MapboxMap>
   );
 };
 

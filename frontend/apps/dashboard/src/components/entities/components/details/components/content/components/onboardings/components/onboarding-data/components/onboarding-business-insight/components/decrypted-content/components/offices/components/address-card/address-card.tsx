@@ -20,7 +20,6 @@ type AddressCardProps = {
 
 const AddressCard = ({ address, isSelected, onSelect }: AddressCardProps) => {
   const { t } = useTranslation('entity-details', { keyPrefix: 'onboardings' });
-  const [satelliteImageError, setSatelliteImageError] = useState(false);
   const {
     id,
     addressLine1,
@@ -36,7 +35,9 @@ const AddressCard = ({ address, isSelected, onSelect }: AddressCardProps) => {
     verified,
   } = address;
   const showNotes = !propertyType || !isUndefined(deliverable);
+  const isCoordinatesAvailable = !!(latitude && longitude);
   const satelliteImageSrc = `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&zoom=${BUILDING_ZOOM}&size=${IMAGE_WIDTH}x${IMAGE_HEIGHT}&maptype=satellite&key=${GOOGLE_MAPS_API_KEY}`;
+  const [isSatelliteImageAvailable, setIsSatelliteImageAvailable] = useState(isCoordinatesAvailable);
 
   const handleSelect = () => {
     const card = document.getElementById(`offices-card-${id}`);
@@ -48,10 +49,6 @@ const AddressCard = ({ address, isSelected, onSelect }: AddressCardProps) => {
       });
     }
     onSelect(address);
-  };
-
-  const handleSatelliteImageError = () => {
-    setSatelliteImageError(true);
   };
 
   const formatAddressLine = (addressFields: (string | undefined)[]) =>
@@ -67,46 +64,55 @@ const AddressCard = ({ address, isSelected, onSelect }: AddressCardProps) => {
     <button
       id={`offices-card-${id}`}
       className={cx(
-        'w-fit relative flex flex-col border border-solid border-tertiary rounded bg-primary cursor-pointer',
+        'w-full relative flex flex-col border border-solid rounded bg-primary cursor-pointer transition-colors duration-200 ease-in-out',
         {
-          'border-secondary after:absolute after:inset-0 after:bg-accent after:opacity-10 after:rounded': isSelected,
-          'hover:bg-secondary': !isSelected,
+          'border-secondary after:content-[""] after:absolute after:inset-0 after:bg-accent z-0 after:opacity-15':
+            isSelected,
+          'border-tertiary hover:border-primary hover:bg-secondary': !isSelected,
         },
       )}
       onClick={handleSelect}
       type="button"
     >
-      <div className="w-full overflow-hidden rounded-t">
-        {latitude && longitude && !satelliteImageError ? (
-          <img aria-label="satellite map" src={satelliteImageSrc} onError={handleSatelliteImageError} />
-        ) : (
+      <div className="w-full h-[150px] overflow-hidden rounded-t relative">
+        {!isSatelliteImageAvailable ? (
           <div
-            style={{ height: `${IMAGE_HEIGHT}px` }}
-            className={
-              'flex flex-col items-center justify-center gap-1 bg-inherit border-b border-solid border-tertiary'
-            }
+            className={cx(
+              'flex flex-col items-center justify-center w-full h-full gap-1 border-b border-solid bg-inherit pt-9',
+              {
+                'border-secondary': isSelected,
+                'border-tertiary': !isSelected,
+              },
+            )}
           >
             <IcoBroadcast24 color="quaternary" />
-            <p className="text-label-2 text-quaternary">{t('offices.no-satellite-image')}</p>
+            <p className="text-label-3 text-quaternary">{t('offices.no-satellite-image')}</p>
           </div>
+        ) : (
+          <img
+            alt="Satellite view"
+            src={satelliteImageSrc}
+            className="object-cover w-full h-full"
+            onError={() => setIsSatelliteImageAvailable(false)}
+          />
         )}
-        <div className="absolute top-0 left-0 flex gap-1 items-center p-3 z-sticky">
-          {!isUndefined(submitted) && (
-            <Badge variant="neutral">
-              {submitted ? t('business-shared.tags.submitted') : t('business-shared.tags.not-submitted')}
-            </Badge>
-          )}
-          {!isUndefined(verified) && (
-            <Badge variant={verified ? 'success' : 'error'}>
-              {verified ? t('business-shared.tags.verified') : t('business-shared.tags.not-verified')}
-            </Badge>
-          )}
-        </div>
       </div>
-      <div className="w-full flex flex-col gap-5 p-4 text-left">
-        <div className="flex flex-col gap-2">
-          <p className="text-label-1">{formatAddressLine([addressLine1, addressLine2])}</p>
-          <p className="text-body-2">{formatAddressLine([city, state, postalCode])}</p>
+      <div className="absolute top-0 left-0 flex items-center gap-1 p-3 z-sticky">
+        {!isUndefined(submitted) && (
+          <Badge variant="neutral">
+            {submitted ? t('business-shared.tags.submitted') : t('business-shared.tags.not-submitted')}
+          </Badge>
+        )}
+        {!isUndefined(verified) && (
+          <Badge variant={verified ? 'success' : 'error'}>
+            {verified ? t('business-shared.tags.verified') : t('business-shared.tags.not-verified')}
+          </Badge>
+        )}
+      </div>
+      <div className="flex flex-col w-full gap-4 p-4 text-left">
+        <div className="flex flex-col gap-1">
+          <p className="text-label-2">{formatAddressLine([addressLine1, addressLine2])}</p>
+          <p className="text-body-3">{formatAddressLine([city, state, postalCode])}</p>
         </div>
         {showNotes && (
           <div className="flex flex-col gap-2">
