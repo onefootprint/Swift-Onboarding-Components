@@ -1,10 +1,9 @@
 import { ChallengeKind } from '@onefootprint/types';
 
 import { isPhone } from 'src/utils/type-guards';
-import type { DeviceInfo } from '../../../../../hooks';
 import type { IdentifyContext, IdentifyMachineContext } from './types';
 import { IdentifyVariant } from './types';
-import { getAvailableChallengeKinds, isRequiredAuthMethodsPending, shouldShowChallengeSelector } from './utils';
+import { isRequiredAuthMethodsPending, shouldShowChallengeSelector } from './utils';
 
 type User = IdentifyContext['user'];
 
@@ -131,30 +130,8 @@ describe('shouldShowChallengeSelector', () => {
   ];
 
   it.each(contexts)('case %#', ({ context, user, x }) => {
-    expect(
-      shouldShowChallengeSelector(context as IdentifyMachineContext, user as unknown as IdentifyContext['user']),
-    ).toEqual(x);
-  });
-});
-
-describe('getAvailableChallengeKinds', () => {
-  it('should return an empty array if user is undefined', () => {
-    const device = { hasSupportForWebauthn: true } as DeviceInfo;
-    const user = undefined;
-    expect(getAvailableChallengeKinds(device, user)).toEqual([]);
-  });
-
-  it('should return the availableChallengeKinds if device supports biometric challenge', () => {
-    const device = { hasSupportForWebauthn: true } as DeviceInfo;
-    const user = { availableChallengeKinds: ['biometric', 'sms'] } as User;
-    expect(getAvailableChallengeKinds(device, user)).toEqual(['biometric', 'sms']);
-  });
-
-  it('should filter out biometric challenge if device does not support it', () => {
-    const device = { hasSupportForWebauthn: false } as DeviceInfo;
-    const user = { availableChallengeKinds: ['biometric', 'sms'] } as User;
-    expect(getAvailableChallengeKinds(device, user)).toEqual(['sms']);
-    expect(user).toEqual({ availableChallengeKinds: ['biometric', 'sms'] });
+    const ctx = { ...context, identify: { user } } as IdentifyMachineContext;
+    expect(shouldShowChallengeSelector(ctx)).toEqual(x);
   });
 });
 

@@ -32,25 +32,28 @@ export const getSubTitle = (t: T, variant: IdentifyVariant): string =>
     ? t('challenge-select-or-biometric.log-in-options')
     : t('challenge-select-or-biometric.log-in-to-modify-details');
 
-export const getMethods = (identify: IdentifyContext, device: DeviceInfo, titleMap: TitleMap) => {
+export const getAvailableMethods = (user: IdentifyContext['user'], device: DeviceInfo) => {
   const { type, hasSupportForWebauthn } = device;
-  const { user } = identify;
-  const kinds = user?.availableChallengeKinds || [];
+  const kinds = [...(user?.availableChallengeKinds || [])];
 
-  return kinds
-    .sort(sortChallenges)
-    .filter(kind => {
-      if (isBiometric(kind)) {
-        return type === 'mobile' ? hasSupportForWebauthn : hasSupportForWebauthn && user?.hasSyncablePasskey;
-      }
+  return kinds.sort(sortChallenges).filter(kind => {
+    if (isBiometric(kind)) {
+      return type === 'mobile' ? hasSupportForWebauthn : hasSupportForWebauthn && user?.hasSyncablePasskey;
+    }
+    if (kind === ChallengeKind.smsLink) {
+      return false;
+    }
 
-      return true;
-    })
-    .map(kind => ({
-      IconComponent: challengeIcons[kind],
-      title: titleMap[kind],
-      value: kind,
-    }));
+    return true;
+  });
+};
+
+export const getMethods = (identify: IdentifyContext, device: DeviceInfo, titleMap: TitleMap) => {
+  return getAvailableMethods(identify.user, device).map(kind => ({
+    IconComponent: challengeIcons[kind],
+    title: titleMap[kind],
+    value: kind,
+  }));
 };
 
 function getChallengeTitleEmail(

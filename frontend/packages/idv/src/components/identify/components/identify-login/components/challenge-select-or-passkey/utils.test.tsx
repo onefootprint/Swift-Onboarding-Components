@@ -1,7 +1,6 @@
-import { ChallengeKind } from '@onefootprint/types';
+import { ChallengeKind, IdDI } from '@onefootprint/types';
 
 import type { IdentifyContext } from '../../state/types';
-import { SuccessfulIdentifier } from '../../state/types';
 import { getChallengeTitleByKind, getMethods } from './utils';
 
 describe('getChallengeTitleByKind', () => {
@@ -13,8 +12,7 @@ describe('getChallengeTitleByKind', () => {
   it.each([
     {
       identify: {
-        user: {},
-        successfulIdentifiers: [SuccessfulIdentifier.email],
+        user: { matchingFps: [IdDI.email] },
       },
       email: 'a@b.com',
       phoneNumber: undefined,
@@ -26,8 +24,7 @@ describe('getChallengeTitleByKind', () => {
     },
     {
       identify: {
-        user: {},
-        successfulIdentifiers: [SuccessfulIdentifier.phone],
+        user: { matchingFps: [IdDI.phoneNumber] },
       },
       email: undefined,
       phoneNumber: '+123',
@@ -39,8 +36,7 @@ describe('getChallengeTitleByKind', () => {
     },
     {
       identify: {
-        user: { scrubbedEmail: 'b***@g**.com' },
-        successfulIdentifiers: [SuccessfulIdentifier.phone],
+        user: { matchingFps: [IdDI.phoneNumber], scrubbedEmail: 'b***@g**.com' },
       },
       email: 'differentemail@gmail.com',
       phoneNumber: '+123',
@@ -52,8 +48,7 @@ describe('getChallengeTitleByKind', () => {
     },
     {
       identify: {
-        user: { scrubbedPhone: '+4***' },
-        successfulIdentifiers: [SuccessfulIdentifier.email, SuccessfulIdentifier.phone],
+        user: { matchingFps: [IdDI.email, IdDI.phoneNumber], scrubbedPhone: '+4***' },
       },
       email: 'a@b.com',
       phoneNumber: '+123',
@@ -95,12 +90,7 @@ describe('getMethods', () => {
 
   it.each([
     {
-      identify: { user: {}, successfulIdentifier: { email: 'a@b.com' } },
-      device: {},
-      x: [],
-    },
-    {
-      identify: { user: {}, successfulIdentifier: { phoneNumber: '+123' } },
+      identify: { user: {} },
       device: {},
       x: [],
     },
@@ -147,7 +137,7 @@ describe('getMethods', () => {
     {
       identify: {
         user: {
-          availableChallengeKinds: ['biometric', 'email', 'sms'],
+          availableChallengeKinds: ['biometric', 'email', 'sms', 'sms_link'],
           hasSyncablePasskey: true,
         },
       },

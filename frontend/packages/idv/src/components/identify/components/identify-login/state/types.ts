@@ -12,12 +12,6 @@ import type { EventObject, StateValue, TransitionConfigOrTarget } from 'xstate';
 import type { DeviceInfo } from '../../../../../hooks';
 import type { DIMetadata } from '../../../../../types';
 
-export enum SuccessfulIdentifier {
-  authToken = 'authToken',
-  email = 'email',
-  phone = 'phone',
-}
-
 export enum IdentifyVariant {
   auth = 'auth',
   updateLoginMethods = 'updateLoginMethods',
@@ -31,14 +25,13 @@ export type LogoConfig = { orgName: string; logoUrl?: string };
 export type MachineChallengeContext = { authToken?: string; challengeData?: ChallengeData };
 
 export type IdentifyMachineArgs = {
-  initialAuthToken?: string;
+  identify: IdentifyContext;
   isComponentsSdk?: boolean;
   bootstrapData?: IdentifyBootstrapData;
   config?: PublicOnboardingConfig;
   isLive: boolean;
   device: DeviceInfo;
   obConfigAuth?: ObConfigAuth;
-  sandboxId?: string;
   overallOutcome?: OverallOutcome;
   logoConfig?: LogoConfig; // When provided, will render the logo
   variant: IdentifyVariant;
@@ -62,11 +55,6 @@ export type IdentifyMachineContext = {
    * The email entered into the identify flow */
   email?: DIMetadata<string>;
   identify: IdentifyContext;
-  /** initialAuthToken -
-   * Optionally, the identified token used to start the flow
-   * The authenticated token we yield at the end of the flow
-   */
-  initialAuthToken?: string;
   /** Use isLive - config isn't always provided */
   isLive: boolean;
   logoConfig?: LogoConfig;
@@ -76,9 +64,8 @@ export type IdentifyMachineContext = {
 };
 
 export type IdentifyContext = {
-  user?: IdentifiedUser;
-  successfulIdentifiers?: SuccessfulIdentifier[];
-  identifyToken?: string;
+  user: IdentifiedUser;
+  identifyToken: string;
 };
 
 export type TransitionsFor<EVENT extends EventObject> = TransitionConfigOrTarget<
@@ -86,13 +73,6 @@ export type TransitionsFor<EVENT extends EventObject> = TransitionConfigOrTarget
   EVENT,
   IdentifyMachineEvents
 >;
-
-export type IdentifiedEventPayload = {
-  user?: IdentifiedUser;
-  successfulIdentifiers?: SuccessfulIdentifier[];
-  phoneNumber?: string;
-  email?: string;
-};
 
 export type NavigatedToPrevPage = {
   type: 'navigatedToPrevPage';
@@ -104,24 +84,12 @@ export type ChallengeSucceededEvent = {
   payload: { kind: AuthMethodKind; authToken: string };
 };
 
-export type IdentifiedEvent = {
-  // Very annoying... unit tests are running init bootstrap data twice
-  type: 'identifyResult' | 'bootstrapReceived';
-  payload: IdentifiedEventPayload;
-};
-
 export type IdentifyMachineEvents =
   | ChallengeSucceededEvent
-  | IdentifiedEvent
   | NavigatedToPrevPage
-  | { type: 'authTokenInvalid' }
-  | { type: 'bootstrapDataInvalid' }
   | { type: 'challengeReceived'; payload: ChallengeData }
   | { type: 'emailAdded'; payload: string }
   | { type: 'goToChallenge'; payload: ChallengeKind }
-  | { type: 'identifiedWithSufficientScopes'; payload: { authToken: string } }
   | { type: 'kbaSucceeded'; payload: { identifyToken: string } }
-  | { type: 'loginWithDifferentAccount' }
   | { type: 'phoneAdded'; payload: string }
-  | { type: 'sandboxIdChanged'; payload: { sandboxId: string } }
   | { type: 'tryAnotherWay'; payload: ChallengeKind };

@@ -13,15 +13,11 @@ export interface Typegen0 {
     services: never;
   };
   eventsCausingActions: {
-    assignAuthToken: 'identifiedWithSufficientScopes';
     assignChallengeData: 'challengeReceived';
+    assignAuthToken: 'challengeSucceeded';
     assignEmail: 'emailAdded';
-    assignIdentifyResult: 'identifyResult';
     assignIdentifyToken: 'kbaSucceeded';
     assignPhoneNumber: 'phoneAdded';
-    resetIdentifyState: 'navigatedToPrevPage';
-    resetPhone: 'navigatedToPrevPage';
-    resetToLoginWithNewAccount: 'loginWithDifferentAccount';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};
@@ -32,12 +28,8 @@ export interface Typegen0 {
     | 'authTokenInvalid'
     | 'challengeSelectOrPasskey'
     | 'emailChallenge'
-    | 'emailIdentification'
     | 'init'
-    | 'initAuthToken'
-    | 'initBootstrap'
     | 'loginChallengeNotPossible'
-    | 'phoneIdentification'
     | 'phoneKbaChallenge'
     | 'smsChallenge'
     | 'success';

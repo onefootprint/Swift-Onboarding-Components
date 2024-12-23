@@ -1,7 +1,15 @@
 import { mockRequest, screen, userEvent, waitFor } from '@onefootprint/test-utils';
-import { AuthMethodKind, ChallengeKind, IdDI, OnboardingConfigStatus } from '@onefootprint/types';
+import {
+  AuthMethodKind,
+  ChallengeKind,
+  type DataIdentifier,
+  IdDI,
+  OnboardingConfigStatus,
+  type UserTokenScope,
+} from '@onefootprint/types';
 
 import * as getBiometricChallengeResponse from '../../../../utils/get-biometric-challenge-response';
+import type { IdentifyContext } from './state';
 
 // This needs to be mocked here and in the test itself as it is a esModule
 jest.mock('../../../../utils/get-biometric-challenge-response', () => ({
@@ -42,13 +50,6 @@ export const liveOnboardingConfigFixture = getOnboardingConfig(true);
 export const sandboxOnboardingConfigFixture = getOnboardingConfig(false);
 export const noPhoneOnboardingConfigFixture = getOnboardingConfig(true, true);
 
-export const withOnboardingConfig = (data = sandboxOnboardingConfigFixture) =>
-  mockRequest({
-    method: 'get',
-    path: '/hosted/onboarding/config',
-    response: data,
-  });
-
 export const withIdentifyError = () =>
   mockRequest({
     method: 'post',
@@ -57,6 +58,35 @@ export const withIdentifyError = () =>
     response: {},
   });
 
+export const user = (context?: {
+  challengeKinds?: string[];
+  isUnverified?: boolean;
+  tokenScopes?: string[];
+  matchingFps?: string[];
+}): IdentifyContext['user'] => {
+  const { challengeKinds, isUnverified, tokenScopes, matchingFps } = context ?? {};
+  const availableChallengeKinds = (challengeKinds ?? ['sms', 'biometric']) as ChallengeKind[];
+  const authMethodKind: Record<string, string> = {
+    [ChallengeKind.biometric]: AuthMethodKind.passkey,
+    [ChallengeKind.sms]: AuthMethodKind.phone,
+    [ChallengeKind.email]: AuthMethodKind.email,
+  };
+  const authMethods = availableChallengeKinds.map(k => ({
+    kind: authMethodKind[k] as AuthMethodKind,
+    isVerified: true,
+  }));
+  return {
+    token: 'utok_xxx',
+    isUnverified: isUnverified ?? false,
+    availableChallengeKinds,
+    authMethods,
+    hasSyncablePasskey: true,
+    scrubbedPhone: '+1 (***) ***-**99',
+    tokenScopes: (tokenScopes ?? []) as UserTokenScope[],
+    matchingFps: (matchingFps ?? [IdDI.phoneNumber]) as DataIdentifier[],
+  };
+};
+
 export const withIdentify = (context?: {
   challengeKinds?: string[];
   isUnverified?: boolean;
@@ -64,33 +94,11 @@ export const withIdentify = (context?: {
   matchingFps?: string[];
 }) => {
   const userFound = !!context;
-  const { challengeKinds, isUnverified, tokenScopes, matchingFps } = context ?? {};
-  const availableChallengeKinds = challengeKinds ?? ['sms', 'biometric'];
-  const authMethodKind: Record<string, string> = {
-    [ChallengeKind.biometric]: AuthMethodKind.passkey,
-    [ChallengeKind.sms]: AuthMethodKind.phone,
-    [ChallengeKind.email]: AuthMethodKind.email,
-  };
-  const authMethods = availableChallengeKinds.map(k => ({
-    kind: authMethodKind[k],
-    isVerified: true,
-  }));
   return mockRequest({
     method: 'post',
     path: '/hosted/identify',
     response: {
-      user: userFound
-        ? {
-            token: 'utok_xxx',
-            isUnverified: isUnverified ?? false,
-            availableChallengeKinds,
-            authMethods,
-            hasSyncablePasskey: true,
-            scrubbedPhone: '+1 (***) ***-**99',
-            tokenScopes: tokenScopes ?? [],
-            matchingFps: matchingFps ?? [IdDI.phoneNumber],
-          }
-        : undefined,
+      user: userFound ? user(context) : undefined,
     },
   });
 };
@@ -106,21 +114,6 @@ export const withLoginChallenge = (challengeKind: string) =>
         biometricChallengeJson: {},
         challengeToken: 'token',
         challengeKind,
-      },
-    },
-  });
-
-export const withSignupChallenge = (challengeKind?: string, onRequest?: (args: unknown) => void) =>
-  mockRequest({
-    method: 'post',
-    path: '/hosted/identify/signup_challenge',
-    onRequest,
-    response: {
-      challengeData: {
-        token: 'utok_xxx',
-        scrubbedPhoneNumber: '+1 (***) ***-**99',
-        challengeToken: 'token',
-        challengeKind: challengeKind ?? 'sms',
       },
     },
   });
@@ -158,17 +151,6 @@ export const withUserChallengeVerify = () =>
     method: 'post',
     path: '/hosted/user/challenge/verify',
     response: {},
-  });
-
-export const withUserVault = () =>
-  mockRequest({
-    method: 'patch',
-    path: '/hosted/user/vault',
-    response: {
-      data: {
-        data: 'success',
-      },
-    },
   });
 
 export const fillIdentifyEmail = async () => {
@@ -209,16 +191,6 @@ export const fillChallengePin = async () => {
   await waitFor(() => {
     expect(screen.getByText('Success!')).toBeInTheDocument();
   });
-};
-
-export const bootstrapNewUser = async (isNoPhone: boolean) => {
-  await waitFor(() => {
-    expect(screen.getByText(isNoPhone ? 'Verify your email address' : 'Verify your phone number')).toBeInTheDocument();
-  });
-  expect(screen.queryByText('Welcome back! 🎉')).toBeNull();
-  expect(screen.getByTestId('navigation-close-button')).toBeInTheDocument();
-  expect(screen.getByText('Log in with a different account')).toBeInTheDocument();
-  await fillChallengePin();
 };
 
 export const fillChallengePinExistingUser = async () => {

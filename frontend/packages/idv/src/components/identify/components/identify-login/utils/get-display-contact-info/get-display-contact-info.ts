@@ -1,5 +1,5 @@
+import { IdDI } from '@onefootprint/types';
 import type { IdentifyMachineContext } from '../../state';
-import { SuccessfulIdentifier } from '../../state/types';
 
 export const getDisplayPhone = (
   context: Pick<IdentifyMachineContext, 'phoneNumber' | 'identify'>,
@@ -7,7 +7,7 @@ export const getDisplayPhone = (
   const { identify, phoneNumber } = context;
   const value = phoneNumber?.value;
   const isLoginChallenge = !!identify.user;
-  if (isLoginChallenge && !identify.successfulIdentifiers?.includes(SuccessfulIdentifier.phone)) {
+  if (isLoginChallenge && !identify.user.matchingFps?.includes(IdDI.phoneNumber)) {
     // The user was identified via something other the phone that was passed in, so we don't know
     // that the phoneNumber we have is the one on the vault. Instead, we'll use the scrubbed one
     // that belongs to the user
@@ -36,7 +36,7 @@ export const getDisplayEmail = (context: Pick<IdentifyMachineContext, 'identify'
   const value = email?.value;
   const isLoginChallenge = !!identify.user;
 
-  if (isLoginChallenge && !identify.successfulIdentifiers?.includes(SuccessfulIdentifier.email)) {
+  if (isLoginChallenge && !identify.user.matchingFps?.includes(IdDI.email)) {
     // The user was identified via something other the email that was passed in, so we don't know
     // that the email we have is the one on the vault. Instead, we'll use the scrubbed email if
     // available

@@ -1,5 +1,5 @@
+import { IdDI } from '@onefootprint/types';
 import type { IdentifyContext } from '../../state/types';
-import { SuccessfulIdentifier } from '../../state/types';
 import { getDisplayEmail, getDisplayPhone } from './get-display-contact-info';
 
 describe('getDisplayEmail', () => {
@@ -7,8 +7,7 @@ describe('getDisplayEmail', () => {
     // Identified via email, show full email
     {
       identify: {
-        user: { scrubbedEmail: 'a**@b**.com' },
-        successfulIdentifiers: [SuccessfulIdentifier.email],
+        user: { matchingFps: [IdDI.email], scrubbedEmail: 'a**@b**.com' },
       },
       email: 'aaa@bbb.com',
       x: 'aaa@bbb.com',
@@ -16,16 +15,14 @@ describe('getDisplayEmail', () => {
     // Email not used to identify, so must display scrubbed
     {
       identify: {
-        user: { scrubbedEmail: 'a**@b**.com' },
-        successfulIdentifiers: [SuccessfulIdentifier.phone],
+        user: { matchingFps: [IdDI.phoneNumber], scrubbedEmail: 'a**@b**.com' },
       },
       email: 'aaa@bbb.com',
       x: 'a••@b••.com',
     },
     {
       identify: {
-        user: { scrubbedEmail: undefined },
-        successfulIdentifiers: [SuccessfulIdentifier.phone],
+        user: { matchingFps: [IdDI.phoneNumber], scrubbedEmail: undefined },
       },
       email: 'aaa@bbb.com',
       x: undefined,
@@ -52,8 +49,7 @@ describe('getDisplayPhone', () => {
     // Identified via phone, show full phone
     {
       identify: {
-        user: { scrubbedPhone: '+1 (***) ***-**00' },
-        successfulIdentifiers: [SuccessfulIdentifier.phone],
+        user: { matchingFps: [IdDI.phoneNumber], scrubbedPhone: '+1 (***) ***-**00' },
       },
       phoneNumber: '+1 (555) 555-0100',
       x: '+1\u00A0(555)\u00A0555\u20110100',
@@ -61,16 +57,14 @@ describe('getDisplayPhone', () => {
     // Phone not used to identify, so must display scrubbed
     {
       identify: {
-        user: { scrubbedPhone: '+1 (***) ***-**00' },
-        successfulIdentifiers: [SuccessfulIdentifier.email],
+        user: { matchingFps: [IdDI.email], scrubbedPhone: '+1 (***) ***-**00' },
       },
       phoneNumber: '+1 (555) 555-0100',
       x: '+1\u00A0(•••)\u00A0•••\u2011••00',
     },
     {
       identify: {
-        user: { scrubbedPhone: undefined },
-        successfulIdentifiers: [SuccessfulIdentifier.email],
+        user: { matchingFps: [IdDI.email], scrubbedPhone: undefined },
       },
       phoneNumber: '+1 (555) 555-0100',
       x: undefined,

@@ -1,27 +1,18 @@
-import { isEmail as isEmailValid, isPhoneNumber } from '@onefootprint/core';
 import { ChallengeKind as Kind } from '@onefootprint/types';
 import compose from 'lodash/fp/compose';
 import { assign, createMachine } from 'xstate';
 
 import { isEmail, isPhone, isSms } from '../../../../../utils';
-import type { LoginInitialArgs } from '../identify';
+import type { LoginInitialArgs } from '../identify-login';
 import type {
   ChallengeSucceededEvent,
-  IdentifiedEvent,
   IdentifyMachineContext,
   IdentifyMachineEvents,
   NavigatedToPrevPage,
   TransitionsFor,
 } from './types';
-import { SuccessfulIdentifier } from './types';
 import {
   getMachineArgs,
-  hasSingleRequiredAuthMethod,
-  isEmailAndPhoneValid,
-  isEmailOrPhoneValid,
-  isEmailVerificationRequired,
-  isNoPhoneFlow,
-  isPhoneVerificationRequired,
   isRequiredAuthMethodsPending,
   isUserFoundWithSingleChallenge,
   shouldShowChallengeSelector,
@@ -31,46 +22,12 @@ const getKindPayload = (_: unknown, { payload }: { payload: Kind }) => payload;
 const isPayloadEmail = compose(isEmail, getKindPayload);
 const isPayloadSms = compose(isSms, getKindPayload);
 
-const LOGIN_CHALLENGE_TRANSITIONS: TransitionsFor<IdentifiedEvent> = [
-  // If there are multiple available challenge kinds OR there's only biometric OR the IdentifyVariant
-  // always requires the challenge selector screen
-  {
-    cond: (ctx, ev) => shouldShowChallengeSelector(ctx, ev.payload.user),
-    target: 'challengeSelectOrPasskey',
-    actions: ['assignIdentifyResult'],
-  },
-  // Otherwise, go directly to the SMS or phone screen
-  {
-    cond: (ctx, ev) => isUserFoundWithSingleChallenge(Kind.email, ctx.device, ev.payload.user),
-    target: 'emailChallenge',
-    actions: ['assignIdentifyResult'],
-  },
-  {
-    cond: (ctx, ev) => isUserFoundWithSingleChallenge(Kind.sms, ctx.device, ev.payload.user),
-    target: 'smsChallenge',
-    actions: ['assignIdentifyResult'],
-  },
-];
-
 /// The set of transitions used to return from the SMS or Email challenge screens
 const BACK_FROM_CHALLENGE_TRANSITIONS: TransitionsFor<NavigatedToPrevPage> = [
   // If we showed the challenge selector, return to it
   {
-    cond: ctx => shouldShowChallengeSelector(ctx, ctx.identify.user),
+    cond: ctx => shouldShowChallengeSelector(ctx),
     target: 'challengeSelectOrPasskey',
-  },
-  // If we didn't show the challenge selector screen, go back to the respective identification screen
-  // If they were identified by email, go back to the email screen
-  {
-    cond: ctx => !!ctx.identify.successfulIdentifiers?.includes(SuccessfulIdentifier.email),
-    target: 'emailIdentification',
-    actions: ['resetIdentifyState'],
-  },
-  // If the user had only one available challenge kind, go back to the phone input screen
-  {
-    cond: ctx => !!ctx.identify.successfulIdentifiers?.includes(SuccessfulIdentifier.phone),
-    target: 'phoneIdentification',
-    actions: ['resetIdentifyState'],
   },
 ];
 
@@ -108,91 +65,33 @@ const createIdentifyMachine = (args: LoginInitialArgs) =>
       context: getMachineArgs(args),
       on: {
         tryAnotherWay: [{ target: 'phoneKbaChallenge', cond: isPayloadEmail }],
-        loginWithDifferentAccount: { target: 'emailIdentification', actions: ['resetToLoginWithNewAccount'] },
       },
       states: {
         init: {
           always: [
-            { target: 'initAuthToken', cond: ctx => !!ctx.initialAuthToken },
-            { target: 'initBootstrap', cond: isEmailOrPhoneValid },
-            { target: 'emailIdentification', cond: ctx => !isEmailValid(ctx.email?.value || '') },
-            { target: 'phoneIdentification' },
-          ],
-        },
-        initBootstrap: {
-          on: {
-            bootstrapReceived: [
-              ...LOGIN_CHALLENGE_TRANSITIONS,
-              // Otherwise, go to respective signup challenge screens
-              {
-                target: 'emailChallenge',
-                cond: ctx => isNoPhoneFlow(ctx) && isEmailValid(ctx.email?.value || ''),
-              },
-              {
-                target: 'emailChallenge',
-                cond: ctx => isEmailAndPhoneValid(ctx) && hasSingleRequiredAuthMethod('email', ctx),
-              },
-              { target: 'smsChallenge', cond: isEmailAndPhoneValid },
-              { target: 'emailIdentification', cond: ctx => !isEmailValid(ctx.email?.value || '') },
-              { target: 'phoneIdentification' },
-            ],
-          },
-        },
-        initAuthToken: {
-          on: {
-            identifyResult: [...LOGIN_CHALLENGE_TRANSITIONS, { target: 'loginChallengeNotPossible' }],
-            authTokenInvalid: { target: 'authTokenInvalid' },
-            identifiedWithSufficientScopes: [{ target: 'success', actions: ['assignAuthToken'] }],
-          },
-        },
-        emailIdentification: {
-          on: {
-            identifyResult: [
-              // Login to existing vault with any available challenge method. If there is only
-              // one available, go directly to that challenge
-              ...LOGIN_CHALLENGE_TRANSITIONS,
-              // If in a no-phone flow, go to signup challenge with only the email
-              {
-                target: 'emailChallenge',
-                cond: isNoPhoneFlow,
-                actions: ['assignIdentifyResult'],
-              },
-              // Otherwise, proceed to see if we can find the user by phone
-              { target: 'phoneIdentification', actions: ['assignIdentifyResult'] },
-            ],
-          },
-        },
-        phoneIdentification: {
-          on: {
-            navigatedToPrevPage: {
-              target: 'emailIdentification',
-              actions: ['resetPhone', 'resetIdentifyState'],
+            // If there are multiple available challenge kinds OR there's only biometric OR the IdentifyVariant
+            // always requires the challenge selector screen
+            {
+              cond: ctx => shouldShowChallengeSelector(ctx),
+              target: 'challengeSelectOrPasskey',
             },
-            identifyResult: [
-              // Login to existing vault with any available challenge method. If there is only
-              // one available, go directly to that challenge
-              ...LOGIN_CHALLENGE_TRANSITIONS,
-              {
-                target: 'smsChallenge',
-                cond: (ctx, { payload }) =>
-                  isPhoneNumber(payload.phoneNumber || '') && isPhoneVerificationRequired(ctx),
-                actions: ['assignIdentifyResult'],
-              },
-              {
-                target: 'emailChallenge',
-                cond: ctx => isEmailValid(ctx.email?.value || '') && isEmailVerificationRequired(ctx),
-                actions: ['assignIdentifyResult'],
-              },
-              { target: 'smsChallenge', actions: ['assignIdentifyResult'] },
-            ],
-          },
+            // Otherwise, go directly to the SMS or phone screen
+            {
+              cond: ctx => isUserFoundWithSingleChallenge(Kind.email, ctx),
+              target: 'emailChallenge',
+            },
+            {
+              cond: ctx => isUserFoundWithSingleChallenge(Kind.sms, ctx),
+              target: 'smsChallenge',
+            },
+            { target: 'loginChallengeNotPossible' },
+          ],
         },
         phoneKbaChallenge: {
           on: {
             navigatedToPrevPage: [
               { target: 'smsChallenge', cond: (_ctx, ev) => ev.payload?.prev === 'smsChallenge' },
-              { target: 'challengeSelectOrPasskey', cond: ctx => shouldShowChallengeSelector(ctx, ctx.identify.user) },
-              { target: 'emailIdentification' },
+              { target: 'challengeSelectOrPasskey', cond: ctx => shouldShowChallengeSelector(ctx) },
             ],
             kbaSucceeded: {
               target: 'emailChallenge',
@@ -202,18 +101,6 @@ const createIdentifyMachine = (args: LoginInitialArgs) =>
         },
         challengeSelectOrPasskey: {
           on: {
-            navigatedToPrevPage: [
-              // User was identified via email, so go back to the email page
-              {
-                target: 'emailIdentification',
-                cond: ctx => !!ctx.identify?.successfulIdentifiers?.includes(SuccessfulIdentifier.email),
-                actions: ['resetIdentifyState'],
-              },
-              {
-                target: 'phoneIdentification',
-                actions: ['resetIdentifyState'],
-              },
-            ],
             goToChallenge: [
               { target: 'emailChallenge', cond: isPayloadEmail },
               { target: 'smsChallenge', cond: isPayloadSms },
@@ -227,22 +114,14 @@ const createIdentifyMachine = (args: LoginInitialArgs) =>
               actions: ['assignChallengeData'],
             },
             challengeSucceeded: SUCCESS_TRANSITIONS,
-            navigatedToPrevPage: [
-              ...BACK_FROM_CHALLENGE_TRANSITIONS,
-              // Otherwise, we were making a new vault. Just go back to the phone input screen
-              { target: 'phoneIdentification', actions: ['resetIdentifyState'] },
-            ],
+            navigatedToPrevPage: BACK_FROM_CHALLENGE_TRANSITIONS,
           },
         },
         emailChallenge: {
           on: {
             challengeReceived: { actions: ['assignChallengeData'] },
             challengeSucceeded: SUCCESS_TRANSITIONS,
-            navigatedToPrevPage: [
-              ...BACK_FROM_CHALLENGE_TRANSITIONS,
-              // Otherwise, we were making a new vault. Just go back to the email input screen
-              { target: 'emailIdentification', actions: ['resetIdentifyState'] },
-            ],
+            navigatedToPrevPage: BACK_FROM_CHALLENGE_TRANSITIONS,
           },
         },
         addPhone: {
@@ -262,7 +141,6 @@ const createIdentifyMachine = (args: LoginInitialArgs) =>
           },
         },
         loginChallengeNotPossible: { type: 'final' },
-        authTokenInvalid: { type: 'final' },
         success: { type: 'final' },
       },
     },
@@ -298,51 +176,6 @@ const createIdentifyMachine = (args: LoginInitialArgs) =>
 
           return context;
         }),
-        resetPhone: assign(context => {
-          context.phoneNumber = undefined;
-          return context;
-        }),
-        resetIdentifyState: assign(context => {
-          context.identify = {};
-          return context;
-        }),
-        assignIdentifyResult: assign((context, event) => {
-          // After we have made a request to POST /hosted/identify with a new phone or email,
-          // save the results from the identify API and any new phone/email
-          const { email, phoneNumber, ...restOfPayload } = event.payload;
-
-          context.identify = restOfPayload;
-          if (restOfPayload.user) {
-            // The "identifyToken" may be overwritten by the KBA challenge, so need to pull it out
-            context.identify.identifyToken = restOfPayload.user.token;
-          }
-
-          // challengeData becomes invalid if the phone or email changes
-          const isEmailChanged = email && context.email?.value !== email;
-          const isPhoneChanged = phoneNumber && context.phoneNumber?.value !== phoneNumber;
-          if (isEmailChanged || isPhoneChanged) {
-            context.challenge.challengeData = undefined;
-          }
-
-          if (email) {
-            context.email = {
-              value: email,
-              isBootstrap: false,
-            };
-          }
-          if (phoneNumber) {
-            context.phoneNumber = {
-              value: phoneNumber,
-              isBootstrap: false,
-            };
-          }
-
-          return context;
-        }),
-        assignAuthToken: assign((context, event) => {
-          context.challenge.authToken = event.payload.authToken;
-          return context;
-        }),
         assignIdentifyToken: assign((context, event) => {
           context.identify.identifyToken = event.payload.identifyToken;
           return context;
@@ -351,12 +184,8 @@ const createIdentifyMachine = (args: LoginInitialArgs) =>
           context.challenge.challengeData = event.payload;
           return context;
         }),
-        resetToLoginWithNewAccount: assign(context => {
-          context.phoneNumber = undefined;
-          context.email = undefined;
-          context.identify = {};
-          context.bootstrapData = {};
-          context.challenge = {};
+        assignAuthToken: assign((context, event: ChallengeSucceededEvent) => {
+          context.challenge.authToken = event.payload.authToken;
           return context;
         }),
       },

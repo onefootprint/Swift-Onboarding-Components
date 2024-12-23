@@ -6,23 +6,22 @@ import type { DoneArgs } from '@/idv/components/identify/identify.types';
 import type { NavigationHeaderLeftButtonProps } from '../../../../../layout';
 import StepHeader from '../../../../../step-header';
 import DifferentAccountOption from '../../../different-account-option';
-import Loading from '../../../loading';
 import type { IdentifyMachineContext } from '../../state';
 import { useIdentifyMachine } from '../../state';
 import type { HeaderProps } from '../../types';
 import getLeftNavButton from '../../utils/nav-left-btn';
 import ChallengeSelectOrPasskey from '../challenge-select-or-passkey';
 import EmailChallenge from '../email-challenge';
-import InitAuthToken from '../init-auth-token';
 import Notification from '../notification';
 import PhoneKbaChallenge from '../phone-kba-challenge';
 import SmsChallenge from '../sms-challenge';
-import StepBootstrap from '../step-bootstrap';
-import StepEmail from '../step-email';
-import StepPhone from '../step-phone';
 import { UpdateEmail, UpdatePhone } from '../user-update';
 
-type RouterProps = { onDone: (payload: DoneArgs) => void; onBack?: () => void; handleReset?: () => void };
+type RouterProps = {
+  onDone: (payload: DoneArgs) => void;
+  onBack?: () => void;
+  handleReset?: () => void;
+};
 
 const getHeader = (
   ctx: IdentifyMachineContext,
@@ -44,7 +43,7 @@ const getHeader = (
 const Router = ({ onDone, onBack, handleReset }: RouterProps): JSX.Element | null => {
   const [state, send] = useIdentifyMachine();
   const { context, matches } = state;
-  const { initialAuthToken, variant, challenge, email, phoneNumber } = context;
+  const { variant, challenge, email, phoneNumber } = context;
   const isDone = matches('success');
   const { t } = useTranslation('identify');
   const leftButton = getLeftNavButton(state, send, onBack);
@@ -63,30 +62,9 @@ const Router = ({ onDone, onBack, handleReset }: RouterProps): JSX.Element | nul
 
   if (isDone) return null;
 
-  if (matches('init')) {
-    return <Loading />;
-  }
-  // TODO: go through with rming this code to see what it's like
-  // TODO: rm
-  if (matches('initBootstrap')) {
-    return <StepBootstrap />;
-  }
-  if (matches('initAuthToken') && initialAuthToken) {
-    return <InitAuthToken authToken={initialAuthToken} />;
-  }
-  // TODO: rm
-  if (matches('emailIdentification')) {
-    return <StepEmail Header={Header} />;
-  }
-  // TODO: rm
-  if (matches('phoneIdentification')) {
-    return <StepPhone Header={Header} />;
-  }
-
-  const handleDifferentAccount = handleReset ?? (() => send({ type: 'loginWithDifferentAccount' }));
   const differentAccountOption = (
     <DifferentAccountOption
-      onLoginWithDifferentAccount={handleDifferentAccount}
+      onLoginWithDifferentAccount={handleReset}
       orgId={context.config?.orgId || ''}
       isComponentsSdk={context.isComponentsSdk}
       hasBootstrapData={email?.isBootstrap || phoneNumber?.isBootstrap || false}
@@ -102,7 +80,6 @@ const Router = ({ onDone, onBack, handleReset }: RouterProps): JSX.Element | nul
     );
   }
   if (matches('smsChallenge')) {
-    // TODO: remove signup challenge logic
     return (
       <>
         <SmsChallenge Header={Header} />
@@ -143,9 +120,6 @@ const Router = ({ onDone, onBack, handleReset }: RouterProps): JSX.Element | nul
         onSuccess={payload => send({ type: 'emailAdded', payload })}
       />
     );
-  }
-  if (matches('authTokenInvalid')) {
-    return <Notification title={t('notification.404-user-title')} subtitle={t('notification.404-user-description')} />;
   }
   if (matches('loginChallengeNotPossible')) {
     return (

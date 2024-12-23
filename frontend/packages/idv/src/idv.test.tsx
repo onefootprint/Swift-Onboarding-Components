@@ -21,6 +21,10 @@ import mockRouter from 'next-router-mock';
 import React from 'react';
 
 import { Layout } from './components';
+import {
+  withRequirements as withIdentifyRequirements,
+  withIdentifySession,
+} from './components/identify/identify.test.config';
 import Idv from './idv';
 import {
   TestAuthorizeRequirement,
@@ -202,6 +206,8 @@ describe('<Idv />', () => {
         const sandboxConfig = getKycOnboardingConfig();
         withOnboarding(sandboxConfig);
         withOnboardingConfig(sandboxConfig);
+        withIdentifySession({});
+        withIdentifyRequirements({});
       });
 
       it('starts flow on sandbox outcome page', async () => {

@@ -1,14 +1,10 @@
 import { isEmail, isPhoneNumber } from '@onefootprint/core';
-import { ChallengeKind as Kind } from '@onefootprint/types';
-import { AuthMethodKind } from '@onefootprint/types';
+import { AuthMethodKind, type ChallengeKind } from '@onefootprint/types';
 
-import type { DeviceInfo as Device } from '../../../../../hooks';
-import { getRandomID } from '../../../../../utils';
-import type { LoginInitialArgs } from '../identify';
-import type { IdentifyMachineContext as Context, IdentifyContext } from './types';
+import { getAvailableMethods } from '../components/challenge-select-or-passkey/utils';
+import type { LoginInitialArgs } from '../identify-login';
+import type { IdentifyMachineContext as Context } from './types';
 import { IdentifyVariant } from './types';
-
-type User = IdentifyContext['user'];
 
 export const isAuthFlow = (v: unknown): v is IdentifyVariant.auth => v === IdentifyVariant.auth;
 
@@ -35,24 +31,13 @@ export const isEmailOrPhoneValid = (ctx: Context): boolean =>
 export const isEmailAndPhoneValid = (ctx: Context): boolean =>
   isEmail(ctx?.email?.value || '') && isPhoneNumber(ctx?.phoneNumber?.value || '');
 
-export const getAvailableChallengeKinds = (device: Device, user: User) => {
-  if (!user) return [];
-
-  // Check if device supports biometric challenge
-  if (!device.hasSupportForWebauthn) {
-    return user.availableChallengeKinds.filter(kind => kind !== Kind.biometric);
-  }
-
-  return user.availableChallengeKinds;
-};
-
-export const isUserFoundWithSingleChallenge = (kind: Kind, device: Device, user?: User): boolean => {
-  const challengeKinds = getAvailableChallengeKinds(device, user);
+export const isUserFoundWithSingleChallenge = (kind: ChallengeKind, ctx: Context): boolean => {
+  const challengeKinds = getAvailableMethods(ctx.identify.user, ctx.device);
   return challengeKinds?.length === 1 && challengeKinds[0] === kind;
 };
 
-export const shouldShowChallengeSelector = (ctx: Context, user?: User): boolean =>
-  isUpdateLoginFlow(ctx.variant) || getAvailableChallengeKinds(ctx.device, user).length > 1;
+export const shouldShowChallengeSelector = (ctx: Context): boolean =>
+  isUpdateLoginFlow(ctx.variant) || getAvailableMethods(ctx.identify.user, ctx.device).length > 1;
 
 export const isRequiredAuthMethodsPending = (kind: `${AuthMethodKind}`, ctx: Context): boolean => {
   const isRequiredByPlaybook = getRequiredAuthMethods(ctx).includes(kind);
@@ -67,13 +52,12 @@ export const isRequiredAuthMethodsPending = (kind: `${AuthMethodKind}`, ctx: Con
 export const getMachineArgs = ({
   config,
   device,
-  initialAuthToken,
+  identify,
   isComponentsSdk,
   isLive,
   logoConfig,
   obConfigAuth,
   overallOutcome,
-  sandboxId,
   variant,
   email,
   phoneNumber,
@@ -88,15 +72,13 @@ export const getMachineArgs = ({
     config,
     device,
     email,
-    identify: {},
-    initialAuthToken,
+    identify,
     isComponentsSdk: !!isComponentsSdk,
     isLive,
     logoConfig,
     obConfigAuth,
     overallOutcome,
     phoneNumber,
-    sandboxId: config?.isLive === false && !initialAuthToken ? sandboxId || getRandomID(13) : undefined,
     variant,
   };
 };

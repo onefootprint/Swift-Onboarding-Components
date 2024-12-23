@@ -1,41 +1,28 @@
-import { useFlags } from 'launchdarkly-react-client-sdk';
+import type { IdentifiedUser } from '@onefootprint/types/src/api/identify';
 import { useReducer } from 'react';
 import Challenge from './components/challenge';
 import CollectEmail from './components/collect-email';
 import CollectPhone from './components/collect-phone';
-import { IdentifyLogin } from './components/identify-login';
+import { IdentifyLogin, IdentifyLoginAuthToken } from './components/identify-login';
 import Init from './components/init';
 import type { DoneArgs, InitArgs } from './identify.types';
 import loadNextRequirement from './utils/load-requirements';
-import { type NextAction, getInitialState } from './utils/reducer';
-import { reducer } from './utils/reducer';
+import { type NextAction, getInitialState, reducer } from './utils/reducer';
 
 type IdentifyProps = {
   onDone: (args: DoneArgs) => void;
   initArgs: InitArgs;
 };
 
-const useIsInRollout = (orgId?: string) => {
-  const { IdentifySignupV2Rollout } = useFlags();
-  const orgIds = new Set<string>(IdentifySignupV2Rollout);
-  if (orgIds.has('all')) {
-    // Our representation of "fully rolled out"
-    return true;
-  }
-  return orgId && orgIds.has(orgId);
-};
-
 const Identify = ({ onDone, initArgs }: IdentifyProps) => {
-  const { bootstrapData, ...restOfInitArgs } = initArgs;
+  const { bootstrapData, initialAuthToken, ...restOfInitArgs } = initArgs;
   const initialState = getInitialState(bootstrapData);
   const [state, dispatch] = useReducer(reducer, initialState);
-  const isInRollout = useIsInRollout(initArgs.config?.orgId);
 
-  if (initArgs.initialAuthToken || !isInRollout) {
-    // If this tenant is not rolled out to use the new Identify signup flow, fall back to legacy Identify component.
-    // Or, if the Identify flow is initialized with an initialAuthToken, fall back to our legacy IdentifyLogin component that handles login.
-    const machineArgs = { ...restOfInitArgs, email: state.email, phoneNumber: state.phoneNumber };
-    return <IdentifyLogin initialArgs={machineArgs} onDone={onDone} />;
+  if (initialAuthToken) {
+    // If the Identify flow is initialized with an initialAuthToken, fall back to our legacy IdentifyLogin component that handles login.
+    const initialArgs = { ...restOfInitArgs, email: state.email, phoneNumber: state.phoneNumber, initialAuthToken };
+    return <IdentifyLoginAuthToken initialArgs={initialArgs} onDone={onDone} />;
   }
 
   const handleAdvanceToNext = async (args: Partial<Omit<NextAction, 'type'>>, delayMs?: number) => {
@@ -87,12 +74,18 @@ const Identify = ({ onDone, initArgs }: IdentifyProps) => {
     );
   }
   if (requirement.kind === 'login') {
-    // Share the phone and email entered by the user in this flow
-    const initialAuthToken = requirement.user.token;
-    const loginArgs = { ...restOfInitArgs, initialAuthToken, email: state.email, phoneNumber: state.phoneNumber };
+    const machineArgs = {
+      ...restOfInitArgs,
+      email: state.email,
+      phoneNumber: state.phoneNumber,
+      identify: {
+        user: requirement.user as IdentifiedUser,
+        identifyToken: requirement.user.token,
+      },
+    };
     // If a user is identified (or if the Identify flow is initialized with an initialAuthToken),
     // we will fall back to our legacy IdentifyLogin component that handles login.
-    return <IdentifyLogin initialArgs={loginArgs} onDone={onDone} onBack={onPrev} handleReset={handleReset} />;
+    return <IdentifyLogin machineArgs={machineArgs} onDone={onDone} onBack={onPrev} handleReset={handleReset} />;
   }
 };
 

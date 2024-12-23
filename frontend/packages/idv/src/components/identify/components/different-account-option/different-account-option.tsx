@@ -9,7 +9,7 @@ import LegalFooter from '../../../legal-footer';
 const { logInfo } = getLogger();
 
 type DifferentAccountOptionProps = {
-  onLoginWithDifferentAccount: () => void;
+  onLoginWithDifferentAccount?: () => void;
   orgId: string;
   isComponentsSdk: boolean;
   hasBootstrapData: boolean;
@@ -28,18 +28,20 @@ const DifferentAccountOption = ({
   const { t } = useTranslation('identify', {
     keyPrefix: 'log-in-different-account',
   });
-  const handleLoginWithDifferent = () => {
-    logInfo('Login with different account');
-    onLoginWithDifferentAccount();
-  };
 
   const { ShouldHideBootstrappedLoginWithDifferent } = useFlags();
   const orgIds = new Set<string>(ShouldHideBootstrappedLoginWithDifferent);
-  const showLoginWithDifferentOption = !orgIds.has(orgId) && hasBootstrapData && !isComponentsSdk;
+  const showLoginWithDifferentOption =
+    !orgIds.has(orgId) && hasBootstrapData && !isComponentsSdk && onLoginWithDifferentAccount;
 
   if (!showLoginWithDifferentOption) {
     return null;
   }
+
+  const handleLoginWithDifferent = () => {
+    logInfo('Login with different account');
+    onLoginWithDifferentAccount();
+  };
 
   return (
     <Container>

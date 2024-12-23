@@ -6,17 +6,17 @@ import {
 } from '@onefootprint/fixtures';
 import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import { CLIENT_PUBLIC_KEY_HEADER, ChallengeKind } from '@onefootprint/types';
-import { mockFlags } from 'jest-launchdarkly-mock';
 import type { ComponentProps } from 'react';
 import { Layout } from '../layout';
 import {
+  expectShimmer,
   fillChallengePin,
   fillIdentifyEmail,
   fillIdentifyPhone,
   sandboxOnboardingConfigFixture,
   withIdentify,
   withIdentifyVerify,
-} from './components/identify-login/identify.test.config';
+} from './components/identify-login/identify-login.test.config';
 import Identify from './identify';
 import {
   withChallenge,
@@ -36,6 +36,7 @@ const renderIdentify = ({
   bootstrapEmail,
   bootstrapPhone,
   initialAuthToken,
+  isComponentsSdk,
   config,
   device,
   onDone,
@@ -43,6 +44,7 @@ const renderIdentify = ({
   bootstrapEmail?: string;
   bootstrapPhone?: string;
   initialAuthToken?: string;
+  isComponentsSdk?: boolean;
   config?: Config;
   device?: Device;
   onDone?: () => void;
@@ -61,8 +63,8 @@ const renderIdentify = ({
           variant: IdentifyVariant.verify,
           config: config ?? sandboxOnboardingConfigFixture,
           isLive: config?.isLive ?? sandboxOnboardingConfigFixture.isLive,
-          isComponentsSdk: false,
-          obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: 'pk' },
+          isComponentsSdk: isComponentsSdk ?? false,
+          obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: 'pk_test_xxxx' },
           bootstrapData: bootstrapEmail || bootstrapPhone ? bootstrapData : undefined,
           initialAuthToken,
           device: device || {
@@ -79,10 +81,6 @@ const renderIdentify = ({
 };
 
 describe('<Identify />', () => {
-  beforeAll(() => {
-    mockFlags({ IdentifySignupV2Rollout: ['all'] });
-  });
-
   it('handles regular signup flow', async () => {
     withIdentifySession({});
     const requirements = [
@@ -128,6 +126,87 @@ describe('<Identify />', () => {
         authToken: 'utok_xxxx',
         email: { value: 'piip@onefootprint.com', isBootstrap: false },
         phoneNumber: { value: '+1 (650) 460-0799', isBootstrap: false },
+      });
+    });
+  });
+
+  it('omits collection of bootstrapped data', async () => {
+    withIdentifySession({});
+    const requirements = [
+      getIdentifyRequirementCollectData({ cdo: 'email' }),
+      getIdentifyRequirementChallenge({ authMethod: 'phone' }),
+    ];
+    withRequirements({ requirements });
+    withVault();
+
+    const onDone = jest.fn();
+    renderIdentify({ onDone, bootstrapPhone: '+1 (555) 555-0100' });
+    await waitFor(() => {
+      expect(screen.getByText('Enter your email to get started.')).toBeInTheDocument();
+    });
+
+    // Fill email
+    withChallenge({});
+    withRequirements({ requirements: requirements.slice(1) });
+    await fillIdentifyEmail();
+    await waitFor(() => {
+      expect(screen.getByText('Enter the 6-digit code sent to +1 (555) 555-0100.')).toBeInTheDocument();
+    });
+
+    // Fill OTP code
+    withChallengeVerify();
+    withRequirements({ requirements: requirements.slice(2) });
+    withSessionVerify({ authToken: 'utok_xxxx' });
+    await fillChallengePin();
+    await waitFor(() => {
+      expect(screen.getByText('Success!')).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      expect(onDone).toHaveBeenCalledWith({
+        authToken: 'utok_xxxx',
+        email: { value: 'piip@onefootprint.com', isBootstrap: false },
+        phoneNumber: { value: '+1 (555) 555-0100', isBootstrap: true },
+      });
+    });
+  });
+
+  it('no-phone playbook', async () => {
+    withIdentifySession({});
+    const requirements = [
+      getIdentifyRequirementCollectData({ cdo: 'email' }),
+      getIdentifyRequirementChallenge({ authMethod: 'email' }),
+    ];
+    withRequirements({ requirements });
+    withVault();
+
+    const onDone = jest.fn();
+    renderIdentify({ onDone });
+    await waitFor(() => {
+      expect(screen.getByText('Enter your email to get started.')).toBeInTheDocument();
+    });
+
+    // Fill email
+    withChallenge({});
+    withRequirements({ requirements: requirements.slice(1) });
+    await fillIdentifyEmail();
+    await waitFor(() => {
+      expect(screen.getByText('Enter the 6-digit code sent to piip@onefootprint.com.')).toBeInTheDocument();
+    });
+
+    // Fill OTP code
+    withChallengeVerify();
+    withRequirements({ requirements: requirements.slice(2) });
+    withSessionVerify({ authToken: 'utok_xxxx' });
+    await fillChallengePin();
+    await waitFor(() => {
+      expect(screen.getByText('Success!')).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      expect(onDone).toHaveBeenCalledWith({
+        authToken: 'utok_xxxx',
+        email: { value: 'piip@onefootprint.com', isBootstrap: false },
       });
     });
   });
@@ -185,8 +264,9 @@ describe('<Identify />', () => {
     // Fill phone. This will identify the user and fall back to the login flow.
     withChallenge({});
     const loginRequirement = getIdentifyRequirementLogin({});
+    loginRequirement.user.isUnverified = false;
+    loginRequirement.user.scrubbedPhone = '+1 (•••) •••-••99';
     withRequirements({ requirements: [loginRequirement] });
-    withIdentify({});
     await fillIdentifyPhone();
     await waitFor(() => {
       expect(screen.getByText('Welcome back! 🎉')).toBeInTheDocument();
@@ -208,13 +288,13 @@ describe('<Identify />', () => {
         authToken: 'new-token',
         email: { value: 'piip@onefootprint.com', isBootstrap: false },
         phoneNumber: { value: '+1 (650) 460-0799', isBootstrap: false },
-        availableChallengeKinds: ['biometric', 'sms'],
+        availableChallengeKinds: loginRequirement.user.availableChallengeKinds,
       });
     });
   });
 
   it('goes to login flow when initial auth token is provided', async () => {
-    withIdentify({});
+    withIdentify({ matchingFps: [] });
 
     const onDone = jest.fn();
     renderIdentify({ onDone, initialAuthToken: 'utok_xxxx' });
@@ -236,8 +316,35 @@ describe('<Identify />', () => {
     await waitFor(() => {
       expect(onDone).toHaveBeenCalledWith({
         authToken: 'new-token',
-        availableChallengeKinds: ['biometric', 'sms'],
+        availableChallengeKinds: ['sms', 'biometric'],
       });
     });
+  });
+
+  it('sends x-fp-is-components-sdk header in signup challenge when using components sdk', async () => {
+    const onInitSessionCalled = jest.fn();
+    withIdentifySession({}, onInitSessionCalled);
+
+    // Bootstrap email, enter phone explicitly
+    renderIdentify({
+      bootstrapEmail: 'sandbox@onefootprint.com',
+      isComponentsSdk: true,
+    });
+
+    expectShimmer();
+
+    await waitFor(() => {
+      expect(onInitSessionCalled).toHaveBeenCalled();
+    });
+    const { body, headers } = onInitSessionCalled.mock.calls[0][0];
+    expect(body).toEqual({
+      scope: 'onboarding',
+      data: {
+        'id.email': 'sandbox@onefootprint.com',
+      },
+    });
+    expect(headers['x-onboarding-config-key']).toEqual('pk_test_xxxx');
+    expect(headers['x-fp-is-bootstrap']).toEqual('true');
+    expect(headers['x-fp-is-components-sdk']).toEqual('true');
   });
 });

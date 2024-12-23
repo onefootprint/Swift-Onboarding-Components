@@ -8,7 +8,7 @@ const useGetHeaderText = (): string => {
   const [state] = useIdentifyMachine();
   const { t } = useTranslation('identify');
 
-  const hasChallengeSelector = shouldShowChallengeSelector(state.context, state.context.identify.user);
+  const hasChallengeSelector = shouldShowChallengeSelector(state.context);
   // Show welcome back if we're doing a login challenge and the user is _not_ unverified
   const shouldShowWelcomeBack = !!state.context.identify.user && !state.context.identify.user.isUnverified;
 

@@ -12,10 +12,11 @@ import type {
 } from '@onefootprint/request-types';
 import { mockRequest } from '@onefootprint/test-utils';
 
-export const withIdentifySession = (props: Partial<IdentifySessionResponse>) =>
+export const withIdentifySession = (props: Partial<IdentifySessionResponse>, onRequest?: (args: unknown) => void) =>
   mockRequest({
     method: 'post',
     path: '/hosted/identify/session',
+    onRequest,
     response: getIdentifySessionResponse(props),
   });
 
