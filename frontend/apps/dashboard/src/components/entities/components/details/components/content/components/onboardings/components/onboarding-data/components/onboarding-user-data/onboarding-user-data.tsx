@@ -27,7 +27,7 @@ const OnboardingUserData = ({ canDecrypt, onboardingId, vault }: OnboardingUserD
       title={t('title')}
       hasDivider
       rightComponent={
-        isAllDecrypted && (
+        !isAllDecrypted && (
           <Decrypt
             canDecrypt={canDecrypt}
             onDecryptSuccess={updateVault}

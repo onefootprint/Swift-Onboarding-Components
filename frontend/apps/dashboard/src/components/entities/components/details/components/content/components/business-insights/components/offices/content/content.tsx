@@ -1,7 +1,7 @@
 import { IcoForbid40 } from '@onefootprint/icons';
 import type { BusinessAddress } from '@onefootprint/types';
 import { Stack, Text } from '@onefootprint/ui';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
@@ -30,6 +30,12 @@ const Content = ({ data }: OfficesProps) => {
   });
   const firstWithCoordinates = dataWithCoordinates.find(address => address.latitude && address.longitude);
   const [selectedAddress, setSelectedAddress] = useState<BusinessAddress | undefined>(firstWithCoordinates);
+
+  useEffect(() => {
+    if (firstWithCoordinates && !selectedAddress) {
+      setSelectedAddress(firstWithCoordinates);
+    }
+  }, [firstWithCoordinates]);
 
   const cards: JSX.Element[] = [];
   const markers: JSX.Element[] = [];

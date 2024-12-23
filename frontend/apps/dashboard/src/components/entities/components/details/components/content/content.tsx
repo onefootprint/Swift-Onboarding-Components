@@ -33,6 +33,7 @@ const Content = () => {
     data: { user },
   } = useSession();
   const isFirmEmployee = user?.isFirmEmployee;
+  const showOldKybSections = !isFirmEmployee && kind === EntityKind.business;
 
   return (
     <>
@@ -61,12 +62,10 @@ const Content = () => {
             <AuditTrail />
           </Box>
         )}
-        {isFirmEmployee && kind === EntityKind.person && (
-          <Box marginBottom={9}>
-            <Onboardings />
-          </Box>
-        )}
-        {kind === EntityKind.business && (
+        <Box marginBottom={9}>
+          <Onboardings />
+        </Box>
+        {showOldKybSections && (
           <Box marginBottom={9}>
             <BusinessInsights />
           </Box>

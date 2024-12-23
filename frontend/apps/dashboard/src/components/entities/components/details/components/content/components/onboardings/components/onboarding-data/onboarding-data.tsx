@@ -6,6 +6,7 @@ import {
 import type { EntityOnboarding } from '@onefootprint/request-types/dashboard';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import OnboardingBusinessInsight from './components/onboarding-business-insight';
 import OnboardingRiskSignals from './components/onboarding-risk-signals';
 import OnboardingRules from './components/onboarding-rules';
@@ -20,6 +21,7 @@ type OnboardingDataProps = {
 };
 
 const OnboardingData = ({ onboarding }: OnboardingDataProps) => {
+  const { t } = useTranslation('entity-details', { keyPrefix: 'onboardings' });
   const entityId = useEntityId();
   const { data: riskSignals } = useQuery({
     ...getEntitiesByFpIdOnboardingsByOnboardingIdRiskSignalsOptions({
@@ -32,7 +34,7 @@ const OnboardingData = ({ onboarding }: OnboardingDataProps) => {
       path: { fpId: entityId },
       query: { seqno: onboarding.seqno },
     }),
-    enabled: Boolean(entityId) && Boolean(onboarding.seqno),
+    enabled: Boolean(entityId),
   });
   const hasDecryptableDIs = Boolean(entityAttributes?.some(attr => attr.isDecryptable));
   const seqnoVault = useSeqnoVault(entityAttributes, onboarding.seqno?.toString());
@@ -45,8 +47,12 @@ const OnboardingData = ({ onboarding }: OnboardingDataProps) => {
     setSelectedSubsection(subsectionKeys[0]);
   }, [riskSignals, onboarding.ruleSetResults]);
 
+  if (Object.keys(subsections).length === 0) {
+    return <p className="text-body-3 p-5">{t('empty')}</p>;
+  }
+
   return (
-    <div className="flex flex-1 overflow-hidden">
+    <div className="min-h-[500px] max-h-[500px] flex flex-1 overflow-hidden">
       <div className="flex flex-col gap-1 w-[200px] border-r border-solid border-tertiary py-5 px-3 flex-shrink-0">
         {Object.entries(subsections).map(([name, { title, iconComponent }]) => (
           <SidebarItem

@@ -2,6 +2,7 @@ import { IcoForbid40 } from '@onefootprint/icons';
 import { cx } from 'class-variance-authority';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import Subsection from '../../../../../subsection';
 import type { FormattedAddress } from '../../../../onboarding-business-insight.types';
 import AddressCard from './components/address-card';
 import ContainerWithToggle from './components/container-with-toggle';
@@ -77,29 +78,31 @@ const Content = ({ data }: OfficesProps) => {
   };
 
   return (
-    <div className="relative h-full w-full rounded overflow-hidden border border-solid border-tertiary">
-      <ContainerWithToggle isHidden={detailsHidden} onChangeHidden={setDetailsHidden}>
-        <div className="relative flex flex-col gap-3 h-full w-full overflow-y-scroll box-content pb-3 pr-3">
-          {cards}
+    <Subsection title={t('title')}>
+      <div className="relative h-full w-full rounded overflow-hidden border border-solid border-tertiary">
+        <ContainerWithToggle isHidden={detailsHidden} onChangeHidden={setDetailsHidden}>
+          <div className="relative flex flex-col gap-3 h-full w-full overflow-y-scroll box-content pb-3 pr-3">
+            {cards}
+          </div>
+        </ContainerWithToggle>
+        <div
+          className={cx(
+            'w-full h-full rounded overflow-hidden relative border border-solid border-tertiary transition-transform duration-300 ease-in-out translate-x-0',
+            {
+              'translate-x-[214px]': !detailsHidden,
+            },
+          )}
+        >
+          <MapComponent
+            markers={markers}
+            selectedAddress={selectedAddress}
+            onSelect={id =>
+              handleSelectFromMap(dataWithCoordinates.find(address => address.id === id) as FormattedAddress)
+            }
+          />
         </div>
-      </ContainerWithToggle>
-      <div
-        className={cx(
-          'w-full h-full rounded overflow-hidden relative border border-solid border-tertiary transition-transform duration-300 ease-in-out translate-x-0',
-          {
-            'translate-x-[214px]': !detailsHidden,
-          },
-        )}
-      >
-        <MapComponent
-          markers={markers}
-          selectedAddress={selectedAddress}
-          onSelect={id =>
-            handleSelectFromMap(dataWithCoordinates.find(address => address.id === id) as FormattedAddress)
-          }
-        />
       </div>
-    </div>
+    </Subsection>
   );
 };
 

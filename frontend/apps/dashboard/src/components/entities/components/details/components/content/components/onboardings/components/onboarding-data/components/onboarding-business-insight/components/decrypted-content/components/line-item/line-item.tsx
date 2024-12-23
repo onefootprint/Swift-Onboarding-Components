@@ -15,7 +15,7 @@ const LineItem = ({ label, value, badge, customValue }: LineItemProps) => (
       {badge}
     </div>
     <Divider variant="secondary" marginBottom={2} />
-    <div className="min-w-fit max-w-1/2 overflow-scroll">{customValue ?? <p className="text-body-3">{value}</p>}</div>
+    {customValue ?? <p className="text-body-3 min-w-fit max-w-1/2 overflow-scroll">{value}</p>}
   </div>
 );
 

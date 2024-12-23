@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import useRiskSignalGroupText from '../../hooks/use-risk-signal-group-text';
 import Subsection from '../subsection';
 import RiskSignalItem from './components/risk-signal-item';
+import SentilinkDetails from './components/sentilink-details';
+import StandardDetails from './components/standard-details';
 
 type OnboardingRiskSignalsProps = {
   riskSignals: Partial<Record<RiskSignalGroupKind, RiskSignal[]>>;
@@ -14,26 +16,30 @@ const OnboardingRiskSignals = ({ riskSignals }: OnboardingRiskSignalsProps) => {
   const hasRiskSignals = Object.keys(riskSignals).length > 0;
 
   return (
-    <Subsection title={t('title')} hasDivider>
-      {hasRiskSignals ? (
-        <div className="flex flex-col gap-6">
-          {Object.entries(riskSignals).map(([group, signals]) => (
-            <div key={group} className="flex flex-col gap-2">
-              <span className="text-label-3">
-                {riskSignalGroupT(group as RiskSignalGroupKind)} ({signals.length})
-              </span>
-              <div className="flex flex-col gap-1">
-                {signals.map(signal => (
-                  <RiskSignalItem key={signal.id} riskSignal={signal} />
-                ))}
+    <>
+      <Subsection title={t('title')} hasDivider>
+        {hasRiskSignals ? (
+          <div className="flex flex-col gap-6">
+            {Object.entries(riskSignals).map(([group, signals]) => (
+              <div key={group} className="flex flex-col gap-2">
+                <span className="text-label-3">
+                  {riskSignalGroupT(group as RiskSignalGroupKind)} ({signals.length})
+                </span>
+                <div className="flex flex-col gap-1">
+                  {signals.map(signal => (
+                    <RiskSignalItem key={signal.id} riskSignal={signal} />
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <span className="text-body-3 mt-1">{t('no-risk-signals')}</span>
-      )}
-    </Subsection>
+            ))}
+          </div>
+        ) : (
+          <span className="text-body-3 mt-1">{t('no-risk-signals')}</span>
+        )}
+      </Subsection>
+      <StandardDetails />
+      <SentilinkDetails />
+    </>
   );
 };
 
