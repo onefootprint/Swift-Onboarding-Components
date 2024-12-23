@@ -6,7 +6,6 @@ import useSession from 'src/hooks/use-session';
 type PlaybookLinkProps = {
   playbook: {
     id: string;
-    playbookId: string;
     name: string;
   };
 };
@@ -20,7 +19,7 @@ const PlaybookLink = ({ playbook }: PlaybookLinkProps) => {
     const mode = session.isLive ? 'live' : 'sandbox';
     const { id, ...query } = router.query;
     router.push({
-      pathname: `/users/${entityId}/playbook/${playbook.playbookId}`,
+      pathname: `/users/${entityId}/playbook/${playbook.id}`,
       query: { ...query, mode },
     });
   };

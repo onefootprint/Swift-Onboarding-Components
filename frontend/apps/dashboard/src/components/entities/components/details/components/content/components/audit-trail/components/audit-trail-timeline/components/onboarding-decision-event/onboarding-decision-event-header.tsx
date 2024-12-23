@@ -70,7 +70,14 @@ const OnboardingDecisionEventHeader = ({ data }: OnboardingDecisionEventHeaderPr
               i18nKey={transKey}
               values={{ outcome }}
               components={{
-                playbook: <PlaybookLink playbook={playbook} />,
+                playbook: (
+                  <PlaybookLink
+                    playbook={{
+                      id: playbook.playbookId,
+                      name: playbook.name,
+                    }}
+                  />
+                ),
               }}
             />
           </Text>
