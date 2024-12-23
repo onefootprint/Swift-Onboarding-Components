@@ -13,6 +13,8 @@ const WorkflowStartedEventHeader = ({ data }: WorkflowStartedEventHeaderProps) =
     keyPrefix: 'audit-trail.timeline.workflow-started-event',
   });
 
+  console.log('data', data);
+
   if (data.kind === WorkflowStartedEventKind.playbook) {
     let transKey = 'audit-trail.timeline.workflow-started-event.started-onboarding-onto';
     if (data.workflowSource === 'tenant') {
