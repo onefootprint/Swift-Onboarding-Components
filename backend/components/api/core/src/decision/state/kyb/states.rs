@@ -202,19 +202,6 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
             id: &wf.id,
             sv_id: &wf.scoped_vault_id,
         };
-        // we need to find a vendor_api and vres_id for risk signals. this is annoying and we should drop
-        // the not null constraint..
-        let bo_rs_for_risk_signals = if let Some((wf, _, _)) = bo_obds.first() {
-            let rses = RiskSignal::latest_by_risk_signal_group_kind(
-                conn,
-                &wf.scoped_vault_id,
-                RiskSignalGroupKind::Kyc,
-            )?;
-
-            rses.first().cloned()
-        } else {
-            None
-        };
 
         // BO features
         let bo_failed_kyc = bo_obds
@@ -230,25 +217,16 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
         // Here we try to give tenants a hint as to whether there's potentially another 25% owner that
         // hasn't been submitted
         let bo_ownership_check = (100 - bo_ownership_total) >= 25;
+        let bo_rs = vec![bo_failed_kyc.then_some((
+            FootprintReasonCode::BeneficialOwnerFailedKyc,
+            VendorAPI::Footprint,
+            None,
+        ))]
+        .into_iter()
+        .flatten()
+        .collect();
 
-        if let Some(rs) = bo_rs_for_risk_signals {
-            let bo_rs = vec![bo_failed_kyc.then_some((
-                FootprintReasonCode::BeneficialOwnerFailedKyc,
-                rs.vendor_api,
-                rs.verification_result_id.clone(),
-            ))]
-            .into_iter()
-            .flatten()
-            .collect();
-
-            RiskSignal::bulk_save_for_scope(conn, scope.clone(), bo_rs, RiskSignalGroupKind::Kyb, false)?;
-        } else {
-            // If we are running KYC on BOs, we expect there will be risk signals and we should take a look at
-            // what's going on.
-            if !obc.verification_checks().skip_kyc() {
-                tracing::error!("Missing KYC reason codes in KYB workflow")
-            }
-        }
+        RiskSignal::bulk_save_for_scope(conn, scope.clone(), bo_rs, RiskSignalGroupKind::Kyb, false)?;
 
         // TODO: move this?
         if !bo_ownership_check {
