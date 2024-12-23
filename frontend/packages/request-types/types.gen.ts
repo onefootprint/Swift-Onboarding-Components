@@ -2211,7 +2211,8 @@ export type UserAuthScope =
   | 'sensitive_profile'
   | 'handoff'
   | 'vault_data'
-  | 'explicit_auth';
+  | 'explicit_auth'
+  | 'identify_session';
 export type UserChallengeData = {
   biometricChallengeJson?: string;
   challengeKind: ChallengeKind;

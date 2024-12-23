@@ -8030,7 +8030,8 @@
                     "sensitive_profile",
                     "handoff",
                     "vault_data",
-                    "explicit_auth"
+                    "explicit_auth",
+                    "identify_session"
                 ]
             },
             "UserChallengeData": {

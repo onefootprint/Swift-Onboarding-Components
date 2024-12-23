@@ -64,7 +64,8 @@ const WrappedDialog = ({ isOpen, onClose }: WrappedDialogProps) => {
             </div>
             <div className="mt-6 text-center">
               <p className="text-primary text-body-3">{t('thank-you-text')}</p>
-              <LinkButton href="/download" $marginTop={2}>
+              {/* @ts-expect-error  - Dave says this is untyped JSON on the backend*/}
+              <LinkButton href={data?.downloadLink} $marginTop={2}>
                 {t('download')}
               </LinkButton>
             </div>
