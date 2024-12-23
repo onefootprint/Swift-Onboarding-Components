@@ -3,18 +3,17 @@ import type { GetOrgFootprintWrappedData } from '@onefootprint/request-types/das
 import { Dialog, LinkButton, Shimmer } from '@onefootprint/ui';
 import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import StatCard from './components/stat-card';
 
-const WrappedPage = () => {
-  const { t } = useTranslation('home', { keyPrefix: 'wrapped' });
-  const [showCard, setShowCard] = useState(true); // default to this
-  const { data, isLoading } = useQuery(getOrgFootprintWrappedOptions());
+type WrappedDialogProps = {
+  isOpen: boolean;
+  onClose: () => void;
+};
 
-  const hideCard = () => {
-    setShowCard(false);
-  };
+const WrappedDialog = ({ isOpen, onClose }: WrappedDialogProps) => {
+  const { t } = useTranslation('home', { keyPrefix: 'wrapped' });
+  const { data, isLoading } = useQuery(getOrgFootprintWrappedOptions());
 
   const metricsToShow = {
     nBusinessOnboarded: t('businesses-onboarded'),
@@ -26,7 +25,7 @@ const WrappedPage = () => {
   };
 
   return (
-    <Dialog open={showCard} onClose={hideCard} title={t('title')} noPadding>
+    <Dialog open={isOpen} onClose={onClose} title={t('title')} noPadding>
       {isLoading || !data ? (
         <Shimmer height="788px" />
       ) : (
@@ -76,4 +75,4 @@ const WrappedPage = () => {
   );
 };
 
-export default WrappedPage;
+export default WrappedDialog;

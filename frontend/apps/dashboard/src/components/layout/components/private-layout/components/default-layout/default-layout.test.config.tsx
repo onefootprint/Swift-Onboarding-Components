@@ -96,3 +96,10 @@ export const withGhostPosts = () =>
     path: '/ghost/api/v3/content/posts/',
     response: { posts: [] },
   });
+
+export const withFootprintWrapped = () =>
+  mockRequest({
+    method: 'get',
+    path: '/org/footprint_wrapped',
+    response: {},
+  });

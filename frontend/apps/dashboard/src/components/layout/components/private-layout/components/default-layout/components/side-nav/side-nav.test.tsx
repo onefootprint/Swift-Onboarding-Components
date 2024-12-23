@@ -1,12 +1,14 @@
 import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import mockRouter from 'next-router-mock';
 import { asAdminUserFirmEmployee, asAdminUserInLive } from 'src/config/tests';
+import { useStore as useHasShown2024WrappedStore } from 'src/hooks/use-has-shown-2024-wrapped';
 import { useStore } from 'src/hooks/use-session';
 
 import SideNav from './side-nav';
 import {
   getOrgAuthRoleFixture,
   withEntities,
+  withFootprintWrapped,
   withGhostPosts,
   withOrgAssumeRole,
   withOrgAssumeRoleError,
@@ -29,6 +31,10 @@ describe('<SideNav />', () => {
     asAdminUserInLive();
     withRiskSignals();
     withGhostPosts();
+    withFootprintWrapped();
+    useHasShown2024WrappedStore.setState({
+      hasShown2024Wrapped: true,
+    });
   });
 
   const renderSideNav = () => customRender(<SideNav />);

@@ -606,6 +606,9 @@
         "internal": "Internal",
         "tenants": "Tenants",
         "toolbox": "Toolbox",
+        "2024-wrapped": {
+          "title": "Your 2024 Footprint Wrapped"
+        },
         "help-links": {
           "title": "Help",
           "documentation": "Documentation",

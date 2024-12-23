@@ -239,3 +239,10 @@ export const withOrgAssumeRoleError = () =>
       message: 'Something went wrong',
     },
   });
+
+export const withFootprintWrapped = () =>
+  mockRequest({
+    method: 'get',
+    path: '/org/footprint_wrapped',
+    response: {},
+  });
