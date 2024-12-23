@@ -31,7 +31,6 @@ use newtypes::CollectedDataOption as CDO;
 use newtypes::ContactInfoKind;
 use newtypes::DataIdentifier;
 use newtypes::DataIdentifierDiscriminant as DID;
-use newtypes::DocumentCdoInfo;
 use newtypes::DocumentConfig;
 use newtypes::DocumentDiKind;
 use newtypes::DocumentRequestConfig;
@@ -44,7 +43,6 @@ use newtypes::Iso3166TwoDigitCountryCode;
 use newtypes::KybState;
 use newtypes::LivenessSource;
 use newtypes::OnboardingRequirement;
-use newtypes::Selfie;
 use newtypes::UsLegalStatus;
 use newtypes::WorkflowConfig;
 use newtypes::WorkflowKind;
@@ -538,7 +536,7 @@ fn get_authorize_requirement<T>(
     uvw: &TenantVw<T>,
     user_wf: &Workflow,
 ) -> FpResult<Option<OnboardingRequirement>> {
-    let (document_types, skipped_selfie) = if ctx.obc.can_access_document() {
+    let document_types = if ctx.obc.can_access_document() {
         // Note: since we might have collected multiple documents in a given onboarding, and we'd like
         // to authorize all of them
         let docs = Document::list_by_wf_id(conn, &user_wf.id)?;
@@ -549,11 +547,9 @@ fn get_authorize_requirement<T>(
             .filter_map(|(id, _)| id.completed_seqno.and(id.vaulted_document_type))
             .unique()
             .collect();
-        // unless all were skipped, we need to authorize since we may have collected it
-        let selfie_skipped = docs.iter().all(|(id, _)| id.should_skip_selfie());
-        (doc_types, selfie_skipped)
+        doc_types
     } else {
-        (vec![], false)
+        vec![]
     };
 
     let collected_data = (ctx.obc.can_access_data)
@@ -566,9 +562,7 @@ fn get_authorize_requirement<T>(
                 true
             }
         })
-        .filter(|cdo| {
-            !matches!(cdo, CDO::Document(DocumentCdoInfo(_, _, Selfie::RequireSelfie))) || !skipped_selfie
-        })
+        .filter(|cdo| !matches!(cdo, CDO::Document(_)))
         .filter(|cdo| !should_skip_us_only_cdos(cdo, ctx.user_values))
         .cloned()
         .collect();
