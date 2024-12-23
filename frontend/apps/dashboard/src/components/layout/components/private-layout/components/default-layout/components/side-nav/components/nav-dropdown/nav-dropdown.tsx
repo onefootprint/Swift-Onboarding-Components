@@ -77,10 +77,10 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user, posts }: Nav
   const handle2024WrappedOpen = () => {
     setIsDropdownOpen(false);
     setIsWrappedOpen(true);
-    markAsShown2024Wrapped();
   };
 
   const handle2024WrappedClose = () => {
+    markAsShown2024Wrapped();
     setIsDropdownOpen(false);
     setIsWrappedOpen(false);
   };
