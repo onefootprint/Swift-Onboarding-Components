@@ -104,6 +104,6 @@
     "typescript": "^5.6.3"
   },
   "peerDependencies": {
-    "next": "14.x"
+    "next": "15.x"
   }
 }
