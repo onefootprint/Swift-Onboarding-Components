@@ -15,6 +15,7 @@
 
 package org.openapitools.client.models
 
+import org.openapitools.client.models.BootstrapDataV1
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
@@ -29,7 +30,7 @@ import kotlinx.serialization.encoding.*
 
 data class OnboardingSessionResponse (
 
-    @SerialName(value = "bootstrap_data") @Required val bootstrapData: kotlin.String
+    @SerialName(value = "bootstrap_data") @Required val bootstrapData: BootstrapDataV1
 
 ) {
 

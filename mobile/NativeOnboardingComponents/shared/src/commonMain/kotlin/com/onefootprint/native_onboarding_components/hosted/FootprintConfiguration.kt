@@ -6,9 +6,9 @@ import com.onefootprint.native_onboarding_components.models.OverallOutcome
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import org.openapitools.client.models.ModernUserDecryptResponse
+import org.openapitools.client.models.BootstrapDataV1
 
-typealias FootprintBootstrapData = ModernUserDecryptResponse
+typealias FootprintBootstrapData = BootstrapDataV1
 
 @Serializable
 internal data class FootprintConfiguration(

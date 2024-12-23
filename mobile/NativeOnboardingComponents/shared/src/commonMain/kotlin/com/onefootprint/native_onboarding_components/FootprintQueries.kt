@@ -307,7 +307,7 @@ internal object FootprintQueries {
     suspend fun decrypt(
         authToken: String,
         fields: List<DataIdentifier>
-    ): ModernUserDecryptResponse {
+    ): ModernRawUserDataRequest {
         val filteredFields = fields.filter {
             it != DataIdentifier.idSsn9 &&
                     it != DataIdentifier.idSsn4 &&

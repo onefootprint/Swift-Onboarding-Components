@@ -15,9 +15,6 @@
 
 package org.openapitools.client.models
 
-import org.openapitools.client.models.InvestorProfileDeclaration
-import org.openapitools.client.models.InvestorProfileFundingSource
-import org.openapitools.client.models.InvestorProfileInvestmentGoal
 import org.openapitools.client.models.Iso3166TwoDigitCountryCode
 
 import kotlinx.serialization.*
@@ -25,7 +22,24 @@ import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
+ * Key-value map of bootstrap data. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/integrate/bootstrap-data#boostraping-kyb-data).
  *
+ * @param businessAddressLine1 
+ * @param businessAddressLine2 
+ * @param businessCity 
+ * @param businessCorporationType 
+ * @param businessCountry 
+ * @param businessDba 
+ * @param businessFormationDate 
+ * @param businessFormationState 
+ * @param businessName 
+ * @param businessPhoneNumber 
+ * @param businessPrimaryOwnerStake 
+ * @param businessSecondaryBeneficialOwners 
+ * @param businessState 
+ * @param businessTin 
+ * @param businessWebsite 
+ * @param businessZip 
  * @param idAddressLine1 
  * @param idAddressLine2 
  * @param idCitizenships 
@@ -49,23 +63,42 @@ import kotlinx.serialization.encoding.*
  * @param idVisaExpirationDate 
  * @param idVisaKind 
  * @param idZip 
- * @param investorProfileAnnualIncome 
- * @param investorProfileBrokerageFirmEmployer 
- * @param investorProfileDeclarations 
- * @param investorProfileEmployer 
- * @param investorProfileEmploymentStatus 
- * @param investorProfileFamilyMemberNames 
- * @param investorProfileFundingSources 
- * @param investorProfileInvestmentGoals 
- * @param investorProfileNetWorth 
- * @param investorProfileOccupation 
- * @param investorProfilePoliticalOrganization 
- * @param investorProfileRiskTolerance 
- * @param investorProfileSeniorExecutiveSymbols 
  */
 @Serializable
 
-open class ModernRawUserDataRequest (
+data class BootstrapDataV1 (
+
+    @SerialName(value = "business.address_line1") val businessAddressLine1: kotlin.String? = null,
+
+    @SerialName(value = "business.address_line2") val businessAddressLine2: kotlin.String? = null,
+
+    @SerialName(value = "business.city") val businessCity: kotlin.String? = null,
+
+    @SerialName(value = "business.corporation_type") val businessCorporationType: kotlin.String? = null,
+
+    @SerialName(value = "business.country") val businessCountry: kotlin.String? = null,
+
+    @SerialName(value = "business.dba") val businessDba: kotlin.String? = null,
+
+    @SerialName(value = "business.formation_date") val businessFormationDate: kotlin.String? = null,
+
+    @SerialName(value = "business.formation_state") val businessFormationState: kotlin.String? = null,
+
+    @SerialName(value = "business.name") val businessName: kotlin.String? = null,
+
+    @SerialName(value = "business.phone_number") val businessPhoneNumber: kotlin.String? = null,
+
+    @SerialName(value = "business.primary_owner_stake") val businessPrimaryOwnerStake: kotlin.Long? = null,
+
+    @SerialName(value = "business.secondary_beneficial_owners") val businessSecondaryBeneficialOwners: kotlin.collections.List<kotlin.String>? = null,
+
+    @SerialName(value = "business.state") val businessState: kotlin.String? = null,
+
+    @SerialName(value = "business.tin") val businessTin: kotlin.String? = null,
+
+    @SerialName(value = "business.website") val businessWebsite: kotlin.String? = null,
+
+    @SerialName(value = "business.zip") val businessZip: kotlin.String? = null,
 
     @SerialName(value = "id.address_line1") val idAddressLine1: kotlin.String? = null,
 
@@ -111,34 +144,10 @@ open class ModernRawUserDataRequest (
 
     @SerialName(value = "id.visa_kind") val idVisaKind: kotlin.String? = null,
 
-    @SerialName(value = "id.zip") val idZip: kotlin.String? = null,
-
-    @SerialName(value = "investor_profile.annual_income") val investorProfileAnnualIncome: kotlin.String? = null,
-
-    @SerialName(value = "investor_profile.brokerage_firm_employer") val investorProfileBrokerageFirmEmployer: kotlin.String? = null,
-
-    @SerialName(value = "investor_profile.declarations") val investorProfileDeclarations: kotlin.collections.List<InvestorProfileDeclaration>? = null,
-
-    @SerialName(value = "investor_profile.employer") val investorProfileEmployer: kotlin.String? = null,
-
-    @SerialName(value = "investor_profile.employment_status") val investorProfileEmploymentStatus: kotlin.String? = null,
-
-    @SerialName(value = "investor_profile.family_member_names") val investorProfileFamilyMemberNames: kotlin.collections.List<kotlin.String>? = null,
-
-    @SerialName(value = "investor_profile.funding_sources") val investorProfileFundingSources: kotlin.collections.List<InvestorProfileFundingSource>? = null,
-
-    @SerialName(value = "investor_profile.investment_goals") val investorProfileInvestmentGoals: kotlin.collections.List<InvestorProfileInvestmentGoal>? = null,
-
-    @SerialName(value = "investor_profile.net_worth") val investorProfileNetWorth: kotlin.String? = null,
-
-    @SerialName(value = "investor_profile.occupation") val investorProfileOccupation: kotlin.String? = null,
-
-    @SerialName(value = "investor_profile.political_organization") val investorProfilePoliticalOrganization: kotlin.String? = null,
-
-    @SerialName(value = "investor_profile.risk_tolerance") val investorProfileRiskTolerance: kotlin.String? = null,
-
-    @SerialName(value = "investor_profile.senior_executive_symbols") val investorProfileSeniorExecutiveSymbols: kotlin.collections.List<kotlin.String>? = null
+    @SerialName(value = "id.zip") val idZip: kotlin.String? = null
 
 ) {
 
+
 }
+

@@ -124,8 +124,8 @@ internal class FootprintHostedInternal private constructor() {
                         fixtureResult = config.overallOutcome,
                         isComponentsSdk = config.isComponentSdk,
                         l10n = L10nV1(
-                            language = config.l10n?.language.toString(),
-                            locale = config.l10n?.locale.toString()
+                            language = config.l10n?.language,
+                            locale = config.l10n?.locale
                         ),
                         options = VerifyV1Options(
                             showLogo = config.options?.showLogo,

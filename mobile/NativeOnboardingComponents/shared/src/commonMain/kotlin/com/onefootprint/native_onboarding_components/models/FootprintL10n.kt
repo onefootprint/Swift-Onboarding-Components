@@ -2,22 +2,12 @@ package com.onefootprint.native_onboarding_components.models
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.openapitools.client.models.Language
+import org.openapitools.client.models.Locale
 
-@Serializable
-enum class FootprintSupportedLocale {
-    @SerialName("en-US")
-    EN_US,
-    @SerialName("es-MX")
-    ES_MX
-}
 
-@Serializable
-enum class FootprintSupportedLanguage {
-    @SerialName("en")
-    ENGLISH,
-    @SerialName("es")
-    SPANISH
-}
+typealias FootprintSupportedLocale = Locale
+typealias FootprintSupportedLanguage  = Language
 
 @Serializable
 data class Translation(
@@ -108,7 +98,7 @@ data class AddressTranslation(
 
 @Serializable
 data class FootprintL10n(
-    @SerialName("locale") val locale: FootprintSupportedLocale? = FootprintSupportedLocale.EN_US,
-    @SerialName("language") val language: FootprintSupportedLanguage? = FootprintSupportedLanguage.ENGLISH,
+    @SerialName("locale") val locale: FootprintSupportedLocale? = FootprintSupportedLocale.en_US,
+    @SerialName("language") val language: FootprintSupportedLanguage? = FootprintSupportedLanguage.en,
     @SerialName("translation") val translation: Translation? = null
 )

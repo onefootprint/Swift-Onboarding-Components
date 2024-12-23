@@ -15,6 +15,7 @@
 
 package org.openapitools.client.models
 
+import org.openapitools.client.models.BootstrapDataV1
 import org.openapitools.client.models.DocumentFixtureResult
 import org.openapitools.client.models.L10nV1
 import org.openapitools.client.models.VerifyV1Options
@@ -61,7 +62,7 @@ data class VerifyV1SdkArgs (
 
     @SerialName(value = "should_relay_to_components") val shouldRelayToComponents: kotlin.Boolean? = null,
 
-    @SerialName(value = "user_data") val userData: ModernUserDecryptResponse? = null
+    @SerialName(value = "user_data") val userData: BootstrapDataV1? = null
 
 ) {
 

@@ -15,7 +15,7 @@ internal object Formatters {
     /// - Returns: The date string in the format 'MM/DD/YYYY'.
     fun strInputToUSDate(locale: FootprintSupportedLocale, str: String): String {
         val dateParts = str.split("/")
-        val expectedFormat = if (locale == FootprintSupportedLocale.EN_US) "MM/DD/YYYY" else "DD/MM/YYYY"
+        val expectedFormat = if (locale == FootprintSupportedLocale.en_US) "MM/DD/YYYY" else "DD/MM/YYYY"
 
         if (dateParts.size != 3) {
             throw FootprintException(
@@ -24,8 +24,8 @@ internal object Formatters {
             )
         }
 
-        val day = if (locale == FootprintSupportedLocale.EN_US) dateParts[1] else dateParts[0]
-        val month = if (locale == FootprintSupportedLocale.EN_US) dateParts[0] else dateParts[1]
+        val day = if (locale == FootprintSupportedLocale.en_US) dateParts[1] else dateParts[0]
+        val month = if (locale == FootprintSupportedLocale.en_US) dateParts[0] else dateParts[1]
         val year = dateParts[2]
 
         // Ensure the date is valid
@@ -47,7 +47,7 @@ internal object Formatters {
     /// - Returns: The date string formatted as 'MM/DD/YYYY' or 'DD/MM/YYYY' based on the locale.
     fun fromUsDateToStringInput(locale: FootprintSupportedLocale, str: String): String {
         val dateParts = str.split("/")
-        val expectedFormat = if (locale == FootprintSupportedLocale.EN_US) "MM/DD/YYYY" else "DD/MM/YYYY"
+        val expectedFormat = if (locale == FootprintSupportedLocale.en_US) "MM/DD/YYYY" else "DD/MM/YYYY"
 
         if (dateParts.size != 3) {
             throw FootprintException(
@@ -68,7 +68,7 @@ internal object Formatters {
             )
         }
 
-        return if (locale == FootprintSupportedLocale.EN_US) {
+        return if (locale == FootprintSupportedLocale.en_US) {
             "$month/$day/$year"
         } else {
             "$day/$month/$year"

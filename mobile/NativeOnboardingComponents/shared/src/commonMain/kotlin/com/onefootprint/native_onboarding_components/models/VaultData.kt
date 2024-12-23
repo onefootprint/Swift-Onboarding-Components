@@ -47,7 +47,7 @@ class VaultData(
     val investorProfileFundingSources: List<InvestorProfileFundingSource>? = null
 ) {
     companion object {
-        internal fun fromModernUserDecryptResponse(from: ModernUserDecryptResponse): VaultData {
+        internal fun fromModernUserDecryptResponse(from: ModernRawUserDataRequest): VaultData {
             return VaultData(
                 idFirstName = from.idFirstName,
                 idMiddleName = from.idMiddleName,

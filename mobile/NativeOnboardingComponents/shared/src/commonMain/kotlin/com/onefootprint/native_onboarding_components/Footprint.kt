@@ -47,8 +47,8 @@ object Footprint {
     internal var sandboxOutcome: SandboxOutcome? = null
     private var isReady: Boolean = false
     var l10n: FootprintL10n = FootprintL10n(
-        locale = FootprintSupportedLocale.EN_US,
-        language = FootprintSupportedLanguage.ENGLISH
+        locale = FootprintSupportedLocale.en_US,
+        language = FootprintSupportedLanguage.en
     )
 
     // To ensure that only one coroutine can modify the state of the Footprint object at any given time
@@ -69,8 +69,8 @@ object Footprint {
         sandboxOutcome = null
         isReady = false
         l10n = FootprintL10n(
-            locale = FootprintSupportedLocale.EN_US,
-            language = FootprintSupportedLanguage.ENGLISH
+            locale = FootprintSupportedLocale.en_US,
+            language = FootprintSupportedLanguage.en
         )
         sessionId = null
     }
@@ -91,7 +91,7 @@ object Footprint {
 
             FootprintQueries.initialize(httpClientConfig = {
 //                it.engine {
-//                    proxy = ProxyBuilder.http("http://192.168.68.102:9090")
+//                    proxy = ProxyBuilder.http("http://10.212.87.99:9090")
 //                }
                 it.defaultRequest {
                     header("X-Fp-Session-Id", sessionId)
@@ -186,6 +186,7 @@ object Footprint {
             }
         }
     }
+
     @Throws(FootprintException::class, CancellationException::class)
     suspend fun createChallenge(email: String? = null, phoneNumber: String? = null): String {
         mutex.withLock {
@@ -221,6 +222,7 @@ object Footprint {
             )
         }
     }
+
     @Throws(FootprintException::class, CancellationException::class)
     suspend fun getRequirements(): Requirements {
         mutex.withLock {
@@ -231,14 +233,22 @@ object Footprint {
     @Throws(FootprintException::class, CancellationException::class)
     suspend fun vault(data: VaultData) {
         mutex.withLock {
-            VaultUtils.vaultData(data = data, authToken = vaultingToken, locale = l10n.locale ?: FootprintSupportedLocale.EN_US)
+            VaultUtils.vaultData(
+                data = data,
+                authToken = vaultingToken,
+                locale = l10n.locale ?: FootprintSupportedLocale.en_US
+            )
         }
     }
 
     @Throws(FootprintException::class, CancellationException::class)
     suspend fun getVaultData(fields: List<DataIdentifier>): VaultData {
         mutex.withLock {
-            return VaultUtils.decryptVaultData(authToken = verifiedAuthToken, fields = fields, locale = l10n.locale ?: FootprintSupportedLocale.EN_US)
+            return VaultUtils.decryptVaultData(
+                authToken = verifiedAuthToken,
+                fields = fields,
+                locale = l10n.locale ?: FootprintSupportedLocale.en_US
+            )
         }
     }
 
@@ -256,7 +266,7 @@ object Footprint {
             }
 
             val requirements = RequirementUtil.getRequirements(authToken = authToken)
-            if(!requirements.canProcessInline){
+            if (!requirements.canProcessInline) {
                 throw FootprintException(
                     kind = FootprintException.ErrorKind.INLINE_PROCESS_NOT_SUPPORTED,
                     message = "Inline processing is not supported. Make sure that all requirements are met or use the hosted handoff."
@@ -271,7 +281,7 @@ object Footprint {
             // Another check to ensure that the requirements are met
             // to handle the step-up case
             val requirementsAfterProcessing = RequirementUtil.getRequirements(authToken = authToken)
-            if(!requirementsAfterProcessing.canProcessInline){
+            if (!requirementsAfterProcessing.canProcessInline) {
                 throw FootprintException(
                     kind = FootprintException.ErrorKind.INLINE_PROCESS_NOT_SUPPORTED,
                     message = "Inline processing is not supported. Make sure that all requirements are met or use the hosted handoff."

@@ -108,7 +108,7 @@ const updateModernRawUserDataRequest = async (dir: string) => {
 
     fileContent = fileContent.replace(
       /(?<!\w)data class ModernRawUserDataRequest/g,
-      'open data class ModernRawUserDataRequest',
+      'open class ModernRawUserDataRequest',
     );
 
     await fs.writeFile(filePath, fileContent);
@@ -130,6 +130,13 @@ const updateVerifyV1SdkArgs = async (dir: string) => {
   await fs.writeFile(verifyPath, fileContent);
 };
 
+const updateLocale = async (dir: string) => {
+  const filePath = path.join(dir, 'src/commonMain/kotlin/org/openapitools/client/models/Locale.kt');
+  let fileContent = await fs.readFile(filePath, 'utf8');
+  fileContent = fileContent.replace(/Minus/g, '_');
+  await fs.writeFile(filePath, fileContent);
+};
+
 export const updateKotlin = async (dir: string) => {
   await updateCollectedDataOption(dir);
   await updateDataIdentifierVarNaming(dir);
@@ -140,4 +147,5 @@ export const updateKotlin = async (dir: string) => {
   await updateModernRawUserDataRequest(dir);
   await updateSdkArgs(dir);
   await updateVerifyV1SdkArgs(dir);
+  await updateLocale(dir);
 };

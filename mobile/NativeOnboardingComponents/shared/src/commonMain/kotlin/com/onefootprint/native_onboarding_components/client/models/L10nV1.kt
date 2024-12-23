@@ -15,6 +15,8 @@
 
 package org.openapitools.client.models
 
+import org.openapitools.client.models.Language
+import org.openapitools.client.models.Locale
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
@@ -30,9 +32,9 @@ import kotlinx.serialization.encoding.*
 
 data class L10nV1 (
 
-    @SerialName(value = "language") val language: kotlin.String? = null,
+    @SerialName(value = "language") val language: Language? = null,
 
-    @SerialName(value = "locale") val locale: kotlin.String? = null
+    @SerialName(value = "locale") val locale: Locale? = null
 
 ) {
 

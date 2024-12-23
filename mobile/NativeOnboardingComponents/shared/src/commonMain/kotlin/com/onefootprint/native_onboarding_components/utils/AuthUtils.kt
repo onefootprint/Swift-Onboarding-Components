@@ -216,7 +216,7 @@ internal object AuthUtils {
         val verificationResponse = FootprintQueries.verifyChallenge(
             challengeResponse = challengeResponse,
             challengeToken = challenge.challengeData.challengeToken,
-            challengeAuthToken = challenge.challengeData.token,
+            challengeAuthToken = challenge.challengeData.token!!,
             scope = scope
         )
 

@@ -16,6 +16,7 @@
 package org.openapitools.client.models
 
 import org.openapitools.client.models.AuthV1Options
+import org.openapitools.client.models.BootstrapDataV1
 import org.openapitools.client.models.L10nV1
 
 import kotlinx.serialization.*
@@ -40,7 +41,7 @@ data class AuthV1SdkArgs (
 
     @SerialName(value = "public_key") val publicKey: kotlin.String? = null,
 
-    @SerialName(value = "user_data") val userData: kotlin.String? = null
+    @SerialName(value = "user_data") val userData: BootstrapDataV1? = null
 
 ) {
 
