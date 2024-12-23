@@ -63,6 +63,40 @@ const Permissions = ({ kind }: PermissionsProps) => {
             {...register('scopeKinds')}
           />
         )}
+        {supportedScopeKinds.includes(RoleScopeKind.decrypt) && (
+          <div>
+            <Checkbox label={t('form.decrypt.label')} hint={t('scopes.hints.decrypt')} {...register('showDecrypt')} />
+            <div ref={animateDecryptSelect}>
+              {showDecryptSelect && (
+                <MultiSelectContainer>
+                  <Controller
+                    control={control}
+                    name="decryptOptions"
+                    rules={{
+                      required: {
+                        value: true,
+                        message: t('form.decrypt.errors.required'),
+                      },
+                    }}
+                    render={({ field }) => (
+                      <MultiSelect
+                        label={t('form.decrypt-attributes.label')}
+                        options={decryptOptions}
+                        allOption={decryptAllOption}
+                        size="compact"
+                        onBlur={field.onBlur}
+                        onChange={field.onChange}
+                        value={field.value}
+                        hasError={!!errors.decryptFields}
+                        hint={errors.decryptFields?.message as string}
+                      />
+                    )}
+                  />
+                </MultiSelectContainer>
+              )}
+            </div>
+          </div>
+        )}
         {supportedScopeKinds.includes(RoleScopeKind.apiKeys) && (
           <Checkbox
             label={t('scopes.api_keys')}
@@ -71,6 +105,7 @@ const Permissions = ({ kind }: PermissionsProps) => {
             {...register('scopeKinds')}
           />
         )}
+
         {supportedScopeKinds.includes(RoleScopeKind.orgSettings) && (
           <Checkbox
             label={t('scopes.org_settings')}
@@ -181,40 +216,6 @@ const Permissions = ({ kind }: PermissionsProps) => {
                         value={field.value}
                         hasError={!!errors.vaultProxyConfigs}
                         hint={errors.vaultProxyConfigs?.message as string}
-                      />
-                    )}
-                  />
-                </MultiSelectContainer>
-              )}
-            </div>
-          </div>
-        )}
-        {supportedScopeKinds.includes(RoleScopeKind.decrypt) && (
-          <div>
-            <Checkbox label={t('form.decrypt.label')} hint={t('scopes.hints.decrypt')} {...register('showDecrypt')} />
-            <div ref={animateDecryptSelect}>
-              {showDecryptSelect && (
-                <MultiSelectContainer>
-                  <Controller
-                    control={control}
-                    name="decryptOptions"
-                    rules={{
-                      required: {
-                        value: true,
-                        message: t('form.decrypt.errors.required'),
-                      },
-                    }}
-                    render={({ field }) => (
-                      <MultiSelect
-                        label={t('form.decrypt-attributes.label')}
-                        options={decryptOptions}
-                        allOption={decryptAllOption}
-                        size="compact"
-                        onBlur={field.onBlur}
-                        onChange={field.onChange}
-                        value={field.value}
-                        hasError={!!errors.decryptFields}
-                        hint={errors.decryptFields?.message as string}
                       />
                     )}
                   />
