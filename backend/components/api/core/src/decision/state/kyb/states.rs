@@ -515,7 +515,7 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
         let kyb_rs: Vec<RiskSignal> = RiskSignal::latest_by_risk_signal_group_kinds(
             conn,
             &wf.scoped_vault_id,
-            RiskSignalFilter::LegacyLatest,
+            RiskSignalFilter::WorkflowId(&wf.id),
         )?
         .into_iter()
         .map(|(_, rs)| rs)
@@ -711,7 +711,7 @@ impl OnAction<MakeDecision, KybState> for KybStepUpDecisioning {
         let kyb_rs: Vec<RiskSignal> = RiskSignal::latest_by_risk_signal_group_kinds(
             conn,
             &wf.scoped_vault_id,
-            RiskSignalFilter::LegacyLatest,
+            RiskSignalFilter::WorkflowId(&wf.id),
         )?
         .into_iter()
         .map(|(_, rs)| rs)

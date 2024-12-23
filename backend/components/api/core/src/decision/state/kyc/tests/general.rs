@@ -573,22 +573,15 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
         UserKind::Demo | UserKind::Sandbox(_) => {}
         UserKind::Live => {
             if !doc_failed {
-                redo_and_pass(
-                    state,
-                    user_kind,
-                    &wf,
-                    &obd,
-                    &tenant.id,
-                    &playbook.key,
-                    rs_failing,
-                    document_requested.is_some(),
-                )
-                .await;
+                redo_and_pass(state, user_kind, &wf, &obd, &tenant.id, &playbook.key, rs_failing).await;
             }
         }
     }
 }
 
+
+// TODO: this test is currently wrong because we don't appropriately mock checking for requirements
+// like we do in /process. This OBC sometimes requires a document, and we don't mock that here...
 #[allow(clippy::too_many_arguments)]
 async fn redo_and_pass(
     state: &mut State,
@@ -598,7 +591,6 @@ async fn redo_and_pass(
     tenant_id: &TenantId,
     ob_config_key: &PublishablePlaybookKey,
     previous_risk_signals: Vec<RiskSignal>,
-    doc_requested: bool,
 ) {
     // Trigger Redo workflow
     let sv_id = prior_wf.scoped_vault_id.clone();
@@ -701,10 +693,6 @@ async fn redo_and_pass(
             Some((VendorAPI::IdologyExpectId, FootprintReasonCode::SsnMatches)),
             Some((VendorAPI::IdologyExpectId, FootprintReasonCode::NameMatches)),
             Some((VendorAPI::IdologyExpectId, FootprintReasonCode::DobMatches)),
-            doc_requested.then_some((
-                VendorAPI::IncodeFetchScores,
-                FootprintReasonCode::DocumentVerified,
-            )),
         ]
         .into_iter()
         .flatten()

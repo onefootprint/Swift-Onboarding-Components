@@ -218,12 +218,15 @@ pub async fn query_data(
     let wfid = wf_id.clone();
     state
         .db_query(move |conn| {
-            let rs =
-                RiskSignal::latest_by_risk_signal_group_kinds(conn, &svid, RiskSignalFilter::LegacyLatest)
-                    .unwrap()
-                    .into_iter()
-                    .map(|(_, rs)| rs)
-                    .collect();
+            let rs = RiskSignal::latest_by_risk_signal_group_kinds(
+                conn,
+                &svid,
+                RiskSignalFilter::WorkflowId(&wfid),
+            )
+            .unwrap()
+            .into_iter()
+            .map(|(_, rs)| rs)
+            .collect();
 
             let wf = Workflow::get(conn, &wfid)?;
             let obd = OnboardingDecision::get_active(conn, &wfid)?;

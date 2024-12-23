@@ -631,9 +631,13 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
 
         let fixture_result = decision::utils::get_fixture_result(ff_client.clone(), &v, &wf, &self.t_id)?;
         let risk_signals: HashMap<RiskSignalGroupKind, Vec<RiskSignal>> =
-            RiskSignal::latest_by_risk_signal_group_kinds(conn, &self.sv_id, RiskSignalFilter::LegacyLatest)?
-                .into_iter()
-                .into_group_map();
+            RiskSignal::latest_by_risk_signal_group_kinds(
+                conn,
+                &self.sv_id,
+                RiskSignalFilter::WorkflowId(&wf.id),
+            )?
+            .into_iter()
+            .into_group_map();
 
         let doc_collected = DocumentRequest::get(conn, &wf.id, DocumentRequestKind::Identity)?.is_some();
         let aml_rs = risk_signals

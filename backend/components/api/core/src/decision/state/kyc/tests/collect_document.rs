@@ -415,16 +415,10 @@ async fn collect_ad_hoc_document(
         }
         UserKind::Live => {
             assert_have_same_elements(
-                vec![
-                    (VendorAPI::IdologyExpectId, FootprintReasonCode::AddressMatches),
-                    (VendorAPI::IdologyExpectId, FootprintReasonCode::SsnMatches),
-                    (VendorAPI::IdologyExpectId, FootprintReasonCode::NameMatches),
-                    (VendorAPI::IdologyExpectId, FootprintReasonCode::DobMatches),
-                    (
-                        VendorAPI::IncodeFetchScores,
-                        FootprintReasonCode::DocumentVerified,
-                    ),
-                ],
+                vec![(
+                    VendorAPI::IncodeFetchScores,
+                    FootprintReasonCode::DocumentVerified,
+                )],
                 rs.into_iter()
                     .map(|rs| (rs.vendor_api, rs.reason_code))
                     .collect_vec(),
