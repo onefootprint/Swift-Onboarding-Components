@@ -66,11 +66,13 @@ const AddressCard = ({ address, isSelected, onSelect }: AddressCardProps) => {
   return (
     <button
       id={`offices-card-${id}`}
-      style={{ width: `${IMAGE_WIDTH}px` }}
-      className={cx('relative flex flex-col border border-solid border-tertiary rounded bg-primary cursor-pointer', {
-        'border-secondary after:absolute after:inset-0 after:bg-accent after:opacity-10': isSelected,
-        'hover:bg-secondary': !isSelected,
-      })}
+      className={cx(
+        'w-fit relative flex flex-col border border-solid border-tertiary rounded bg-primary cursor-pointer',
+        {
+          'border-secondary after:absolute after:inset-0 after:bg-accent after:opacity-10 after:rounded': isSelected,
+          'hover:bg-secondary': !isSelected,
+        },
+      )}
       onClick={handleSelect}
       type="button"
     >

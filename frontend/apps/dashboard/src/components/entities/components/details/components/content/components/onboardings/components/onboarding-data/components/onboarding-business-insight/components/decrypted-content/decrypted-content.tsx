@@ -4,6 +4,7 @@ import ErrorComponent from 'src/components/error';
 import type { Subsection } from '../../../../hooks/use-subsections';
 import BusinessDetails from './components/business-details';
 import Loading from './components/loading';
+import Offices from './components/offices';
 import People from './components/people';
 import RegistrationDetails from './components/registration-details';
 import Registrations from './components/registrations';
@@ -44,6 +45,7 @@ const DecryptedContent = ({ onboardingId, selectedSubsection }: DecryptedContent
         <Registrations data={insights.registrations} onClick={handleOpen} />
       )}
       {insights?.watchlist && selectedSubsection === 'watchlist' && <Watchlist data={insights.watchlist} />}
+      {insights?.addresses && selectedSubsection === 'offices' && <Offices data={insights.addresses} />}
       {!!openRegistration && <RegistrationDetails registration={openRegistration} onClose={handleClose} />}
     </>
   );
