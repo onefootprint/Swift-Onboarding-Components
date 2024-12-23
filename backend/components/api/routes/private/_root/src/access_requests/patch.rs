@@ -7,6 +7,7 @@ use api_wire_types::AccessRequest;
 use api_wire_types::PatchAccessRequestRequest;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::super_admin_request::SuperAdminRequest;
+use db::models::tenant::Tenant;
 use db::models::tenant_user::TenantUser;
 use newtypes::SuperAdminAccessRequestId;
 use paperclip::actix::api_v2_operation;
@@ -47,8 +48,8 @@ pub async fn patch_access_request(
             )?;
 
             let requester = TenantUser::get(conn, &access_request.tenant_user_id)?;
-
             let responder = TenantUser::get(conn, &approver_tenant_user_id)?;
+            let tenant_name = Tenant::get(conn, &access_request.tenant_id)?.name;
 
             Ok(AccessRequest {
                 id: access_request.id,
@@ -60,6 +61,8 @@ pub async fn patch_access_request(
                 responded_at: access_request.responded_at,
                 approved: access_request.approved,
                 reason: access_request.reason,
+                tenant_id: access_request.tenant_id,
+                tenant_name,
             })
         })
         .await?;

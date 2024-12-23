@@ -47,7 +47,7 @@ pub async fn list_access_requests(
 
             let result = requests
                 .into_iter()
-                .map(|(request, requester, responder)| AccessRequest {
+                .map(|(request, tenant_name, requester, responder)| AccessRequest {
                     id: request.id,
                     requester,
                     scopes: request.scopes,
@@ -57,6 +57,8 @@ pub async fn list_access_requests(
                     responded_at: request.responded_at,
                     approved: request.approved,
                     reason: request.reason,
+                    tenant_id: request.tenant_id,
+                    tenant_name,
                 });
             Ok(result)
         })

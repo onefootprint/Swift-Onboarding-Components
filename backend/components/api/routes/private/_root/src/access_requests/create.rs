@@ -9,6 +9,7 @@ use chrono::Utc;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::super_admin_request::NewSuperAdminRequest;
 use db::models::super_admin_request::SuperAdminRequest;
+use db::models::tenant::Tenant;
 use db::models::tenant_user::TenantUser;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
@@ -46,6 +47,7 @@ pub async fn create_access_request(
             let now = Utc::now();
             let expires_at = now + chrono::Duration::hours(duration_hours);
             let tenant_user = TenantUser::get(conn, &tenant_user_id)?;
+            let tenant_name = Tenant::get(conn, &tenant_id)?.name;
 
             let request = NewSuperAdminRequest {
                 tenant_user_id,
@@ -69,6 +71,8 @@ pub async fn create_access_request(
                 responded_at: None,
                 reason,
                 approved: None,
+                tenant_id: created.tenant_id,
+                tenant_name,
             })
         })
         .await?;

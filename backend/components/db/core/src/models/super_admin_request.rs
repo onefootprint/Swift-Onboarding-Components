@@ -5,6 +5,7 @@ use crate::TxnPgConn;
 use api_errors::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
+use db_schema::schema::tenant;
 use db_schema::schema::tenant_user;
 use diesel::prelude::*;
 use newtypes::InsightEventId;
@@ -108,7 +109,13 @@ pub struct SuperAdminRequestListArgs {
     pub approved: Option<bool>,
 }
 
-pub type SuperAdminRequestList = Vec<(SuperAdminRequest, OrgMemberEmail, Option<OrgMemberEmail>)>;
+pub type TenantName = String;
+pub type SuperAdminRequestList = Vec<(
+    SuperAdminRequest,
+    TenantName,
+    OrgMemberEmail,
+    Option<OrgMemberEmail>,
+)>;
 
 impl SuperAdminRequest {
     #[tracing::instrument("SuperAdminRequest::list", skip(conn))]
@@ -118,6 +125,7 @@ impl SuperAdminRequest {
         let mut query = super_admin_request::table
             .order_by(super_admin_request::created_at.desc())
             .inner_join(tenant_user::table.on(tenant_user::id.eq(super_admin_request::tenant_user_id)))
+            .inner_join(tenant::table.on(tenant::id.eq(super_admin_request::tenant_id)))
             .left_join(
                 tenant_user_alias.on(tenant_user::id
                     .nullable()
@@ -125,6 +133,7 @@ impl SuperAdminRequest {
             )
             .select((
                 super_admin_request::all_columns,
+                tenant::name,
                 tenant_user::email,
                 tenant_user::email.nullable(),
             ))

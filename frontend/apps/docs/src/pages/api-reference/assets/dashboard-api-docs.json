@@ -9099,6 +9099,12 @@
                         "items": {
                             "$ref": "#/components/schemas/TenantScope"
                         }
+                    },
+                    "tenant_id": {
+                        "type": "string"
+                    },
+                    "tenant_name": {
+                        "type": "string"
                     }
                 },
                 "required": [
@@ -9106,7 +9112,9 @@
                     "expires_at",
                     "id",
                     "requester",
-                    "scopes"
+                    "scopes",
+                    "tenant_id",
+                    "tenant_name"
                 ]
             },
             "ActionKind": {

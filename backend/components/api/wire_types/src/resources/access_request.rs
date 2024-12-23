@@ -3,6 +3,7 @@ use chrono::DateTime;
 use chrono::Utc;
 use newtypes::OrgMemberEmail;
 use newtypes::SuperAdminAccessRequestId;
+use newtypes::TenantId;
 use newtypes::TenantScope;
 
 #[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
@@ -16,4 +17,6 @@ pub struct AccessRequest {
     pub responded_at: Option<DateTime<Utc>>,
     pub approved: Option<bool>,
     pub reason: Option<String>,
+    pub tenant_id: TenantId,
+    pub tenant_name: String,
 }
