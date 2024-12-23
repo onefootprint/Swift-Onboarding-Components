@@ -1,5 +1,4 @@
 import type { GetStaticProps } from 'next';
-import type { Params } from 'next/dist/shared/lib/router/utils/route-matcher';
 import { getAllMarkdownFiles } from 'src/utils/articles';
 import { getSectionId } from 'src/utils/section';
 import type { ApiReferenceProps } from './api-reference';
@@ -33,7 +32,7 @@ export type IntroductionArticle = {
   rightContent: string;
 };
 
-export const getStaticProps: GetStaticProps<ApiReferenceProps, Params> = async () => {
+export const getStaticProps: GetStaticProps<ApiReferenceProps> = async () => {
   const rawIntroductionSections = await getAllMarkdownFiles<RawIntroductionArticle>(
     'src/content/api-reference/00-introduction/**.mdx',
   );
