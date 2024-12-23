@@ -20,7 +20,6 @@ export enum TenantPreviewApi {
   RiskSignalsList = 'risk_signals_list',
   OnboardingSessionToken = 'onboarding_session_token',
   VaultIntegrity = 'vault_integrity',
-  ReonboardUser = 'reonboard_user',
   CreateUserDecision = 'create_user_decision',
   CreateBusinessOwner = 'create_business_owner',
   ListBusinessOwners = 'list_business_owners',
