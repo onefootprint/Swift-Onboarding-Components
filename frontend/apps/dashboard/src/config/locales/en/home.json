@@ -35,13 +35,16 @@
     "id-illustration-alt": "ID illustration",
     "gift-illustration-alt": "Percy with gift",
     "loading-text": "Loading...",
-    "thank-you-text": "Thank you for being an incredible partner and part of our journey this year!",
+    "thank-you-text": "Thank you for choosing us to be a part of your journey this year!",
     "download": "Download your 2024 Footprint Wrapped",
     "businesses-onboarded": "Businesses onboarded",
     "documents-collected": "Documents collected",
     "passkeys-registered": "Passkeys registered",
     "step-ups-generated": "Step-ups generated",
     "users-onboarded": "Users onboarded",
-    "verification-rate-improvement": "Verification rate increase due to KYC waterfall"
+    "verification-rate-improvement": "Verification rate increase due to KYC waterfall",
+    "person-vaults-created": "User vaults (Vault only)",
+    "business-vaults-created": "Business vaults (Vault only)",
+    "metrics-as-of": "Metrics as of {{date}}"
   }
 }

@@ -1,7 +1,8 @@
 import { getOrgFootprintWrappedOptions } from '@onefootprint/axios/dashboard';
 import type { GetOrgFootprintWrappedData } from '@onefootprint/request-types/dashboard';
-import { Dialog, LinkButton, Shimmer } from '@onefootprint/ui';
+import { Dialog, Divider, LinkButton, Shimmer } from '@onefootprint/ui';
 import { useQuery } from '@tanstack/react-query';
+import { format } from 'date-fns';
 import Image from 'next/image';
 import { useTranslation } from 'react-i18next';
 import StatCard from './components/stat-card';
@@ -14,13 +15,17 @@ type WrappedDialogProps = {
 const WrappedDialog = ({ isOpen, onClose }: WrappedDialogProps) => {
   const { t } = useTranslation('home', { keyPrefix: 'wrapped' });
   const { data, isLoading } = useQuery(getOrgFootprintWrappedOptions());
+  // @ts-expect-error - Dave says this is untyped JSON on the backend
+  const asOf = data?.asOf ? format(new Date(data.asOf), 'MM/dd/yy') : '';
 
   const metricsToShow = {
+    nPersonOnboarded: t('users-onboarded'),
     nBusinessOnboarded: t('businesses-onboarded'),
+    nPersonVaults: t('person-vaults-created'),
+    nBusinessVaults: t('business-vaults-created'),
     nDocument: t('documents-collected'),
     nPasskeys: t('passkeys-registered'),
     nStepups: t('step-ups-generated'),
-    nPersonOnboarded: t('users-onboarded'),
     pctWaterfallVerifRateIncrease: t('verification-rate-improvement'),
   };
 
@@ -51,7 +56,7 @@ const WrappedDialog = ({ isOpen, onClose }: WrappedDialogProps) => {
               </div>
             </div>
           </div>
-          <div className="p-6">
+          <div className="p-6 flex flex-col gap-4">
             <div className="grid grid-cols-2 gap-3">
               {Object.entries(metricsToShow).map(([key, label]) => (
                 <StatCard
@@ -62,13 +67,15 @@ const WrappedDialog = ({ isOpen, onClose }: WrappedDialogProps) => {
                 />
               ))}
             </div>
-            <div className="mt-6 text-center">
+            <div className="text-center">
               <p className="text-primary text-body-3">{t('thank-you-text')}</p>
               {/* @ts-expect-error  - Dave says this is untyped JSON on the backend*/}
               <LinkButton href={data?.downloadLink} $marginTop={2}>
                 {t('download')}
               </LinkButton>
             </div>
+            <Divider variant="secondary" />
+            <p className="text-tertiary text-body-3 text-center">{t('metrics-as-of', { date: asOf })}</p>
           </div>
         </div>
       )}
