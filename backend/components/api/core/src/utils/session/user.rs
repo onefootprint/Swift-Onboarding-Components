@@ -88,14 +88,13 @@ impl AuthSession {
         state: &State,
         data: T,
         expires_in: Duration,
-    ) -> FpResult<SessionAuthToken> {
+    ) -> FpResult<(SessionAuthToken, Self)> {
         let data = data.into();
         let key = state.session_sealing_key.clone();
-        let (auth_token, _) = state
+        let res = state
             .db_query(move |conn| Self::create_sync(conn, &key, data, expires_in))
             .await?;
-
-        Ok(auth_token)
+        Ok(res)
     }
 
     #[tracing::instrument(skip_all)]

@@ -1,4 +1,3 @@
-use crate::identify::create_identified_token;
 use crate::identify::serialize_auth_methods;
 use crate::GetIdentifyChallengeArgs;
 use crate::IdentifyChallengeContext;
@@ -135,10 +134,11 @@ async fn login_challenge_requirements(
         vw,
     } = ctx;
 
-    let session = UserSessionBuilder::new(vw.vault.id.clone(), vec![identify.scope.into()])
+    let (token, _) = UserSessionBuilder::new(vw.vault.id.clone(), vec![identify.scope.into()])
         .replace_su_id(sv.map(|sv| sv.id))
-        .replace_ob_config_auth_context(identify.ob_config_auth_context());
-    let (token, _) = create_identified_token(state, session, identify.scope).await?;
+        .replace_ob_config_auth_context(identify.ob_config_auth_context())
+        .save(state, identify.scope.token_ttl())
+        .await?;
     let scrubbed_phone = ams.iter().find_map(|am| am.phone()).map(|p| p.scrubbed());
 
     let (has_syncable_passkey, available_challenge_kinds, auth_methods) =

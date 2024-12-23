@@ -217,7 +217,7 @@ where
         .await?;
 
     let session = TenantRbSession::create(&login_result, TenantSessionPurpose::Dashboard);
-    let auth_token = AuthSession::create(&state, session, Duration::days(5)).await?;
+    let (auth_token, _) = AuthSession::create(&state, session, Duration::days(5)).await?;
 
     let TenantRbLoginResult {
         t_user,

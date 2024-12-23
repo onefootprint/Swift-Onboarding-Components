@@ -3,7 +3,6 @@ use crate::IdentifyChallengeContext;
 use crate::IdentifyLookupId;
 use crate::UserAuthMethodsContext;
 use api_core::auth::ob_config::ObConfigAuth;
-use api_core::auth::session::user::TokenCreationPurpose;
 use api_core::auth::session::user::UserSessionBuilder;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
@@ -12,8 +11,6 @@ use api_core::telemetry::RootSpan;
 use api_core::types::ApiResponse;
 use api_core::utils::headers::SandboxId;
 use api_core::utils::identify::AuthMethod;
-use api_core::utils::session::AuthSession;
-use api_core::FpResult;
 use api_core::State;
 use api_errors::BadRequestInto;
 use api_wire_types::IdentifiedUser;
@@ -23,9 +20,7 @@ use api_wire_types::IdentifyResponse;
 use db::models::tenant::Tenant;
 use itertools::Itertools;
 use newtypes::ChallengeKind;
-use newtypes::IdentifyScope;
 use newtypes::PreviewApi::SmsLinkAuthentication;
-use newtypes::SessionAuthToken;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
 use paperclip::actix::web::Json;
@@ -140,7 +135,7 @@ pub async fn post(
         if let Some(ob_context) = ob_context.as_ref() {
             session = session.replace_ob_config_auth_context(ob_context.ob_config_auth_context());
         }
-        let (token, _) = create_identified_token(&state, session, scope).await?;
+        let (token, _) = session.save(&state, scope.token_ttl()).await?;
         (token, vec![])
     };
 
@@ -195,34 +190,4 @@ pub(super) fn serialize_auth_methods(
         })
         .collect();
     (has_syncable_passkey, available_challenge_kinds, auth_methods)
-}
-
-/// Creates an identified, unauthed token for the provided vault ID.
-/// The token may either explicitly specify a sv_id when vault has already onboarded onto the
-/// tenant, or it may specify a playbook id onto which the vault will be onboarded after they
-/// complete the auth.
-pub(super) async fn create_identified_token(
-    state: &State,
-    mut session: UserSessionBuilder,
-    scope: IdentifyScope,
-) -> FpResult<(SessionAuthToken, AuthSession)> {
-    let session_key = state.session_sealing_key.clone();
-    // Add metadata from the onboarding session token
-    let token = state
-        .db_query(move |conn| {
-            // TODO: put this in util for .with_ob_config_auth_context()
-            if session.bo_id.is_some() {
-                // TODO we should migrate the BO tokens to use un-authed, identified tokens.
-                // Then the purpose here would come from the SecondayBo token. But for now, we'll just
-                // manually add this purpose to keep track of when the auth session is for a secondary BO.
-                session.purposes.push(TokenCreationPurpose::SecondaryBo);
-            }
-
-            let session = session.finish()?;
-            let duration = scope.token_ttl();
-            let (token, session) = AuthSession::create_sync(conn, &session_key, session, duration)?;
-            Ok((token, session))
-        })
-        .await?;
-    Ok(token)
 }

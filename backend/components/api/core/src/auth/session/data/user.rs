@@ -1,8 +1,11 @@
 use super::onboarding::OnboardingSessionTrustedMetadata;
 use super::AuthSessionData;
 use crate::errors::user::UserError;
+use crate::utils::session::AuthSession;
 use crate::FpResult;
+use crate::State;
 use api_errors::BadRequestInto;
+use chrono::Duration;
 use itertools::chain;
 use itertools::Itertools;
 use newtypes::AuthEventId;
@@ -16,6 +19,7 @@ use newtypes::InsightEventId;
 use newtypes::ObConfigurationId;
 use newtypes::RequestedTokenScope;
 use newtypes::ScopedVaultId;
+use newtypes::SessionAuthToken;
 use newtypes::TenantId;
 use newtypes::UserAuthScope;
 use newtypes::VaultId;
@@ -285,12 +289,26 @@ impl UserSessionBuilder {
     }
 
     pub fn replace_ob_config_auth_context(mut self, new_ctx: ObConfigAuthFields) -> Self {
+        if new_ctx.bo_id.is_some() {
+            // TODO we should migrate the BO tokens to use un-authed, identified tokens.
+            // Then the purpose here would come from the SecondayBo token. But for now, we'll just
+            // manually add this purpose to keep track of when the auth session is for a secondary BO.
+            self.purposes.push(TokenCreationPurpose::SecondaryBo);
+        }
         self.sb_id = new_ctx.sb_id;
         self.bo_id = new_ctx.bo_id;
         self.obc_id = new_ctx.obc_id;
         self.biz_wf_id = new_ctx.biz_wf_id;
         self.metadata = new_ctx.metadata.unwrap_or(self.metadata.clone());
         self
+    }
+}
+
+impl UserSessionBuilder {
+    pub async fn save(self, state: &State, ttl: Duration) -> FpResult<(SessionAuthToken, AuthSession)> {
+        let session = self.finish()?;
+        let res = AuthSession::create(state, session, ttl).await?;
+        Ok(res)
     }
 }
 

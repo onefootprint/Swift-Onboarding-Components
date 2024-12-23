@@ -1,4 +1,3 @@
-use crate::identify::create_identified_token;
 use api_core::auth::ob_config::ObConfigAuth;
 use api_core::auth::session::user::TokenCreationPurpose;
 use api_core::auth::session::user::UserSessionBuilder;
@@ -89,12 +88,13 @@ pub async fn post(
         })
         .await?;
 
-    let session = UserSessionBuilder::new(uv.id, vec![TokenCreationPurpose::IdentifySession])
+    let (token, _) = UserSessionBuilder::new(uv.id, vec![TokenCreationPurpose::IdentifySession])
         .replace_su_id(Some(su.id))
         .replace_identify_scope(Some(scope))
         .replace_ob_config_auth_context(ob_context.ob_config_auth_context())
-        .add_scopes(vec![UserAuthScope::IdentifySession]);
-    let (token, _) = create_identified_token(&state, session, scope).await?;
+        .add_scopes(vec![UserAuthScope::IdentifySession])
+        .save(&state, scope.token_ttl())
+        .await?;
     let response = IdentifySessionResponse { token };
     Ok(response)
 }
