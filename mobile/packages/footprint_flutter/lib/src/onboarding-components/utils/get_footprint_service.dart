@@ -8,7 +8,6 @@ import 'package:footprint_flutter/src/onboarding-components/models/auth_token_st
 import 'package:footprint_flutter/src/onboarding-components/models/footprint_configuration.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/footprint_error.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/form_data.dart';
-import 'package:footprint_flutter/src/onboarding-components/models/onboarding_status.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/onboarding_step.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/save_data_request.dart';
 import 'package:footprint_flutter/src/onboarding-components/models/verification_response.dart';
@@ -441,14 +440,11 @@ typedef GetRequirementsHandler = Future<GetOnboardingStatusResult> Function();
     }
 
     final requirementsBeforeProcess = await getOnboardingStatus(authToken);
-    for (var requirement in requirementsBeforeProcess.requirements.all) {
-      if (!requirement.isMet &&
-          requirement.kind != OnboardingRequirementKind.process) {
-        throw FootprintError(
-          kind: ErrorKind.inlineProcessNotSupported,
-          message: "Process error. Onboarding requirements not met.",
-        );
-      }
+    if (!requirementsBeforeProcess.requirements.canProcessInline) {
+      throw FootprintError(
+        kind: ErrorKind.inlineProcessNotSupported,
+        message: "Process error. Onboarding requirements not met.",
+      );
     }
 
     try {
@@ -457,6 +453,15 @@ typedef GetRequirementsHandler = Future<GetOnboardingStatusResult> Function();
       throw FootprintError(
         kind: ErrorKind.inlineProcessNotSupported,
         message: "Failed to process onboarding. Error: $e",
+      );
+    }
+
+    // For stepup case, the document requirement shows up after processing
+    final requirementsAfterProcess = await getOnboardingStatus(authToken);
+    if (!requirementsAfterProcess.requirements.canProcessInline) {
+      throw FootprintError(
+        kind: ErrorKind.inlineProcessNotSupported,
+        message: "Cannot complete onboarding inline. Please call handoff.",
       );
     }
 

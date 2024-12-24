@@ -15,10 +15,9 @@ typedef Fields = ({
 });
 
 typedef Requirements = ({
-  List<OnboardingRequirement> all,
   bool isCompleted,
   bool isMissing,
-  List<OnboardingRequirement> missing,
+  bool canProcessInline,
   bool canUpdateUserData
 });
 
@@ -61,7 +60,8 @@ Future<GetOnboardingStatusResult> getOnboardingStatus(String authToken) async {
   List<DataIdentifier> collectedFields = [];
   List<DataIdentifier> optionalFields = [];
 
-  for (var requirement in allRequirements) {
+  for (var obRequirement in allRequirements) {
+    final requirement = obRequirement.requirement;
     List<DataIdentifier> optionalAttributes = [];
     List<DataIdentifier> populatedAttributes = [];
     List<DataIdentifier> missingAttributes = [];
@@ -110,10 +110,11 @@ Future<GetOnboardingStatusResult> getOnboardingStatus(String authToken) async {
       optional: optionalFields,
     ),
     requirements: (
-      all: allRequirements,
       isCompleted: allRequirements.every((element) => element.isMet),
       isMissing: allRequirements.any((element) => !element.isMet),
-      missing: allRequirements.where((element) => !element.isMet).toList(),
+      canProcessInline: !allRequirements.any((element) =>
+          !element.isMet &&
+          element.requirement.kind != OnboardingRequirementKind.process),
       canUpdateUserData: onboardingStatusResponse.canUpdateUserData
     )
   );

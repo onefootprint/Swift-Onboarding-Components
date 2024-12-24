@@ -776,6 +776,9 @@ class Ssn extends StatelessWidget {
     )
         .then(
       (_) {
+        utilMethods.getRequirements().then((requirements) {
+          print("Requirements: $requirements");
+        });
         utilMethods.process().then((validationToken) {
           onCompleted(validationToken);
         }).catchError((err) {

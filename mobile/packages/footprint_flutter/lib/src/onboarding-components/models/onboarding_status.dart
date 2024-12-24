@@ -43,26 +43,20 @@ enum OnboardingRequirementKind {
   }
 }
 
-// Notice that this an oversimplified version of the original model in "frontend/packages/types/src/api/onboarding-status.ts"
-// This is because Dart does not have union types
-// So, it would be quite complex to implement the original model in Dart
-// This model should serve the purpose for now
-class OnboardingRequirement {
+class Requirement {
   final OnboardingRequirementKind kind;
-  final bool isMet;
   final List<CollectedDataOption>? missingAttributes;
   final List<CollectedDataOption>? populatedAttributes;
   final List<CollectedDataOption>? optionalAttributes;
 
-  OnboardingRequirement({
+  Requirement({
     required this.kind,
-    required this.isMet,
     this.missingAttributes,
     this.populatedAttributes,
     this.optionalAttributes,
   });
 
-  factory OnboardingRequirement.fromJson(Map<String, dynamic> json) {
+  factory Requirement.fromJson(Map<String, dynamic> json) {
     List<CollectedDataOption>? missingAttributes = [];
     List<CollectedDataOption>? populatedAttributes = [];
     List<CollectedDataOption>? optionalAttributes = [];
@@ -91,9 +85,8 @@ class OnboardingRequirement {
       }
     }
 
-    return OnboardingRequirement(
+    return Requirement(
       kind: OnboardingRequirementKind.fromValue(json['kind'])!,
-      isMet: json['is_met'],
       missingAttributes:
           json['missing_attributes'] != null ? missingAttributes : null,
       populatedAttributes:
@@ -102,24 +95,26 @@ class OnboardingRequirement {
           json['optional_attributes'] != null ? optionalAttributes : null,
     );
   }
+}
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['kind'] = kind.value;
-    data['is_met'] = isMet;
-    if (missingAttributes != null) {
-      data['missing_attributes'] =
-          missingAttributes!.map((e) => e.value).toList();
-    }
-    if (populatedAttributes != null) {
-      data['populated_attributes'] =
-          populatedAttributes!.map((e) => e.value).toList();
-    }
-    if (optionalAttributes != null) {
-      data['optional_attributes'] =
-          optionalAttributes!.map((e) => e.value).toList();
-    }
-    return data;
+// Notice that this an oversimplified version of the original model in "frontend/packages/types/src/api/onboarding-status.ts"
+// This is because Dart does not have union types
+// So, it would be quite complex to implement the original model in Dart
+// This model should serve the purpose for now
+class OnboardingRequirement {
+  final bool isMet;
+  final Requirement requirement;
+
+  OnboardingRequirement({
+    required this.isMet,
+    required this.requirement,
+  });
+
+  factory OnboardingRequirement.fromJson(Map<String, dynamic> json) {
+    return OnboardingRequirement(
+      isMet: json['is_met'],
+      requirement: Requirement.fromJson(json),
+    );
   }
 }
 
