@@ -513,13 +513,12 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             .into_iter()
             .map(|frc| (frc, VendorAPI::Footprint, None))
             .collect();
-        let hidden = !self.t_id.is_triumph(); // rolling this out slightly safely
         RiskSignal::bulk_save_for_scope(
             conn,
             risk_signal_group_scope.clone(),
             duplicate_risk_signals,
             RiskSignalGroupKind::Duplicates,
-            hidden,
+            false,
         )?;
 
 
