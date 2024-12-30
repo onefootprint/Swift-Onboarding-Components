@@ -17,6 +17,7 @@ export enum CardCaptureStatus {
   OK = 'ok',
   detecting = 'detecting',
   blurry = 'blurry',
+  error = 'error',
 }
 
 const isImageBlurry = (cv: OpenCVType, src: Mat) => {
@@ -264,8 +265,8 @@ export const getCardCaptureStatus = (
     return detectCardStatus(cv, src, imgSrc.width, imgSrc.height, params, startParamIndex, batchSize);
   } catch (err) {
     Logger.error(
-      `Error in getCardCaptureStatus. Passed image width ${imgSrc.width}, image height ${imgSrc.height}. Error ${err}. Returning "detecting" status so that the user can move on with the flow and manually capture the card.`,
+      `Error in getCardCaptureStatus. Passed image width ${imgSrc.width}, image height ${imgSrc.height}. Error ${err}. Returning "error" status so that the user can move on with the flow and manually capture the card.`,
     );
-    return { status: CardCaptureStatus.detecting, paramIndex: -1 };
+    return { status: CardCaptureStatus.error, paramIndex: -1 };
   }
 };

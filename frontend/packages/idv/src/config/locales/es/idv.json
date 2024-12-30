@@ -1160,17 +1160,20 @@
               "face-too-far": "Tu rostro está demasiado lejos de la cámara",
               "face-outside-the-frame": "Tu rostro está fuera del contorno del marco",
               "head-not-straight": "Tu rostro está inclinado o mirando en otra dirección",
-              "blurry": "La imagen está borrosa, busca una mejor iluminación o mueve tu cámara"
+              "blurry": "La imagen está borrosa, busca una mejor iluminación o mueve tu cámara",
+              "error": "Intenta capturar manualmente"
             },
             "idDoc": {
               "ok": "Mantén la posición...",
               "detecting": "Escanee el {{side, allCaps}} de tu {{documentType}}",
-              "blurry": "La imagen está borrosa, busca una mejor iluminación o mueve tu cámara"
+              "blurry": "La imagen está borrosa, busca una mejor iluminación o mueve tu cámara",
+              "error": "Intenta capturar manualmente"
             },
             "nonIdDoc": {
               "ok": "Mantén la posición...",
               "detecting": "Escanee tu {{documentType}}",
-              "blurry": "La imagen está borrosa, busca una mejor iluminación o mueve tu cámara"
+              "blurry": "La imagen está borrosa, busca una mejor iluminación o mueve tu cámara",
+              "error": "Intenta capturar manualmente"
             }
           }
         },

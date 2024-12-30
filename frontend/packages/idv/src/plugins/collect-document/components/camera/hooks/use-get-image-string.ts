@@ -1,7 +1,7 @@
 import { useOpenCv } from 'opencv-react-ts';
 import type { MutableRefObject } from 'react';
 
-import { Logger } from '@/idv/utils';
+import { Logger, getLogger } from '@/idv/utils';
 import type { AutoCaptureKind, Resolution, VideoRef } from '../types';
 import getSourceDimensions from '../utils/get-source-dimensions';
 import { sharpenImage } from '../utils/graphics-utils/graphics-processing-utils';
@@ -17,6 +17,8 @@ type GetImageStringProps = {
   centerOffsetX?: number;
   centerOffsetY?: number;
 };
+
+const { logWarn } = getLogger({ location: 'camera' });
 
 const useGetImageString = () => {
   const { cv, loaded } = useOpenCv();
@@ -71,10 +73,14 @@ const useGetImageString = () => {
     );
 
     if (loaded && cv && autoCaptureKind !== 'face') {
-      const src = cv.imread(canvasRef.current);
-      const sharpenedImage = sharpenImage(cv, src, true);
-      cv.imshow(canvasRef.current, sharpenedImage);
-      sharpenedImage.delete();
+      try {
+        const src = cv.imread(canvasRef.current);
+        const sharpenedImage = sharpenImage(cv, src, true);
+        cv.imshow(canvasRef.current, sharpenedImage);
+        sharpenedImage.delete();
+      } catch (error) {
+        logWarn('Error sharpening image', error);
+      }
     }
 
     const imageString = canvasRef.current.toDataURL();

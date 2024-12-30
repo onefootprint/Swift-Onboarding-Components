@@ -71,6 +71,7 @@ const useAutoCaptureDoc = ({
   const rearrangedParamsRef = useRef({ params, currentIndex: 0 });
   const pastStatusRef = useRef<FaceStatus | CardCaptureStatus | undefined>(FaceStatus.detecting);
   const [statusChangeDelayRunning, setStatusChangeDelayTimeRunning] = useState(false);
+  const [detectionError, setDetectionError] = useState(false);
 
   const { cv, loaded } = useOpenCv();
   const [waitVal, { startCountdown, resetCountdown }] = useCountdown(CountDownProps);
@@ -105,7 +106,7 @@ const useAutoCaptureDoc = ({
   );
 
   const detectAndCaptureDocument = useCallback((): void => {
-    if (isCaptured || !cv || !videoRef.current || !isNonZeroVideoSize(videoSize) || !docImageDrawer) {
+    if (isCaptured || !cv || !videoRef.current || !isNonZeroVideoSize(videoSize) || !docImageDrawer || detectionError) {
       return;
     }
 
@@ -124,6 +125,9 @@ const useAutoCaptureDoc = ({
 
     if (isCardOk(cardCaptureStatus)) {
       rearrangedParamsRef.current = moveParamToStart(paramIndex, rearrangedParamsRef.current.params);
+    } else if (cardCaptureStatus === CardCaptureStatus.error && !detectionError) {
+      // If we get an error, we cancel the auto capture because we don't want to keep trying
+      setDetectionError(true);
     } else {
       rearrangedParamsRef.current.currentIndex = getNextIndexForBatch(rearrangedParamsRef);
     }
@@ -177,11 +181,13 @@ const useAutoCaptureDoc = ({
         onDetectionComplete();
       }
 
-      if (isCaptured) cancelAnimationFrame(frameId);
+      if (isCaptured || detectionError) {
+        cancelAnimationFrame(frameId);
+      }
     });
 
     return () => cancelAnimationFrame(frameId);
-  }, [detectAndCaptureDocument, isCaptured, onDetectionComplete]);
+  }, [detectAndCaptureDocument, isCaptured, onDetectionComplete, detectionError]);
 };
 
 export default useAutoCaptureDoc;
