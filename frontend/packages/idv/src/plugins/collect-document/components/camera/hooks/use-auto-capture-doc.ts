@@ -73,7 +73,7 @@ const useAutoCaptureDoc = ({
   const [statusChangeDelayRunning, setStatusChangeDelayTimeRunning] = useState(false);
   const [detectionError, setDetectionError] = useState(false);
 
-  const { cv, loaded } = useOpenCv();
+  const { cv: openCv, loaded } = useOpenCv();
   const [waitVal, { startCountdown, resetCountdown }] = useCountdown(CountDownProps);
 
   /**
@@ -105,19 +105,31 @@ const useAutoCaptureDoc = ({
     [canvasRef, memoDocSrcDimensions],
   );
 
-  const detectAndCaptureDocument = useCallback((): void => {
-    if (isCaptured || !cv || !videoRef.current || !isNonZeroVideoSize(videoSize) || !docImageDrawer || detectionError) {
+  const detectAndCaptureDocument = useCallback(async () => {
+    if (
+      isCaptured ||
+      !openCv ||
+      !videoRef.current ||
+      !isNonZeroVideoSize(videoSize) ||
+      !docImageDrawer ||
+      detectionError
+    ) {
       return;
     }
 
     const refCanvas = docImageDrawer(videoRef);
     if (!refCanvas) return;
 
+    // the useOpenCv hook returns a promise lately when the opencv is being loaded
+    // so we need to await it here
+    // it used to return a resolved object, so we check both cases
+    const openCvResolved = openCv instanceof Promise ? await openCv : openCv;
+
     // We get the card capture status and the index of the param that successfully detected the card
     const { status: cardCaptureStatus, paramIndex } = getCardCaptureStatus(
       refCanvas,
       rearrangedParamsRef.current.params,
-      cv,
+      openCvResolved,
       loaded,
       rearrangedParamsRef.current.currentIndex,
       DOC_DETECTION_PARAMS_BATCH_SIZE,
@@ -145,7 +157,7 @@ const useAutoCaptureDoc = ({
     }
     pastStatusRef.current = cardCaptureStatus;
   }, [
-    cv,
+    openCv,
     docImageDrawer,
     isCaptured,
     loaded,
@@ -176,14 +188,14 @@ const useAutoCaptureDoc = ({
 
   useEffect(() => {
     const frameId = requestAnimationFrame(() => {
-      detectAndCaptureDocument();
-      if (successCountRef.current >= REQUIRED_SUCCESSES) {
-        onDetectionComplete();
-      }
-
-      if (isCaptured || detectionError) {
-        cancelAnimationFrame(frameId);
-      }
+      detectAndCaptureDocument().then(() => {
+        if (successCountRef.current >= REQUIRED_SUCCESSES) {
+          onDetectionComplete();
+        }
+        if (isCaptured || detectionError) {
+          cancelAnimationFrame(frameId);
+        }
+      });
     });
 
     return () => cancelAnimationFrame(frameId);
