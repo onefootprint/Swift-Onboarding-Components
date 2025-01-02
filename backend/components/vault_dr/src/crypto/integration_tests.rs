@@ -53,9 +53,10 @@ mod tests {
         let plaintext = generate_random_bytes(1234);
         println!("Plaintext: {}", String::from_utf8(plaintext.clone()).unwrap());
 
-        let other_recipient = Box::new(age::x25519::Identity::generate().to_public());
+        let other_recipient = age::x25519::Identity::generate().to_public();
 
-        let encryptor = age::Encryptor::with_recipients(vec![recipient, other_recipient]).unwrap();
+        let encryptor =
+            age::Encryptor::with_recipients(vec![recipient, &other_recipient].into_iter()).unwrap();
         let mut encrypted = vec![];
         let mut writer = encryptor.wrap_output(&mut encrypted).unwrap();
         writer.write_all(&plaintext).unwrap();

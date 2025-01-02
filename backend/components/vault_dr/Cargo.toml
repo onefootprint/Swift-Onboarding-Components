@@ -33,6 +33,7 @@ tokio = { workspace = true }
 age = { workspace = true }
 age-plugin = { workspace = true }
 age-core = { workspace = true }
+zeroize = { workspace = true }
 chrono = { workspace = true }
 sha2 = { workspace = true }
 rand = { workspace = true }

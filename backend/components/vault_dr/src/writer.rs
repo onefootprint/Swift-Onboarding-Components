@@ -7,7 +7,6 @@ use crate::PublicKey;
 use crate::PublicKeySet;
 use crate::VaultDrAwsConfig;
 use crate::WrappedKey;
-use age::secrecy::Zeroize;
 use api_core::utils::vault_wrapper::bulk_decrypt_dls_unchecked;
 use api_core::utils::vault_wrapper::MimeTypedPii;
 use api_core::utils::vault_wrapper::Pii;
@@ -51,6 +50,7 @@ use std::fmt::Debug;
 use tokio::task::JoinHandle;
 use tokio::time::Instant;
 use tracing::Instrument;
+use zeroize::Zeroize;
 
 // https://www.iana.org/assignments/media-types/application/vnd.age
 const AGE_CONTENT_TYPE: &str = "application/vnd.age";

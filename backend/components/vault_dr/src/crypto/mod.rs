@@ -1,24 +1,24 @@
 use super::error::Error;
 use age::secrecy::ExposeSecret;
 use age::secrecy::SecretString;
-use age::secrecy::Zeroize;
 use bech32::FromBase32;
 use itertools::Itertools;
 use newtypes::PiiString;
 use std::fmt::Display;
 use std::io::Write;
 use std::str::FromStr;
+use zeroize::Zeroize;
 
 mod integration_tests;
 mod p256;
 mod piv_format;
 
 pub trait AgeEncryptor {
-    fn recipients(&self) -> Vec<Box<dyn age::Recipient + Send>>;
+    fn recipients(&self) -> Vec<&dyn age::Recipient>;
 
     fn encrypt(&self, plaintext: &[u8]) -> Result<Vec<u8>, Error> {
-        let encryptor = age::Encryptor::with_recipients(self.recipients())
-            .ok_or(Error::Age("given recipient vec is empty".to_owned()))?;
+        let recipients = self.recipients().into_iter();
+        let encryptor = age::Encryptor::with_recipients(recipients)?;
 
         let mut encrypted = vec![];
         let mut writer = encryptor.wrap_output(&mut encrypted)?;
@@ -29,8 +29,8 @@ pub trait AgeEncryptor {
     }
 
     fn encrypt_armored(&self, plaintext: &[u8]) -> Result<String, Error> {
-        let encryptor = age::Encryptor::with_recipients(self.recipients())
-            .ok_or(Error::Age("given recipient vec is empty".to_owned()))?;
+        let recipients = self.recipients().into_iter();
+        let encryptor = age::Encryptor::with_recipients(recipients)?;
 
         let mut encrypted = vec![];
         let mut writer = encryptor.wrap_output(age::armor::ArmoredWriter::wrap_output(
@@ -48,12 +48,12 @@ pub trait AgeEncryptor {
 
     // We ASCII armor wrapped keys so they are easy to transfer to the tenant.
     fn wrap_key(&self, inner_key: age::x25519::Identity) -> Result<WrappedKey, Error> {
-        let mut payload = inner_key.to_string().expose_secret().clone().into_bytes();
+        let mut payload = inner_key.to_string().expose_secret().to_owned().into_bytes();
 
         let wrapped = self.encrypt_armored(&payload)?;
         payload.zeroize();
 
-        Ok(WrappedKey(SecretString::new(wrapped)))
+        Ok(WrappedKey(SecretString::new(wrapped.into())))
     }
 }
 
@@ -109,17 +109,17 @@ impl std::fmt::Debug for PublicKey {
 }
 
 impl PublicKey {
-    pub fn recipient(self) -> Box<dyn age::Recipient + Send> {
+    pub fn recipient(&self) -> &dyn age::Recipient {
         match self {
-            PublicKey::X15519Recipient(recipient) => Box::new(recipient),
-            PublicKey::YubiKeyRecipient { recipient, .. } => Box::new(recipient),
+            PublicKey::X15519Recipient(recipient) => recipient,
+            PublicKey::YubiKeyRecipient { recipient, .. } => recipient,
         }
     }
 }
 
 impl AgeEncryptor for PublicKey {
-    fn recipients(&self) -> Vec<Box<dyn age::Recipient + Send>> {
-        vec![self.clone().recipient()]
+    fn recipients(&self) -> Vec<&dyn age::Recipient> {
+        vec![self.recipient()]
     }
 }
 
@@ -144,8 +144,8 @@ impl PublicKeySet {
 }
 
 impl AgeEncryptor for PublicKeySet {
-    fn recipients(&self) -> Vec<Box<dyn age::Recipient + Send>> {
-        self.0.iter().map(|pubkey| pubkey.clone().recipient()).collect()
+    fn recipients(&self) -> Vec<&dyn age::Recipient> {
+        self.0.iter().map(|pubkey| pubkey.recipient()).collect()
     }
 }
 
@@ -230,10 +230,10 @@ mod tests {
         // matches the recovery_public_key.
         for key in &[org_privkey_1, org_privkey_2] {
             let armored_reader = age::armor::ArmoredReader::new(wrapped_recovery_key.as_bytes());
-            let decryptor = match age::Decryptor::new(armored_reader).unwrap() {
-                age::Decryptor::Recipients(d) => d,
-                age::Decryptor::Passphrase(_) => panic!("unexpected decryptor type"),
-            };
+            let decryptor = age::Decryptor::new(armored_reader).unwrap();
+            if decryptor.is_scrypt() {
+                panic!("unexpected decryptor type");
+            }
 
             let mut decrypted = vec![];
             let mut reader = decryptor.decrypt(iter::once(key as &dyn age::Identity)).unwrap();

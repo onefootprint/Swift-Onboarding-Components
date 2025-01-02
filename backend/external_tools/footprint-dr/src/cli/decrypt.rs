@@ -55,7 +55,7 @@ pub async fn decrypt_cmd(
     let concurrency_limit = concurrency_limit.unwrap_or(2 * num_cpus::get());
     log::debug!("Concurrency limit: {}", concurrency_limit);
 
-    let (org_identities, has_yubikey_identity) = read_identities(org_identity_path)
+    let org_identities = read_identities(org_identity_path)
         .await
         .context("failed to load org identity")?;
 
@@ -110,16 +110,10 @@ pub async fn decrypt_cmd(
     // single key, so we only need one tap.
     let identities: Box<dyn IdentityForKey> =
         if let Some(wrapped_recovery_key_path) = wrapped_recovery_key_path {
-            get_full_recovery_key(org_identities, wrapped_recovery_key_path, has_yubikey_identity).await?
+            get_full_recovery_key(org_identities, wrapped_recovery_key_path).await?
         } else {
-            let (identities, enc_data_keys) = get_test_recovery_keys(
-                &api_root,
-                is_live,
-                org_identities,
-                enc_data_key_stream,
-                has_yubikey_identity,
-            )
-            .await?;
+            let (identities, enc_data_keys) =
+                get_test_recovery_keys(&api_root, is_live, org_identities, enc_data_key_stream).await?;
 
             // Reset the stream for decryption.
             enc_data_key_stream = futures::stream::iter(enc_data_keys.into_iter().map(Ok)).boxed();
@@ -256,7 +250,6 @@ async fn read_records_file(
 async fn get_full_recovery_key(
     org_identities: Vec<Box<dyn age::Identity>>,
     wrapped_recovery_key_path: PathBuf,
-    has_yubikey_identity: bool,
 ) -> Result<Box<dyn IdentityForKey>> {
     log::debug!("Decrypting in Full Recovery Mode");
 
@@ -271,10 +264,8 @@ async fn get_full_recovery_key(
     let mut wrapped_recovery_key = vec![];
     file.read_to_end(&mut wrapped_recovery_key).await?;
 
-    if has_yubikey_identity {
-        println!("Unwrapping recovery key...");
-        println!("Enter YubiKey pin if prompted and tap the key when the light blinks slowly.");
-    }
+    println!("Unwrapping recovery key...");
+    println!("Enter YubiKey pin if prompted and tap the key when the light blinks slowly.");
 
     let recovery_key = unwrap_key(&wrapped_recovery_key, org_identities.iter().map(|i| i.as_ref()))
         .await
@@ -289,7 +280,6 @@ async fn get_test_recovery_keys(
     is_live: IsLive,
     org_identities: Vec<Box<dyn age::Identity>>,
     enc_data_key_stream: Pin<Box<dyn Stream<Item = Result<EncDataKey>> + Send>>,
-    has_yubikey_identity: bool,
 ) -> Result<(Box<dyn IdentityForKey>, Vec<EncDataKey>)> {
     log::debug!("Decrypting in Test Recovery Mode");
 
@@ -334,19 +324,15 @@ async fn get_test_recovery_keys(
         progress.inc(chunk.len().try_into()?);
     }
     progress.finish();
-    println!();
 
-    if has_yubikey_identity {
-        println!();
-        println!("Enter YubiKey pin if prompted and tap the key when the light blinks slowly.");
-    }
+    println!();
+    println!();
+    println!("Enter YubiKey pin if prompted and tap the key when the light blinks slowly.");
 
     let progress = ProgressBar::new(wrapped_record_keys.len().try_into()?)
         .with_style(progress_bar_style.clone())
         .with_message("Unwrapping record keys...");
-    if has_yubikey_identity {
-        progress.println("If unwrapping record keys stalls, you may need to tap your YubiKey again.\n\n");
-    }
+    progress.println("If unwrapping record keys stalls, you may need to tap your YubiKey again.\n\n");
 
     let mut identities_by_record_path = HashMap::new();
     for (record_path, wrapped_record_key) in wrapped_record_keys {

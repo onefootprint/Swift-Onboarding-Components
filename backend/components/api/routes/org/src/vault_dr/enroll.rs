@@ -113,7 +113,7 @@ pub async fn post(
                 aws_role_name,
                 s3_bucket_name,
                 recovery_public_key,
-                wrapped_recovery_key: wrapped_recovery_key.expose_secret().clone(),
+                wrapped_recovery_key: wrapped_recovery_key.expose_secret().to_owned(),
                 org_public_keys: org_public_key_set.into(),
                 bucket_path_namespace,
             };

@@ -4,6 +4,7 @@ use p256::elliptic_curve::sec1::FromEncodedPoint;
 use p256::elliptic_curve::sec1::ToEncodedPoint;
 use sha2::Digest;
 use sha2::Sha256;
+use std::collections::HashSet;
 
 pub(crate) const TAG_BYTES: usize = 4;
 use super::piv_format::RecipientLine;
@@ -13,9 +14,12 @@ use super::piv_format::RecipientLine;
 pub struct Recipient(p256::PublicKey);
 
 impl age::Recipient for Recipient {
-    fn wrap_file_key(&self, file_key: &FileKey) -> Result<Vec<Stanza>, age::EncryptError> {
+    fn wrap_file_key(&self, file_key: &FileKey) -> Result<(Vec<Stanza>, HashSet<String>), age::EncryptError> {
         let recipient_line = RecipientLine::wrap_file_key(file_key, self);
-        Ok(vec![recipient_line.into()])
+        // Labels can be used to restrict how age keys are combined for encryption.
+        let labels = HashSet::new();
+
+        Ok((vec![recipient_line.into()], labels))
     }
 }
 
