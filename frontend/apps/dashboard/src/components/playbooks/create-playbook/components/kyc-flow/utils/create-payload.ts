@@ -74,11 +74,10 @@ const createMustCollect = ({ person, investor, gov }: DetailsFormData) => {
   if (collectInvestorQuestion) {
     mustCollectData.push('investor_profile');
   }
-  if (ssn.collect && ssn.kind) {
+  if (usTaxIdAcceptable) {
+    mustCollectData.push('us_tax_id');
+  } else if (ssn.collect && ssn.kind) {
     if (!ssn.optional) {
-      if (ssn.kind === 'ssn9' && usTaxIdAcceptable) {
-        mustCollectData.push('us_tax_id');
-      }
       mustCollectData.push(ssn.kind);
     } else {
       optionalData.push(ssn.kind);
