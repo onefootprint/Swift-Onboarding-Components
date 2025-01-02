@@ -99,7 +99,7 @@ const CopyButton = ({
     >
       {children ? (
         <button
-          className="cursor-pointer disabled:pointer-events-none w-fit h-fit"
+          className="max-w-full cursor-pointer disabled:pointer-events-none w-fit h-fit"
           aria-label={ariaLabel ?? (t('components.copy-button.aria-label-default') as string)}
           type="button"
           disabled={disable}
