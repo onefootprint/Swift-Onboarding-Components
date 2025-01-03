@@ -89,6 +89,15 @@ export type TenantVendorControl = {
   neuroEnabled: boolean;
 };
 
+export type TenantBusinessInfo = {
+  companyName: string;
+  phone: string;
+  addressLine1: string;
+  city: string;
+  state: string;
+  zip: string;
+};
+
 export type TenantDetail = {
   id: string;
   name: string;
@@ -114,4 +123,5 @@ export type TenantDetail = {
 
   billingProfile?: TenantBillingProfile;
   vendorControl?: TenantVendorControl;
+  businessInfo?: TenantBusinessInfo;
 };

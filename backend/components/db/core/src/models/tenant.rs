@@ -1,4 +1,5 @@
 use super::billing_profile::BillingProfile;
+use super::tenant_business_info::TenantBusinessInfo;
 use super::tenant_role::ImmutableRoleKind;
 use super::tenant_role::TenantRole;
 use super::tenant_vendor::TenantVendorControl;
@@ -18,6 +19,7 @@ use db_schema::schema::tenant::BoxedQuery;
 use db_schema::schema::tenant::{
     self,
 };
+use db_schema::schema::tenant_business_info;
 use db_schema::schema::tenant_vendor_control;
 use diesel::dsl::count_star;
 use diesel::insertable::CanInsertInSingleQuery;
@@ -251,16 +253,24 @@ impl Tenant {
         Ok(results)
     }
 
+    #[allow(clippy::type_complexity)]
     #[tracing::instrument("Tenant::private_get", skip_all)]
     pub fn private_get(
         conn: &mut PgConn,
         id: &TenantId,
-    ) -> FpResult<(Self, Option<BillingProfile>, Option<TenantVendorControl>)> {
+    ) -> FpResult<(
+        Self,
+        Option<BillingProfile>,
+        Option<TenantVendorControl>,
+        Option<TenantBusinessInfo>,
+    )> {
         let result = tenant::table
             .filter(tenant::id.eq(id))
             .left_join(billing_profile::table)
             .left_join(tenant_vendor_control::table)
+            .left_join(tenant_business_info::table)
             .filter(tenant_vendor_control::deactivated_at.is_null())
+            .filter(tenant_business_info::deactivated_at.is_null())
             .get_result(conn)?;
         Ok(result)
     }
@@ -295,7 +305,7 @@ impl Tenant {
     ) -> FpResult<Self> {
         if update == Default::default() {
             // Support no-op updates
-            let (tenant, _, _) = Self::private_get(conn, id)?;
+            let (tenant, _, _, _) = Self::private_get(conn, id)?;
             return Ok(tenant);
         }
         let result = diesel::update(tenant::table)

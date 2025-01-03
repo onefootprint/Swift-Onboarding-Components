@@ -1,4 +1,5 @@
 use crate::utils::db2api::DbToApi;
+use api_wire_types::TenantBusinessInfo;
 use db::models::billing_profile::BillingProfile;
 use db::models::tenant::Tenant;
 use db::models::tenant::UserCounts;
@@ -36,10 +37,22 @@ impl DbToApi<(Option<UserCounts>, Tenant)> for api_wire_types::PrivateTenant {
     }
 }
 
-impl DbToApi<(Tenant, Option<BillingProfile>, Option<TenantVendorControl>)>
-    for api_wire_types::PrivateTenantDetail
+impl
+    DbToApi<(
+        Tenant,
+        Option<BillingProfile>,
+        Option<TenantVendorControl>,
+        Option<TenantBusinessInfo>,
+    )> for api_wire_types::PrivateTenantDetail
 {
-    fn from_db((t, bp, tvc): (Tenant, Option<BillingProfile>, Option<TenantVendorControl>)) -> Self {
+    fn from_db(
+        (t, bp, tvc, tbi): (
+            Tenant,
+            Option<BillingProfile>,
+            Option<TenantVendorControl>,
+            Option<TenantBusinessInfo>,
+        ),
+    ) -> Self {
         let Tenant {
             id,
             name,
@@ -88,6 +101,7 @@ impl DbToApi<(Tenant, Option<BillingProfile>, Option<TenantVendorControl>)>
 
             billing_profile: bp.map(api_wire_types::PrivateBillingProfile::from_db),
             vendor_control: tvc.map(api_wire_types::PrivateTenantVendorControl::from_db),
+            business_info: tbi,
         }
     }
 }
@@ -136,6 +150,29 @@ impl DbToApi<TenantVendorControl> for api_wire_types::PrivateTenantVendorControl
             middesk_api_key_exists: middesk_api_key.is_some(),
             sentilink_credentials_exists: sentilink_credentials.is_some(),
             neuro_enabled,
+        }
+    }
+}
+
+
+impl DbToApi<newtypes::TenantBusinessInfo> for api_wire_types::TenantBusinessInfo {
+    fn from_db(tbi: newtypes::TenantBusinessInfo) -> Self {
+        let newtypes::TenantBusinessInfo {
+            company_name,
+            address_line1,
+            city,
+            state,
+            zip,
+            phone,
+        } = tbi;
+
+        Self {
+            company_name,
+            address_line1,
+            city,
+            state,
+            zip,
+            phone,
         }
     }
 }

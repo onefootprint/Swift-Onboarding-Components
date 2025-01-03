@@ -58,6 +58,8 @@ pub struct PrivateTenantDetail {
 
     pub billing_profile: Option<PrivateBillingProfile>,
     pub vendor_control: Option<PrivateTenantVendorControl>,
+
+    pub business_info: Option<TenantBusinessInfo>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
@@ -131,4 +133,16 @@ pub struct PrivatePatchTenant {
 
     pub billing_profile: Option<PrivateUpdateBillingProfile>,
     pub vendor_control: Option<PrivateUpdateTvc>,
+
+    pub business_info: Option<PrivateUpdateBusinessInfo>,
+}
+
+#[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
+pub struct PrivateUpdateBusinessInfo {
+    pub company_name: PiiString,
+    pub phone: PiiString,
+    pub address_line1: PiiString,
+    pub city: PiiString,
+    pub state: PiiString,
+    pub zip: PiiString,
 }

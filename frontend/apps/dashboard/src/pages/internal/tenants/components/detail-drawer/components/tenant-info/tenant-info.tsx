@@ -1,7 +1,7 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IcoCheck24, IcoCloseSmall24 } from '@onefootprint/icons';
-import type { TenantDetail } from '@onefootprint/types';
 import { TenantPreviewApi, TenantSupportedAuthMethod } from '@onefootprint/types/src/api/get-tenants';
+import type { TenantDetail } from '@onefootprint/types/src/api/get-tenants';
 import type { SelectOption } from '@onefootprint/ui';
 import { Checkbox, CodeInline, MultiSelect, Stack, TextInput } from '@onefootprint/ui';
 import type React from 'react';
@@ -40,7 +40,7 @@ const AUTH_METHOD_OPTIONS: SelectOption<TenantSupportedAuthMethod>[] = Object.va
 
 const getDefaultValues = (tenant: TenantDetail): UpdateTenantFormData => ({
   name: tenant.name,
-  superTenantId: tenant.superTenantId,
+  superTenantId: tenant.superTenantId ?? null,
   isDemoTenant: tenant.isDemoTenant,
   domains: tenant.domains.join(','),
   allowDomainAccess: tenant.allowDomainAccess,
@@ -50,6 +50,11 @@ const getDefaultValues = (tenant: TenantDetail): UpdateTenantFormData => ({
   notIsProdAuthPlaybookRestricted: !tenant.isProdAuthPlaybookRestricted,
   supportedAuthMethods: AUTH_METHOD_OPTIONS.filter(o => tenant.supportedAuthMethods?.includes(o.value)),
   allowedPreviewApis: PREVIEW_API_OPTIONS.filter(o => tenant.allowedPreviewApis.includes(o.value)),
+  companyName: tenant.businessInfo?.companyName || '',
+  phone: tenant.businessInfo?.phone || '',
+  addressLine1: tenant.businessInfo?.addressLine1 || '',
+  city: tenant.businessInfo?.city || '',
+  zip: tenant.businessInfo?.zip || '',
 });
 
 const TenantInfo = ({ tenant }: TenantInfoProps) => {
@@ -85,6 +90,34 @@ const TenantInfo = ({ tenant }: TenantInfoProps) => {
       title: 'Domain access enabled',
       content: checkbox(tenant.allowDomainAccess),
       editModeContent: <Checkbox {...register('allowDomainAccess', {})} />,
+    },
+  ];
+
+  const businessInfo: TenantField[] = [
+    {
+      title: 'Company name',
+      content: tenant.businessInfo?.companyName || '-',
+      editModeContent: <TextInput placeholder="Acme Inc" {...register('companyName')} />,
+    },
+    {
+      title: 'Phone',
+      content: tenant.businessInfo?.phone || '-',
+      editModeContent: <TextInput placeholder="+1 (555) 555-5555" {...register('phone')} />,
+    },
+    {
+      title: 'Address',
+      content: tenant.businessInfo?.addressLine1 || '-',
+      editModeContent: <TextInput placeholder="123 Main St" {...register('addressLine1')} />,
+    },
+    {
+      title: 'City',
+      content: tenant.businessInfo?.city || '-',
+      editModeContent: <TextInput placeholder="San Francisco" {...register('city')} />,
+    },
+    {
+      title: 'ZIP',
+      content: tenant.businessInfo?.zip || '-',
+      editModeContent: <TextInput placeholder="94105" {...register('zip')} />,
     },
   ];
 
@@ -160,6 +193,10 @@ const TenantInfo = ({ tenant }: TenantInfoProps) => {
     {
       title: 'Basic info',
       fields: basic,
+    },
+    {
+      title: 'Business info',
+      fields: businessInfo,
     },
     {
       title: 'Production access',

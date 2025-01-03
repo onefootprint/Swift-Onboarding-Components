@@ -2,17 +2,20 @@ use actix_web::patch;
 use actix_web::web;
 use api_core::auth::protected_auth::ProtectedAuth;
 use api_core::types::ApiResponse;
+use api_core::utils;
 use api_core::utils::db2api::DbToApi;
 use api_core::FpResult;
 use api_core::State;
 use api_errors::BadRequest;
 use api_wire_types::PrivateUpdateBillingProfile;
+use api_wire_types::PrivateUpdateBusinessInfo;
 use api_wire_types::PrivateUpdateSentilinkCredentials;
 use api_wire_types::PrivateUpdateTvc;
 use db::models::billing_profile::BillingProfile;
 use db::models::billing_profile::UpdateBillingProfileArgs;
 use db::models::tenant::PrivateUpdateTenant;
 use db::models::tenant::Tenant;
+use db::models::tenant_business_info::NewBusinessInfo;
 use db::models::tenant_business_info::TenantBusinessInfo;
 use db::models::tenant_vendor::TenantVendorControl;
 use db::models::tenant_vendor::UpdateTenantVendorControlArgs;
@@ -29,13 +32,13 @@ async fn patch(
     let id = id.into_inner();
     let request = request.into_inner();
 
-    let tenant_info = state
+    let (tenant, bp, tvc, tbi) = state
         .db_transaction(move |conn| {
-            let (tenant, bp, tvc) = Tenant::private_get(conn, &id)?;
+            let (tenant, bp, tvc, tbi) = Tenant::private_get(conn, &id)?;
             // In absence of a real update log, will just add a log line
             tracing::info!(?request, ?tenant, ?bp, ?tvc, "Updating tenant info");
 
-            let (update, bp_update, tvc_update) = make_tenant_update(&tenant, request)?;
+            let (update, bp_update, tvc_update, tbi_update) = make_tenant_update(&tenant, request)?;
             let tenant = Tenant::private_update(conn, &id, update)?;
             let bp = if let Some(bp_update) = bp_update {
                 let bp = BillingProfile::update_or_create(conn, &tenant.id, bp_update)?;
@@ -54,14 +57,51 @@ async fn patch(
             } else {
                 tvc
             };
-            Ok((tenant, bp, tvc))
+
+            let tbi = if let Some(business_info) = tbi_update {
+                let PrivateUpdateBusinessInfo {
+                    company_name,
+                    address_line1,
+                    city,
+                    state,
+                    zip,
+                    phone,
+                } = business_info;
+                let tbi = TenantBusinessInfo::create(
+                    conn,
+                    &tenant.id,
+                    NewBusinessInfo {
+                        company_name: tenant.public_key.seal_bytes(company_name.leak().as_bytes())?,
+                        address_line1: tenant.public_key.seal_bytes(address_line1.leak().as_bytes())?,
+                        city: tenant.public_key.seal_bytes(city.leak().as_bytes())?,
+                        state: tenant.public_key.seal_bytes(state.leak().as_bytes())?,
+                        zip: tenant.public_key.seal_bytes(zip.leak().as_bytes())?,
+                        phone: tenant.public_key.seal_bytes(phone.leak().as_bytes())?,
+                    },
+                )?;
+                Some(tbi)
+            } else {
+                tbi
+            };
+
+            Ok((tenant, bp, tvc, tbi))
         })
         .await?;
 
-    let response = api_wire_types::PrivateTenantDetail::from_db(tenant_info);
+    let tbi = if let Some(tbi) = tbi {
+        let tbi =
+            utils::tenant_business_info::decrypt_tenant_business_info(&state.enclave_client, &tenant, &tbi)
+                .await?;
+        Some(api_wire_types::TenantBusinessInfo::from_db(tbi))
+    } else {
+        None
+    };
+
+    let response = api_wire_types::PrivateTenantDetail::from_db((tenant, bp, tvc, tbi));
     Ok(response)
 }
 
+#[allow(clippy::type_complexity)]
 fn make_tenant_update(
     tenant: &Tenant,
     req: api_wire_types::PrivatePatchTenant,
@@ -69,6 +109,7 @@ fn make_tenant_update(
     PrivateUpdateTenant,
     Option<UpdateBillingProfileArgs>,
     Option<UpdateTenantVendorControlArgs>,
+    Option<PrivateUpdateBusinessInfo>,
 )> {
     let api_wire_types::PrivatePatchTenant {
         name,
@@ -85,6 +126,7 @@ fn make_tenant_update(
         super_tenant_id,
         billing_profile,
         vendor_control,
+        business_info: tbi,
     } = req;
     let update = PrivateUpdateTenant {
         name,
@@ -104,7 +146,8 @@ fn make_tenant_update(
     let vendor_control = vendor_control
         .map(|tvc| make_tvc_update(tenant, tvc))
         .transpose()?;
-    Ok((update, billing_profile, vendor_control))
+
+    Ok((update, billing_profile, vendor_control, tbi))
 }
 
 fn make_bp_update(request: PrivateUpdateBillingProfile) -> UpdateBillingProfileArgs {

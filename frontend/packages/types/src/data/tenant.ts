@@ -1,3 +1,5 @@
+import type { TenantBusinessInfo } from '../api/get-tenants';
+
 export type Tenant = {
   id: string;
   name: string;
@@ -11,4 +13,5 @@ export type Tenant = {
   numSandboxVaults: number;
   createdAt: string;
   superTenantId: string | null;
+  businessInfo?: TenantBusinessInfo;
 };

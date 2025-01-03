@@ -20,6 +20,12 @@ export type UpdateTenantFormData = {
 
   supportedAuthMethods: SelectOption<TenantSupportedAuthMethod>[];
   allowedPreviewApis: SelectOption<TenantPreviewApi>[];
+
+  companyName: string;
+  phone: string;
+  addressLine1: string;
+  city: string;
+  zip: string;
 };
 
 export const convertFormData = (tenant: TenantDetail, formData: UpdateTenantFormData): PrivatePatchTenantRequest => ({
