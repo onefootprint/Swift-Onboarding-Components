@@ -118,7 +118,7 @@ struct EmailAndPhoneView: View {
                 do {
                     let sandboxOutcome = SandboxOutcome(overallOutcome: .stepUp, documentOutcome: .pass)
                     // TODO: fix optional fields
-                    try await Footprint.shared.initialize(publicKey: "pb_test_qGrzwX22Vu5IGRsjbBFS4s", authToken: nil, sandboxId: nil, sandboxOutcome: sandboxOutcome, l10n: nil, sessionId: "" )
+                    try await Footprint.shared.initialize(publicKey: "pb_test_fvM7uG6JY41t0JLrYP2aEG", authToken: nil, sandboxId: nil, sandboxOutcome: sandboxOutcome, l10n: nil, sessionId: "" )
                 } catch {
                     print("Error: \(error)")
                 }

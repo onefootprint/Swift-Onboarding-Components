@@ -58,6 +58,7 @@ internal actual fun handleSdkArgsToken(
                     sessionResult.vaultingToken
                 )
             }
+
             is SessionResult.Error -> config.onError?.invoke("Error parsing redirect URL.")
         }
     }
@@ -86,7 +87,7 @@ object FootprintHosted {
     ) {
         return FootprintHostedCommon.launchIdentify(
             PlatformContext(),
-            "com.onefootprint.native_onboarding_components.NativeOnboardingComponents",
+            "Footprint",
             email,
             phone,
             onCancel,
@@ -104,7 +105,7 @@ object FootprintHosted {
     ) {
         return FootprintHostedCommon.handoff(
             PlatformContext(),
-            "com.onefootprint.native_onboarding_components.NativeOnboardingComponents",
+            "Footprint",
             onComplete,
             onCancel,
             onError,

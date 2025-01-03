@@ -3,9 +3,9 @@ import Foundation
 let DOB_MIN_AGE = 18
 let DOB_MAX_AGE = 120
 
-func getMonthYearDateString(date: String, locale: FootprintSupportedLocale) -> [String: String] {
-    let dayIndex = (locale == FootprintSupportedLocale.enUs) ? 1 : 0
-    let monthIndex = (locale == FootprintSupportedLocale.enUs) ? 0 : 1
+func getMonthYearDateString(date: String, locale: SwiftOnboardingComponentsShared.Locale) -> [String: String] {
+    let dayIndex = (locale == SwiftOnboardingComponentsShared.Locale.enUs) ? 1 : 0
+    let monthIndex = (locale == SwiftOnboardingComponentsShared.Locale.enUs) ? 0 : 1
     let yearIndex = 2
     
     let dateArray = date.split(separator: "/").map { String($0) }
@@ -56,7 +56,7 @@ func isDobInTheFuture(_ date: Date, today: Date = Date()) -> Bool {
     return date >= today
 }
 
-func isDob(_ dob: String, locale: FootprintSupportedLocale, translation: Translation?) -> String? {
+func isDob(_ dob: String, locale: SwiftOnboardingComponentsShared.Locale, translation: Translation?) -> String? {
     if dob.isEmpty {
         return translation?.dob?.required ?? "Date of birth is required"
     }
@@ -64,7 +64,7 @@ func isDob(_ dob: String, locale: FootprintSupportedLocale, translation: Transla
     let today = Date()
     let dateComponents = getMonthYearDateString(date: dob, locale: locale)
     let isCorrectFormat = validateFormat(dateComponents: dateComponents)
-    let correctFormat = locale == FootprintSupportedLocale.enUs ? "MM/DD/YYYY" : "DD/MM/YYYY"
+    let correctFormat = locale == SwiftOnboardingComponentsShared.Locale.enUs ? "MM/DD/YYYY" : "DD/MM/YYYY"
     if(!isCorrectFormat) { return translation?.dob?.invalid ?? "Invalid date format. Please use \(correctFormat)" }
     
     // Ensure day and month are padded to two digits

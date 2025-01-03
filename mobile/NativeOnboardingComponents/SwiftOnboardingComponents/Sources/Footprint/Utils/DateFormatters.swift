@@ -11,14 +11,14 @@ func isString(_ value: Any) -> Bool {
 ///   - locale: Locale specifying the date format, either `enUS` or `esMX`.
 ///   - str: A date string in the format 'DD/MM/YYYY' or 'MM/DD/YYYY'.
 /// - Returns: The date string in the format 'MM/DD/YYYY'.
-func strInputToUSDate(locale: FootprintSupportedLocale, str: String) -> String {
+func strInputToUSDate(locale: SwiftOnboardingComponentsShared.Locale, str: String) -> String {
     let dateFormatter = DateFormatter()
     
     // Set input date format based on locale
     switch locale {
-    case FootprintSupportedLocale.enUs:
+    case SwiftOnboardingComponentsShared.Locale.enUs:
         dateFormatter.dateFormat = "MM/dd/yyyy" // Assuming input is already in US format
-    case FootprintSupportedLocale.esMx:
+    case SwiftOnboardingComponentsShared.Locale.esMx:
         dateFormatter.dateFormat = "dd/MM/yyyy" // Input is in Mexican Spanish format
     default:
         break;
@@ -43,7 +43,7 @@ func strInputToUSDate(locale: FootprintSupportedLocale, str: String) -> String {
 ///   - locale: Locale specifying the output format, either `enUS` or `esMX`.
 ///   - str: A date string in the format 'MM/DD/YYYY' or 'DD/MM/YYYY'.
 /// - Returns: The date string formatted as 'MM/DD/YYYY' or 'DD/MM/YYYY' based on the locale.
-func fromUsDateToStringInput(locale: FootprintSupportedLocale, str: String) -> String {
+func fromUsDateToStringInput(locale: SwiftOnboardingComponentsShared.Locale, str: String) -> String {
     let dateFormatter = DateFormatter()
     
     // Set the input format as US style (MM/DD/YYYY)
@@ -56,9 +56,9 @@ func fromUsDateToStringInput(locale: FootprintSupportedLocale, str: String) -> S
     
     // Set output format based on locale
     switch locale {
-    case FootprintSupportedLocale.enUs:
+    case SwiftOnboardingComponentsShared.Locale.enUs:
         dateFormatter.dateFormat = "MM/dd/yyyy" // Assuming input is already in US format
-    case FootprintSupportedLocale.esMx:
+    case SwiftOnboardingComponentsShared.Locale.esMx:
         dateFormatter.dateFormat = "dd/MM/yyyy" // Input is in Mexican Spanish format
     default:
         break;
