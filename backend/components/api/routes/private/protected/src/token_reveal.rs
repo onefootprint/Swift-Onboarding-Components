@@ -3,7 +3,6 @@ use crate::State;
 use actix_web::post;
 use actix_web::web;
 use actix_web::web::Json;
-use api_core::auth::session::sdk_args::SdkArgs;
 use api_core::auth::session::sdk_args::SdkArgsData;
 use api_core::auth::session::AuthSessionData;
 use api_core::types::ApiResponse;
@@ -82,8 +81,7 @@ pub async fn post(
                 .enclave_client
                 .decrypt_to_piistring(&e_data, &e_private_key)
                 .await?;
-            let args: SdkArgs = serde_json::de::from_str(sdk_args_str.leak())?;
-            serde_json::value::to_value(args)?
+            serde_json::de::from_str::<serde_json::Value>(sdk_args_str.leak())?
         } else {
             serde_json::value::to_value(data)?
         };
