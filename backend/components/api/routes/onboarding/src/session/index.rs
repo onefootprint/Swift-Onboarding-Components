@@ -77,7 +77,6 @@ pub async fn post(
         allow_reonboard,
         business_external_id,
     } = request.into_inner();
-    bootstrap_data.validate_keys();
 
     let sealing_key = state.session_sealing_key.clone();
     let (token, session) = state

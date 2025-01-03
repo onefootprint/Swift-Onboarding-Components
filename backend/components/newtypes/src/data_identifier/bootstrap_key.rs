@@ -6,6 +6,7 @@ use strum::IntoEnumIterator;
 
 /// Bootstrap data mostly consistents of DataIdentifiers, but there are a few additional keys that
 /// are only able to be passed when bootstrapping
+#[derive(Debug, Clone, serde_with::SerializeDisplay, serde_with::DeserializeFromStr, PartialEq, Eq, Hash)]
 pub enum BootstrapKey {
     Di(DI),
     Additional(AdditionalBootstrapKey),

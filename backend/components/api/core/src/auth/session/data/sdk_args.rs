@@ -18,31 +18,18 @@ use newtypes::SessionAuthToken;
 use newtypes::WorkflowFixtureResult;
 use paperclip::actix::Apiv2Schema;
 use std::collections::HashMap;
-use std::str::FromStr;
 use strum_macros::Display;
 use strum_macros::EnumDiscriminants;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Default)]
 #[serde(transparent)]
-/// NOTE: this doesn't yet validate that the keys are valid BootstrapKeys
-pub struct BootstrapDataV1(pub HashMap<String, PiiJsonValue>);
+pub struct BootstrapDataV1(pub HashMap<BootstrapKey, PiiJsonValue>);
 impl_modern_map_apiv2_schema!(
     BootstrapDataV1,
     BootstrapKey,
     "Key-value map of bootstrap data. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/integrate/bootstrap-data#boostraping-kyb-data).",
     { "id.first_name": "Jane", "id.last_name": "Doe" }
 );
-
-impl BootstrapDataV1 {
-    /// Soft validates that UserDataV1 keys are all valid. Eventually this will become a hard
-    /// validation
-    pub fn validate_keys(&self) {
-        for k in self.0.keys().filter(|k| BootstrapKey::from_str(k).is_err()) {
-            // TODO: turn into hard error
-            tracing::warn!(key=%k, "Invalid bootstrap data key provided");
-        }
-    }
-}
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema)]
 pub struct L10nV1 {
@@ -58,9 +45,6 @@ pub enum Locale {
     EnUs,
     #[serde(rename = "es-MX")]
     EsMx,
-    #[serde(untagged)]
-    #[openapi(skip)]
-    Other(String),
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema)]
@@ -68,9 +52,6 @@ pub enum Locale {
 pub enum Language {
     En,
     Es,
-    #[serde(untagged)]
-    #[openapi(skip)]
-    Other(String),
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema)]
@@ -205,15 +186,6 @@ impl ValidateSdkArgs for VerifyV1SdkArgs {
         if self.auth_token.is_none() && self.public_key.is_none() {
             return BadRequestInto("Either auth token or public key must be provided");
         }
-        if let Some(user_data) = self.user_data.as_ref() {
-            user_data.validate_keys();
-        }
-        if let Some(Language::Other(language)) = self.l10n.as_ref().and_then(|l| l.language.as_ref()) {
-            tracing::warn!(%language, "Invalid language variant");
-        }
-        if let Some(Locale::Other(locale)) = self.l10n.as_ref().and_then(|l| l.locale.as_ref()) {
-            tracing::warn!(%locale, "Invalid locale variant");
-        }
 
         let show_completion_page = self
             .options
@@ -233,17 +205,8 @@ impl ValidateSdkArgs for AuthV1SdkArgs {
             .map(|pk| pk.to_string())
             .unwrap_or("None".into());
         tracing::info!(%public_key, "Auth args");
-        if let Some(user_data) = self.user_data.as_ref() {
-            user_data.validate_keys();
-        }
         if self.public_key.is_none() {
             return BadRequestInto("Public key must be provided");
-        }
-        if let Some(Language::Other(language)) = self.l10n.as_ref().and_then(|l| l.language.as_ref()) {
-            tracing::warn!(%language, "Invalid language variant");
-        }
-        if let Some(Locale::Other(locale)) = self.l10n.as_ref().and_then(|l| l.locale.as_ref()) {
-            tracing::warn!(%locale, "Invalid locale variant");
         }
         Ok(())
     }
