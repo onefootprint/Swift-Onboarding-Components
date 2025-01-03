@@ -34,11 +34,9 @@ import com.onefootprint.native_onboarding_components.models.FootprintAuthMethods
 import com.onefootprint.native_onboarding_components.models.FootprintException
 import com.onefootprint.native_onboarding_components.models.OverallOutcome
 import com.onefootprint.native_onboarding_components.models.SandboxOutcome
+import com.onefootprint.native_onboarding_components.utils.FootprintUtils
 import kotlinx.coroutines.launch
 import org.openapitools.client.models.DataIdentifier
-import org.openapitools.client.models.InvestorProfileDeclaration
-import org.openapitools.client.models.InvestorProfileFundingSource
-import org.openapitools.client.models.InvestorProfileInvestmentGoal
 import org.openapitools.client.models.VaultData
 
 class MainActivity : ComponentActivity() {
@@ -153,6 +151,7 @@ fun Init(
                     val authRequirement = Footprint.initialize(
                         publicKey = "pb_test_fvM7uG6JY41t0JLrYP2aEG",
 //                        authToken = "utok_MhyAZwlmbZVLaxH6Kr7aeBe564fi13buhp",
+                        sandboxId = "sandboxhfvjh3678246bdf1",
                         sandboxOutcome = SandboxOutcome(
                             overallOutcome = OverallOutcome.fail
                         )
@@ -466,6 +465,10 @@ fun BasicInfo(
             middleName = vaultData.idMiddleName ?: middleName
             lastName = vaultData.idLastName ?: lastName
             dob = vaultData.idDob ?: dob
+
+            // This is an example of how to get <data identifiers, value> map from vault data
+            // Note this will only return non-null values for the fields that were requested and has vaulted data
+            println(FootprintUtils.dataIdentifiersFromVaultData(vaultData))
         } catch (e: Exception) {
             println("Error retrieving vault data: ${e.message}")
         }
@@ -736,6 +739,10 @@ fun Address(
             state = vaultData.idState ?: state
             zip = vaultData.idZip ?: zip
             country = vaultData.idCountry ?: country
+
+            // This is an example of how to get <data identifiers, value> map from vault data
+            // Note this will only return non-null values for the fields that were requested and has vaulted data
+            println(FootprintUtils.dataIdentifiersFromVaultData(vaultData))
         } catch (e: Exception) {
             println("Error retrieving vault data: ${e.message}")
         }
