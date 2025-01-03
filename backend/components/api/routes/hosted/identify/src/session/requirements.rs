@@ -19,6 +19,7 @@ use itertools::chain;
 use itertools::Itertools;
 use newtypes::AuthMethodKind;
 use newtypes::CollectedDataOption as CDO;
+use newtypes::DataIdentifierDiscriminant as DID;
 use newtypes::IdentityDataKind::Email;
 use newtypes::IdentityDataKind::PhoneNumber;
 use newtypes::ObConfigurationKind;
@@ -84,16 +85,22 @@ pub(super) async fn get_requirements(
     let obc = identify.obc.clone();
     let required_auth_methods = obc.required_auth_methods.unwrap_or(vec![AuthMethodKind::Phone]);
 
+    // Certain playbooks don't collect phone or email explicitly, but we should still collect them for
+    // the identify flow anyways
+    let is_document_playbook = obc.kind == ObConfigurationKind::Document;
+    let is_skip_bo_playbook =
+        obc.kind == ObConfigurationKind::Kyb && !obc.must_collect_data.iter().any(|cdo| cdo.matches(DID::Id));
+    let should_collect_unconditionally = is_document_playbook || is_skip_bo_playbook;
+
     let possible_auth_cdos = vec![CDO::Email, CDO::PhoneNumber];
     for cdo in possible_auth_cdos {
-        // Document playbooks never collect email or phone, but we need them for the identify flow
-        let playbook_requires =
-            obc.must_collect_data.contains(&cdo) || obc.kind == ObConfigurationKind::Document;
+        let playbook_requires = obc.must_collect_data.contains(&cdo);
+        let should_collect = playbook_requires || should_collect_unconditionally;
         let is_populated = cdo
             .required_data_identifiers()
             .iter()
             .all(|di| placeholder_vw.has_field(di));
-        if playbook_requires && !is_populated {
+        if should_collect && !is_populated {
             requirements.push(IdentifyRequirement::CollectData { cdo });
         }
     }

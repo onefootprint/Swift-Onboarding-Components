@@ -249,6 +249,45 @@ def test_doc_playbook(sandbox_tenant):
     post("hosted/identify/session/verify", None, token)
 
 
+def test_skip_bo_playbook(sandbox_tenant):
+    playbook = create_ob_config(
+        sandbox_tenant,
+        "Skip BO",
+        ["business_name", "business_tin", "business_address"],
+        kind="kyb",
+        skip_kyc=True,
+    )
+    sandbox_id = _gen_random_sandbox_id()
+    sandbox_id_h = SandboxId(sandbox_id)
+    data = dict(scope="onboarding", data=dict())
+    body = post("hosted/identify/session", data, playbook.key, sandbox_id_h)
+    token = FpAuth(body["token"])
+
+    # Check the requirements. Should need to collect phone number and email, just to preserve legacy behavior.
+    # In theory, we could only collect phone since phone is the only implicitly required auth method
+    body = get("hosted/identify/session/requirements", None, token)
+    assert body["requirements"][0]["kind"] == "collect_data"
+    assert body["requirements"][0]["cdo"] == "email"
+    assert body["requirements"][1]["kind"] == "collect_data"
+    assert body["requirements"][1]["cdo"] == "phone_number"
+    assert body["requirements"][2]["kind"] == "challenge"
+    assert body["requirements"][2]["auth_method"] == "phone"
+
+    # Vault the phone number and email
+    data = {"id.phone_number": FIXTURE_PHONE_NUMBER, "id.email": FIXTURE_EMAIL}
+    body = patch("hosted/identify/session/vault", data, token)
+
+    # Verify the phone number
+    data = dict(challenge_kind="sms")
+    body = post("hosted/identify/session/challenge", data, token)
+    challenge_token = body["challenge_data"]["challenge_token"]
+
+    data = dict(challenge_token=challenge_token, challenge_response="000000")
+    body = post("hosted/identify/session/challenge/verify", data, token)
+
+    post("hosted/identify/session/verify", None, token)
+
+
 def test_no_phone_playbook(skip_phone_obc):
     sandbox_id = _gen_random_sandbox_id()
     sandbox_id_h = SandboxId(sandbox_id)
