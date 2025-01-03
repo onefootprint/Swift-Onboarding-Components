@@ -34,12 +34,12 @@ import com.onefootprint.native_onboarding_components.models.FootprintAuthMethods
 import com.onefootprint.native_onboarding_components.models.FootprintException
 import com.onefootprint.native_onboarding_components.models.OverallOutcome
 import com.onefootprint.native_onboarding_components.models.SandboxOutcome
-import com.onefootprint.native_onboarding_components.models.VaultData
 import kotlinx.coroutines.launch
 import org.openapitools.client.models.DataIdentifier
 import org.openapitools.client.models.InvestorProfileDeclaration
 import org.openapitools.client.models.InvestorProfileFundingSource
 import org.openapitools.client.models.InvestorProfileInvestmentGoal
+import org.openapitools.client.models.VaultData
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -452,42 +452,42 @@ fun BasicInfo(
 
     val coroutineScope = rememberCoroutineScope()
 
-//    LaunchedEffect(Unit) {
-//        try {
-//            val vaultData = Footprint.getVaultData(
-//                listOf(
-//                    DataIdentifier.idFirstName,
-//                    DataIdentifier.idMiddleName,
-//                    DataIdentifier.idLastName,
-//                    DataIdentifier.idDob
-//                )
-//            )
-//            firstName = vaultData.idFirstName ?: ""
-//            middleName = vaultData.idMiddleName ?: ""
-//            lastName = vaultData.idLastName ?: ""
-//            dob = vaultData.idDob ?: ""
-//        } catch (e: Exception) {
-//            println("Error retrieving vault data: ${e.message}")
-//        }
-//
-//        // Get requirements
-//        // This is an example of how to get requirements for the user
-//        // For demonstration purposes, we will print the requirements to the console
-//        // The requirements response will change during the flow as you collect more data and complete the requirements
-//        // So, you can call this function at any point in the flow to get the latest requirements
-//        try {
-//            val requirementsResponse = Footprint.getRequirements()
-//            println("Has missing requirements: ${requirementsResponse.requirements.isMissing}")
-//            println("Is requirements completed: ${requirementsResponse.requirements.isCompleted}")
-//            println("Missing fields: ${requirementsResponse.fields.missing}")
-//            println("Collected fields: ${requirementsResponse.fields.collected}")
-//            println("Optional fields: ${requirementsResponse.fields.optional}")
-//            println("Can updated user data: ${requirementsResponse.canUpdateUserData}")
-//            println("Can process inline OTP: ${requirementsResponse.canProcessInline}")
-//        } catch (e: Exception) {
-//            println("Error getting requirements: ${e.message}")
-//        }
-//    }
+    LaunchedEffect(Unit) {
+        try {
+            val vaultData = Footprint.getVaultData(
+                listOf(
+                    DataIdentifier.idFirstName,
+                    DataIdentifier.idMiddleName,
+                    DataIdentifier.idLastName,
+                    DataIdentifier.idDob
+                )
+            )
+            firstName = vaultData.idFirstName ?: firstName
+            middleName = vaultData.idMiddleName ?: middleName
+            lastName = vaultData.idLastName ?: lastName
+            dob = vaultData.idDob ?: dob
+        } catch (e: Exception) {
+            println("Error retrieving vault data: ${e.message}")
+        }
+
+        // Get requirements
+        // This is an example of how to get requirements for the user
+        // For demonstration purposes, we will print the requirements to the console
+        // The requirements response will change during the flow as you collect more data and complete the requirements
+        // So, you can call this function at any point in the flow to get the latest requirements
+        try {
+            val requirementsResponse = Footprint.getRequirements()
+            println("Has missing requirements: ${requirementsResponse.requirements.isMissing}")
+            println("Is requirements completed: ${requirementsResponse.requirements.isCompleted}")
+            println("Missing fields: ${requirementsResponse.fields.missing}")
+            println("Collected fields: ${requirementsResponse.fields.collected}")
+            println("Optional fields: ${requirementsResponse.fields.optional}")
+            println("Can updated user data: ${requirementsResponse.canUpdateUserData}")
+            println("Can process inline OTP: ${requirementsResponse.canProcessInline}")
+        } catch (e: Exception) {
+            println("Error getting requirements: ${e.message}")
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -668,6 +668,7 @@ fun BasicInfo(
 
                             // Fallback for other errors
                             if (fnError == null && lnError == null && mnError == null && birthdayError == null) {
+                                println("Error updating basic info: ${e.message}")
                                 generalErrorMessage =
                                     "An unexpected error occurred. Please try again later."
                             }
@@ -717,46 +718,46 @@ fun Address(
 
     val coroutineScope = rememberCoroutineScope()
 
-//    LaunchedEffect(Unit) {
-//        try {
-//            val vaultData = Footprint.getVaultData(
-//                listOf(
-//                    DataIdentifier.idAddressLine1,
-//                    DataIdentifier.idAddressLine2,
-//                    DataIdentifier.idCity,
-//                    DataIdentifier.idState,
-//                    DataIdentifier.idZip,
-//                    DataIdentifier.idCountry
-//                )
-//            )
-//            addressLine1 = vaultData.idAddressLine1 ?: ""
-//            addressLine2 = vaultData.idAddressLine2 ?: ""
-//            city = vaultData.idCity ?: ""
-//            state = vaultData.idState ?: ""
-//            zip = vaultData.idZip ?: ""
-//            country = vaultData.idCountry ?: ""
-//        } catch (e: Exception) {
-//            println("Error retrieving vault data: ${e.message}")
-//        }
-//
-//        // Get requirements
-//        // This is an example of how to get requirements for the user
-//        // For demonstration purposes, we will print the requirements to the console
-//        // The requirements response will change during the flow as you collect more data and complete the requirements
-//        // So, you can call this function at any point in the flow to get the latest requirements
-//        try {
-//            val requirementsResponse = Footprint.getRequirements()
-//            println("Has missing requirements: ${requirementsResponse.requirements.isMissing}")
-//            println("Is requirements completed: ${requirementsResponse.requirements.isCompleted}")
-//            println("Missing fields: ${requirementsResponse.fields.missing}")
-//            println("Collected fields: ${requirementsResponse.fields.collected}")
-//            println("Optional fields: ${requirementsResponse.fields.optional}")
-//            println("Can updated user data: ${requirementsResponse.canUpdateUserData}")
-//            println("Can process inline OTP: ${requirementsResponse.canProcessInline}")
-//        } catch (e: Exception) {
-//            println("Error getting requirements: ${e.message}")
-//        }
-//    }
+    LaunchedEffect(Unit) {
+        try {
+            val vaultData = Footprint.getVaultData(
+                listOf(
+                    DataIdentifier.idAddressLine1,
+                    DataIdentifier.idAddressLine2,
+                    DataIdentifier.idCity,
+                    DataIdentifier.idState,
+                    DataIdentifier.idZip,
+                    DataIdentifier.idCountry
+                )
+            )
+            addressLine1 = vaultData.idAddressLine1 ?: addressLine1
+            addressLine2 = vaultData.idAddressLine2 ?: addressLine2
+            city = vaultData.idCity ?: city
+            state = vaultData.idState ?: state
+            zip = vaultData.idZip ?: zip
+            country = vaultData.idCountry ?: country
+        } catch (e: Exception) {
+            println("Error retrieving vault data: ${e.message}")
+        }
+
+        // Get requirements
+        // This is an example of how to get requirements for the user
+        // For demonstration purposes, we will print the requirements to the console
+        // The requirements response will change during the flow as you collect more data and complete the requirements
+        // So, you can call this function at any point in the flow to get the latest requirements
+        try {
+            val requirementsResponse = Footprint.getRequirements()
+            println("Has missing requirements: ${requirementsResponse.requirements.isMissing}")
+            println("Is requirements completed: ${requirementsResponse.requirements.isCompleted}")
+            println("Missing fields: ${requirementsResponse.fields.missing}")
+            println("Collected fields: ${requirementsResponse.fields.collected}")
+            println("Optional fields: ${requirementsResponse.fields.optional}")
+            println("Can updated user data: ${requirementsResponse.canUpdateUserData}")
+            println("Can process inline OTP: ${requirementsResponse.canProcessInline}")
+        } catch (e: Exception) {
+            println("Error getting requirements: ${e.message}")
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -987,6 +988,7 @@ fun Address(
 
                             // Fallback for other errors
                             if (addressLine1ErrorMsg == null && cityErrorMsg == null && stateErrorMsg == null && zipErrorMsg == null && countryErrorMsg == null) {
+                                println("Error updating basic info: ${e.message}")
                                 generalErrorMessage =
                                     "An unexpected error occurred. Please try again later."
                             }

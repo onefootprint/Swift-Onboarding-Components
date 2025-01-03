@@ -15,7 +15,7 @@
 
 package org.openapitools.client.apis
 
-import org.openapitools.client.models.ModernRawUserDataRequest
+import org.openapitools.client.models.VaultData
 
 import org.openapitools.client.infrastructure.*
 import io.ktor.client.HttpClient
@@ -45,17 +45,17 @@ open class UsersApi : ApiClient {
     /**
      * 
      * Updates data in a user vault
-     * @param modernRawUserDataRequest Key-value map of data to add to the user&#39;s vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).
+     * @param vaultData Key-value map of data to add to the user&#39;s vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).
      * @param xFpIsBootstrap Provide &#x60;true&#x60; if the data in the request is bootstrap data. (optional)
      * @param xFpAuthorization Short-lived auth token for a user during bifrost. Issued by identify and contains scopes to perform specific user actions. (optional)
      * @return kotlin.String
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun hostedUserVaultPatch_1(modernRawUserDataRequest: ModernRawUserDataRequest, xFpIsBootstrap: kotlin.Boolean? = null, xFpAuthorization: kotlin.String? = null): HttpResponse<kotlin.String> {
+    open suspend fun hostedUserVaultPatch_1(vaultData: VaultData, xFpIsBootstrap: kotlin.Boolean? = null, xFpAuthorization: kotlin.String? = null): HttpResponse<kotlin.String> {
 
         val localVariableAuthNames = listOf<String>("userOnboardingToken")
 
-        val localVariableBody = modernRawUserDataRequest
+        val localVariableBody = vaultData
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
@@ -82,16 +82,16 @@ open class UsersApi : ApiClient {
     /**
      * 
      * Checks if provided vault data is valid before adding it to the vault
-     * @param modernRawUserDataRequest Key-value map of data to add to the user&#39;s vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).
+     * @param vaultData Key-value map of data to add to the user&#39;s vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).
      * @param xFpAuthorization Short-lived auth token for a user during bifrost. Issued by identify and contains scopes to perform specific user actions. (optional)
      * @return kotlin.String
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun hostedUserVaultValidatePost_1(modernRawUserDataRequest: ModernRawUserDataRequest, xFpAuthorization: kotlin.String? = null): HttpResponse<kotlin.String> {
+    open suspend fun hostedUserVaultValidatePost_1(vaultData: VaultData, xFpAuthorization: kotlin.String? = null): HttpResponse<kotlin.String> {
 
         val localVariableAuthNames = listOf<String>("userOnboardingToken")
 
-        val localVariableBody = modernRawUserDataRequest
+        val localVariableBody = vaultData
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()

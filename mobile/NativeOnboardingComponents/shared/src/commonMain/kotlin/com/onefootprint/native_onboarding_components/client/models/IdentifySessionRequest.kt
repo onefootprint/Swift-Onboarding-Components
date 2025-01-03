@@ -16,7 +16,7 @@
 package org.openapitools.client.models
 
 import org.openapitools.client.models.IdentifyScope
-import org.openapitools.client.models.ModernRawUserDataRequest
+import org.openapitools.client.models.VaultData
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
@@ -32,7 +32,7 @@ import kotlinx.serialization.encoding.*
 
 data class IdentifySessionRequest (
 
-    @SerialName(value = "data") @Required val `data`: ModernRawUserDataRequest,
+    @SerialName(value = "data") @Required val `data`: VaultData,
 
     @SerialName(value = "scope") @Required val scope: IdentifyScope
 

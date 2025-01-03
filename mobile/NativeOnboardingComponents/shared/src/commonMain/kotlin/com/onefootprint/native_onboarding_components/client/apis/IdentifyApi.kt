@@ -30,8 +30,8 @@ import org.openapitools.client.models.KbaResponse
 import org.openapitools.client.models.LiteIdentifyRequest
 import org.openapitools.client.models.LiteIdentifyResponse
 import org.openapitools.client.models.LoginChallengeRequest
-import org.openapitools.client.models.ModernRawUserDataRequest
 import org.openapitools.client.models.SignupChallengeRequest
+import org.openapitools.client.models.VaultData
 
 import org.openapitools.client.infrastructure.*
 import io.ktor.client.HttpClient
@@ -61,16 +61,16 @@ open class IdentifyApi : ApiClient {
     /**
      * 
      * Respond to a KBA challenge to prove knowledge of existing data in the vault.
-     * @param modernRawUserDataRequest Key-value map of data to add to the user&#39;s vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).
+     * @param vaultData Key-value map of data to add to the user&#39;s vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).
      * @param xFpAuthorization Short-lived auth token for a user. Issued by identify and contains scopes to perform specific user actions. (optional)
      * @return KbaResponse
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun hostedIdentifyKbaPost(modernRawUserDataRequest: ModernRawUserDataRequest, xFpAuthorization: kotlin.String? = null): HttpResponse<KbaResponse> {
+    open suspend fun hostedIdentifyKbaPost(vaultData: VaultData, xFpAuthorization: kotlin.String? = null): HttpResponse<KbaResponse> {
 
         val localVariableAuthNames = listOf<String>("userToken")
 
-        val localVariableBody = modernRawUserDataRequest
+        val localVariableBody = vaultData
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
@@ -356,16 +356,16 @@ open class IdentifyApi : ApiClient {
     /**
      * 
      * Updates the data stored in this identify session.
-     * @param modernRawUserDataRequest Key-value map of data to add to the user&#39;s vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).
+     * @param vaultData Key-value map of data to add to the user&#39;s vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).
      * @param xFpAuthorization Short-lived auth token for an identify session. (optional)
      * @return kotlin.String
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun hostedIdentifySessionVaultPatch(modernRawUserDataRequest: ModernRawUserDataRequest, xFpAuthorization: kotlin.String? = null): HttpResponse<kotlin.String> {
+    open suspend fun hostedIdentifySessionVaultPatch(vaultData: VaultData, xFpAuthorization: kotlin.String? = null): HttpResponse<kotlin.String> {
 
         val localVariableAuthNames = listOf<String>("Identify Token")
 
-        val localVariableBody = modernRawUserDataRequest
+        val localVariableBody = vaultData
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()

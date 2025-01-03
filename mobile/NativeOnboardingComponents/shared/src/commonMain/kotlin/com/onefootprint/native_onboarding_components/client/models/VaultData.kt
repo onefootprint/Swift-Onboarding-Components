@@ -65,7 +65,7 @@ import kotlinx.serialization.encoding.*
  */
 @Serializable
 
-open class ModernRawUserDataRequest (
+data class VaultData (
 
     @SerialName(value = "id.address_line1") val idAddressLine1: kotlin.String? = null,
 

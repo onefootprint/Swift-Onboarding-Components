@@ -5,11 +5,7 @@ import {
   patchHostedUserVault,
 } from '@onefootprint/axios';
 import { uuidv4 } from '@onefootprint/dev-tools';
-import type {
-  HostedBusinessOwner,
-  ModernRawBusinessDataRequest,
-  ModernRawUserDataRequest,
-} from '@onefootprint/request-types';
+import type { HostedBusinessOwner, VaultData } from '@onefootprint/request-types';
 
 import type { BootstrapBusinessData, BootstrapUserData } from '../../../types';
 
@@ -134,7 +130,7 @@ const getBusinessPayload = (businessData: BootstrapBusinessData) => {
   return Object.fromEntries(
     Object.entries(businessData)
       .map(([key, { value }]) => [key, String(value)])
-      .filter(([key]) => allowedKeys.includes(key as keyof ModernRawBusinessDataRequest)),
+      .filter(([key]) => allowedKeys.includes(key as keyof VaultData)),
   );
 };
 
@@ -144,7 +140,7 @@ const getUserPayload = (userData: BootstrapUserData) => {
   return Object.fromEntries(
     Object.entries(userData)
       .map(([key, { value }]) => [key, String(value)])
-      .filter(([key]) => allowedKeys.includes(key as keyof ModernRawUserDataRequest)),
+      .filter(([key]) => allowedKeys.includes(key as keyof VaultData)),
   );
 };
 

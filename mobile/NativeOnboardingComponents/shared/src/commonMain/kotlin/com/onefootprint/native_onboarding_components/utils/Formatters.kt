@@ -2,9 +2,8 @@ package com.onefootprint.native_onboarding_components.utils
 
 import com.onefootprint.native_onboarding_components.models.FootprintException
 import com.onefootprint.native_onboarding_components.models.FootprintSupportedLocale
-import com.onefootprint.native_onboarding_components.models.VaultData
 import kotlinx.datetime.LocalDate
-import org.openapitools.client.models.DataIdentifier
+import org.openapitools.client.models.VaultData
 
 internal object Formatters {
     /// Converts a date string to US date format (MM/DD/YYYY or DD/MM/YYYY) based on the locale.
@@ -163,7 +162,7 @@ internal object Formatters {
             visaExpiration = fromUsDateToISO8601(visaExpiration)
         }
 
-        return data.getUpdatedVaultData(
+        return data.copy(
             idDob = dob,
             idVisaExpirationDate = visaExpiration
         )
@@ -183,7 +182,7 @@ internal object Formatters {
             visaExpiration = fromUsDateToStringInput(locale, visaExpiration)
         }
 
-        return data.getUpdatedVaultData(
+        return data.copy(
             idDob = dob,
             idVisaExpirationDate = visaExpiration
         )

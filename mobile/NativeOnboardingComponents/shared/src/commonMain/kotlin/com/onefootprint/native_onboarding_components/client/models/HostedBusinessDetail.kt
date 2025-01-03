@@ -16,7 +16,7 @@
 package org.openapitools.client.models
 
 import org.openapitools.client.models.Inviter
-import org.openapitools.client.models.ModernRawUserDataRequest
+import org.openapitools.client.models.VaultData
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
@@ -33,7 +33,7 @@ import kotlinx.serialization.encoding.*
 
 data class HostedBusinessDetail (
 
-    @SerialName(value = "invited_data") @Required val invitedData: ModernRawUserDataRequest,
+    @SerialName(value = "invited_data") @Required val invitedData: VaultData,
 
     @SerialName(value = "inviter") @Required val inviter: Inviter,
 

@@ -24,8 +24,6 @@ import org.openapitools.client.models.IdentifyVerifyRequest
 import org.openapitools.client.models.IdentifyVerifyResponse
 import org.openapitools.client.models.LogBody
 import org.openapitools.client.models.LoginChallengeRequest
-import org.openapitools.client.models.ModernRawUserDataRequest
-import org.openapitools.client.models.ModernUserDecryptResponse
 import org.openapitools.client.models.OnboardingResponse
 import org.openapitools.client.models.OnboardingStatusResponse
 import org.openapitools.client.models.PostOnboardingRequest
@@ -35,6 +33,7 @@ import org.openapitools.client.models.RequestedTokenScope
 import org.openapitools.client.models.SdkArgs
 import org.openapitools.client.models.SignupChallengeRequest
 import org.openapitools.client.models.SignupChallengeRequestEmail
+import org.openapitools.client.models.VaultData
 import org.openapitools.client.models.WorkflowFixtureResult
 
 internal object FootprintQueries {
@@ -287,9 +286,9 @@ internal object FootprintQueries {
         return response.body()
     }
 
-    suspend fun vault(authToken: String, vaultData: ModernRawUserDataRequest): String {
+    suspend fun vault(authToken: String, vaultData: VaultData): String {
         val response = vaultApi.hostedUserVaultPatch(
-            modernRawUserDataRequest = vaultData,
+            vaultData = vaultData,
             xFpAuthorization = authToken
         )
         if (!response.success) {
@@ -308,7 +307,7 @@ internal object FootprintQueries {
     suspend fun decrypt(
         authToken: String,
         fields: List<DataIdentifier>
-    ): ModernRawUserDataRequest {
+    ): VaultData {
         val filteredFields = fields.filter {
             it != DataIdentifier.idSsn9 &&
                     it != DataIdentifier.idSsn4 &&

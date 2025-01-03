@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import $RefParser from '@apidevtools/json-schema-ref-parser';
 import { runBiome } from '@onefootprint/request-types/config/run-biome';
+import { updateOpenApi } from '@onefootprint/request-types/config/update-openapi';
 import deepmerge from 'deepmerge';
 import { JSONSchemaFaker } from 'json-schema-faker';
 import _ from 'lodash';
@@ -33,6 +34,8 @@ export async function generateFixtures(type: 'hosted' | 'dashboard') {
   let examples = '';
   let imports = 'import deepmerge from "deepmerge";\nimport type { \n';
 
+  const tempPath = 'tempApiDocs.json';
+
   const config =
     type === 'hosted'
       ? {
@@ -46,7 +49,9 @@ export async function generateFixtures(type: 'hosted' | 'dashboard') {
           specPath: path.resolve('../../apps/docs/src/pages/api-reference/assets/dashboard-api-docs.json'),
         };
 
-  const spec = (await $RefParser.dereference(config.specPath)) as OpenAPIV3.Document;
+  await updateOpenApi(config.specPath, tempPath);
+
+  const spec = (await $RefParser.dereference(tempPath)) as OpenAPIV3.Document;
 
   if (spec.components?.schemas) {
     const enhancedSchemas = Object.entries(spec.components.schemas).reduce(
@@ -97,6 +102,8 @@ export async function generateFixtures(type: 'hosted' | 'dashboard') {
   }
 
   fs.writeFileSync(config.outputPath, imports + examples);
+
+  fs.unlinkSync(tempPath);
 }
 
 const generate = async () => {

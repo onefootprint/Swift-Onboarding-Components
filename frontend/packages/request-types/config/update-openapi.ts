@@ -1,6 +1,6 @@
 import deepmerge from 'deepmerge';
 import fs from 'fs/promises';
-import { partition, startCase, toLower } from 'lodash';
+import { partition, startCase, toLower, unset } from 'lodash';
 import type {
   OpenAPIObject,
   OperationObject,
@@ -144,12 +144,22 @@ export const updateOpenApi = async (filePath: string, tempPath: string) => {
       regex: /#\/components\/schemas\/ModernUserDecryptResponse/g,
       value: '#/components/schemas/ModernRawUserDataRequest',
     },
+    {
+      regex: /#\/components\/schemas\/ModernRawUserDataRequest/g,
+      value: '#/components/schemas/VaultData',
+    },
+    {
+      regex: /"ModernRawUserDataRequest":\s*\{/g,
+      value: '"VaultData": {',
+    },
   ];
 
   const updatedContent = replaceContent(openAPIContent, replacements);
 
   // Parse and type the OpenAPI specification
   const openAPI: OpenAPIObject = JSON.parse(updatedContent);
+
+  unset(openAPI, 'components.schemas.ModernUserDecryptResponse');
 
   const openAPIWithHeaders = createHeadersFromSecuritySchemes(openAPI);
 

@@ -87,7 +87,7 @@ const updateOnboardingRequirementCollectDocument = async (dir: string) => {
 };
 
 const updateModernRawUserDataRequest = async (dir: string) => {
-  const files = ['ModernRawUserDataRequest.kt', 'ModernUserDecryptResponse.kt', 'DataIdentifier.kt'];
+  const files = ['DataIdentifier.kt', 'VaultData.kt'];
   const basePath = 'src/commonMain/kotlin/org/openapitools/client/models/';
 
   files.forEach(async file => {
@@ -106,11 +106,6 @@ const updateModernRawUserDataRequest = async (dir: string) => {
       .replace(/(\r?\n){2,}/g, '\n\n')
       .trim();
 
-    fileContent = fileContent.replace(
-      /(?<!\w)data class ModernRawUserDataRequest/g,
-      'open class ModernRawUserDataRequest',
-    );
-
     await fs.writeFile(filePath, fileContent);
   });
 };
@@ -121,13 +116,6 @@ const updateSdkArgs = async (dir: string) => {
   let fileContent = await fs.readFile(verifyPath, 'utf8');
   fileContent = fileContent.replace(/SdkArgsVerifyV1/g, 'SdkArgs');
   await fs.writeFile(sdkPath, fileContent);
-};
-
-const updateVerifyV1SdkArgs = async (dir: string) => {
-  const verifyPath = path.join(dir, 'src/commonMain/kotlin/org/openapitools/client/models/VerifyV1SdkArgs.kt');
-  let fileContent = await fs.readFile(verifyPath, 'utf8');
-  fileContent = fileContent.replace(/userData: kotlin\.String\?/, 'userData: ModernUserDecryptResponse?');
-  await fs.writeFile(verifyPath, fileContent);
 };
 
 const updateLocale = async (dir: string) => {
@@ -146,6 +134,5 @@ export const updateKotlin = async (dir: string) => {
   await updateOnboardingRequirementDataClasses(dir);
   await updateModernRawUserDataRequest(dir);
   await updateSdkArgs(dir);
-  await updateVerifyV1SdkArgs(dir);
   await updateLocale(dir);
 };

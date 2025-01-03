@@ -35,7 +35,7 @@ import kotlinx.serialization.encoding.*
  * @param businessName 
  * @param businessPhoneNumber 
  * @param businessPrimaryOwnerStake 
- * @param businessSecondaryBeneficialOwners 
+ * @param businessSecondaryOwners 
  * @param businessState 
  * @param businessTin 
  * @param businessWebsite 
@@ -90,7 +90,7 @@ data class BootstrapDataV1 (
 
     @SerialName(value = "business.primary_owner_stake") val businessPrimaryOwnerStake: kotlin.Long? = null,
 
-    @SerialName(value = "business.secondary_beneficial_owners") val businessSecondaryBeneficialOwners: kotlin.collections.List<kotlin.String>? = null,
+    @SerialName(value = "business.secondary_owners") val businessSecondaryOwners: kotlin.collections.List<kotlin.String>? = null,
 
     @SerialName(value = "business.state") val businessState: kotlin.String? = null,
 

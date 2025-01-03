@@ -9,7 +9,6 @@ import com.onefootprint.native_onboarding_components.models.FootprintSupportedLa
 import com.onefootprint.native_onboarding_components.models.FootprintSupportedLocale
 import com.onefootprint.native_onboarding_components.models.Requirements
 import com.onefootprint.native_onboarding_components.models.SandboxOutcome
-import com.onefootprint.native_onboarding_components.models.VaultData
 import com.onefootprint.native_onboarding_components.models.VerificationResponse
 import com.onefootprint.native_onboarding_components.utils.AuthUtils
 import com.onefootprint.native_onboarding_components.utils.RequirementUtil
@@ -26,6 +25,7 @@ import org.openapitools.client.models.DocumentFixtureResult
 import org.openapitools.client.models.IdentifyChallengeResponse
 import org.openapitools.client.models.ObConfigurationKind
 import org.openapitools.client.models.PublicOnboardingConfiguration
+import org.openapitools.client.models.VaultData
 import org.openapitools.client.models.WorkflowFixtureResult
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.uuid.ExperimentalUuidApi

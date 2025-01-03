@@ -76,6 +76,9 @@ const createKotlinTypes = async () => {
       '../../../mobile/NativeOnboardingComponents/shared/src/commonMain/kotlin/com/onefootprint/native_onboarding_components',
     );
 
+    // Remove everything from target directory
+    await fs.rm(path.join(targetDir, 'client'), { recursive: true, force: true });
+
     await updateKotlin(tempKotlinDir);
     // Copy all files from source to target directory
     await fs.cp(path.join(tempKotlinDir, 'src/commonMain/kotlin/org/openapitools'), targetDir, {

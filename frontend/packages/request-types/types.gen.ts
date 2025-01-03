@@ -45,7 +45,7 @@ export type BatchHostedBusinessOwnerRequest =
   | BatchHostedBusinessOwnerRequestCreate
   | BatchHostedBusinessOwnerRequestDelete;
 export type BatchHostedBusinessOwnerRequestCreate = {
-  data: ModernRawUserDataRequest;
+  data: VaultData;
   op: 'create';
   ownershipStake?: number;
   uuid: string;
@@ -57,7 +57,7 @@ export type BatchHostedBusinessOwnerRequestDelete = {
 };
 export type op2 = 'delete';
 export type BatchHostedBusinessOwnerRequestUpdate = {
-  data: ModernRawUserDataRequest;
+  data: VaultData;
   op: 'update';
   ownershipStake?: number;
   uuid: string;
@@ -787,13 +787,13 @@ export type HostedBusinessDetail = {
   /**
    * The basic data provided for the user accepting this invitation.
    */
-  invitedData: ModernRawUserDataRequest;
+  invitedData: VaultData;
   inviter: Inviter;
   name: string;
 };
 export type HostedBusinessOwner = {
   createdAt: string;
-  decryptedData: ModernRawUserDataRequest;
+  decryptedData: VaultData;
   /**
    * True if a user has already started onboarding as this beneficial owner. In this case, the
    * data below comes directly from that user's vault.
@@ -934,7 +934,7 @@ export type IdentifyResponse = {
 };
 export type IdentifyScope = 'my1fp' | 'onboarding' | 'auth';
 export type IdentifySessionRequest = {
-  data: ModernRawUserDataRequest;
+  data: VaultData;
   scope: IdentifyScope;
 };
 export type IdentifySessionResponse = {
@@ -1344,305 +1344,7 @@ export type ModernRawBusinessDataRequest<T extends string = string> = ReplaceWil
 /**
  * Key-value map of data to add to the user's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).
  */
-export type ModernRawUserDataRequest<T extends string = string> = ReplaceWildcard<
-  {
-    'bank.*.account_type'?: string;
-    'bank.*.ach_account_id'?: string;
-    'bank.*.ach_account_number'?: string;
-    'bank.*.ach_routing_number'?: string;
-    'bank.*.fingerprint'?: string;
-    'bank.*.name'?: string;
-    'card.*.billing_address.country'?: string;
-    'card.*.billing_address.zip'?: string;
-    'card.*.cvc'?: string;
-    'card.*.expiration'?: string;
-    'card.*.expiration_month'?: string;
-    'card.*.expiration_year'?: string;
-    'card.*.fingerprint'?: string;
-    'card.*.issuer'?: string;
-    'card.*.name'?: string;
-    'card.*.number'?: string;
-    'card.*.number_last4'?: string;
-    'custom.*'?: string;
-    'document.custom.*'?: string;
-    'document.drivers_license.address_line1'?: string;
-    'document.drivers_license.back.image'?: string;
-    'document.drivers_license.back.mime_type'?: string;
-    'document.drivers_license.city'?: string;
-    'document.drivers_license.classified_document_type'?: string;
-    'document.drivers_license.clave_de_elector'?: string;
-    'document.drivers_license.curp'?: string;
-    'document.drivers_license.curp_validation_response'?: string;
-    'document.drivers_license.dob'?: string;
-    'document.drivers_license.document_number'?: string;
-    'document.drivers_license.expires_at'?: string;
-    'document.drivers_license.first_name'?: string;
-    'document.drivers_license.front.image'?: string;
-    'document.drivers_license.front.mime_type'?: string;
-    'document.drivers_license.full_address'?: string;
-    'document.drivers_license.full_name'?: string;
-    'document.drivers_license.gender'?: string;
-    'document.drivers_license.issued_at'?: string;
-    'document.drivers_license.issuing_country'?: string;
-    'document.drivers_license.issuing_state'?: string;
-    'document.drivers_license.last_name'?: string;
-    'document.drivers_license.nationality'?: string;
-    'document.drivers_license.postal_code'?: string;
-    'document.drivers_license.ref_number'?: string;
-    'document.drivers_license.samba_activity_history_response'?: string;
-    'document.drivers_license.selfie.image'?: string;
-    'document.drivers_license.selfie.mime_type'?: string;
-    'document.drivers_license.state'?: string;
-    'document.drivers_license.us_issuing_state'?: string;
-    'document.finra_compliance_letter'?: string;
-    'document.id_card.address_line1'?: string;
-    'document.id_card.back.image'?: string;
-    'document.id_card.back.mime_type'?: string;
-    'document.id_card.city'?: string;
-    'document.id_card.classified_document_type'?: string;
-    'document.id_card.clave_de_elector'?: string;
-    'document.id_card.curp'?: string;
-    'document.id_card.curp_validation_response'?: string;
-    'document.id_card.dob'?: string;
-    'document.id_card.document_number'?: string;
-    'document.id_card.expires_at'?: string;
-    'document.id_card.first_name'?: string;
-    'document.id_card.front.image'?: string;
-    'document.id_card.front.mime_type'?: string;
-    'document.id_card.full_address'?: string;
-    'document.id_card.full_name'?: string;
-    'document.id_card.gender'?: string;
-    'document.id_card.issued_at'?: string;
-    'document.id_card.issuing_country'?: string;
-    'document.id_card.issuing_state'?: string;
-    'document.id_card.last_name'?: string;
-    'document.id_card.nationality'?: string;
-    'document.id_card.postal_code'?: string;
-    'document.id_card.ref_number'?: string;
-    'document.id_card.samba_activity_history_response'?: string;
-    'document.id_card.selfie.image'?: string;
-    'document.id_card.selfie.mime_type'?: string;
-    'document.id_card.state'?: string;
-    'document.id_card.us_issuing_state'?: string;
-    'document.passport_card.address_line1'?: string;
-    'document.passport_card.back.image'?: string;
-    'document.passport_card.back.mime_type'?: string;
-    'document.passport_card.city'?: string;
-    'document.passport_card.classified_document_type'?: string;
-    'document.passport_card.clave_de_elector'?: string;
-    'document.passport_card.curp'?: string;
-    'document.passport_card.curp_validation_response'?: string;
-    'document.passport_card.dob'?: string;
-    'document.passport_card.document_number'?: string;
-    'document.passport_card.expires_at'?: string;
-    'document.passport_card.first_name'?: string;
-    'document.passport_card.front.image'?: string;
-    'document.passport_card.front.mime_type'?: string;
-    'document.passport_card.full_address'?: string;
-    'document.passport_card.full_name'?: string;
-    'document.passport_card.gender'?: string;
-    'document.passport_card.issued_at'?: string;
-    'document.passport_card.issuing_country'?: string;
-    'document.passport_card.issuing_state'?: string;
-    'document.passport_card.last_name'?: string;
-    'document.passport_card.nationality'?: string;
-    'document.passport_card.postal_code'?: string;
-    'document.passport_card.ref_number'?: string;
-    'document.passport_card.samba_activity_history_response'?: string;
-    'document.passport_card.selfie.image'?: string;
-    'document.passport_card.selfie.mime_type'?: string;
-    'document.passport_card.state'?: string;
-    'document.passport_card.us_issuing_state'?: string;
-    'document.passport.address_line1'?: string;
-    'document.passport.back.image'?: string;
-    'document.passport.back.mime_type'?: string;
-    'document.passport.city'?: string;
-    'document.passport.classified_document_type'?: string;
-    'document.passport.clave_de_elector'?: string;
-    'document.passport.curp'?: string;
-    'document.passport.curp_validation_response'?: string;
-    'document.passport.dob'?: string;
-    'document.passport.document_number'?: string;
-    'document.passport.expires_at'?: string;
-    'document.passport.first_name'?: string;
-    'document.passport.front.image'?: string;
-    'document.passport.front.mime_type'?: string;
-    'document.passport.full_address'?: string;
-    'document.passport.full_name'?: string;
-    'document.passport.gender'?: string;
-    'document.passport.issued_at'?: string;
-    'document.passport.issuing_country'?: string;
-    'document.passport.issuing_state'?: string;
-    'document.passport.last_name'?: string;
-    'document.passport.nationality'?: string;
-    'document.passport.postal_code'?: string;
-    'document.passport.ref_number'?: string;
-    'document.passport.samba_activity_history_response'?: string;
-    'document.passport.selfie.image'?: string;
-    'document.passport.selfie.mime_type'?: string;
-    'document.passport.state'?: string;
-    'document.passport.us_issuing_state'?: string;
-    'document.permit.address_line1'?: string;
-    'document.permit.back.image'?: string;
-    'document.permit.back.mime_type'?: string;
-    'document.permit.city'?: string;
-    'document.permit.classified_document_type'?: string;
-    'document.permit.clave_de_elector'?: string;
-    'document.permit.curp'?: string;
-    'document.permit.curp_validation_response'?: string;
-    'document.permit.dob'?: string;
-    'document.permit.document_number'?: string;
-    'document.permit.expires_at'?: string;
-    'document.permit.first_name'?: string;
-    'document.permit.front.image'?: string;
-    'document.permit.front.mime_type'?: string;
-    'document.permit.full_address'?: string;
-    'document.permit.full_name'?: string;
-    'document.permit.gender'?: string;
-    'document.permit.issued_at'?: string;
-    'document.permit.issuing_country'?: string;
-    'document.permit.issuing_state'?: string;
-    'document.permit.last_name'?: string;
-    'document.permit.nationality'?: string;
-    'document.permit.postal_code'?: string;
-    'document.permit.ref_number'?: string;
-    'document.permit.samba_activity_history_response'?: string;
-    'document.permit.selfie.image'?: string;
-    'document.permit.selfie.mime_type'?: string;
-    'document.permit.state'?: string;
-    'document.permit.us_issuing_state'?: string;
-    'document.proof_of_address.image'?: string;
-    'document.residence_document.address_line1'?: string;
-    'document.residence_document.back.image'?: string;
-    'document.residence_document.back.mime_type'?: string;
-    'document.residence_document.city'?: string;
-    'document.residence_document.classified_document_type'?: string;
-    'document.residence_document.clave_de_elector'?: string;
-    'document.residence_document.curp'?: string;
-    'document.residence_document.curp_validation_response'?: string;
-    'document.residence_document.dob'?: string;
-    'document.residence_document.document_number'?: string;
-    'document.residence_document.expires_at'?: string;
-    'document.residence_document.first_name'?: string;
-    'document.residence_document.front.image'?: string;
-    'document.residence_document.front.mime_type'?: string;
-    'document.residence_document.full_address'?: string;
-    'document.residence_document.full_name'?: string;
-    'document.residence_document.gender'?: string;
-    'document.residence_document.issued_at'?: string;
-    'document.residence_document.issuing_country'?: string;
-    'document.residence_document.issuing_state'?: string;
-    'document.residence_document.last_name'?: string;
-    'document.residence_document.nationality'?: string;
-    'document.residence_document.postal_code'?: string;
-    'document.residence_document.ref_number'?: string;
-    'document.residence_document.samba_activity_history_response'?: string;
-    'document.residence_document.selfie.image'?: string;
-    'document.residence_document.selfie.mime_type'?: string;
-    'document.residence_document.state'?: string;
-    'document.residence_document.us_issuing_state'?: string;
-    'document.ssn_card.image'?: string;
-    'document.visa.address_line1'?: string;
-    'document.visa.back.image'?: string;
-    'document.visa.back.mime_type'?: string;
-    'document.visa.city'?: string;
-    'document.visa.classified_document_type'?: string;
-    'document.visa.clave_de_elector'?: string;
-    'document.visa.curp'?: string;
-    'document.visa.curp_validation_response'?: string;
-    'document.visa.dob'?: string;
-    'document.visa.document_number'?: string;
-    'document.visa.expires_at'?: string;
-    'document.visa.first_name'?: string;
-    'document.visa.front.image'?: string;
-    'document.visa.front.mime_type'?: string;
-    'document.visa.full_address'?: string;
-    'document.visa.full_name'?: string;
-    'document.visa.gender'?: string;
-    'document.visa.issued_at'?: string;
-    'document.visa.issuing_country'?: string;
-    'document.visa.issuing_state'?: string;
-    'document.visa.last_name'?: string;
-    'document.visa.nationality'?: string;
-    'document.visa.postal_code'?: string;
-    'document.visa.ref_number'?: string;
-    'document.visa.samba_activity_history_response'?: string;
-    'document.visa.selfie.image'?: string;
-    'document.visa.selfie.mime_type'?: string;
-    'document.visa.state'?: string;
-    'document.visa.us_issuing_state'?: string;
-    'document.voter_identification.address_line1'?: string;
-    'document.voter_identification.back.image'?: string;
-    'document.voter_identification.back.mime_type'?: string;
-    'document.voter_identification.city'?: string;
-    'document.voter_identification.classified_document_type'?: string;
-    'document.voter_identification.clave_de_elector'?: string;
-    'document.voter_identification.curp'?: string;
-    'document.voter_identification.curp_validation_response'?: string;
-    'document.voter_identification.dob'?: string;
-    'document.voter_identification.document_number'?: string;
-    'document.voter_identification.expires_at'?: string;
-    'document.voter_identification.first_name'?: string;
-    'document.voter_identification.front.image'?: string;
-    'document.voter_identification.front.mime_type'?: string;
-    'document.voter_identification.full_address'?: string;
-    'document.voter_identification.full_name'?: string;
-    'document.voter_identification.gender'?: string;
-    'document.voter_identification.issued_at'?: string;
-    'document.voter_identification.issuing_country'?: string;
-    'document.voter_identification.issuing_state'?: string;
-    'document.voter_identification.last_name'?: string;
-    'document.voter_identification.nationality'?: string;
-    'document.voter_identification.postal_code'?: string;
-    'document.voter_identification.ref_number'?: string;
-    'document.voter_identification.samba_activity_history_response'?: string;
-    'document.voter_identification.selfie.image'?: string;
-    'document.voter_identification.selfie.mime_type'?: string;
-    'document.voter_identification.state'?: string;
-    'document.voter_identification.us_issuing_state'?: string;
-    'id.address_line1'?: string;
-    'id.address_line2'?: string;
-    'id.citizenships'?: Array<Iso3166TwoDigitCountryCode>;
-    'id.city'?: string;
-    'id.country'?: string;
-    'id.dob'?: string;
-    'id.drivers_license_number'?: string;
-    'id.drivers_license_state'?: string;
-    'id.email'?: string;
-    'id.first_name'?: string;
-    'id.itin'?: string;
-    'id.last_name'?: string;
-    'id.middle_name'?: string;
-    'id.nationality'?: string;
-    'id.phone_number'?: string;
-    'id.ssn4'?: string;
-    'id.ssn9'?: string;
-    'id.state'?: string;
-    'id.us_legal_status'?: string;
-    'id.us_tax_id'?: string;
-    'id.visa_expiration_date'?: string;
-    'id.visa_kind'?: string;
-    'id.zip'?: string;
-    'investor_profile.annual_income'?: string;
-    'investor_profile.brokerage_firm_employer'?: string;
-    'investor_profile.declarations'?: Array<InvestorProfileDeclaration>;
-    'investor_profile.employer'?: string;
-    'investor_profile.employment_status'?: string;
-    'investor_profile.family_member_names'?: Array<string>;
-    'investor_profile.funding_sources'?: Array<InvestorProfileFundingSource>;
-    'investor_profile.investment_goals'?: Array<InvestorProfileInvestmentGoal>;
-    'investor_profile.net_worth'?: string;
-    'investor_profile.occupation'?: string;
-    'investor_profile.political_organization'?: string;
-    'investor_profile.risk_tolerance'?: string;
-    'investor_profile.senior_executive_symbols'?: Array<string>;
-  },
-  T
->;
-/**
- * A key-value map with the corresponding decrypted values
- */
-export type ModernUserDecryptResponse<T extends string = string> = ReplaceWildcard<
+export type VaultData<T extends string = string> = ReplaceWildcard<
   {
     'bank.*.account_type'?: string;
     'bank.*.ach_account_id'?: string;
@@ -2828,7 +2530,7 @@ export type PostHostedIdentifyKbaData = {
   /**
    * Key-value map of data to add to the user's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).
    */
-  body: ModernRawUserDataRequest;
+  body: VaultData;
   headers?: {
     /**
      * Short-lived auth token for a user. Issued by identify and contains scopes to perform specific user actions.
@@ -2928,7 +2630,7 @@ export type PatchHostedIdentifySessionVaultData = {
   /**
    * Key-value map of data to add to the user's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).
    */
-  body: ModernRawUserDataRequest;
+  body: VaultData;
   headers?: {
     /**
      * Short-lived auth token for an identify session.
@@ -3711,7 +3413,7 @@ export type PatchHostedUserVaultData = {
   /**
    * Key-value map of data to add to the user's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).
    */
-  body: ModernRawUserDataRequest;
+  body: VaultData;
   headers?: {
     /**
      * Short-lived auth token for a user during bifrost. Issued by identify and contains scopes to perform specific user actions.
@@ -3734,13 +3436,13 @@ export type PostHostedUserVaultDecryptData = {
     'X-Fp-Authorization'?: string;
   };
 };
-export type PostHostedUserVaultDecryptResponse = ModernRawUserDataRequest;
+export type PostHostedUserVaultDecryptResponse = VaultData;
 export type PostHostedUserVaultDecryptError = unknown;
 export type PostHostedUserVaultValidateData = {
   /**
    * Key-value map of data to add to the user's vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/articles/vault/fields).
    */
-  body: ModernRawUserDataRequest;
+  body: VaultData;
   headers?: {
     /**
      * Short-lived auth token for a user during bifrost. Issued by identify and contains scopes to perform specific user actions.
@@ -4453,7 +4155,7 @@ export type $OpenApiTs = {
         /**
          * OK
          */
-        '200': ModernRawUserDataRequest;
+        '200': VaultData;
       };
     };
   };

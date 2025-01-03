@@ -18,7 +18,7 @@ package org.openapitools.client.models
 import org.openapitools.client.models.BatchHostedBusinessOwnerRequestCreate
 import org.openapitools.client.models.BatchHostedBusinessOwnerRequestDelete
 import org.openapitools.client.models.BatchHostedBusinessOwnerRequestUpdate
-import org.openapitools.client.models.ModernRawUserDataRequest
+import org.openapitools.client.models.VaultData
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
@@ -36,7 +36,7 @@ import kotlinx.serialization.encoding.*
 
 data class BatchHostedBusinessOwnerRequest (
 
-    @SerialName(value = "data") @Required val `data`: ModernRawUserDataRequest,
+    @SerialName(value = "data") @Required val `data`: VaultData,
 
     @SerialName(value = "op") @Required val op: BatchHostedBusinessOwnerRequest.Op,
 

@@ -17,6 +17,8 @@ export type AccessRequest = {
   respondedAt?: string;
   responder?: string;
   scopes: Array<TenantScope>;
+  tenantId: string;
+  tenantName: string;
 };
 export type ActionKind = 'replace' | 'add_primary';
 export type Actor = ActorUser | ActorFootprint | ActorFirmEmployee | ActorOrganization | ActorApiKey;

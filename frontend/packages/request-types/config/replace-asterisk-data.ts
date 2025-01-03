@@ -49,10 +49,9 @@ const replaceUnionTypes = (fileContent: string) => {
 const replaceWildcardKeys = (fileContent: string) => {
   const typeNamesToTransform = [
     'ModernRawBusinessDataRequest',
-    'ModernRawUserDataRequest',
     'ModernBusinessDecryptResponse',
-    'ModernUserDecryptResponse',
     'ModernEntityDecryptResponse',
+    'VaultData',
   ];
 
   // Track transformed types to ensure only the next "};" is replaced
