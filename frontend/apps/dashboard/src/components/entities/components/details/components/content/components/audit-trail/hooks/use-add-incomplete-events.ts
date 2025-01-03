@@ -32,7 +32,7 @@ const useAddIncompleteEvents = (timeline: TimelineEvent[], entity: Entity): Audi
 
   const incompleteEvents: ExtraTimelineEvents[] = [];
   // Add in incomplete events
-  if (entity.status === EntityStatus.incomplete) {
+  if (entity.status === EntityStatus.incomplete && timeline.length > 0) {
     const hasPendingBos = bosQuery.data?.some(bo => {
       const isIncomplete = bo.boStatus === 'incomplete' || bo.boStatus === 'awaiting_kyc' || bo.boStatus === 'pending';
       return bo.name && isIncomplete;
