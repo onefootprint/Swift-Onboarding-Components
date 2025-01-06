@@ -11,7 +11,7 @@ import {
   IcoWarning16,
   type Icon,
 } from '@onefootprint/icons';
-import type { EntityOnboarding, RiskSignal } from '@onefootprint/request-types/dashboard';
+import type { EntityOnboarding } from '@onefootprint/request-types/dashboard';
 import { DecisionStatus, TimelineEventKind, WorkflowKind } from '@onefootprint/types';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -27,7 +27,7 @@ export type Subsection =
   | 'offices';
 type SubsectionMap = Partial<Record<Subsection, { title: string; iconComponent: Icon; isBusinessInsight?: boolean }>>;
 
-const useSubsections = (onboarding: EntityOnboarding, riskSignals: RiskSignal[] | undefined): SubsectionMap => {
+const useSubsections = (onboarding: EntityOnboarding): SubsectionMap => {
   const { t } = useTranslation('entity-details', { keyPrefix: 'onboardings' });
   const { kind: entityKind } = useEntityContext();
   const { data: timelineData } = useCurrentEntityTimeline();
@@ -98,13 +98,7 @@ const useSubsections = (onboarding: EntityOnboarding, riskSignals: RiskSignal[] 
   }, [timelineData]);
 
   const shownSubsections = Object.fromEntries(
-    Object.entries(subsections).filter(([subsection, options]) => {
-      if (subsection === 'risk-signals') {
-        return riskSignals && riskSignals?.length > 0;
-      }
-      if (subsection === 'rules') {
-        return onboarding.ruleSetResults && onboarding.ruleSetResults.length > 0;
-      }
+    Object.entries(subsections).filter(([_, options]) => {
       if (options.isBusinessInsight) {
         return hideBusinessInsights ? false : Boolean(onboarding.seqno);
       }

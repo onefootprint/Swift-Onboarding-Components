@@ -1,5 +1,6 @@
 import useEntityId from '@/entities/components/details/hooks/use-entity-id';
 import { getEntitiesByFpIdRuleSetResultByRuleSetResultIdOptions } from '@onefootprint/axios/dashboard';
+import type { EntityOnboardingRuleSetResult } from '@onefootprint/request-types/dashboard';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -11,27 +12,34 @@ import Content from './components/content';
 import RulesDropdown from './components/rules-dropdown';
 
 type OnboardingRulesProps = {
-  ruleSetResultId: string;
+  ruleSetResults: EntityOnboardingRuleSetResult[];
 };
 
-const OnboardingRules = ({ ruleSetResultId }: OnboardingRulesProps) => {
+const OnboardingRules = ({ ruleSetResults }: OnboardingRulesProps) => {
   const { t } = useTranslation('entity-details', { keyPrefix: 'onboardings.rules' });
   const [showTriggeredRules, setShowTriggeredRules] = useState(true);
   const entityId = useEntityId();
-  const { data, isPending, error } = useQuery({
+  const ruleSetResultId = ruleSetResults && ruleSetResults.length > 0 ? ruleSetResults[0].id : '';
+  const { data, isLoading, error } = useQuery({
     ...getEntitiesByFpIdRuleSetResultByRuleSetResultIdOptions({
       path: { fpId: entityId, ruleSetResultId },
     }),
     enabled: Boolean(entityId) && Boolean(ruleSetResultId),
   });
+  const noRuleResults = !ruleSetResultId || (data && data.ruleResults.length === 0);
 
   const handleClick = (isTriggered: boolean) => {
     setShowTriggeredRules(isTriggered);
   };
 
   return (
-    <Subsection title={t('title')} hasDivider rightComponent={<RulesDropdown onClick={handleClick} />}>
-      {isPending && <Loading />}
+    <Subsection
+      title={t('title')}
+      hasDivider
+      rightComponent={!noRuleResults && <RulesDropdown onClick={handleClick} />}
+    >
+      {noRuleResults && <p className="text-body-3">{t('no-rule-results')}</p>}
+      {isLoading && <Loading />}
       {error && <ErrorComponent error={error} />}
       {data && data.ruleResults.length > 0 && (
         <Content
@@ -39,7 +47,6 @@ const OnboardingRules = ({ ruleSetResultId }: OnboardingRulesProps) => {
           showTriggered={showTriggeredRules}
         />
       )}
-      {data?.ruleResults.length === 0 && <ErrorComponent error={t('no-rule-results')} />}
     </Subsection>
   );
 };

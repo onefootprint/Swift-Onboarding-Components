@@ -1139,7 +1139,7 @@
     },
     "risk-signals": {
       "title": "Risk signals",
-      "no-risk-signals": "No risk signals",
+      "no-risk-signals": "No risk signals.",
       "group": {
         "kyc": "KYC",
         "kyb": "KYB",
@@ -1223,7 +1223,7 @@
         "triggered": "Rules triggered",
         "not-triggered": "Rules not triggered"
       },
-      "no-rule-results": "No rule results found.",
+      "no-rule-results": "No rule results.",
       "no-triggered-rules": "There were no rules triggered.",
       "no-not-triggered-rules": "There were no rules that were not triggered.",
       "action": {
