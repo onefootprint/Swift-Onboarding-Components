@@ -161,6 +161,27 @@ impl EnhancedAmlOption {
                 .unwrap_or(AdverseMediaListKind::default_lists()),
         }
     }
+
+    pub fn ofac(&self) -> bool {
+        match self {
+            EnhancedAmlOption::No => false,
+            EnhancedAmlOption::Yes { ofac, .. } => *ofac,
+        }
+    }
+
+    pub fn pep(&self) -> bool {
+        match self {
+            EnhancedAmlOption::No => false,
+            EnhancedAmlOption::Yes { pep, .. } => *pep,
+        }
+    }
+
+    pub fn adverse_media(&self) -> bool {
+        match self {
+            EnhancedAmlOption::No => false,
+            EnhancedAmlOption::Yes { adverse_media, .. } => *adverse_media,
+        }
+    }
 }
 
 #[derive(

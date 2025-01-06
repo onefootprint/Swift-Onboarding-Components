@@ -121,20 +121,40 @@ footprint_reason_code_enum! {
         WatchlistHitOfac,
 
         #[scope = SignalScope::Name, additional_scopes = vec![SignalScope::Dob], match_level = None]
+        #[note = "No OFAC watchlist hit", severity = SignalSeverity::Info, description = "No match on a governmental OFAC watchlist"]
+        WatchlistClearOfac,
+
+        #[scope = SignalScope::Name, additional_scopes = vec![SignalScope::Dob], match_level = None]
         #[note = "Non-SDN watchlist hit", severity = SignalSeverity::High,  description = "A strong potential match on a governmental NonSDN watchlist (Consolidated Sanctions (PLC, FSE, ISA, SSI))"]
         WatchlistHitNonSdn,
+
+        #[scope = SignalScope::Name, additional_scopes = vec![SignalScope::Dob], match_level = None]
+        #[note = "No Non-SDN watchlist hit", severity = SignalSeverity::Info, description = "No match on a governmental NonSDN watchlist (Consolidated Sanctions (PLC, FSE, ISA, SSI))"]
+        WatchlistClearNonSdn,
 
         #[scope = SignalScope::Name, additional_scopes = vec![SignalScope::Dob], match_level = None]
         #[note = "Warning list hit", severity = SignalSeverity::High,  description = "A potential match on a non-sanction warning list. Entities on such lists are either involved in law-breaking activities at international level or in particular jurisdictions, under investigation or found guilty of regulatory breaches in their operating industry, which may indicate a significant financial, compliance, or reputational risk."]
         WatchlistHitWarning,
 
         #[scope = SignalScope::Name, additional_scopes = vec![SignalScope::Dob], match_level = None]
+        #[note = "No Warning list hit", severity = SignalSeverity::Info, description = "No match on a non-sanction warning list"]
+        WatchlistClearWarning,
+
+        #[scope = SignalScope::Name, additional_scopes = vec![SignalScope::Dob], match_level = None]
         #[note = "PEP hit", severity = SignalSeverity::High,  description = "A strong potential match as a Politically Exposed Person"]
         WatchlistHitPep,
 
         #[scope = SignalScope::Name, additional_scopes = vec![SignalScope::Dob], match_level = None]
+        #[note = "No PEP hit", severity = SignalSeverity::Info, description = "No match as a Politically Exposed Person"]
+        WatchlistClearPep,
+
+        #[scope = SignalScope::Name, additional_scopes = vec![SignalScope::Dob], match_level = None]
         #[note = "Adverse media hit", severity = SignalSeverity::High,  description = "A strong potential match with adverse media found"]
         AdverseMediaHit,
+
+        #[scope = SignalScope::Name, additional_scopes = vec![SignalScope::Dob], match_level = None]
+        #[note = "No Adverse media hit", severity = SignalSeverity::Info, description = "No match with adverse media found"]
+        AdverseMediaClear,
 
         #[scope = SignalScope::Ssn, additional_scopes = vec![SignalScope::Name, SignalScope::Dob, SignalScope::Address], match_level = Some(MatchLevel::CouldNotMatch)]
         #[note = "Identity not located", severity = SignalSeverity::High,  description = "Identity could not be located with the information provided"]

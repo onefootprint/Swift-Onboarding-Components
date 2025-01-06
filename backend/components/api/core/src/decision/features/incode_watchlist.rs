@@ -271,9 +271,94 @@ pub fn get_hits(res: &WatchlistResultResponse, enhanced_aml: &EnhancedAmlOption)
         .collect()
 }
 
-pub fn reason_codes_from_watchlist_result(
+// Helper struct to help with the logic of computing reason codes and adding default reason codes
+struct AmlReasonCodeHelper {
+    enhanced_aml: EnhancedAmlOption,
+    all_types_for_hits: Vec<String>,
+    include_default_reason_codes: bool,
+}
+impl AmlReasonCodeHelper {
+    // Add default AML reason code if no hits are found for a particular AML type
+    fn add_default_reason_codes(
+        all_aml_reason_codes: Vec<FootprintReasonCode>,
+        filter_fn: impl FnMut(&FootprintReasonCode) -> bool,
+        default_reason_code: FootprintReasonCode,
+    ) -> Vec<FootprintReasonCode> {
+        let reason_codes = all_aml_reason_codes.into_iter().filter(filter_fn).collect_vec();
+        if reason_codes.is_empty() {
+            vec![default_reason_code]
+        } else {
+            reason_codes
+        }
+    }
+
+    fn new(
+        all_types_for_hits: Vec<String>,
+        enhanced_aml: EnhancedAmlOption,
+        include_default_reason_codes: bool,
+    ) -> Self {
+        Self {
+            enhanced_aml,
+            all_types_for_hits,
+            include_default_reason_codes,
+        }
+    }
+
+    fn footprint_reason_codes(&self) -> Vec<FootprintReasonCode> {
+        let all_aml_reason_codes = self.all_types_for_hits.clone()
+            .into_iter()
+            .filter_map(type_to_frc)
+            .unique()
+            // only consider risk signals of kinds that the enhanced_aml config specifies
+            .filter(|r|
+                (self.enhanced_aml.ofac() && r.is_watchlist()) ||
+                (self.enhanced_aml.pep() && r.is_pep()) ||
+                (self.enhanced_aml.adverse_media() && r.is_adverse_media())
+            )
+            .collect::<Vec<_>>();
+
+        // if we don't want default reason codes, just return the reason codes we found
+        if !self.include_default_reason_codes {
+            return all_aml_reason_codes;
+        }
+
+        // if we do want default reason codes, we need to add them
+        let ofac = self
+            .enhanced_aml
+            .ofac()
+            .then_some(Self::add_default_reason_codes(
+                all_aml_reason_codes.clone(),
+                |r| r.is_watchlist(),
+                FootprintReasonCode::WatchlistClearOfac,
+            ))
+            .unwrap_or_default();
+        let pep = self
+            .enhanced_aml
+            .pep()
+            .then_some(Self::add_default_reason_codes(
+                all_aml_reason_codes.clone(),
+                |r| r.is_pep(),
+                FootprintReasonCode::WatchlistClearPep,
+            ))
+            .unwrap_or_default();
+        let adverse_media = self
+            .enhanced_aml
+            .adverse_media()
+            .then_some(Self::add_default_reason_codes(
+                all_aml_reason_codes,
+                |r| r.is_adverse_media(),
+                FootprintReasonCode::AdverseMediaClear,
+            ))
+            .unwrap_or_default();
+
+        ofac.into_iter().chain(pep).chain(adverse_media).collect()
+    }
+}
+
+fn footprint_reason_codes(
     res: &WatchlistResultResponse,
     enhanced_aml: &EnhancedAmlOption,
+    include_default_reason_codes: bool,
 ) -> Vec<FootprintReasonCode> {
     let unique_types_for_valid_hits = get_hits(res, enhanced_aml)
         .into_iter()
@@ -281,28 +366,34 @@ pub fn reason_codes_from_watchlist_result(
         .unique()
         .collect::<Vec<_>>();
 
-    unique_types_for_valid_hits
-        .into_iter()
-        .filter_map(type_to_frc)
-        .unique()
-        // only save risk signals of kinds that the enhanced_aml config specifies
-        .filter(|r| match enhanced_aml {
-            EnhancedAmlOption::No => true, //shouldn't happen
-            EnhancedAmlOption::Yes {
-                ofac,
-                pep,
-                adverse_media,
-                continuous_monitoring: _,
-                adverse_media_lists: _,
-                match_kind: _,
-            } => (*ofac && r.is_watchlist()) || (*pep && r.is_pep()) || (*adverse_media && r.is_adverse_media()),
-        })
-        .collect::<Vec<_>>()
+    let reason_code_helper = AmlReasonCodeHelper::new(
+        unique_types_for_valid_hits,
+        enhanced_aml.clone(),
+        include_default_reason_codes,
+    );
+    reason_code_helper.footprint_reason_codes()
+}
+
+pub fn reason_codes_from_watchlist_result(
+    res: &WatchlistResultResponse,
+    enhanced_aml: &EnhancedAmlOption,
+) -> Vec<FootprintReasonCode> {
+    footprint_reason_codes(res, enhanced_aml, false)
+}
+
+// Some customers want to include default reason codes even if there are no hits for a particular
+// AML type
+pub fn reason_codes_from_watchlist_result_with_default_reason_codes(
+    res: &WatchlistResultResponse,
+    enhanced_aml: &EnhancedAmlOption,
+) -> Vec<FootprintReasonCode> {
+    footprint_reason_codes(res, enhanced_aml, true)
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
+    use db::test_helpers::assert_have_same_elements;
     use idv::incode::watchlist::response::Content;
     use idv::incode::watchlist::response::Data;
     use idv::incode::watchlist::response::Doc;
@@ -362,6 +453,133 @@ mod test {
                 match_kind: AmlMatchKind::ExactName,
             },
         )
+    }
+
+    #[test_case(vec![(55.0, vec!["pep", "sanction"], vec!["name_exact"])], vec![FootprintReasonCode::WatchlistClearPep, FootprintReasonCode::WatchlistClearOfac, FootprintReasonCode::AdverseMediaClear])]
+    #[test_case(vec![(1.7, vec!["pep", "sanction"], vec!["name_exact"])], vec![FootprintReasonCode::WatchlistHitPep, FootprintReasonCode::WatchlistHitOfac, FootprintReasonCode::AdverseMediaClear])]
+    #[test_case(vec![(1.7, vec!["pep"], vec!["name_exact"]), (1.8, vec!["sanction"], vec!["name_exact"])], vec![FootprintReasonCode::WatchlistHitPep, FootprintReasonCode::WatchlistHitOfac, FootprintReasonCode::AdverseMediaClear])]
+    #[test_case(vec![(1.7, vec!["pep"], vec!["name_exact"]), (1.8, vec!["sanction"], vec!["name_exact"]), (1.9, vec!["sanction"], vec!["name_exact"]), (2.0, vec!["sanction", "pep"], vec!["name_exact"])], vec![FootprintReasonCode::WatchlistHitPep, FootprintReasonCode::WatchlistHitOfac, FootprintReasonCode::AdverseMediaClear])]
+    #[test_case(vec![(1.7, vec!["adverse-media-v2-terrorism"], vec!["name_exact"]), (1.8, vec!["sanction"], vec!["name_exact"])], vec![FootprintReasonCode::AdverseMediaHit, FootprintReasonCode::WatchlistHitOfac, FootprintReasonCode::WatchlistClearPep])]
+    #[test_case(vec![(1.7, vec!["adverse-media-v2-terrorism"], vec!["unknown"]), (1.8, vec!["sanction"], vec!["name_exact"])], vec![FootprintReasonCode::WatchlistHitOfac, FootprintReasonCode::WatchlistClearPep, FootprintReasonCode::AdverseMediaClear])]
+    #[test_case(vec![(1.7, vec!["adverse-media-v2-terrorism"], vec!["unknown"]), (1.8, vec!["sanction"], vec!["equivalent_name"])], vec![FootprintReasonCode::WatchlistClearPep, FootprintReasonCode::WatchlistClearOfac, FootprintReasonCode::AdverseMediaClear])]
+    #[test_case(vec![(1.7, vec!["warning", "fitness-probity"], vec!["name_exact"])], vec![FootprintReasonCode::WatchlistClearPep, FootprintReasonCode::WatchlistClearOfac, FootprintReasonCode::AdverseMediaClear])]
+    fn test_reason_codes_from_watchlist_result_with_default_reason_codes<'a>(
+        hits: Vec<(f32, Vec<&'a str>, Vec<&'a str>)>,
+        expected_reason_codes: Vec<FootprintReasonCode>,
+    ) {
+        let hits = hits
+            .into_iter()
+            .map(|h| TestHit {
+                score: h.0,
+                types: h.1,
+                match_types: h.2,
+                name: "Bob Boberto",
+            })
+            .collect();
+        let res = make_watchlist_res("Bob Boberto", hits);
+        let computed_codes = reason_codes_from_watchlist_result_with_default_reason_codes(
+            &res,
+            &EnhancedAmlOption::Yes {
+                ofac: true,
+                pep: true,
+                adverse_media: true,
+                continuous_monitoring: true,
+                adverse_media_lists: None,
+                match_kind: AmlMatchKind::ExactName,
+            },
+        );
+        assert_have_same_elements(computed_codes, expected_reason_codes);
+    }
+
+    #[test_case(vec![(55.0, vec!["pep", "sanction"], vec!["name_exact"])], vec![FootprintReasonCode::WatchlistClearPep, FootprintReasonCode::WatchlistClearOfac, FootprintReasonCode::AdverseMediaClear])]
+    #[test_case(vec![(1.7, vec!["pep", "sanction"], vec!["name_exact"])], vec![FootprintReasonCode::WatchlistHitPep, FootprintReasonCode::WatchlistHitOfac, FootprintReasonCode::AdverseMediaClear])]
+    #[test_case(vec![(1.7, vec!["pep"], vec!["name_exact"]), (1.8, vec!["sanction"], vec!["name_exact"])], vec![FootprintReasonCode::WatchlistHitPep, FootprintReasonCode::WatchlistHitOfac, FootprintReasonCode::AdverseMediaClear])]
+    #[test_case(vec![(1.7, vec!["pep"], vec!["name_exact"]), (1.8, vec!["sanction"], vec!["name_exact"]), (1.9, vec!["sanction"], vec!["name_exact"]), (2.0, vec!["sanction", "pep"], vec!["name_exact"])], vec![FootprintReasonCode::WatchlistHitPep, FootprintReasonCode::WatchlistHitOfac, FootprintReasonCode::AdverseMediaClear])]
+    #[test_case(vec![(1.7, vec!["adverse-media-v2-terrorism"], vec!["name_exact"]), (1.8, vec!["sanction"], vec!["name_exact"])], vec![FootprintReasonCode::AdverseMediaHit, FootprintReasonCode::WatchlistHitOfac, FootprintReasonCode::WatchlistClearPep])]
+    #[test_case(vec![(1.7, vec!["adverse-media-v2-terrorism"], vec!["unknown"]), (1.8, vec!["sanction"], vec!["name_exact"])], vec![FootprintReasonCode::WatchlistHitOfac, FootprintReasonCode::WatchlistClearPep, FootprintReasonCode::AdverseMediaClear])]
+    #[test_case(vec![(1.7, vec!["adverse-media-v2-terrorism"], vec!["unknown"]), (1.8, vec!["sanction"], vec!["equivalent_name"])], vec![FootprintReasonCode::WatchlistClearPep, FootprintReasonCode::WatchlistClearOfac, FootprintReasonCode::AdverseMediaClear])]
+    #[test_case(vec![(1.7, vec!["warning", "fitness-probity"], vec!["name_exact"])], vec![FootprintReasonCode::WatchlistClearPep, FootprintReasonCode::WatchlistClearOfac, FootprintReasonCode::AdverseMediaClear])]
+    fn test_default_reason_codes_with_empty_aml_config<'a>(
+        hits: Vec<(f32, Vec<&'a str>, Vec<&'a str>)>,
+        expected_reason_codes: Vec<FootprintReasonCode>,
+    ) {
+        // Note: This isn't really a test of anything we'd allow in production, but it's a good sanity check
+
+        let hits = hits
+            .into_iter()
+            .map(|h| TestHit {
+                score: h.0,
+                types: h.1,
+                match_types: h.2,
+                name: "Bob Boberto",
+            })
+            .collect();
+        let res = make_watchlist_res("Bob Boberto", hits);
+        let computed_codes1 = reason_codes_from_watchlist_result_with_default_reason_codes(
+            &res,
+            &EnhancedAmlOption::Yes {
+                ofac: true,
+                pep: true,
+                adverse_media: true,
+                continuous_monitoring: true,
+                adverse_media_lists: None,
+                match_kind: AmlMatchKind::ExactName,
+            },
+        );
+        // No matter what the reason codes are, we should not return any reason codes
+        let computed_codes2 = reason_codes_from_watchlist_result_with_default_reason_codes(
+            &res,
+            &EnhancedAmlOption::Yes {
+                ofac: false,
+                pep: false,
+                adverse_media: false,
+                continuous_monitoring: true,
+                adverse_media_lists: None,
+                match_kind: AmlMatchKind::ExactName,
+            },
+        );
+        assert_have_same_elements(computed_codes1, expected_reason_codes);
+        assert_have_same_elements(computed_codes2, vec![]);
+    }
+
+    #[test]
+    fn test_no_ofac_with_default_reason_codes() {
+        let ofac_hits = vec![(55.0, vec!["pep", "sanction"], vec!["name_exact"])]
+            .into_iter()
+            .map(|h| TestHit {
+                score: h.0,
+                types: h.1,
+                match_types: h.2,
+                name: "Bob Boberto",
+            })
+            .collect();
+        let res = make_watchlist_res("Bob Boberto", ofac_hits);
+        let computed_codes = reason_codes_from_watchlist_result_with_default_reason_codes(
+            &res,
+            &EnhancedAmlOption::Yes {
+                ofac: true,
+                pep: true,
+                adverse_media: true,
+                continuous_monitoring: true,
+                adverse_media_lists: None,
+                match_kind: AmlMatchKind::ExactName,
+            },
+        );
+        assert!(computed_codes.contains(&FootprintReasonCode::WatchlistClearOfac));
+
+        let computed_codes_no_ofac = reason_codes_from_watchlist_result_with_default_reason_codes(
+            &res,
+            &EnhancedAmlOption::Yes {
+                ofac: false,
+                pep: true,
+                adverse_media: true,
+                continuous_monitoring: true,
+                adverse_media_lists: None,
+                match_kind: AmlMatchKind::ExactName,
+            },
+        );
+
+        assert!(!computed_codes_no_ofac.contains(&FootprintReasonCode::WatchlistClearOfac));
     }
 
     #[test_case(vec![vec!["adverse-media-v2-terrorism"]], EnhancedAmlOption::No => Vec::<FootprintReasonCode>::new())]
