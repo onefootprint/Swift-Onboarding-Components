@@ -1,4 +1,4 @@
-import { postHostedIdentifySignupChallengeMutation } from '@onefootprint/axios';
+import { postHostedIdentifySessionChallengeMutation, postHostedIdentifySessionMutation } from '@onefootprint/axios';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -39,37 +39,32 @@ const Intro = ({ onDone }: IntroStepProps) => {
       countryCode: '+1',
     },
   });
-  const mutation = useMutation(postHostedIdentifySignupChallengeMutation({}));
+  // TODO: playbook key, sandbox ID, etc
+  const startSession = useMutation(postHostedIdentifySessionMutation());
+  const createChallenge = useMutation(postHostedIdentifySessionChallengeMutation());
   const classNames = getClassNames(focusedField);
 
-  const onSubmit = (formData: FormData) => {
+  const onSubmit = async (formData: FormData) => {
     const phoneNumber = `${formData.countryCode}${formData.phoneNumber}`;
-    mutation.mutate(
-      {
-        body: {
-          phoneNumber: {
-            value: phoneNumber,
-            isBootstrap: false,
-          },
-          email: {
-            value: formData.email,
-            isBootstrap: false,
-          },
-          challengeKind: 'sms_link',
-          scope: 'onboarding',
+    const sessionData = await startSession.mutateAsync({
+      body: {
+        data: {
+          'id.phone_number': phoneNumber,
+          'id.email': formData.email,
         },
+        scope: 'onboarding',
       },
-      {
-        onSuccess: data => {
-          onDone({
-            challengeToken: data.challengeData.challengeToken,
-            token: data.challengeData.token,
-            email: formData.email,
-            phoneNumber: phoneNumber,
-          });
-        },
-      },
-    );
+    });
+    const challengeData = await createChallenge.mutateAsync({
+      headers: { 'X-Fp-Authorization': sessionData.token },
+      body: { challengeKind: 'sms_link' },
+    });
+    onDone({
+      challengeToken: challengeData.challengeData.challengeToken,
+      token: sessionData.token,
+      email: formData.email,
+      phoneNumber: phoneNumber,
+    });
   };
 
   return (
@@ -127,11 +122,11 @@ const Intro = ({ onDone }: IntroStepProps) => {
             })}
           />
           <FormError>{errors.phoneNumber?.message}</FormError>
-          <FormError>{mutation.error?.message}</FormError>
+          <FormError>{startSession.error?.message || createChallenge.error?.message}</FormError>
         </div>
         <div className="mt-3 mb-4">
-          <Button variant="primary" type="submit" disabled={mutation.isPending}>
-            {mutation.isPending ? 'Loading...' : 'Continue'}
+          <Button variant="primary" type="submit" disabled={startSession.isPending || createChallenge.isPending}>
+            {startSession.isPending || createChallenge.isPending ? 'Loading...' : 'Continue'}
           </Button>
         </div>
         <div>

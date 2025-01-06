@@ -1,4 +1,8 @@
-import { postHostedIdentifyVerifyMutation, postHostedOnboardingMutation } from '@onefootprint/axios';
+import {
+  postHostedIdentifySessionChallengeVerifyMutation,
+  postHostedIdentifySessionVerifyMutation,
+  postHostedOnboardingMutation,
+} from '@onefootprint/axios';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import Header from '../../components/header';
@@ -17,7 +21,7 @@ type WaitingConfirmationProps = {
 
 const WaitingConfirmation = ({ tokens, onCancel, onDone }: WaitingConfirmationProps) => {
   const mutation = useMutation(
-    postHostedIdentifyVerifyMutation({
+    postHostedIdentifySessionChallengeVerifyMutation({
       headers: {
         'X-Fp-Authorization': tokens.authToken,
       },
@@ -29,7 +33,6 @@ const WaitingConfirmation = ({ tokens, onCancel, onDone }: WaitingConfirmationPr
       body: {
         challengeResponse: '',
         challengeToken: tokens.challengeToken,
-        scope: 'onboarding',
       },
     });
   };
@@ -47,33 +50,28 @@ const WaitingConfirmation = ({ tokens, onCancel, onDone }: WaitingConfirmationPr
         subtitle="Text message sent to customer's phone number. Ask them to continue from their phone."
       />
       <LoadingSpinner className="mx-auto mb-4" />
-      {mutation.data && <StartOnboarding authToken={mutation.data.authToken} onDone={onDone} />}
+      {mutation.data && <StartOnboarding authToken={tokens.authToken} onDone={onDone} />}
     </Layout>
   );
 };
 
 const StartOnboarding = ({ authToken, onDone }: { authToken: string; onDone: (authToken: string) => void }) => {
-  const startOnboardingMutation = useMutation(
-    postHostedOnboardingMutation({
-      headers: {
-        'X-Fp-Authorization': authToken,
-      },
-    }),
+  const verifySession = useMutation(
+    postHostedIdentifySessionVerifyMutation({ headers: { 'X-Fp-Authorization': authToken } }),
   );
+  const startOnboarding = useMutation(postHostedOnboardingMutation({ headers: { 'X-Fp-Authorization': authToken } }));
+
+  const initOnboarding = async () => {
+    const identifyData = await verifySession.mutateAsync({});
+    const data = await startOnboarding.mutateAsync({
+      body: { fixtureResult: 'pass' },
+      headers: { 'X-Fp-Authorization': identifyData.authToken },
+    });
+    onDone(data.authToken);
+  };
 
   useEffect(() => {
-    startOnboardingMutation.mutate(
-      {
-        body: {
-          fixtureResult: 'pass',
-        },
-      },
-      {
-        onSuccess: response => {
-          onDone(response.authToken);
-        },
-      },
-    );
+    initOnboarding();
   }, []);
 
   return null;
