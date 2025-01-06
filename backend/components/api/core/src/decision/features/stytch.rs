@@ -79,10 +79,7 @@ mod test {
     #[test_case(Action::Challenge, vec![Reason::HeadlessBrowserAutomation] => vec![FootprintReasonCode::DeviceMediumRisk, FootprintReasonCode::BrowserAutomation])]
     #[test_case(Action::Challenge, vec![Reason::UnauthorizedPayloadOrigin] => vec![FootprintReasonCode::DeviceMediumRisk, FootprintReasonCode::BrowserTampering])]
     #[test_case(Action::Challenge, vec![Reason::UnauthorizedPayloadOrigin, Reason::JsPropertyDeception] => vec![FootprintReasonCode::DeviceMediumRisk, FootprintReasonCode::BrowserTampering])]
-    fn test_reason_codes_from_watchlist_result(
-        action: Action,
-        reasons: Vec<Reason>,
-    ) -> Vec<FootprintReasonCode> {
+    fn test_reason_codes_from_stytch(action: Action, reasons: Vec<Reason>) -> Vec<FootprintReasonCode> {
         let res = make_lookup_response(action, reasons);
         lookup_response_to_footprint_reason_codes(&res)
     }

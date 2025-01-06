@@ -82,7 +82,10 @@ pub async fn complete_vendor_call(
     )
     .await?;
 
-    let reason_codes = decision::features::incode_watchlist::reason_codes_from_watchlist_result(
+    // WARNING - DO NOT CHANGE THIS TO USE THE DEFAULT REASON CODES version
+    // Watchlist checks status is derived from the presence of reason codes, _not_ specific reason codes
+    // so if we start materializing default reason codes, we'll start having all watchlist tasks "fail
+    let (reason_codes, _) = decision::features::incode_watchlist::reason_codes_from_watchlist_result(
         &res,
         &obc.verification_checks().enhanced_aml(),
     );

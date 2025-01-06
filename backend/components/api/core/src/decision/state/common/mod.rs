@@ -461,10 +461,11 @@ pub fn get_aml_risk_signals_from_aml_call(
     watchlist_vres_id: &VerificationResultId,
     watchlist_result_response: &WatchlistResultResponse,
 ) -> Vec<NewRiskSignalInfo> {
-    let wc_reason_codes = decision::features::incode_watchlist::reason_codes_from_watchlist_result(
-        watchlist_result_response,
-        &obc.verification_checks().enhanced_aml(),
-    );
+    let (wc_reason_codes, _) =
+        decision::features::incode_watchlist::reason_codes_from_watchlist_result_with_default_reason_codes(
+            watchlist_result_response,
+            &obc.verification_checks().enhanced_aml(),
+        );
     wc_reason_codes
         .into_iter()
         .map(|r| (r, VendorAPI::IncodeWatchlistCheck, watchlist_vres_id.clone()))
