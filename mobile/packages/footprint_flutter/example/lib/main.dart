@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:footprint_flutter/footprint_flutter.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 void main() {
   runApp(const MyApp());
@@ -397,6 +398,10 @@ class _IdentifyState extends State<Identify> {
   bool isChallengeCreated = false;
   ChallengeKind? challengeKind;
   var requiresAuth;
+  var phoneNumberFormatter = MaskTextInputFormatter(
+      mask: '+# (###) ###-####',
+      filter: {"#": RegExp(r'[0-9]')},
+      type: MaskAutoCompletionType.lazy);
 
   @override
   void initState() {
@@ -498,6 +503,7 @@ class _IdentifyState extends State<Identify> {
                     child: FootprintTextInput(
                       labelText: "Phone Number",
                       decoration: inputDecoration("Phone Number"),
+                      inputFormatters: [phoneNumberFormatter],
                     ),
                   ),
                   const SizedBox(height: 12),

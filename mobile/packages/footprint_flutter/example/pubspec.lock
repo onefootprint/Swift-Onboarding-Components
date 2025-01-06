@@ -171,7 +171,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "2.0.0-beta.3.4"
+    version: "2.0.0-beta.3.6"
   fuchsia_remote_debug_protocol:
     dependency: transitive
     description: flutter
@@ -231,7 +231,7 @@ packages:
     source: hosted
     version: "2.1.1"
   mask_text_input_formatter:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: mask_text_input_formatter
       sha256: "978c58ec721c25621ceb468e633f4eef64b64d45424ac4540e0565d4f7c800cd"

@@ -52,3 +52,7 @@ Add Footprint specific error logs
 # 2.0.0-beta.3.6
 
 Update the getRequirements() response
+
+# 2.0.0-beta.3.7
+
+Provide `inputFormatters` prop

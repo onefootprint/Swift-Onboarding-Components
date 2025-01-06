@@ -35,6 +35,7 @@ class FootprintTextInput extends ConsumerStatefulWidget {
     this.maxLines,
     this.minLines,
     this.maxLengthEnforcement,
+    this.inputFormatters,
     this.scrollPadding = const EdgeInsets.all(20.0),
     this.selectionControls,
     this.autovalidateMode = AutovalidateMode.disabled,
@@ -69,6 +70,7 @@ class FootprintTextInput extends ConsumerStatefulWidget {
   final int? maxLines;
   final int? minLines;
   final MaxLengthEnforcement? maxLengthEnforcement;
+  final List<TextInputFormatter>? inputFormatters;
   final EdgeInsets scrollPadding;
   final TextSelectionControls? selectionControls;
   final AutovalidateMode autovalidateMode;
@@ -191,7 +193,7 @@ class _FootprintTextInputState extends ConsumerState<FootprintTextInput> {
       minLines: widget.minLines,
       maxLength: maxLength,
       maxLengthEnforcement: widget.maxLengthEnforcement,
-      inputFormatters: inputFormatters,
+      inputFormatters: widget.inputFormatters ?? inputFormatters,
       scrollPadding: widget.scrollPadding,
       selectionControls: widget.selectionControls,
       autovalidateMode: widget.autovalidateMode,
