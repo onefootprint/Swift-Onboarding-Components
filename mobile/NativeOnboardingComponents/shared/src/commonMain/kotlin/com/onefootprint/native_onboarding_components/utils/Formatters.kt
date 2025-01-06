@@ -5,7 +5,7 @@ import com.onefootprint.native_onboarding_components.models.FootprintSupportedLo
 import kotlinx.datetime.LocalDate
 import org.openapitools.client.models.VaultData
 
-internal object Formatters {
+object Formatters {
     /// Converts a date string to US date format (MM/DD/YYYY or DD/MM/YYYY) based on the locale.
     ///
     /// - Parameters:
@@ -14,7 +14,8 @@ internal object Formatters {
     /// - Returns: The date string in the format 'MM/DD/YYYY'.
     fun strInputToUSDate(locale: FootprintSupportedLocale, str: String): String {
         val dateParts = str.split("/")
-        val expectedFormat = if (locale == FootprintSupportedLocale.en_US) "MM/DD/YYYY" else "DD/MM/YYYY"
+        val expectedFormat =
+            if (locale == FootprintSupportedLocale.en_US) "MM/DD/YYYY" else "DD/MM/YYYY"
 
         if (dateParts.size != 3) {
             throw FootprintException(
@@ -46,7 +47,8 @@ internal object Formatters {
     /// - Returns: The date string formatted as 'MM/DD/YYYY' or 'DD/MM/YYYY' based on the locale.
     fun fromUsDateToStringInput(locale: FootprintSupportedLocale, str: String): String {
         val dateParts = str.split("/")
-        val expectedFormat = if (locale == FootprintSupportedLocale.en_US) "MM/DD/YYYY" else "DD/MM/YYYY"
+        val expectedFormat =
+            if (locale == FootprintSupportedLocale.en_US) "MM/DD/YYYY" else "DD/MM/YYYY"
 
         if (dateParts.size != 3) {
             throw FootprintException(
@@ -135,7 +137,7 @@ internal object Formatters {
     private fun isValidDate(day: String, month: String, year: String): Boolean {
         if (day.toIntOrNull() == null || month.toIntOrNull() == null || year.toIntOrNull() == null) {
             return false
-        }else if (day.toInt() < 1 || day.toInt() > 31 || month.toInt() < 1 || month.toInt() > 12) {
+        } else if (day.toInt() < 1 || day.toInt() > 31 || month.toInt() < 1 || month.toInt() > 12) {
             return false
         }
 
@@ -186,5 +188,60 @@ internal object Formatters {
             idDob = dob,
             idVisaExpirationDate = visaExpiration
         )
+    }
+
+    // Function to format phone numbers
+    fun formatPhoneNumber(number: String): String {
+        // Remove non-numeric characters
+        val digits = number.filter { it.isDigit() }
+
+        // Return the formatted number with a leading '+'
+        return "+$digits"
+    }
+
+    // Function to format date strings
+    fun formatDate(date: String): String {
+        // Remove any non-numeric characters
+        val cleanInput = date.replace(Regex("[^0-9]"), "")
+
+        // Define the mask
+        val mask = "##/##/####"
+        val result = StringBuilder()
+        var index = 0
+
+        for (ch in mask) {
+            if (index >= cleanInput.length) break
+            if (ch == '#') {
+                result.append(cleanInput[index])
+                index++
+            } else {
+                result.append(ch)
+            }
+        }
+
+        return result.toString()
+    }
+
+    // Function to format SSN (Social Security Number)
+    fun formatSsn9(ssn: String): String {
+        // Remove any non-numeric characters
+        val cleanInput = ssn.replace(Regex("[^0-9]"), "")
+
+        // Define the mask
+        val mask = "###-##-####"
+        val result = StringBuilder()
+        var index = 0
+
+        for (ch in mask) {
+            if (index >= cleanInput.length) break
+            if (ch == '#') {
+                result.append(cleanInput[index])
+                index++
+            } else {
+                result.append(ch)
+            }
+        }
+
+        return result.toString()
     }
 }

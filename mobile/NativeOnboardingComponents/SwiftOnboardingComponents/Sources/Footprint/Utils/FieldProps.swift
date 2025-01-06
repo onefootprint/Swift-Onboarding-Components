@@ -8,46 +8,45 @@ internal struct FootprintInputProps{
     var format: ((_ value: String)-> String)? = nil
 }
 
-
-
 internal func getValidations(fieldName: FpFieldName) -> (String) -> String?{
     let translation = Footprint.shared.l10n.translation
+    
     switch fieldName {
     case .idEmail:
         return { (value: String) -> String? in
-            return isEmail(value, translation: translation)
+            return Validations.shared.isEmail(value: value, translation: translation)
         }
     case .idPhoneNumber:
         return { (value: String) -> String? in
-            return PhoneNumberValidator.isPhoneNumberGeneric(value, translation: translation)
+            return Validations.shared.isPhoneNumberGeneric(value: value, translation: translation)
         }
     case .idDob:
         return { (value: String) -> String? in
-            return isDob(value, locale: Footprint.shared.l10n.locale!, translation: translation)
+            return Validations.shared.isDob(dob: value, locale: Footprint.shared.l10n.locale!, translation: translation)
         }
     case .idSsn4:
         return { (value: String) -> String? in
-            isSSN4(value, translation: translation)
+            Validations.shared.isSSN4(value:value, translation: translation)
         }
     case .idSsn9:
         return { (value: String) -> String? in
-            return isSSN9(value, isFlexible: false, translation: translation)
+            return Validations.shared.isSSN9(value: value, isFlexible: false, translation: translation)
         }
     case .idFirstName:
         return { (value: String) -> String? in
-            return isName(value, type: .firstName, translation: translation)
+            return  Validations.shared.isName(value: value, type: .firstName, translation: translation)
         }
     case .idLastName:
         return { (value: String) -> String? in
-            return isName(value, type: .lastName, translation: translation)
+            return Validations.shared.isName(value: value, type: .lastName, translation: translation)
         }
     case .idMiddleName:
         return { (value: String) -> String? in
-            return isName(value, type: .middleName, translation: translation)
+            return Validations.shared.isName(value: value, type: .middleName, translation: translation)
         }
     case .idCountry:
         return { (value: String) -> String? in
-            isSupportedCountryCode(value, translation: translation)
+            Validations.shared.isSupportedCountryCode(countryCode: value, translation: translation)
         }
     case .idCity:
         return { (value: String) -> String? in
@@ -86,18 +85,18 @@ internal func getInputProps(fieldName: FpFieldName) -> FootprintInputProps {
     case .idPhoneNumber:
         inputProps.keyboardType = .phonePad
         inputProps.textContentType = .telephoneNumber
-        inputProps.format = formatPhoneNumber
+        inputProps.format = Formatters.shared.formatPhoneNumber
     case .idDob:
         inputProps.keyboardType = .numberPad
         inputProps.maxLength = 10
-        inputProps.format = formatDate
+        inputProps.format = Formatters.shared.formatDate
     case .idSsn4:
         inputProps.keyboardType = .numberPad
         inputProps.maxLength = 4
     case .idSsn9:
         inputProps.maxLength = 11
         inputProps.keyboardType = .numberPad
-        inputProps.format = formatSsn9
+        inputProps.format = Formatters.shared.formatSsn9
     case .idFirstName:
         inputProps.textContentType = .name
         inputProps.keyboardType = .default
