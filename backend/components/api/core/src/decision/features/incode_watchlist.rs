@@ -361,6 +361,8 @@ impl AmlReasonCodeHelper {
     }
 }
 
+
+// Helper function that is split out to help with unit testing
 fn footprint_reason_codes(
     res: &WatchlistResultResponse,
     enhanced_aml: &EnhancedAmlOption,
@@ -380,12 +382,6 @@ fn footprint_reason_codes(
     reason_code_helper.footprint_reason_codes()
 }
 
-pub fn reason_codes_from_watchlist_result(
-    res: &WatchlistResultResponse,
-    enhanced_aml: &EnhancedAmlOption,
-) -> (Vec<FootprintReasonCode>, HasAmlHit) {
-    footprint_reason_codes(res, enhanced_aml, false)
-}
 
 // Some customers want to include default reason codes even if there are no hits for a particular
 // AML type
@@ -449,7 +445,7 @@ mod test {
             })
             .collect();
         let res = make_watchlist_res("Bob Boberto", hits);
-        let (reason_codes, has_aml_hit) = reason_codes_from_watchlist_result(
+        let (reason_codes, has_aml_hit) = footprint_reason_codes(
             &res,
             &EnhancedAmlOption::Yes {
                 ofac: true,
@@ -459,6 +455,7 @@ mod test {
                 adverse_media_lists: None,
                 match_kind: AmlMatchKind::ExactName,
             },
+            false,
         );
 
         if !reason_codes.is_empty() {
@@ -617,7 +614,7 @@ mod test {
             })
             .collect();
         let res = make_watchlist_res("Bob Boberto", hits);
-        let (computed_codes, _) = reason_codes_from_watchlist_result(&res, &enhanced_aml);
+        let (computed_codes, _) = footprint_reason_codes(&res, &enhanced_aml, false);
         computed_codes
     }
 
@@ -652,7 +649,7 @@ mod test {
             })
             .collect();
         let res = make_watchlist_res(search_term, hits);
-        let (computed_codes, _) = reason_codes_from_watchlist_result(
+        let (computed_codes, _) = footprint_reason_codes(
             &res,
             &EnhancedAmlOption::Yes {
                 ofac: true,
@@ -662,6 +659,7 @@ mod test {
                 adverse_media_lists: None,
                 match_kind,
             },
+            false,
         );
         computed_codes
     }
@@ -679,7 +677,7 @@ mod test {
             }
         };
 
-        let (codes, has_aml_hit) = reason_codes_from_watchlist_result(
+        let (codes, has_aml_hit) = footprint_reason_codes(
             &res,
             &EnhancedAmlOption::Yes {
                 ofac: true,
@@ -689,6 +687,7 @@ mod test {
                 adverse_media_lists: None,
                 match_kind: AmlMatchKind::FuzzyHigh,
             },
+            false,
         );
 
         assert!(has_aml_hit);
@@ -715,7 +714,7 @@ mod test {
             }
         };
 
-        let (codes, has_aml_hit) = reason_codes_from_watchlist_result(
+        let (codes, has_aml_hit) = footprint_reason_codes(
             &res,
             &EnhancedAmlOption::Yes {
                 ofac: true,
@@ -725,6 +724,7 @@ mod test {
                 adverse_media_lists: None,
                 match_kind: AmlMatchKind::FuzzyMedium,
             },
+            false,
         );
 
         assert!(has_aml_hit);
@@ -751,7 +751,7 @@ mod test {
             }
         };
 
-        let (codes, has_aml_hit) = reason_codes_from_watchlist_result(
+        let (codes, has_aml_hit) = footprint_reason_codes(
             &res,
             &EnhancedAmlOption::Yes {
                 ofac: true,
@@ -761,6 +761,7 @@ mod test {
                 adverse_media_lists: None,
                 match_kind: AmlMatchKind::FuzzyHigh,
             },
+            false,
         );
 
         assert!(has_aml_hit);

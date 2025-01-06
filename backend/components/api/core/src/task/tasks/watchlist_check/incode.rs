@@ -1,3 +1,4 @@
+use super::watchlist_check_task::HasAmlHit;
 use crate::decision::vendor::incode::incode_watchlist::WatchlistCheckKind;
 use crate::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
 use crate::decision::{
@@ -35,7 +36,7 @@ pub async fn complete_vendor_call(
     playbook: &Playbook,
     obc: &ObConfiguration,
     current_uvw: &VaultWrapper<Person>,
-) -> FpResult<Vec<NewRiskSignalInfo>> {
+) -> FpResult<(Vec<NewRiskSignalInfo>, HasAmlHit)> {
     let sv_id = sv_id.clone();
     let di_id = di_id.clone();
     let (di, latest_watchlist_check_vres) = state
@@ -82,19 +83,19 @@ pub async fn complete_vendor_call(
     )
     .await?;
 
-    // WARNING - DO NOT CHANGE THIS TO USE THE DEFAULT REASON CODES version
-    // Watchlist checks status is derived from the presence of reason codes, _not_ specific reason codes
-    // so if we start materializing default reason codes, we'll start having all watchlist tasks "fail
-    let (reason_codes, _) = decision::features::incode_watchlist::reason_codes_from_watchlist_result(
-        &res,
-        &obc.verification_checks().enhanced_aml(),
-    );
+    let (reason_codes, has_aml_hit) =
+        decision::features::incode_watchlist::reason_codes_from_watchlist_result_with_default_reason_codes(
+            &res,
+            &obc.verification_checks().enhanced_aml(),
+        );
 
-    // TODO: vendor_api here should be either IncodeWatchlistCheck or IncodeUpdatedWatchlistResult
-    Ok(reason_codes
+    let codes = reason_codes
         .into_iter()
         .map(|r| (r, kind.clone().into(), vres_id.clone()))
-        .collect())
+        .collect();
+
+    // TODO: vendor_api here should be either IncodeWatchlistCheck or IncodeUpdatedWatchlistResult
+    Ok((codes, has_aml_hit))
 }
 
 async fn watchlist_check_ref_from_latest_vres(

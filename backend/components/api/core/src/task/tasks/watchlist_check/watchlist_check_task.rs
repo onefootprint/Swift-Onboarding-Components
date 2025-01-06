@@ -51,20 +51,20 @@ pub(crate) struct WatchlistCheckTask {
     state: State,
     task_id: TaskId,
 }
-
+pub type HasAmlHit = bool;
 enum WatchlistVendorResult {
-    Completed(Vec<NewRiskSignalInfo>),
+    Completed((Vec<NewRiskSignalInfo>, HasAmlHit)),
     InsufficientData,
 }
 
 impl WatchlistVendorResult {
     pub fn status(&self) -> WatchlistCheckStatus {
         match self {
-            WatchlistVendorResult::Completed(rs) => {
-                if rs.is_empty() {
-                    WatchlistCheckStatus::Pass
-                } else {
+            WatchlistVendorResult::Completed((_, has_aml_hit)) => {
+                if *has_aml_hit {
                     WatchlistCheckStatus::Fail
+                } else {
+                    WatchlistCheckStatus::Pass
                 }
             }
             WatchlistVendorResult::InsufficientData => {
@@ -75,7 +75,7 @@ impl WatchlistVendorResult {
 
     pub fn reason_codes(&self) -> Option<Vec<NewRiskSignalInfo>> {
         match self {
-            WatchlistVendorResult::Completed(rs) => Some(rs.clone()),
+            WatchlistVendorResult::Completed((rs, _)) => Some(rs.clone()),
             WatchlistVendorResult::InsufficientData => None,
         }
     }
@@ -151,10 +151,10 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
                 .ok();
 
                 if IdologyPa.requirements_are_satisfied(uvw.populated().as_slice()) {
-                    let reason_codes =
+                    let (reason_codes, has_aml_hit) =
                         idology::complete_vendor_call(&state, &sv.id, &di_id, &tenant.id, existing_response)
                             .await?;
-                    WatchlistVendorResult::Completed(reason_codes)
+                    WatchlistVendorResult::Completed((reason_codes, has_aml_hit))
                 } else {
                     WatchlistVendorResult::InsufficientData
                 }
@@ -176,9 +176,9 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
                     return ServerErrInto!("WatchlistCheckTask run with an obc enhanced_aml.continuous_monitoring = false: {}, {}",tenant.id, obc.id);
                 }
                 if IncodeWatchlistCheck.requirements_are_satisfied(uvw.populated().as_slice()) {
-                    let reason_codes =
+                    let (reason_codes, has_aml_hit) =
                         incode::complete_vendor_call(&state, &sv.id, &di_id, playbook, obc, &uvw).await?;
-                    WatchlistVendorResult::Completed(reason_codes)
+                    WatchlistVendorResult::Completed((reason_codes, has_aml_hit))
                 } else {
                     WatchlistVendorResult::InsufficientData
                 }

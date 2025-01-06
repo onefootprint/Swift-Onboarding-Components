@@ -1,3 +1,4 @@
+use super::watchlist_check_task::HasAmlHit;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
 use crate::decision::vendor::verification_result::ShouldSaveVerificationRequest;
@@ -14,6 +15,7 @@ use idv::idology::expectid::response::PaWatchlistHit;
 use idv::idology::pa::response::PaResponse;
 use idv::idology::pa::IdologyPaAPIResponse;
 use idv::idology::pa::IdologyPaRequest;
+use itertools::Itertools;
 use newtypes::DecisionIntentId;
 use newtypes::FootprintReasonCode;
 use newtypes::ScopedVaultId;
@@ -27,7 +29,7 @@ pub async fn complete_vendor_call(
     di_id: &DecisionIntentId,
     tenant_id: &TenantId,
     existing_response: Option<(PaResponse, VerificationResultId)>,
-) -> FpResult<Vec<NewRiskSignalInfo>> {
+) -> FpResult<(Vec<NewRiskSignalInfo>, HasAmlHit)> {
     let (reason_codes, vres_id) = if let Some((res, vres_id)) = existing_response {
         // we already successfully completed a IdologyPa call for this watchlist task, so just return reason
         // codes from it
@@ -38,10 +40,15 @@ pub async fn complete_vendor_call(
         (parse_reason_codes(pa_res)?, vres_id)
     };
 
-    Ok(reason_codes
+    let codes = reason_codes
         .into_iter()
         .map(|r| (r, VendorAPI::IdologyPa, vres_id.clone()))
-        .collect())
+        .collect_vec();
+
+    // As of 2025-01-02, we don't return any default reason codes for IdologyPa
+    let has_aml_hit = !codes.is_empty();
+
+    Ok((codes, has_aml_hit))
 }
 
 async fn make_vendor_call(

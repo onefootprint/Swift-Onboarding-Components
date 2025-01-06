@@ -169,9 +169,9 @@ async fn vendor_error(state: &mut State, vault_kind: VaultKind) {
 }
 
 #[test_state_case(VaultKind::Portable(EnhancedAmlOption::No), OnboardingStatus::Pass, VendorRes::Hit, (WatchlistCheckStatusKind::Fail, vec![FootprintReasonCode::WatchlistHitOfac]))]
-#[test_state_case(VaultKind::Portable(enhanced_aml_option_yes()), OnboardingStatus::Pass, VendorRes::Hit, (WatchlistCheckStatusKind::Fail, vec![FootprintReasonCode::WatchlistHitOfac]))]
+#[test_state_case(VaultKind::Portable(enhanced_aml_option_yes()), OnboardingStatus::Pass, VendorRes::Hit, (WatchlistCheckStatusKind::Fail, vec![FootprintReasonCode::WatchlistHitOfac, FootprintReasonCode::WatchlistClearPep, FootprintReasonCode::AdverseMediaClear]))]
 #[test_state_case(VaultKind::Portable(EnhancedAmlOption::No), OnboardingStatus::Pass, VendorRes::NoHit, (WatchlistCheckStatusKind::Pass, vec![]))]
-#[test_state_case(VaultKind::Portable(enhanced_aml_option_yes()), OnboardingStatus::Pass, VendorRes::NoHit, (WatchlistCheckStatusKind::Pass, vec![]))]
+#[test_state_case(VaultKind::Portable(enhanced_aml_option_yes()), OnboardingStatus::Pass, VendorRes::NoHit, (WatchlistCheckStatusKind::Pass, vec![FootprintReasonCode::WatchlistClearOfac, FootprintReasonCode::WatchlistClearPep, FootprintReasonCode::AdverseMediaClear]))]
 #[test_state_case(VaultKind::NonPortable, OnboardingStatus::Pass, VendorRes::Hit, (WatchlistCheckStatusKind::Fail, vec![FootprintReasonCode::WatchlistHitOfac]))]
 #[test_state_case(VaultKind::NonPortable, OnboardingStatus::Pass, VendorRes::NoHit, (WatchlistCheckStatusKind::Pass, vec![]))]
 // Non portable vaults always have checks run even if they are in non-Pass states. although.. TODO: we should
