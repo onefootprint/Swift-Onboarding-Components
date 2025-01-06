@@ -1,5 +1,5 @@
 import pytest
-from tests.utils import get, post, _gen_random_sandbox_id
+from tests.utils import create_ob_config, get, post, _gen_random_sandbox_id
 from tests.identify_client import ForbiddenChallengeKindError, IdentifyClient
 from tests.constants import (
     FIXTURE_PHONE_NUMBER,
@@ -58,12 +58,7 @@ def verified_fixture_id_data_for_auth_kinds(kinds):
 
 
 @pytest.mark.parametrize("login_auth_kind", ["sms", "email"])
-def test_portablize_nypid_via_auth(
-    sandbox_tenant,
-    foo_sandbox_tenant,
-    auth_playbook,
-    login_auth_kind,
-):
+def test_portablize_nypid_via_auth(sandbox_tenant, foo_sandbox_tenant, login_auth_kind):
     """
     Portablize a vault created via API at sandbox_tenant by onboarding onto an auth playbook.
     Then onboard the user onto foo_sandbox_tenant and ensure the data was prefilled
@@ -71,6 +66,13 @@ def test_portablize_nypid_via_auth(
     Auth playbooks don't yet support passkeys, so portablization can only happen via a verified email.
     """
     login_auth_method = challenge_kind_to_auth_method(login_auth_kind)
+    auth_playbook = create_ob_config(
+        sandbox_tenant,
+        "Auth playbook",
+        ["phone_number", "email"],
+        required_auth_methods=[login_auth_method],
+        kind="auth",
+    )
 
     sandbox_id = _gen_random_sandbox_id()
     sandbox_id_h = SandboxId(sandbox_id)
@@ -108,10 +110,14 @@ def test_portablize_nypid_via_auth(
 
     # Now, when one-click onboarding onto another tenant, we may prefill this data instead of
     # using the data that is filled in by the Bifrost client
+    foo_playbook = create_ob_config(
+        foo_sandbox_tenant,
+        "Foo playbook",
+        must_collect_data=foo_sandbox_tenant.default_ob_config.must_collect_data,
+        required_auth_methods=[login_auth_method],
+    )
     bifrost = BifrostClient.login_user(
-        foo_sandbox_tenant.default_ob_config,
-        sandbox_id,
-        auth_kind=login_auth_kind,
+        foo_playbook, sandbox_id, auth_kind=login_auth_kind
     )
     user = bifrost.run()
 
@@ -185,6 +191,19 @@ def test_nypid_portablized_via_kyc_playbook(
     Portablize a vault created via API at sandbox_tenant by onboarding onto a KYC playbook.
     Then onboard the user onto foo_sandbox_tenant and ensure the data was prefilled
     """
+    login_auth_method = challenge_kind_to_auth_method(first_login_auth_kind)
+    playbook = create_ob_config(
+        sandbox_tenant,
+        "Playbook",
+        sandbox_tenant.default_ob_config.must_collect_data,
+        required_auth_methods=[login_auth_method],
+    )
+    foo_playbook = create_ob_config(
+        foo_sandbox_tenant,
+        "Foo playbook",
+        must_collect_data=foo_sandbox_tenant.default_ob_config.must_collect_data,
+        required_auth_methods=[login_auth_method],
+    )
 
     sandbox_id = _gen_random_sandbox_id()
     sandbox_id_h = SandboxId(sandbox_id)
@@ -197,9 +216,7 @@ def test_nypid_portablized_via_kyc_playbook(
         "email": {"email": FIXTURE_EMAIL, "scope": "auth"},
     }
     for data in identify_by_fixture_data.values():
-        body = post(
-            "hosted/identify", data, sandbox_id_h, sandbox_tenant.default_ob_config.key
-        )
+        body = post("hosted/identify", data, sandbox_id_h, playbook.key)
         assert body["user"]["is_unverified"]
         assert set(i["kind"] for i in body["user"]["auth_methods"]) == {
             "phone",
@@ -208,19 +225,13 @@ def test_nypid_portablized_via_kyc_playbook(
         assert all(not i["is_verified"] for i in body["user"]["auth_methods"])
 
     # Inherit the user via identify flow. This will verify the first auth method.
-    auth = IdentifyClient(sandbox_tenant.default_ob_config, sandbox_id).login(
-        kind=first_login_auth_kind,
-    )
+    auth = IdentifyClient(playbook, sandbox_id).login(kind=first_login_auth_kind)
 
     # Logging in via the unverified auth method should not work, since an auth
     # method is already verified.
     for identify_auth_kind in verify_additional_auth_kinds:
         with pytest.raises(ForbiddenChallengeKindError):
-            BifrostClient.login_user(
-                sandbox_tenant.default_ob_config,
-                sandbox_id,
-                auth_kind=identify_auth_kind,
-            )
+            BifrostClient.login_user(playbook, sandbox_id, auth_kind=identify_auth_kind)
 
         # Verify the additional auth kind.
         add_primary_auth_method(identify_auth_kind, auth)
@@ -235,9 +246,9 @@ def test_nypid_portablized_via_kyc_playbook(
     # Since this is not an auth playbook, we won't portablize all data in the vault - only the
     # auth method that was verified
     for obc, expected_ci in [
-        (sandbox_tenant.default_ob_config, {"phone", "email"}),
+        (playbook, {"phone", "email"}),
         # Only the verified auth method can be used for identifying at a different tenant.
-        (foo_sandbox_tenant.default_ob_config, verified_auth_methods),
+        (foo_playbook, verified_auth_methods),
     ]:
         for identify_auth_method, data in identify_by_fixture_data.items():
             body = post("hosted/identify", data, sandbox_id_h, obc.key)
@@ -259,7 +270,7 @@ def test_nypid_portablized_via_kyc_playbook(
             assert got_auth_methods_verified == expect_auth_methods_verified
 
     # Then, run them through a KYC playbook
-    bifrost = BifrostClient.raw_auth(sandbox_tenant.default_ob_config, auth, sandbox_id)
+    bifrost = BifrostClient.raw_auth(playbook, auth, sandbox_id)
     user = bifrost.run()
 
     # Now, even identifying at foo_sandbox_tenant should show the verified contact info
@@ -268,12 +279,7 @@ def test_nypid_portablized_via_kyc_playbook(
         "email": {"email": FIXTURE_EMAIL, "scope": "auth"},
     }
     for identify_auth_method, data in identify_by_fixture_data.items():
-        body = post(
-            "hosted/identify",
-            data,
-            sandbox_id_h,
-            foo_sandbox_tenant.default_ob_config.key,
-        )
+        body = post("hosted/identify", data, sandbox_id_h, foo_playbook.key)
 
         auth_methods = body["user"]["auth_methods"]
         got_auth_methods_verified = {m["kind"]: m["is_verified"] for m in auth_methods}
@@ -288,7 +294,7 @@ def test_nypid_portablized_via_kyc_playbook(
     # using the data that is filled in by the Bifrost client
     def bifrost_login_user():
         return BifrostClient.login_user(
-            foo_sandbox_tenant.default_ob_config,
+            foo_playbook,
             sandbox_id,
             auth_kind=one_click_auth_kind,
             webauthn=user.client.webauthn_device,

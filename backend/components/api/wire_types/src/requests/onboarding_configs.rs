@@ -53,7 +53,7 @@ pub struct CreateOnboardingConfigurationRequest {
     #[serde(default)]
     pub verification_checks: Option<Vec<VerificationCheck>>,
     #[serde(default)]
-    pub required_auth_methods: Patch<Vec<AuthMethodKind>>,
+    pub required_auth_methods: Option<Vec<AuthMethodKind>>,
     pub prompt_for_passkey: Option<bool>,
 }
 

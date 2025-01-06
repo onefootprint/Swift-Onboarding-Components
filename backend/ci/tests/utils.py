@@ -371,6 +371,11 @@ def create_ob_config(
         # Need to populate verification_checks with the default KYB verification check, unless skip_kyb has
         # been specifically requested by providing empty verification_checks
         verification_checks = [dict(kind="kyb", data=dict(ein_only=False))]
+    if kind != "document" and required_auth_methods is None:
+        if is_no_phone_flow:
+            required_auth_methods = ["email"]
+        else:
+            required_auth_methods = ["phone"]
 
     checks = get_verification_checks(verification_checks, kind)
     ob_conf_data = {

@@ -1,0 +1,1 @@
+UPDATE ob_configuration SET required_auth_methods = array['phone']::text[] WHERE required_auth_methods IS NULL AND kind != 'document';

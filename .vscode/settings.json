@@ -137,5 +137,6 @@
   "python.analysis.include": [
     "backend/ci/tests"
   ],
+  "ruff.lint.ignore": ["E731"],
   "tlaplus.tlc.modelChecker.options": "-workers auto"
 }

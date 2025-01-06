@@ -131,6 +131,7 @@ def test_config_create(sandbox_tenant):
         must_collect_data=["ssn4", "phone_number", "email", "name", "full_address"],
         kind="kyc",
         verification_checks=[{"data": {}, "kind": "kyc"}],
+        required_auth_methods=["phone"],
     )
     body = post("org/playbooks", data, *sandbox_tenant.db_auths)
     obc = ObConfiguration.from_response(body, sandbox_tenant)
@@ -162,6 +163,7 @@ def test_config_create(sandbox_tenant):
                 allow_international_residents=False,
                 international_country_restrictions=None,
                 verification_checks=[{"kind": "kyc", "data": {}}],
+                required_auth_methods=["phone"],
             ),
             None,
         ),
@@ -181,6 +183,7 @@ def test_config_create(sandbox_tenant):
                     {"kind": "kyc", "data": {}},
                     {"kind": "phone", "data": {"attributes": []}},
                 ],
+                required_auth_methods=["phone"],
             ),
             "Validation error: Must provide `attributes` if enabling a phone verification check",
         ),
@@ -198,6 +201,7 @@ def test_config_create(sandbox_tenant):
                 allow_international_residents=False,
                 international_country_restrictions=None,
                 verification_checks=[{"kind": "kyc", "data": {}}],
+                required_auth_methods=["phone"],
             ),
             "Validation error: Cannot provide both ssn4 and ssn9",
         ),
@@ -209,6 +213,7 @@ def test_config_create(sandbox_tenant):
                 allow_international_residents=False,
                 international_country_restrictions=None,
                 verification_checks=[{"kind": "kyc", "data": {}}],
+                required_auth_methods=["phone"],
             ),
             "Validation error: Decryptable Ssn fields must be a subset of collected fields",
         ),  # can_access must be < must_collect
@@ -220,6 +225,7 @@ def test_config_create(sandbox_tenant):
                 allow_international_residents=False,
                 international_country_restrictions=None,
                 verification_checks=[{"kind": "kyc", "data": {}}],
+                required_auth_methods=["phone"],
             ),
             None,
         ),  # data in optional_data should be allowed in can_access
@@ -230,6 +236,7 @@ def test_config_create(sandbox_tenant):
                 allow_international_residents=False,
                 international_country_restrictions=None,
                 verification_checks=[{"kind": "kyc", "data": {}}],
+                required_auth_methods=["phone"],
             ),
             "Validation error: [Dob] cannot be optional",
         ),  # for now only let ssn4/ssn9 be optional, not any arbitary CDO
@@ -246,6 +253,7 @@ def test_config_create(sandbox_tenant):
                 allow_international_residents=False,
                 international_country_restrictions=["MX"],
                 verification_checks=[{"kind": "kyc", "data": {}}],
+                required_auth_methods=["phone"],
             ),
             "Validation error: Cannot specify international_country_restrictions without allow_international_residents",
         ),
@@ -262,6 +270,7 @@ def test_config_create(sandbox_tenant):
                 allow_international_residents=True,
                 international_country_restrictions=[],
                 verification_checks=[{"kind": "kyc", "data": {}}],
+                required_auth_methods=["phone"],
             ),
             "Validation error: Must specify 1 or more countries in international_country_restrictions",
         ),
@@ -278,8 +287,22 @@ def test_config_create(sandbox_tenant):
                 allow_international_residents=True,
                 international_country_restrictions=["MX"],
                 verification_checks=[],
+                required_auth_methods=["phone"],
             ),
             None,
+        ),
+        (
+            dict(
+                must_collect_data=[
+                    "name",
+                    "full_address",
+                    "email",
+                    "phone_number",
+                ],
+                optional_data=[],
+                verification_checks=[dict(kind="kyc", data={})],
+            ),
+            "Must provide required_auth_methods",
         ),
         (
             dict(
@@ -294,6 +317,7 @@ def test_config_create(sandbox_tenant):
                 allow_international_residents=False,
                 allow_us_residents=False,
                 verification_checks=[{"kind": "kyc", "data": {}}],
+                required_auth_methods=["phone"],
             ),
             "Validation error: Must set one of allow_us_residents or allow_international_residents to true",
         ),
@@ -311,6 +335,7 @@ def test_config_create(sandbox_tenant):
                 allow_us_territories=True,
                 allow_us_residents=True,
                 verification_checks=[{"kind": "kyc", "data": {}}],
+                required_auth_methods=["phone"],
             ),
             "Validation error: Specifying allow_us_territories with allow_international_residents is redundant",
         ),
@@ -320,6 +345,7 @@ def test_config_create(sandbox_tenant):
                 optional_data=[],
                 kind="document",
                 skip_kyc=True,
+                required_auth_methods=["phone"],
             ),
             "Validation error: Playbooks of kind document cannot collect name",
         ),
@@ -329,6 +355,7 @@ def test_config_create(sandbox_tenant):
                 optional_data=[],
                 kind="document",
                 skip_kyc=False,
+                required_auth_methods=["phone"],
             ),
             "Playbook of kind document must skip KYC",
         ),
@@ -339,6 +366,7 @@ def test_config_create(sandbox_tenant):
                 optional_data=[],
                 kind="document",
                 verification_checks=[{"kind": "kyc", "data": {}}],
+                required_auth_methods=["phone"],
             ),
             "Playbook of kind document must skip KYC",
         ),
@@ -366,6 +394,7 @@ def test_config_create(sandbox_tenant):
                 ),
                 allow_us_residents=True,
                 allow_us_territories=True,
+                required_auth_methods=["phone"],
             ),
             None,
         ),
@@ -391,6 +420,7 @@ def test_config_create(sandbox_tenant):
                 ),
                 allow_us_residents=True,
                 allow_us_territories=True,
+                required_auth_methods=["phone"],
             ),
             "Missing required data options: ssn9 for cip: alpaca",
         ),
@@ -422,6 +452,7 @@ def test_config_create(sandbox_tenant):
                         ),
                     ),
                 ],
+                required_auth_methods=["phone"],
             ),
             "Missing required data options: ssn9 for cip: alpaca",
         ),
@@ -449,6 +480,7 @@ def test_config_create(sandbox_tenant):
                 ),
                 allow_us_residents=True,
                 allow_us_territories=True,
+                required_auth_methods=["phone"],
             ),
             "Validation error: Cannot specify documents in Playbook and be using an Alpaca CIP",
         ),
@@ -481,6 +513,7 @@ def test_config_create(sandbox_tenant):
                         ),
                     ),
                 ],
+                required_auth_methods=["phone"],
             ),
             "Validation error: Cannot create Alpaca playbook without allow_us_residents=true && allow_us_territories=true",
         ),
@@ -507,6 +540,7 @@ def test_config_create(sandbox_tenant):
                 ),
                 allow_us_residents=True,
                 allow_us_territories=True,
+                required_auth_methods=["phone"],
             ),
             "Validation error: Must run OFAC/PEP/AdverseMedia for Alpaca playbook",
         ),
@@ -545,6 +579,7 @@ def test_config_create(sandbox_tenant):
                         ),
                     ),
                 ],
+                required_auth_methods=["phone"],
             ),
             "Validation error: Must run OFAC/PEP/AdverseMedia for Alpaca playbook",
         ),
@@ -571,6 +606,7 @@ def test_config_create(sandbox_tenant):
                 ),
                 allow_us_residents=True,
                 allow_us_territories=True,
+                required_auth_methods=["phone"],
             ),
             "Validation error: Must choose EnhancedAmlOption Alpaca playbook",
         ),
@@ -591,6 +627,7 @@ def test_config_create(sandbox_tenant):
                 allow_us_residents=True,
                 allow_us_territories=True,
                 verification_checks=[{"kind": "kyc", "data": {}}],  # no AML check
+                required_auth_methods=["phone"],
             ),
             "Validation error: Must choose EnhancedAmlOption Alpaca playbook",
         ),
@@ -618,6 +655,7 @@ def test_config_create(sandbox_tenant):
                         ),
                     )
                 ],
+                required_auth_methods=["phone"],
             ),
             "Must use identifier starting with document.custom. for custom documents",
         ),
@@ -640,6 +678,7 @@ def test_config_create(sandbox_tenant):
                     )
                 ],
                 verification_checks=[{"kind": "kyc", "data": {}}],
+                required_auth_methods=["phone"],
             ),
             "Must use identifier starting with document.custom. for custom documents",
         ),
@@ -667,6 +706,7 @@ def test_config_create(sandbox_tenant):
                         ),
                     )
                 ],
+                required_auth_methods=["phone"],
             ),
             "Cannot collect business documents in non-KYB playbook",
         ),
@@ -689,6 +729,7 @@ def test_config_create(sandbox_tenant):
                     )
                 ],
                 verification_checks=[{"kind": "kyc", "data": {}}],
+                required_auth_methods=["phone"],
             ),
             "Cannot collect business documents in non-KYB playbook",
         ),
@@ -706,6 +747,7 @@ def test_config_create(sandbox_tenant):
                     {"kind": "kyc", "data": {}},
                     {"kind": "sentilink", "data": {}},
                 ],
+                required_auth_methods=["phone"],
             ),
             "Validation error: Must collect id.dob, id.ssn9 to use Sentilink",
         ),
@@ -725,6 +767,7 @@ def test_config_create(sandbox_tenant):
                     {"kind": "kyc", "data": {}},
                     {"kind": "sentilink", "data": {}},
                 ],
+                required_auth_methods=["phone"],
             ),
             None,
         ),
@@ -741,6 +784,7 @@ def test_config_create(sandbox_tenant):
                 kind="kyc",
                 optional_data=[],
                 is_doc_first_flow=True,
+                required_auth_methods=["phone"],
             ),
             "Validation error: Must collect document if is_doc_first is true",
         ),
@@ -758,20 +802,22 @@ def test_config_create(sandbox_tenant):
                 kind="kyc",
                 optional_data=[],
                 is_doc_first_flow=True,
+                required_auth_methods=["phone"],
             ),
             None,
         ),
         (
             dict(
                 must_collect_data=[
-                "business_name",
-                "business_tin",
-                "business_address",
-                "business_phone_number",
-                "business_website",
-            ],
+                    "business_name",
+                    "business_tin",
+                    "business_address",
+                    "business_phone_number",
+                    "business_website",
+                ],
                 kind="kyb",
                 verification_checks=[{"kind": "kyb", "data": {"ein_only": False}}],
+                required_auth_methods=["phone"],
                 allow_us_territory_residents=True,
             ),
             None,
@@ -779,14 +825,15 @@ def test_config_create(sandbox_tenant):
         (
             dict(
                 must_collect_data=[
-                "business_name",
-                "business_tin",
-                "business_address",
-                "business_phone_number",
-                "business_website",
-            ],
+                    "business_name",
+                    "business_tin",
+                    "business_address",
+                    "business_phone_number",
+                    "business_website",
+                ],
                 kind="kyb",
                 verification_checks=[{"kind": "kyb", "data": {"ein_only": False}}],
+                required_auth_methods=["phone"],
                 allow_international_residents=True,
             ),
             "Validation error: Cannot collect address and run KYB with allow_international_residents or allow_us_territory_residents",
@@ -794,14 +841,15 @@ def test_config_create(sandbox_tenant):
         (
             dict(
                 must_collect_data=[
-                "business_name",
-                "business_tin",
-                "business_address",
-                "business_phone_number",
-                "business_website",
-            ],
+                    "business_name",
+                    "business_tin",
+                    "business_address",
+                    "business_phone_number",
+                    "business_website",
+                ],
                 kind="kyb",
                 verification_checks=[{"kind": "kyb", "data": {"ein_only": False}}],
+                required_auth_methods=["phone"],
                 allow_us_territories=True,
             ),
             "Validation error: Cannot collect address and run KYB with allow_international_residents or allow_us_territory_residents",
@@ -809,17 +857,18 @@ def test_config_create(sandbox_tenant):
         (
             dict(
                 must_collect_data=[
-                "business_name",
-                "business_tin",
-                "business_address",
-                "business_phone_number",
-                "business_website",
-            ],
+                    "business_name",
+                    "business_tin",
+                    "business_address",
+                    "business_phone_number",
+                    "business_website",
+                ],
                 kind="kyb",
                 verification_checks=[],
-                allow_international_residents=True
+                required_auth_methods=["phone"],
+                allow_international_residents=True,
             ),
-            None
+            None,
         ),
     ],
 )
@@ -848,10 +897,11 @@ def test_no_phone_obc(sandbox_tenant):
         is_no_phone_flow=True,
         kind="kyc",
         verification_checks=[{"kind": "kyc", "data": {}}],
+        required_auth_methods=["email"],
     )
     res = post("org/playbooks", data, *sandbox_tenant.db_auths)
 
-    assert res["is_no_phone_flow"] == True
+    assert res["is_no_phone_flow"]
     assert res["must_collect_data"] == collect_data
     assert res["optional_data"] == []
 
@@ -911,6 +961,7 @@ def test_skip_kyc(
         allow_international_residents=allow_international_residents,
         skip_kyc=True,
         kind="kyc",
+        required_auth_methods=["phone"],
     )
     res = post(
         "org/playbooks",
@@ -922,7 +973,7 @@ def test_skip_kyc(
     if expected_error:
         assert res["message"] == expected_error
     else:
-        assert res["skip_kyc"] == True
+        assert res["skip_kyc"]
 
 
 @pytest.mark.parametrize(
@@ -1049,6 +1100,7 @@ def test_verification_checks(
         must_collect_data=collected_data,
         kind=kind,
         verification_checks=checks,
+        required_auth_methods=["phone"],
     )
     res = post(
         "org/playbooks",
@@ -1126,6 +1178,7 @@ def test_enhanced_aml(sandbox_tenant, must_collect_data, enhanced_aml, expected_
         enhanced_aml=enhanced_aml,
         kind="kyc",
         verification_checks=[{"kind": "kyc", "data": {}}],
+        required_auth_methods=["phone"],
     )
     res = post(
         "org/playbooks",
@@ -1190,6 +1243,7 @@ def test_enhanced_aml_with_verification_checks(
         optional_data=[],
         kind="kyc",
         verification_checks=verification_checks,
+        required_auth_methods=["phone"],
     )
     res = post(
         "org/playbooks",
@@ -1259,6 +1313,7 @@ def test_business_aml_with_verification_checks(
         optional_data=[],
         kind=playbook_kind,
         verification_checks=verification_checks,
+        required_auth_methods=["phone"],
     )
 
     res = post(
@@ -1282,7 +1337,7 @@ def test_config_update(sandbox_tenant, ob_configuration):
     new_skip_confirm = True
     data = dict(name=new_name, skip_confirm=new_skip_confirm)
     patch(
-        f"org/onboarding_configs/flerpderp",
+        "org/onboarding_configs/flerpderp",
         data,
         *sandbox_tenant.db_auths,
         status_code=404,
@@ -1299,7 +1354,7 @@ def test_config_update(sandbox_tenant, ob_configuration):
     assert ob_config["skip_confirm"] == new_skip_confirm
 
     # Verify the update
-    body = get(f"org/playbooks?page_size=100", None, *sandbox_tenant.db_auths)
+    body = get("org/playbooks?page_size=100", None, *sandbox_tenant.db_auths)
     configs = body["data"]
     ob_config = next(i for i in configs if i["id"] == ob_configuration.id)
     assert ob_config["name"] == new_name
@@ -1340,6 +1395,7 @@ def test_business_only_obc(sandbox_tenant):
         must_collect_data=collect_data,
         kind="kyb",
         verification_checks=[{"kind": "kyb", "data": {"ein_only": False}}],
+        required_auth_methods=["phone"],
     )
     res = post(
         "org/playbooks",
@@ -1360,6 +1416,7 @@ def test_default_rules(sandbox_tenant):
             must_collect_data=collect_data,
             kind="kyc",
             verification_checks=[{"kind": "kyc", "data": {}}],
+            required_auth_methods=["phone"],
         ),
         *sandbox_tenant.db_auths,
     )
@@ -1562,6 +1619,7 @@ def test_playbook_versions(sandbox_tenant, tenant):
         ],
         "kind": "kyc",
         "skip_kyc": False,
+        "required_auth_methods": ["phone"],
     }
     obc_v1_resp = post(
         "org/playbooks",
@@ -1576,7 +1634,7 @@ def test_playbook_versions(sandbox_tenant, tenant):
 
     obc_v1 = ObConfiguration.from_response(obc_v1_resp, sandbox_tenant)
     bifrost_v1 = BifrostClient.new_user(obc_v1)
-    assert bifrost_v1.get_requirement("collect_document") == None
+    assert bifrost_v1.get_requirement("collect_document") is None
 
     # Modify rules for the initial playbook
     patch(

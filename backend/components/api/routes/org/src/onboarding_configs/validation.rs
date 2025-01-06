@@ -6,7 +6,6 @@ use api_core::State;
 use api_errors::BadRequestInto;
 use api_errors::ServerErr;
 use api_wire_types::CreateOnboardingConfigurationRequest;
-use api_wire_types::Patch;
 use db::models::ob_configuration::IsLive;
 use db::models::ob_configuration::NewObConfigurationArgs;
 use db::models::ob_configuration::VerificationChecks;
@@ -666,6 +665,10 @@ impl ObConfigurationArgsToValidate {
 
     fn validate_required_auth_methods(&self) -> FpResult<()> {
         let Some(reqd_methods) = self.required_auth_methods.as_ref() else {
+            let is_document_playbook = matches!(self.kind, ObConfigurationKind::Document);
+            if !is_document_playbook {
+                return BadRequestInto("Must provide required_auth_methods");
+            }
             return Ok(());
         };
         if matches!(self.kind, ObConfigurationKind::Document) {
@@ -776,21 +779,6 @@ pub async fn prepare_onboarding_configuration_request(
     );
 
     let is_no_phone_flow = is_no_phone_flow.unwrap_or(false);
-
-    // TODO remove once client start providing this
-    let required_auth_methods = match required_auth_methods {
-        Patch::Null => None,
-        Patch::Value(v) => Some(v),
-        Patch::Missing => match kind {
-            // Auth and Document playbooks don't (yet) have an opinion on which login method is used
-            ObConfigurationKind::Auth | ObConfigurationKind::Document => None,
-            ObConfigurationKind::Kyc | ObConfigurationKind::Kyb => Some(if is_no_phone_flow {
-                vec![AuthMethodKind::Email]
-            } else {
-                vec![AuthMethodKind::Phone]
-            }),
-        },
-    };
 
     let prompt_for_passkey =
         prompt_for_passkey.unwrap_or(!is_no_phone_flow && kind != ObConfigurationKind::Auth);

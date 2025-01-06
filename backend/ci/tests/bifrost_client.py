@@ -453,7 +453,7 @@ class BifrostClient:
 
     def handle_register_auth_method(self, requirement):
         CHALLENGE_INFO = {
-            "phone": dict(kind="sms", phone_number=self.data["id.phone_number"]),
+            "phone": dict(kind="phone", phone_number=self.data["id.phone_number"]),
             "email": dict(kind="email", email=self.data["id.email"]),
         }
         challenge_info = CHALLENGE_INFO[requirement["auth_method_kind"]]
