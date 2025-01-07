@@ -3,6 +3,7 @@ use crate::PgConn;
 use crate::TxnPgConn;
 use api_errors::FpResult;
 use chrono::DateTime;
+use chrono::NaiveDate;
 use chrono::Utc;
 use db_schema::schema::billing_profile;
 use diesel::prelude::*;
@@ -27,6 +28,7 @@ pub struct BillingProfile {
     pub send_automatically: bool,
     #[diesel(deserialize_as = NonNullVec<BillingMinimum>)]
     pub minimums: Vec<BillingMinimum>,
+    pub platform_fee_starts_on: Option<NaiveDate>,
 }
 
 #[derive(Debug, Clone, Insertable)]

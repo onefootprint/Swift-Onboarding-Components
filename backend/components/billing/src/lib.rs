@@ -236,7 +236,7 @@ impl BillingClient {
         // Calculate each of the line items
         //
 
-        let prices = BillingProfile::new(info.billing_profile.clone())?;
+        let prices = BillingProfile::new(&info)?;
         let mut items = HashMap::new();
         let line_items = info.counts.line_items(&info.tenant_id, &prices)?;
 

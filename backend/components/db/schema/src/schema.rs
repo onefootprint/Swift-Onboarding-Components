@@ -146,6 +146,7 @@ diesel::table! {
         omit_billing -> Bool,
         send_automatically -> Bool,
         minimums -> Array<Nullable<Jsonb>>,
+        platform_fee_starts_on -> Nullable<Date>,
     }
 }
 

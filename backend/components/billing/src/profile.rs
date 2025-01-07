@@ -1,7 +1,7 @@
 use crate::is_managed;
 use crate::managed_metadata;
 use crate::BResult;
-use db::models::billing_profile::BillingProfile as DbBillingProfile;
+use crate::BillingInfo;
 use newtypes::Product;
 use rust_decimal::Decimal;
 use std::collections::HashMap;
@@ -21,12 +21,18 @@ pub struct BillingProfile(HashMap<Product, Decimal>);
 
 impl BillingProfile {
     /// Get prices as decimal for each product
-    pub(crate) fn new(bp: Option<DbBillingProfile>) -> BResult<Self> {
+    pub(crate) fn new(info: &BillingInfo) -> BResult<Self> {
+        let bp = info.billing_profile.as_ref();
         let mut prices = HashMap::new();
-        let prices_str: HashMap<_, _> = bp.map(|bp| bp.prices.into()).unwrap_or_default();
+        let prices_str: HashMap<_, _> = bp.map(|bp| bp.prices.clone().into()).unwrap_or_default();
         for (product, price) in prices_str {
             let price_cents = Decimal::from_str(&price)?;
             prices.insert(product, price_cents);
+        }
+        if (bp.and_then(|bp| bp.platform_fee_starts_on)).is_some_and(|t| t < info.interval.start.date_naive())
+        {
+            // The monthly platform fee hasn't started yet, so remove it from the profile
+            prices.remove(&Product::MonthlyPlatformFee);
         }
         let profile = BillingProfile(prices);
         Ok(profile)

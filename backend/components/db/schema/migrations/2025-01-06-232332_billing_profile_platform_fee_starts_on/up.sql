@@ -1,0 +1,1 @@
+ALTER TABLE billing_profile ADD COLUMN platform_fee_starts_on date;
