@@ -11,6 +11,7 @@ import {
   FlexcarLogo,
   Goodfin,
   GridLogo,
+  LoftyLogo,
   WingSpan,
   YieldStreet,
 } from 'src/components/company-logos';
@@ -26,6 +27,7 @@ const logos = [
   WingSpan,
   Goodfin,
   Aryeo,
+  LoftyLogo,
 ];
 
 const GROUP_SIZE = 4;
@@ -97,7 +99,7 @@ const Logos = () => {
             variants={marqueeItemVariants}
             key={uniqueId()}
           >
-            <RenderedLogo className="text-tertiary" />
+            <RenderedLogo className="text-tertiary max-h-9" />
           </motion.div>
         );
       })}

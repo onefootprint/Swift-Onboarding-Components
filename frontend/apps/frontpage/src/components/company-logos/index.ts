@@ -8,10 +8,10 @@ import FlexcarLogo from './flexcar';
 import Fractional from './fractional';
 import Goodfin from './goodfin';
 import GridLogo from './grid';
+import LoftyLogo from './lofty';
 import WhaleLogo from './whale';
 import WingSpan from './wingspan';
 import YieldStreet from './yieldstreet';
-
 export {
   ApitureLogo,
   BloomLogo,
@@ -21,6 +21,7 @@ export {
   FlexcarLogo,
   Fractional,
   GridLogo,
+  LoftyLogo,
   YieldStreet,
   WingSpan,
   Goodfin,
