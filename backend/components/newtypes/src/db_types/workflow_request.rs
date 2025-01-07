@@ -15,20 +15,25 @@ use serde::Serialize;
 pub enum WorkflowRequestConfig {
     /// Allow onboarding onto the specific playbook.
     /// This allows editing data, re-verifies data, and then re-triggers decision engine
-    Onboard {
-        playbook_id: ObConfigurationId,
-        #[serde(default)]
-        recollect_attributes: Vec<CollectedDataOption>,
-        /// When true, reuses existing BOs' KYC results on the same playbook.
-        /// When false, requires the existing BOs to re-complete KYC.
-        /// Can only be true for KYB playbooks
-        #[serde(default)]
-        reuse_existing_bo_kyc: bool,
-    },
+    Onboard(WfrOnboardConfig),
     /// Upload a new document and re-run the decision engine
-    Document {
-        configs: Vec<DocumentRequestConfig>,
-        #[serde(default)]
-        business_configs: Vec<DocumentRequestConfig>,
-    },
+    Document(WfrDocumentConfig),
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb)]
+#[serde(rename_all = "snake_case")]
+pub struct WfrOnboardConfig {
+    pub playbook_id: ObConfigurationId,
+    #[serde(default)]
+    pub recollect_attributes: Vec<CollectedDataOption>,
+    #[serde(default)]
+    pub reuse_existing_bo_kyc: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb)]
+#[serde(rename_all = "snake_case")]
+pub struct WfrDocumentConfig {
+    pub configs: Vec<DocumentRequestConfig>,
+    #[serde(default)]
+    pub business_configs: Vec<DocumentRequestConfig>,
 }

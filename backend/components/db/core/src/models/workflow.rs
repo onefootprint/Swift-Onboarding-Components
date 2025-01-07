@@ -266,23 +266,19 @@ impl Workflow {
         }
 
         let config: WorkflowConfig = match wfr.map(|wfr| wfr.config.clone()) {
-            Some(WorkflowRequestConfig::Document {
-                configs,
-                business_configs,
-            }) => DocumentConfig {
-                configs,
-                business_configs,
+            Some(WorkflowRequestConfig::Document(cfg)) => DocumentConfig {
+                configs: cfg.configs,
+                business_configs: cfg.business_configs,
             }
             .into(),
-            Some(WorkflowRequestConfig::Onboard {
-                recollect_attributes,
-                reuse_existing_bo_kyc,
-                ..
-            }) => match v.kind {
-                VaultKind::Person => KycConfig { recollect_attributes }.into(),
+            Some(WorkflowRequestConfig::Onboard(cfg)) => match v.kind {
+                VaultKind::Person => KycConfig {
+                    recollect_attributes: cfg.recollect_attributes,
+                }
+                .into(),
                 VaultKind::Business => KybConfig {
-                    recollect_attributes,
-                    reuse_existing_bo_kyc,
+                    recollect_attributes: cfg.recollect_attributes,
+                    reuse_existing_bo_kyc: cfg.reuse_existing_bo_kyc,
                 }
                 .into(),
             },

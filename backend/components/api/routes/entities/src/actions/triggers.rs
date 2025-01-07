@@ -49,37 +49,34 @@ fn validate(
 ) -> FpResult<()> {
     let has_sb = sb.is_some();
     match trigger {
-        WorkflowRequestConfig::Onboard {
-            playbook_id,
-            recollect_attributes: attrs,
-            reuse_existing_bo_kyc,
-        } => {
-            let (_, obc) = ObConfiguration::get(conn, (playbook_id, &su.tenant_id, su.is_live))?;
-            if attrs.iter().any(|cdo| !obc.must_collect_data.contains(cdo)) {
+        WorkflowRequestConfig::Onboard(cfg) => {
+            let (_, obc) = ObConfiguration::get(conn, (&cfg.playbook_id, &su.tenant_id, su.is_live))?;
+            if cfg
+                .recollect_attributes
+                .iter()
+                .any(|cdo| !obc.must_collect_data.contains(cdo))
+            {
                 return BadRequestInto("recollect_attributes must be a subset of the playbook's data");
             }
             let is_kyb = obc.kind == ObConfigurationKind::Kyb;
-            if *reuse_existing_bo_kyc && !is_kyb {
+            if cfg.reuse_existing_bo_kyc && !is_kyb {
                 return BadRequestInto("reuse_existing_bo_kyc can only be used with KYB playbooks");
             }
             if has_sb && !is_kyb {
                 return BadRequestInto("Must provide a KYB playbook when providing fp_bid");
             }
             // Temporary until we implement this
-            if has_sb && !*reuse_existing_bo_kyc {
+            if has_sb && !cfg.reuse_existing_bo_kyc {
                 return BadRequestInto("Must provide reuse_existing_bo_kyc for KYB flows");
             }
         }
-        WorkflowRequestConfig::Document {
-            configs,
-            business_configs,
-        } => {
-            DocumentRequestConfig::validate(configs)?;
-            DocumentRequestConfig::validate(business_configs)?;
-            if business_configs.iter().any(|c| !c.is_custom()) {
+        WorkflowRequestConfig::Document(cfg) => {
+            DocumentRequestConfig::validate(&cfg.configs)?;
+            DocumentRequestConfig::validate(&cfg.business_configs)?;
+            if cfg.business_configs.iter().any(|c| !c.is_custom()) {
                 return BadRequestInto("business_configs can only contain custom document requests");
             }
-            let has_business_configs = !business_configs.is_empty();
+            let has_business_configs = !cfg.business_configs.is_empty();
             if has_sb != has_business_configs {
                 return BadRequestInto("fp_bid and business_configs must both be provided together");
             }
@@ -127,12 +124,12 @@ pub(super) fn apply_trigger_request(
     }
 
     let obc = match &trigger {
-        WorkflowRequestConfig::Onboard { playbook_id, .. } => {
+        WorkflowRequestConfig::Onboard(cfg) => {
             // Trigger specifically requested the playbook onto which the user should onboard
-            let (_, obc) = ObConfiguration::get(conn, (playbook_id, &sv.tenant_id, sv.is_live))?;
+            let (_, obc) = ObConfiguration::get(conn, (&cfg.playbook_id, &sv.tenant_id, sv.is_live))?;
             obc
         }
-        WorkflowRequestConfig::Document { .. } => {
+        WorkflowRequestConfig::Document(_) => {
             // For all other trigger kinds, just associate the last playbook with the WFR.
             // This is mostly just used to serialize information on the tenant. Would be nice if we could stop
             // associating a playbook with these WFRs

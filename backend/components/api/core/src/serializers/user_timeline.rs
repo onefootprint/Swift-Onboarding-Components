@@ -11,6 +11,8 @@ use itertools::Itertools;
 use newtypes::AuthMethodUpdatedInfo;
 use newtypes::ExternalIntegrationInfo;
 use newtypes::OnboardingTimelineInfo;
+use newtypes::WfrDocumentConfig;
+use newtypes::WfrOnboardConfig;
 use newtypes::WorkflowConfig;
 use newtypes::WorkflowRequestConfig;
 
@@ -73,26 +75,29 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                     // Some legacy triggers created a Workflow inline
                     match wf.config {
                         WorkflowConfig::Kyc(_) | WorkflowConfig::AlpacaKyc(_) | WorkflowConfig::Kyb(_) => {
-                            WorkflowRequestConfig::Onboard {
+                            let cfg = WfrOnboardConfig {
                                 playbook_id: wf.ob_configuration_id.clone(),
-                                // Legacy triggers never had these fields
                                 recollect_attributes: vec![],
                                 reuse_existing_bo_kyc: false,
-                            }
+                            };
+                            WorkflowRequestConfig::Onboard(cfg)
                         }
-                        WorkflowConfig::Document(ref c) => WorkflowRequestConfig::Document {
-                            configs: c.configs.clone(),
-                            business_configs: c.business_configs.clone(),
-                        },
+                        WorkflowConfig::Document(ref c) => {
+                            let cfg = WfrDocumentConfig {
+                                configs: c.configs.clone(),
+                                business_configs: c.business_configs.clone(),
+                            };
+                            WorkflowRequestConfig::Document(cfg)
+                        }
                     }
                 } else {
                     // And even more legacy triggers didn't have a workflow associated with them
-                    WorkflowRequestConfig::Onboard {
+                    let cfg = WfrOnboardConfig {
                         playbook_id,
-                        // Legacy triggers never had these fields
                         recollect_attributes: vec![],
                         reuse_existing_bo_kyc: false,
-                    }
+                    };
+                    WorkflowRequestConfig::Onboard(cfg)
                 };
                 let request_is_active = wfr.as_ref().is_some_and(|wfr| wfr.deactivated_at.is_none());
                 let fp_id = su.map(|su| su.fp_id);

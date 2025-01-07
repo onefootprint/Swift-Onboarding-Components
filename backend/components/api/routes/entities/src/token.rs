@@ -104,14 +104,10 @@ async fn send_communication(
     let (kind, note) = if let Some(wfr) = wfr {
         let WorkflowRequest { note, config, .. } = wfr;
         let kind = match config {
-            WorkflowRequestConfig::Onboard { .. } => TriggerMessageKind::Onboard,
-            WorkflowRequestConfig::Document {
-                configs,
-                business_configs,
-                ..
-            } => TriggerMessageKind::Document {
-                configs,
-                business_configs,
+            WorkflowRequestConfig::Onboard(_) => TriggerMessageKind::Onboard,
+            WorkflowRequestConfig::Document(cfg) => TriggerMessageKind::Document {
+                configs: cfg.configs,
+                business_configs: cfg.business_configs,
             },
         };
         (kind, note)
