@@ -153,6 +153,21 @@ const BillingProfile = ({ tenant }: BillingProfileProps) => {
     },
   ];
 
+  const platformFee: TenantField[] = [
+    {
+      title: 'Amount',
+      content: priceDisplay(bp?.prices[TenantBillingProfileProduct.monthlyPlatformFee]),
+      editModeContent: (
+        <TextInput placeholder="0" {...register(`prices.${TenantBillingProfileProduct.monthlyPlatformFee}`)} />
+      ),
+    },
+    {
+      title: 'Starts on',
+      content: bp?.platformFeeStartsOn || '-',
+      editModeContent: <TextInput placeholder="2025-01-01" {...register('platformFeeStartsOn')} />,
+    },
+  ];
+
   const handleFormSubmit = (formData: BillingProfileFormData) => {
     const bpRequestData = convertFormData(bp, formData);
     if (Object.values(bpRequestData).every(v => v === undefined)) {
@@ -225,22 +240,13 @@ const BillingProfile = ({ tenant }: BillingProfileProps) => {
               </Stack>
             </Fieldset>
           ))}
-          {/* TODO clean up */}
           <Fieldset title="Monthly platform fee">
             <Stack direction="column" gap={5}>
-              <Field label="Amount">
-                {!isEditing && priceDisplay(bp?.prices[TenantBillingProfileProduct.monthlyPlatformFee])}
-                {isEditing && (
-                  <TextInput
-                    placeholder="0"
-                    {...register(`prices.${TenantBillingProfileProduct.monthlyPlatformFee}`)}
-                  />
-                )}
-              </Field>
-              <Field label="Starts on">
-                {!isEditing && (bp?.platformFeeStartsOn || '-')}
-                {isEditing && <TextInput type="date" placeholder="2025-01-01" {...register('platformFeeStartsOn')} />}
-              </Field>
+              {platformFee.map(f => (
+                <Field label={f.title} key={f.title}>
+                  {!isEditing || !f.editModeContent ? f.content : f.editModeContent}
+                </Field>
+              ))}
             </Stack>
           </Fieldset>
           <Minimums isEditing={isEditing} />
@@ -267,8 +273,6 @@ const Minimums = ({ isEditing }: { isEditing: boolean }) => {
     // real values from the backend are snake_case.
     value: snakeCase(p) as TenantBillingProfileProduct,
   }));
-
-  console.log(fields);
 
   return (
     <>
