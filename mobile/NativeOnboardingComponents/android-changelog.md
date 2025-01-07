@@ -3,3 +3,6 @@
 
 # v0.0.1
 Test publish version to mavenCentral
+
+# v1.0.0-beta-1
+Publish first beta version to mavenCentral
