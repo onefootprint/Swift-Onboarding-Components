@@ -196,35 +196,6 @@ impl Product {
         }
     }
 
-    /// Only some products count towards the per-tenant monthly minimum on identity spend.
-    /// Generally, vaulting and auth products do not count toward the monthly minimum.
-    pub fn applies_to_monthly_minimum(&self) -> bool {
-        // TODO:
-        match self {
-            Self::IdDocs
-            | Self::Kyb
-            | Self::KybEinOnly
-            | Self::WatchlistChecks
-            | Self::Kyc
-            | Self::OneClickKyc
-            | Self::KycWaterfallSecondVendor
-            | Self::KycWaterfallThirdVendor
-            | Self::AdverseMediaPerOnboarding
-            | Self::ContinuousMonitoringPerYear
-            | Self::AdverseMediaPerYear
-            | Self::SambaActivityHistory
-            | Self::SentilinkScore
-            | Self::NeuroIdBehavioral
-            | Self::CurpVerification => true,
-            Self::MonthlyPlatformFee
-            | Self::HotProxyVaults
-            | Self::HotVaults
-            | Self::Pii
-            | Self::VaultsWithNonPci
-            | Self::VaultsWithPci => false,
-        }
-    }
-
     /// Groups the product into one of the predefined revenue categories. These catgegories are used
     /// to generate monthly revenue reports in stripe sigms
     pub fn revenue_category(&self) -> RevenueCategory {
