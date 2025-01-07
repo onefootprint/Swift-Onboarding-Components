@@ -43,28 +43,27 @@ export enum TenantPreviewApi {
 }
 
 export enum TenantBillingProfileProduct {
-  monthlyPlatformFee = 'monthlyPlatformFee',
+  monthlyPlatformFee = 'monthly_platform_fee',
   kyc = 'kyc',
-  oneClickKyc = 'oneClickKyc',
-  kycWaterfallSecondVendor = 'kycWaterfallSecondVendor',
-  kycWaterfallThirdVendor = 'kycWaterfallThirdVendor',
-  idDocs = 'idDocs',
+  oneClickKyc = 'one_click_kyc',
+  kycWaterfallSecondVendor = 'kyc_waterfall_second_vendor',
+  kycWaterfallThirdVendor = 'kyc_waterfall_third_vendor',
+  idDocs = 'id_docs',
   kyb = 'kyb',
-  kybEinOnly = 'kybEinOnly',
-  curpVerification = 'curpVerification',
+  kybEinOnly = 'kyb_ein_only',
+  curpVerification = 'curp_verification',
   pii = 'pii',
-  hotVaults = 'hotVaults',
-  hotProxyVaults = 'hotProxyVaults',
-  vaultsWithNonPci = 'vaultsWithNonPci',
-  vaultsWithPci = 'vaultsWithPci',
-  watchlistChecks = 'watchlistChecks',
-  adverseMediaPerOnboarding = 'adverseMediaPerOnboarding',
-  adverseMediaPerYear = 'adverseMediaPerYear',
-  continuousMonitoringPerYear = 'continuousMonitoringPerYear',
-  monthlyMinimumOnIdentity = 'monthlyMinimumOnIdentity',
-  sambaActivityHistory = 'sambaActivityHistory',
-  neuroIdBehavioral = 'neuroIdBehavioral',
-  sentilinkScore = 'sentilinkScore',
+  hotVaults = 'hot_vaults',
+  hotProxyVaults = 'hot_proxy_vaults',
+  vaultsWithNonPci = 'vaults_with_non_pci',
+  vaultsWithPci = 'vaults_with_pci',
+  watchlistChecks = 'watchlist_checks',
+  adverseMediaPerOnboarding = 'adverse_media_per_onboarding',
+  adverseMediaPerYear = 'adverse_media_per_year',
+  continuousMonitoringPerYear = 'continuous_monitoring_per_year',
+  sambaActivityHistory = 'samba_activity_history',
+  neuroIdBehavioral = 'neuro_id_behavioral',
+  sentilinkScore = 'sentilink_score',
 }
 
 /**
@@ -73,8 +72,18 @@ export enum TenantBillingProfileProduct {
 export type TenantBillingProfile = {
   prices: TenantBillingProfilePrices;
   billingEmail?: string;
+  pricingDoc?: string;
+  minimums: BillingMinimum[];
+  platformFeeStartsOn?: string;
   omitBilling: boolean;
   sendAutomatically: boolean;
+};
+
+export type BillingMinimum = {
+  products: TenantBillingProfileProduct[];
+  amountCents: string;
+  name: string;
+  startsOn?: string | null;
 };
 
 export type TenantBillingProfilePrices = Partial<Record<TenantBillingProfileProduct, string | null>>;

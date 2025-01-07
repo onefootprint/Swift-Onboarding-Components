@@ -2,17 +2,19 @@ import { useRequestErrorToast } from '@onefootprint/hooks';
 import type { TenantDetail } from '@onefootprint/types';
 import type { TenantBillingProfile } from '@onefootprint/types/src/api/get-tenants';
 import { TenantBillingProfileProduct } from '@onefootprint/types/src/api/get-tenants';
-import { Checkbox, Stack, Text, TextInput } from '@onefootprint/ui';
+import { Checkbox, LinkButton, MultiSelect, Stack, Text, TextInput } from '@onefootprint/ui';
 import type React from 'react';
 import { useState } from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
+import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from 'react-hook-form';
 import { Field, Fieldset } from 'src/components';
 import type { FieldsetProps } from 'src/components/fieldset/fieldset';
 
-import { IcoCheck24, IcoCloseSmall24 } from '@onefootprint/icons';
+import { IcoCheck24, IcoCloseSmall24, IcoPlusSmall24 } from '@onefootprint/icons';
+import { snakeCase } from 'lodash';
 import useUpdateTenant from '../../hooks/use-update-tenant';
 import type { BillingProfileFormData } from './convert-form-data';
 import { convertFormData } from './convert-form-data';
+import type { BillingMinimumFormData } from './convert-form-data/convert-form-data';
 
 type BillingProfileProps = {
   tenant: TenantDetail;
@@ -52,8 +54,6 @@ const WATCHLIST = [
   TenantBillingProfileProduct.watchlistChecks,
 ];
 
-const OTHER = [TenantBillingProfileProduct.monthlyMinimumOnIdentity, TenantBillingProfileProduct.monthlyPlatformFee];
-
 const ProductToTitle: Record<TenantBillingProfileProduct, string> = {
   [TenantBillingProfileProduct.kyc]: 'KYC',
   [TenantBillingProfileProduct.oneClickKyc]: 'One-click KYC',
@@ -72,7 +72,6 @@ const ProductToTitle: Record<TenantBillingProfileProduct, string> = {
   [TenantBillingProfileProduct.continuousMonitoringPerYear]: 'Continuous monitoring (per year)',
   [TenantBillingProfileProduct.adverseMediaPerYear]: 'Adverse media (per year)',
   [TenantBillingProfileProduct.adverseMediaPerOnboarding]: 'Adverse media (per user, legacy)',
-  [TenantBillingProfileProduct.monthlyMinimumOnIdentity]: 'Monthly minimum',
   [TenantBillingProfileProduct.monthlyPlatformFee]: 'Monthly platform fee',
   [TenantBillingProfileProduct.sambaActivityHistory]: 'Samba Safety Activity History',
   [TenantBillingProfileProduct.neuroIdBehavioral]: 'Neuro ID',
@@ -96,13 +95,20 @@ const PRICE_SECTIONS = [
     title: 'Watchlist monitoring',
     fields: WATCHLIST,
   },
-  {
-    title: 'Other',
-    fields: OTHER,
-  },
 ];
 
-const getDefaultValues = (bp?: TenantBillingProfile): BillingProfileFormData => bp || ({} as BillingProfileFormData);
+const getDefaultValues = (bp?: TenantBillingProfile): BillingProfileFormData => {
+  const { minimums, ...rest } = bp || {};
+  const minimumsFormData: BillingMinimumFormData[] = (minimums ?? []).map(m => ({
+    ...m,
+    products: m.products.map(p => ({ label: ProductToTitle[p], value: p })),
+  }));
+  return {
+    ...rest,
+    minimums: minimumsFormData,
+  } as BillingProfileFormData;
+};
+const priceDisplay = (value?: string | null) => (value ? `${value} cents` : '-');
 
 type TenantField = {
   title: string;
@@ -131,6 +137,11 @@ const BillingProfile = ({ tenant }: BillingProfileProps) => {
       editModeContent: <TextInput placeholder="jane@acmebank.org" {...register('billingEmail')} />,
     },
     {
+      title: 'Pricing document',
+      content: bp?.pricingDoc || '-',
+      editModeContent: <TextInput placeholder="https://notion.so/..." {...register('pricingDoc')} />,
+    },
+    {
       title: 'Send invoice automatically',
       content: checkbox(bp?.sendAutomatically || false),
       editModeContent: <Checkbox {...register('sendAutomatically', {})} />,
@@ -142,7 +153,7 @@ const BillingProfile = ({ tenant }: BillingProfileProps) => {
     },
   ];
 
-  const handleFormSubmit = (formData: TenantBillingProfile) => {
+  const handleFormSubmit = (formData: BillingProfileFormData) => {
     const bpRequestData = convertFormData(bp, formData);
     if (Object.values(bpRequestData).every(v => v === undefined)) {
       setIsEditing(false);
@@ -189,7 +200,6 @@ const BillingProfile = ({ tenant }: BillingProfileProps) => {
     );
   }
 
-  const priceDisplay = (value?: string | null) => (value ? `${value} cents` : '-');
   return (
     <FormProvider {...editMethods}>
       <form id={UPDATE_BP_FORM_ID} onSubmit={handleSubmit(handleFormSubmit)}>
@@ -215,9 +225,115 @@ const BillingProfile = ({ tenant }: BillingProfileProps) => {
               </Stack>
             </Fieldset>
           ))}
+          {/* TODO clean up */}
+          <Fieldset title="Monthly platform fee">
+            <Stack direction="column" gap={5}>
+              <Field label="Amount">
+                {!isEditing && priceDisplay(bp?.prices[TenantBillingProfileProduct.monthlyPlatformFee])}
+                {isEditing && (
+                  <TextInput
+                    placeholder="0"
+                    {...register(`prices.${TenantBillingProfileProduct.monthlyPlatformFee}`)}
+                  />
+                )}
+              </Field>
+              <Field label="Starts on">
+                {!isEditing && (bp?.platformFeeStartsOn || '-')}
+                {isEditing && <TextInput type="date" placeholder="2025-01-01" {...register('platformFeeStartsOn')} />}
+              </Field>
+            </Stack>
+          </Fieldset>
+          <Minimums isEditing={isEditing} />
         </Stack>
       </form>
     </FormProvider>
+  );
+};
+
+const Minimums = ({ isEditing }: { isEditing: boolean }) => {
+  const { control, register } = useFormContext<BillingProfileFormData>();
+  const { append, fields, remove } = useFieldArray({ name: 'minimums', control });
+  const emptyMinimum: BillingMinimumFormData = {
+    products: [],
+    amountCents: '0',
+    name: '',
+  };
+  const handleAdd = () => append(emptyMinimum);
+  const handleRemove = (index: number) => remove(index);
+
+  const productOptions = Object.values(TenantBillingProfileProduct).map(p => ({
+    label: ProductToTitle[p],
+    // Since the products are also used as a key in the response, they are stored as camelCase... But the
+    // real values from the backend are snake_case.
+    value: snakeCase(p) as TenantBillingProfileProduct,
+  }));
+
+  console.log(fields);
+
+  return (
+    <>
+      {fields.map((minimum, index) => (
+        <Fieldset
+          title={`Monthly minimum ${minimum.name ? `(${minimum.name})` : ''}`}
+          cta={isEditing ? { label: 'Remove', onClick: () => handleRemove(index) } : undefined}
+          key={`minimum-${minimum.name}`}
+        >
+          <div className="flex flex-col gap-5">
+            <Field label="Name (appears on invoice)">
+              {!isEditing && minimum.name}
+              {isEditing && <TextInput placeholder="Name" {...register(`minimums.${index}.name`)} />}
+            </Field>
+            <Field label="Amount">
+              {!isEditing && priceDisplay(minimum.amountCents)}
+              {isEditing && <TextInput placeholder="0" {...register(`minimums.${index}.amountCents`)} />}
+            </Field>
+            <Field label="Products that count towards this minimum">
+              {!isEditing && minimum.products.map(p => p.label).join(', ')}
+              {isEditing && (
+                <Controller
+                  control={control}
+                  name={`minimums.${index}.products`}
+                  rules={{
+                    required: {
+                      value: true,
+                      message: 'Products required',
+                    },
+                  }}
+                  render={({ field }) => (
+                    <MultiSelect
+                      options={productOptions}
+                      size="compact"
+                      onBlur={field.onBlur}
+                      onChange={field.onChange}
+                      value={field.value}
+                    />
+                  )}
+                />
+              )}
+            </Field>
+            <Field label="Starts on">
+              {!isEditing && (minimum.startsOn || '-')}
+              {isEditing && (
+                <TextInput type="date" placeholder="2025-01-01" {...register(`minimums.${index}.startsOn`)} />
+              )}
+            </Field>
+          </div>
+        </Fieldset>
+      ))}
+      {isEditing && (
+        <div className="flex mb-7">
+          <LinkButton
+            data-dd-action-name="add-beneficial-owner"
+            iconComponent={IcoPlusSmall24}
+            iconPosition="left"
+            variant="label-2"
+            onClick={handleAdd}
+          >
+            Add a monthly minimum
+          </LinkButton>
+        </div>
+      )}
+    </>
   );
 };
 

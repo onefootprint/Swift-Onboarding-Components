@@ -1,5 +1,6 @@
 import request from '@onefootprint/request';
 import type {
+  BillingMinimum,
   TenantBillingProfilePrices,
   TenantBusinessInfo,
   TenantDetail,
@@ -25,6 +26,9 @@ export type UpdateTenantVendorControl = {
 
 export type UpdateTenantBillingProfile = {
   prices?: TenantBillingProfilePrices;
+  pricingDoc?: string | null;
+  minimums?: BillingMinimum[];
+  platformFeeStartsOn?: string | null;
   billingEmail?: string | null;
   omitBilling?: boolean;
   sendAutomatically?: boolean;
