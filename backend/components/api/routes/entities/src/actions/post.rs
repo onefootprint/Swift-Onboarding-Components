@@ -73,9 +73,9 @@ pub async fn post(
         })
         .await?;
 
-    let responses = outcomes
+    let responses = futures::future::join_all(outcomes.into_iter().map(|o| o.apply(&state)))
+        .await
         .into_iter()
-        .map(|o| o.apply(&state))
         .flatten_ok()
         .collect::<FpResult<_>>()?;
     Ok(responses)

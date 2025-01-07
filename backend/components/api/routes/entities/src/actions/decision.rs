@@ -6,12 +6,14 @@ use api_core::FpResult;
 use api_errors::FpDbOptionalExtension;
 use db::models::audit_event::AuditEvent;
 use db::models::scoped_vault::ScopedVault;
+use db::models::task::TaskPollArgs;
 use db::models::workflow::Workflow;
 use db::TxnPgConn;
 use newtypes::AuditEventDetail;
 use newtypes::DbActor;
 use newtypes::DecisionStatus;
 use newtypes::ManualDecisionRequest;
+use newtypes::TaskKind;
 use newtypes::TenantId;
 
 
@@ -34,7 +36,11 @@ pub(super) fn apply_manual_decision(
         scoped_vault_id: sv.id.clone(),
     };
     AuditEvent::create_with_insight(conn, &tenant_id, actor, insight, detail)?;
-    Ok(EntityActionPostCommit::FireWebhooks)
+    let args = TaskPollArgs::Kind {
+        limit: 10,
+        kind: TaskKind::FireWebhook,
+    };
+    Ok(EntityActionPostCommit::ExecuteTasks(args))
 }
 
 pub(super) fn clear_review(
@@ -46,5 +52,9 @@ pub(super) fn clear_review(
         .optional()?
         .ok_or(OnboardingError::NoWorkflow)?;
     save_review_decision(conn, wf, DecisionStatus::None, None, actor)?;
-    Ok(EntityActionPostCommit::FireWebhooks)
+    let args = TaskPollArgs::Kind {
+        limit: 10,
+        kind: TaskKind::FireWebhook,
+    };
+    Ok(EntityActionPostCommit::ExecuteTasks(args))
 }
