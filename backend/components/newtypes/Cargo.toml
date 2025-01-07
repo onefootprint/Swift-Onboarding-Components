@@ -39,6 +39,7 @@ api_errors = { path = "../api/errors" }
 rand = { workspace = true }
 diesel = { workspace = true }
 actix-web = { workspace = true }
+rust_decimal = { workspace = true }
 
 diesel_as_jsonb = { workspace = true }
 phonenumber = { workspace = true }

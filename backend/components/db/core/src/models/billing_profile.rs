@@ -1,3 +1,4 @@
+use crate::NonNullVec;
 use crate::PgConn;
 use crate::TxnPgConn;
 use api_errors::FpResult;
@@ -6,6 +7,7 @@ use chrono::Utc;
 use db_schema::schema::billing_profile;
 use diesel::prelude::*;
 use diesel::Queryable;
+use newtypes::BillingMinimum;
 use newtypes::BillingProfileId;
 use newtypes::PriceMap;
 use newtypes::Product;
@@ -23,8 +25,9 @@ pub struct BillingProfile {
     pub billing_email: Option<String>,
     pub omit_billing: bool,
     pub send_automatically: bool,
+    #[diesel(deserialize_as = NonNullVec<BillingMinimum>)]
+    pub minimums: Vec<BillingMinimum>,
 }
-
 
 #[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = billing_profile)]

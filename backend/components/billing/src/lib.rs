@@ -7,8 +7,6 @@ use interval::BillingInterval;
 use itertools::chain;
 use itertools::Itertools;
 use newtypes::PiiString;
-use newtypes::Product;
-use newtypes::RevenueCategory;
 use newtypes::StripeCustomerId;
 use newtypes::TenantId;
 use profile::get_or_create_price;
@@ -241,35 +239,46 @@ impl BillingClient {
         let prices = BillingProfile::new(info.billing_profile.clone())?;
         let mut items = HashMap::new();
         let line_items = info.counts.line_items(&info.tenant_id, &prices)?;
-        let monthly_spend_cents: Decimal = line_items
-            .iter()
-            .filter(|li| li.product.applies_to_monthly_minimum())
-            .flat_map(|li| li.notional())
-            .sum();
 
         // Create the invoice items in stripe, including monthly minimum
-        for l in line_items.into_iter().sorted_by_key(|l| l.product) {
+        for l in line_items.clone().into_iter().sorted_by_key(|l| l.product) {
             let Some(i) = self.get_or_create_invoice_item(&customer_id, l).await? else {
                 continue;
             };
             items.insert(i.id.clone(), i);
         }
 
-        // If the tenant didn't hit their monthly minimum, add another line item for the remaining
+        // If the tenant didn't hit a monthly minimum, add another line item for the remaining
         // amount
-        if let Some(monthly_minimum_price) = prices.get(&Product::MonthlyMinimumOnIdentity) {
-            if monthly_spend_cents < *monthly_minimum_price {
-                let remaining_cents = monthly_minimum_price - monthly_spend_cents;
-                let mut new_invoice_item = CreateInvoiceItem::new(customer_id.clone());
-                let extra_metadata = [("revenue-category".into(), RevenueCategory::Identity.to_string())];
-
-                new_invoice_item.description = Some("Monthly minimum spend on identity");
-                new_invoice_item.amount = remaining_cents.to_i64();
-                new_invoice_item.metadata = Some(chain!(extra_metadata, managed_metadata()).collect());
-                new_invoice_item.currency = Some(Currency::USD);
-                let i = InvoiceItem::create(&self.client, new_invoice_item).await?;
-                items.insert(i.id.clone(), i);
+        let minimums = (info.billing_profile.as_ref())
+            .map(|bp| bp.minimums.clone())
+            .unwrap_or_default();
+        for minimum in minimums {
+            if (minimum.starts_on).is_some_and(|starts_on| starts_on < info.interval.start.date_naive()) {
+                continue;
             }
+            let monthly_spend_cents: Decimal = line_items
+                .iter()
+                .filter(|li| minimum.products.contains(&li.product))
+                .flat_map(|li| li.notional())
+                .sum();
+            if monthly_spend_cents >= minimum.amount_cents {
+                continue;
+            }
+
+            let remaining_cents = minimum.amount_cents - monthly_spend_cents;
+            let mut new_invoice_item = CreateInvoiceItem::new(customer_id.clone());
+            let product =
+                (minimum.products.first()).ok_or(Error::ValidationError("No products for minimum".into()))?;
+            let extra_metadata = [("revenue-category".into(), product.revenue_category().to_string())];
+
+            let description = format!("Monthly minimum spend ({})", minimum.name);
+            new_invoice_item.description = Some(&description);
+            new_invoice_item.amount = remaining_cents.to_i64();
+            new_invoice_item.metadata = Some(chain!(extra_metadata, managed_metadata()).collect());
+            new_invoice_item.currency = Some(Currency::USD);
+            let i = InvoiceItem::create(&self.client, new_invoice_item).await?;
+            items.insert(i.id.clone(), i);
         }
 
         // If there are no line items, no-op
@@ -282,9 +291,7 @@ impl BillingClient {
         //
 
         let billing_interval = [("billing-interval".to_owned(), info.interval.label())];
-        let send_automatically = info
-            .billing_profile
-            .as_ref()
+        let send_automatically = (info.billing_profile.as_ref())
             .is_some_and(|bp| bp.send_automatically)
             .then_some(("send-automatically".to_owned(), "true".to_string()));
         let metadata = chain!(billing_interval, send_automatically, managed_metadata()).collect();

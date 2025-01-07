@@ -145,6 +145,7 @@ diesel::table! {
         billing_email -> Nullable<Text>,
         omit_billing -> Bool,
         send_automatically -> Bool,
+        minimums -> Array<Nullable<Jsonb>>,
     }
 }
 

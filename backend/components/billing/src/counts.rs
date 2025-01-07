@@ -24,7 +24,7 @@ use strum::IntoEnumIterator;
 #[derive(Debug, Default)]
 pub struct BillingCounts(HashMap<Product, i64>);
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(crate) struct LineItem {
     pub product: Product,
     pub price: LineItemPrice,
@@ -42,7 +42,7 @@ impl LineItem {
     }
 }
 
-#[derive(Debug, derive_more::From)]
+#[derive(Debug, derive_more::From, Clone)]
 pub enum LineItemPrice {
     Price(Decimal),
     /// The tenant doesn't have a price listed for this product.

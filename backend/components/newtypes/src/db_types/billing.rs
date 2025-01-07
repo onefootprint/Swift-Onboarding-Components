@@ -1,9 +1,12 @@
 use crate::util::impl_enum_string_diesel;
 use chrono::Duration;
+use chrono::NaiveDate;
 use diesel::sql_types::Text;
 use diesel::AsExpression;
 use diesel::FromSqlRow;
 use diesel_as_jsonb::AsJsonb;
+use serde::Deserialize;
+use serde::Serialize;
 use serde_with::DeserializeFromStr;
 use serde_with::SerializeDisplay;
 use std::collections::HashMap;
@@ -85,8 +88,6 @@ impl_enum_string_diesel!(BillingEventKind);
 pub enum Product {
     /// A fixed amount charged monthly
     MonthlyPlatformFee,
-    /// Monthly minimum spend on identity products
-    MonthlyMinimumOnIdentity,
 
     /// Number of KYC verifications ran this month, not including one-click onboardings
     Kyc,
@@ -160,9 +161,6 @@ impl Product {
             Self::AdverseMediaPerYear => "prod_QS2lZZRG3QuzT8",
             Self::CurpVerification => "prod_QE6roGU9hUeA6m",
             Self::SambaActivityHistory => "prod_RAVutLy5GihkDE",
-
-            // TODO this isn't actually used
-            Self::MonthlyMinimumOnIdentity => "prod_QPQlh7JsolnihQ",
             Self::SentilinkScore => "prod_RAsaWO48Zgbu6F",
             Self::NeuroIdBehavioral => "prod_RAsb9TecOnqi4w",
         }
@@ -171,7 +169,6 @@ impl Product {
     pub fn uncontracted_description(&self) -> &'static str {
         match self {
             Self::MonthlyPlatformFee => "Uncontracted MonthlyPlatformFee",
-            Self::MonthlyMinimumOnIdentity => "Uncontracted MonthlyMinimumOnIdentity",
             Self::HotProxyVaults => "Uncontracted HotProxyVaults",
             Self::HotVaults => "Uncontracted HotVaults",
             Self::IdDocs => "Uncontracted IdDocs",
@@ -198,6 +195,7 @@ impl Product {
     /// Only some products count towards the per-tenant monthly minimum on identity spend.
     /// Generally, vaulting and auth products do not count toward the monthly minimum.
     pub fn applies_to_monthly_minimum(&self) -> bool {
+        // TODO:
         match self {
             Self::IdDocs
             | Self::Kyb
@@ -215,7 +213,6 @@ impl Product {
             | Self::NeuroIdBehavioral
             | Self::CurpVerification => true,
             Self::MonthlyPlatformFee
-            | Self::MonthlyMinimumOnIdentity
             | Self::HotProxyVaults
             | Self::HotVaults
             | Self::Pii
@@ -242,8 +239,7 @@ impl Product {
             | Self::CurpVerification
             | Self::SambaActivityHistory
             | Self::SentilinkScore
-            | Self::NeuroIdBehavioral
-            | Self::MonthlyMinimumOnIdentity => RevenueCategory::Identity,
+            | Self::NeuroIdBehavioral => RevenueCategory::Identity,
             Self::HotProxyVaults
             | Self::HotVaults
             | Self::Pii
@@ -254,7 +250,7 @@ impl Product {
     }
 }
 
-#[derive(Display)]
+#[derive(Display, Clone, Copy, PartialEq, Eq)]
 #[strum(serialize_all = "snake_case")]
 pub enum RevenueCategory {
     Identity,
@@ -299,4 +295,16 @@ impl From<PriceMap> for HashMap<Product, String> {
     fn from(value: PriceMap) -> Self {
         value.0
     }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, AsJsonb)]
+pub struct BillingMinimum {
+    /// The set of products that apply towards this minimum
+    pub products: Vec<Product>,
+    /// The required minumum monthly spend, in cents
+    pub amount_cents: rust_decimal::Decimal,
+    /// The human-readable name that displays on the invoice line item
+    pub name: String,
+    /// The date on which the minimum starts applying
+    pub starts_on: Option<NaiveDate>,
 }
