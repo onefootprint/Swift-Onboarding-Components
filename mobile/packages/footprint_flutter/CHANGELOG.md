@@ -56,3 +56,7 @@ Update the getRequirements() response
 # 2.0.0-beta.3.7
 
 Provide `inputFormatters` prop
+
+# 2.0.0-beta.3.8
+
+Extend phone number validation to more formats
