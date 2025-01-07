@@ -14,6 +14,7 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault::SerializableEntity;
 use db::models::task::Task;
 use db::models::task::TaskCreateArgs;
+use db::models::task::TaskPollArgs;
 use db::PgConn;
 use itertools::Itertools;
 use newtypes::FpId;
@@ -69,7 +70,10 @@ async fn post(
         })
         .await?;
 
-    task::poll_and_execute_tasks_non_blocking((*state.into_inner()).clone(), num_fp_ids as u32, None);
+    let args = TaskPollArgs::Limit {
+        limit: num_fp_ids as u32,
+    };
+    task::poll_and_execute_tasks_non_blocking((*state.into_inner()).clone(), args);
     Ok(api_wire_types::Empty)
 }
 

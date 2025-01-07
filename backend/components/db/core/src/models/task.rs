@@ -59,6 +59,28 @@ pub struct TaskUpdate {
     status: TaskStatus,
 }
 
+pub enum TaskPollArgs {
+    Limit { limit: u32 },
+    Kind { limit: u32, kind: TaskKind },
+    Single { id: TaskId },
+}
+impl TaskPollArgs {
+    pub fn limit(&self) -> u32 {
+        match self {
+            TaskPollArgs::Limit { limit } => *limit,
+            TaskPollArgs::Kind { limit, .. } => *limit,
+            TaskPollArgs::Single { .. } => 1,
+        }
+    }
+
+    pub fn kind(&self) -> Option<TaskKind> {
+        match self {
+            TaskPollArgs::Kind { kind, .. } => Some(*kind),
+            TaskPollArgs::Limit { .. } | TaskPollArgs::Single { .. } => None,
+        }
+    }
+}
+
 impl Task {
     #[tracing::instrument("Task::create", skip_all)]
     pub fn create<T: Into<TaskData>>(
@@ -137,6 +159,41 @@ impl Task {
         .bind::<BigInt, _>(i64::from(limit))
         .get_results::<Task>(conn.conn())?;
 
+        Self::create_task_executions(conn, tasks, now)
+    }
+
+    #[tracing::instrument("Task::poll_single", skip_all)]
+    pub fn poll_single(conn: &mut TxnPgConn, id: TaskId) -> FpResult<Vec<(Task, TaskExecution)>> {
+        let now = Utc::now();
+        // TODO: cannot for the life of me get this to compile in diesel
+        let task = sql_query(
+            "
+            UPDATE task
+            SET status = $1, num_attempts = num_attempts + 1, last_leased_at = $3
+            WHERE id IN (
+                SELECT id FROM task
+                WHERE
+                    id = $4 AND
+                    (status = $2 or (status = $1 AND now() > last_leased_at + max_lease_duration_s * interval '1 second'))
+                ORDER BY scheduled_for ASC
+                FOR UPDATE SKIP LOCKED
+            )
+            RETURNING *;
+        ")
+        .bind::<Text, _>(TaskStatus::Running)
+        .bind::<Text, _>(TaskStatus::Pending)
+        .bind::<Timestamptz, _>(now)
+        .bind::<Text, _>(id.to_string())
+        .get_result::<Task>(conn.conn())?;
+
+        Self::create_task_executions(conn, vec![task], now)
+    }
+
+    fn create_task_executions(
+        conn: &mut TxnPgConn,
+        tasks: Vec<Task>,
+        now: DateTime<Utc>,
+    ) -> FpResult<Vec<(Task, TaskExecution)>> {
         let task_execution_args: Vec<TaskExecutionCreateArgs> = tasks
             .iter()
             .map(|t| TaskExecutionCreateArgs {

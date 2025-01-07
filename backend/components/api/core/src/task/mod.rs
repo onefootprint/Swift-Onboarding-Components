@@ -7,6 +7,7 @@ use crate::State;
 use api_errors::FpResult;
 use async_trait::async_trait;
 use db::models::task::Task;
+use db::models::task::TaskPollArgs;
 use db::models::task_execution::TaskExecutionUpdate;
 use newtypes::TaskKind;
 use newtypes::TaskStatus;
@@ -16,12 +17,17 @@ use tracing::Instrument;
 mod tasks;
 
 pub fn execute_webhook_tasks(state: State) {
-    poll_and_execute_tasks_non_blocking(state, 10, Some(TaskKind::FireWebhook))
+    let args = TaskPollArgs::Kind {
+        limit: 10,
+        kind: TaskKind::FireWebhook,
+    };
+    poll_and_execute_tasks_non_blocking(state, args);
 }
 
-pub fn poll_and_execute_tasks_non_blocking(state: State, limit: u32, kind: Option<TaskKind>) {
+pub fn poll_and_execute_tasks_non_blocking(state: State, args: TaskPollArgs) {
+    let kind = args.kind();
     let fut = async move {
-        let _ = poll_and_execute_tasks(&state, limit, kind)
+        let _ = poll_and_execute_tasks(&state, args)
             .await
             .map_err(|err| {
                 tracing::error!(?err, kind=?kind, "poll_and_execute_tasks_non_blocking failed to execute 1 or more tasks");
@@ -37,13 +43,14 @@ pub fn poll_and_execute_tasks_non_blocking(state: State, limit: u32, kind: Optio
     }
 }
 
-pub async fn poll_and_execute_tasks(
-    state: &State,
-    limit: u32,
-    kind: Option<TaskKind>,
-) -> FpResult<Vec<Task>> {
+pub async fn poll_and_execute_tasks(state: &State, args: TaskPollArgs) -> FpResult<Vec<Task>> {
     let tasks = state
-        .db_transaction(move |conn| Task::poll(conn, limit, kind))
+        .db_transaction(move |conn| match args {
+            args @ TaskPollArgs::Limit { .. } | args @ TaskPollArgs::Kind { .. } => {
+                Task::poll(conn, args.limit(), args.kind())
+            }
+            TaskPollArgs::Single { id } => Task::poll_single(conn, id),
+        })
         .await?;
 
     tracing::info!(tasks = format!("{:?}", tasks), "Executing polled tasks");
@@ -149,7 +156,8 @@ mod task_tests {
             .unwrap();
 
         // Test
-        let executed_tasks = poll_and_execute_tasks(state, 2, None).await.unwrap();
+        let args = TaskPollArgs::Limit { limit: 2 };
+        let executed_tasks = poll_and_execute_tasks(state, args).await.unwrap();
         // TODO: would be nice to actually assert the tasks did what they were supposed to do. Some dumb
         // ideas: have a task which writes a Task to PG with a particular nonce as an arg and then
         // confirm that was written. Or a task that writes to a tmp file and then we read and confirm

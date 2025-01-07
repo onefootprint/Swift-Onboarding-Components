@@ -7,6 +7,7 @@ use api_core::types::ApiResponse;
 use api_core::State;
 use chrono::Utc;
 use db::models::task::Task;
+use db::models::task::TaskPollArgs;
 use newtypes::TaskData;
 use newtypes::TaskId;
 
@@ -22,7 +23,8 @@ async fn execute_tasks(
     request: Json<ExecuteTasksRequest>,
 ) -> ApiResponse<api_wire_types::Empty> {
     let ExecuteTasksRequest { num_tasks } = request.into_inner();
-    task::poll_and_execute_tasks_non_blocking((*state.into_inner()).clone(), num_tasks, None);
+    let args = TaskPollArgs::Limit { limit: num_tasks };
+    task::poll_and_execute_tasks_non_blocking((*state.into_inner()).clone(), args);
     Ok(api_wire_types::Empty)
 }
 

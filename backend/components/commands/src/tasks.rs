@@ -4,6 +4,7 @@ use api_core::config::Config;
 use api_core::task;
 use api_core::State;
 use clap::Parser;
+use db::models::task::TaskPollArgs;
 use tokio::select;
 use tokio::signal;
 use tokio::time::Duration;
@@ -78,7 +79,10 @@ impl ExecuteTasks {
 
     #[tracing::instrument("ExecuteTasks::run_batch", skip_all)]
     async fn run_batch(&self, state: &State) -> Result<()> {
-        let num_completed = task::poll_and_execute_tasks(state, self.batch_size, None)
+        let args = TaskPollArgs::Limit {
+            limit: self.batch_size,
+        };
+        let num_completed = task::poll_and_execute_tasks(state, args)
             .await
             .map_err(|e| anyhow!("{}", e))?
             .len();
