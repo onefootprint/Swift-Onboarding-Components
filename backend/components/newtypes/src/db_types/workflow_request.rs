@@ -1,3 +1,4 @@
+use super::VerificationCheck;
 use crate::CollectedDataOption;
 use crate::DocumentRequestConfig;
 use crate::ObConfigurationId;
@@ -18,6 +19,8 @@ pub enum WorkflowRequestConfig {
     Onboard(WfrOnboardConfig),
     /// Upload a new document and re-run the decision engine
     Document(WfrDocumentConfig),
+    /// Adhoc vendor call
+    AdhocVendorCall(WfrAdhocVendorCallConfig),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb)]
@@ -36,4 +39,10 @@ pub struct WfrDocumentConfig {
     pub configs: Vec<DocumentRequestConfig>,
     #[serde(default)]
     pub business_configs: Vec<DocumentRequestConfig>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb)]
+#[serde(rename_all = "snake_case")]
+pub struct WfrAdhocVendorCallConfig {
+    pub verification_checks: Vec<VerificationCheck>,
 }

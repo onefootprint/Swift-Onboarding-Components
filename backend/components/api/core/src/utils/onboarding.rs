@@ -188,6 +188,7 @@ pub fn get_or_create_user_workflow(
             WorkflowConfig::Kyb(_) => {
                 vec![]
             }
+            WorkflowConfig::AdhocVendorCall(_) => vec![],
         };
         create_doc_requests(conn, &user_doc_requests, &wf)?;
     }

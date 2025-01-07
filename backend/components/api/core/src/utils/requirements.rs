@@ -158,6 +158,7 @@ pub fn requires_biz_workflow(person_wf: &Workflow, person_obc: &ObConfiguration)
         WorkflowConfig::Kyc(_) | WorkflowConfig::AlpacaKyc(_) => person_obc.kind.is_kyb(),
         WorkflowConfig::Document(DocumentConfig { business_configs, .. }) => !business_configs.is_empty(),
         WorkflowConfig::Kyb(_) => return ServerErrInto("Person workflow cannot have kind KYB"),
+        WorkflowConfig::AdhocVendorCall(_) => false,
     };
     Ok(requires_biz_workflow)
 }

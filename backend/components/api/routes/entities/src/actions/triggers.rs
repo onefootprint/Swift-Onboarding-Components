@@ -81,6 +81,10 @@ fn validate(
                 return BadRequestInto("fp_bid and business_configs must both be provided together");
             }
         }
+        WorkflowRequestConfig::AdhocVendorCall { .. } => {
+            // TODO
+            unimplemented!()
+        }
     }
     Ok(())
 }
@@ -166,6 +170,9 @@ pub(super) fn apply_trigger_request(
             // effects in bifrost any place where bifrost reads a playbook setting that
             // is technically not pertinent to the document workflow.
             // https://github.com/onefootprint/monorepo/blob/bf8d6eb7e391e66ccafe73bbd2866d427160da54/frontend/packages/types/src/data/onboarding-config.ts#L51
+        }
+        WorkflowRequestConfig::AdhocVendorCall { .. } => {
+            unimplemented!()
         }
     };
     if obc.kind == ObConfigurationKind::Auth {

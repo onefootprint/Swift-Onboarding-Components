@@ -11,6 +11,7 @@ use itertools::Itertools;
 use newtypes::AuthMethodUpdatedInfo;
 use newtypes::ExternalIntegrationInfo;
 use newtypes::OnboardingTimelineInfo;
+use newtypes::WfrAdhocVendorCallConfig;
 use newtypes::WfrDocumentConfig;
 use newtypes::WfrOnboardConfig;
 use newtypes::WorkflowConfig;
@@ -89,6 +90,12 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                             };
                             WorkflowRequestConfig::Document(cfg)
                         }
+                        WorkflowConfig::AdhocVendorCall(ref c) => {
+                            let cfg = WfrAdhocVendorCallConfig {
+                                verification_checks: c.verification_checks.clone(),
+                            };
+                            WorkflowRequestConfig::AdhocVendorCall(cfg)
+                        }
                     }
                 } else {
                     // And even more legacy triggers didn't have a workflow associated with them
@@ -116,6 +123,7 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                         WorkflowStartedEventKind::Playbook
                     }
                     WorkflowConfig::Document(_) => WorkflowStartedEventKind::Document,
+                    WorkflowConfig::AdhocVendorCall(_) => WorkflowStartedEventKind::Adhoc,
                 };
                 Self::WorkflowStarted(api_wire_types::WorkflowStarted {
                     kind,

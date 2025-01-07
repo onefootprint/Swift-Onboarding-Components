@@ -26,8 +26,6 @@ impl AdhocVendorCallVendorCalls {
     }
 }
 
-#[derive(Clone)]
-pub struct AdhocVendorCallComplete;
 
 /////////////////////
 /// MakeVendorCalls
@@ -55,6 +53,9 @@ impl OnAction<MakeVendorCalls, AdhocVendorCallState> for AdhocVendorCallVendorCa
     }
 }
 
+
+#[derive(Clone)]
+pub struct AdhocVendorCallComplete;
 
 /////////////////////
 /// Complete

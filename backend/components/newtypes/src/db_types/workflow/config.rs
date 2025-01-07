@@ -1,6 +1,7 @@
 pub use super::*;
 use crate::CollectedDataOption;
 use crate::DocumentRequestConfig;
+use crate::VerificationCheck;
 use diesel::AsExpression;
 use diesel::FromSqlRow;
 use diesel_as_jsonb::AsJsonb;
@@ -16,6 +17,7 @@ pub enum WorkflowConfig {
     AlpacaKyc(AlpacaKycConfig),
     Document(DocumentConfig),
     Kyb(KybConfig),
+    AdhocVendorCall(AdhocVendorCallConfig),
 }
 
 impl WorkflowConfig {
@@ -25,6 +27,7 @@ impl WorkflowConfig {
             Self::AlpacaKyc(_) => WorkflowKind::AlpacaKyc,
             Self::Document(_) => WorkflowKind::Document,
             Self::Kyb(_) => WorkflowKind::Kyb,
+            Self::AdhocVendorCall(_) => WorkflowKind::AdhocVendorCall,
         }
     }
 
@@ -34,6 +37,7 @@ impl WorkflowConfig {
             Self::AlpacaKyc(_) => &[],
             Self::Document(_) => &[],
             Self::Kyb(config) => &config.recollect_attributes,
+            Self::AdhocVendorCall(_) => &[],
         }
     }
 }
@@ -84,5 +88,17 @@ pub struct KybConfig {
 impl From<KybConfig> for WorkflowConfig {
     fn from(value: KybConfig) -> Self {
         Self::Kyb(value)
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+
+pub struct AdhocVendorCallConfig {
+    pub verification_checks: Vec<VerificationCheck>,
+}
+
+impl From<AdhocVendorCallConfig> for WorkflowConfig {
+    fn from(value: AdhocVendorCallConfig) -> Self {
+        Self::AdhocVendorCall(value)
     }
 }

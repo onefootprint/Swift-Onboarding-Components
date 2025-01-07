@@ -14,6 +14,7 @@ use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::TenantVw;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::FpResult;
+use api_errors::ServerErr;
 use api_wire_types::CreateEntityTokenRequest;
 use api_wire_types::CreateEntityTokenResponse;
 use chrono::Duration;
@@ -109,6 +110,9 @@ async fn send_communication(
                 configs: cfg.configs,
                 business_configs: cfg.business_configs,
             },
+            WorkflowRequestConfig::AdhocVendorCall { .. } => {
+                return Err(ServerErr!("Adhoc workflows do not send SMS"));
+            }
         };
         (kind, note)
     } else {

@@ -103,6 +103,8 @@ pub enum WorkflowStartedEventKind {
     Playbook,
     /// Collecting documents
     Document,
+    /// Adhoc vendor call
+    Adhoc,
 }
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]

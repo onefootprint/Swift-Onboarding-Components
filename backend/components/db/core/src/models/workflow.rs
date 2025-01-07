@@ -30,6 +30,7 @@ use db_schema::schema::workflow;
 use diesel::dsl::not;
 use diesel::prelude::*;
 use itertools::Itertools;
+use newtypes::AdhocVendorCallConfig;
 use newtypes::AdhocVendorCallState;
 use newtypes::AlpacaKycState;
 use newtypes::ApiKeyStatus;
@@ -283,6 +284,10 @@ impl Workflow {
                 }
                 .into(),
             },
+            Some(WorkflowRequestConfig::AdhocVendorCall(cfg)) => AdhocVendorCallConfig {
+                verification_checks: cfg.verification_checks,
+            }
+            .into(),
             None => match v.kind {
                 VaultKind::Person => KycConfig::default().into(),
                 VaultKind::Business => KybConfig::default().into(),
