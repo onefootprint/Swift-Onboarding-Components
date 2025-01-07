@@ -36,7 +36,9 @@ impl WorkflowState {
             | Self::Kyb(KybState::VendorCalls)
             | Self::Kyb(KybState::Decisioning)
             | Self::Kyb(KybState::StepUpDecisioning)
-            | Self::Kyb(KybState::Complete) => vec![],
+            | Self::Kyb(KybState::Complete)
+            | Self::AdhocVendorCall(AdhocVendorCallState::VendorCalls)
+            | Self::AdhocVendorCall(AdhocVendorCallState::Complete) => vec![],
         }
     }
 
@@ -64,6 +66,8 @@ impl WorkflowState {
             | Self::Kyb(KybState::VendorCalls)
             | Self::Kyb(KybState::Decisioning)
             | Self::Kyb(KybState::StepUpDecisioning)
+            | Self::AdhocVendorCall(AdhocVendorCallState::VendorCalls)
+            | Self::AdhocVendorCall(AdhocVendorCallState::Complete)
             | Self::Kyb(KybState::Complete) => false,
         }
     }

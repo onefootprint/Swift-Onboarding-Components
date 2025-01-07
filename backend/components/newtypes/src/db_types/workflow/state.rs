@@ -52,6 +52,7 @@ pub enum WorkflowState {
     Kyc(KycState),
     AlpacaKyc(AlpacaKycState),
     Document(DocumentState),
+    AdhocVendorCall(AdhocVendorCallState),
     Kyb(KybState),
 }
 
@@ -65,6 +66,7 @@ impl WorkflowState {
             Self::AlpacaKyc(s) => matches!(s, AlpacaKycState::PendingReview | AlpacaKycState::Complete),
             Self::Document(s) => matches!(s, DocumentState::Complete),
             Self::Kyb(s) => matches!(s, KybState::Complete),
+            Self::AdhocVendorCall(s) => matches!(s, AdhocVendorCallState::Complete),
         }
     }
 }
@@ -76,7 +78,7 @@ impl WorkflowKind {
             Self::Kyb | Self::Kyc | Self::AlpacaKyc => true,
             // Don't show status of document-only workflows triggered via the dashboard. Onboardings onto
             // document playbooks actually use the Kyc workflow (which is shown above)
-            Self::Document => false,
+            Self::Document | Self::AdhocVendorCall => false,
         }
     }
 
@@ -85,8 +87,9 @@ impl WorkflowKind {
         match self {
             Self::Kyb => !matches!(obc_kind, ObConfigurationKind::Kyc | ObConfigurationKind::Auth),
             Self::Kyc | Self::AlpacaKyc => !matches!(obc_kind, ObConfigurationKind::Auth),
-            // Document workflows don't particularly care what kind of playbook they're associated with
-            Self::Document => !matches!(obc_kind, ObConfigurationKind::Auth),
+            // Document and AdhocVendorCall workflows don't particularly care what kind of playbook they're
+            // associated with
+            Self::Document | Self::AdhocVendorCall => !matches!(obc_kind, ObConfigurationKind::Auth),
         }
     }
 }
@@ -98,6 +101,7 @@ impl std::fmt::Display for WorkflowState {
             WorkflowState::Kyc(s) => s.to_string(),
             WorkflowState::AlpacaKyc(s) => s.to_string(),
             WorkflowState::Document(s) => s.to_string(),
+            WorkflowState::AdhocVendorCall(s) => s.to_string(),
             WorkflowState::Kyb(s) => s.to_string(),
         };
         write!(f, "{}.{}", prefix, suffix)
@@ -126,6 +130,9 @@ impl FromStr for WorkflowState {
             WorkflowKind::Document => {
                 Self::Document(DocumentState::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?)
             }
+            WorkflowKind::AdhocVendorCall => Self::AdhocVendorCall(
+                AdhocVendorCallState::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?,
+            ),
             WorkflowKind::Kyb => Self::Kyb(KybState::from_str(suffix).map_err(|_| cannot_parse_suffix_err)?),
         };
         Ok(result)
@@ -200,5 +207,20 @@ pub enum KybState {
 impl From<KybState> for WorkflowState {
     fn from(value: KybState) -> Self {
         Self::Kyb(value)
+    }
+}
+
+
+#[derive(Debug, PartialEq, Eq, Display, Clone, Copy, EnumString, Apiv2Schema, macros::SerdeAttr)]
+#[strum(serialize_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
+pub enum AdhocVendorCallState {
+    VendorCalls,
+    Complete,
+}
+
+impl From<AdhocVendorCallState> for WorkflowState {
+    fn from(value: AdhocVendorCallState) -> Self {
+        Self::AdhocVendorCall(value)
     }
 }

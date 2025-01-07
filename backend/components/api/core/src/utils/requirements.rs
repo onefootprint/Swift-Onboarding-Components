@@ -599,7 +599,7 @@ pub fn get_requirements_for_wf<T>(
     vw: &TenantVw<T>,
 ) -> FpResult<Vec<OnboardingRequirement>> {
     let requirements = match wf.kind {
-        WorkflowKind::AlpacaKyc | WorkflowKind::Kyc => chain!(
+        WorkflowKind::AlpacaKyc | WorkflowKind::Kyc | WorkflowKind::AdhocVendorCall => chain!(
             get_register_auth_method_requirements(conn, ctx.obc, ctx.auth_events, vw)?,
             get_collect_kyc_data_requirement(ctx, vw, wf)?,
             get_collect_investor_profile_requirement(ctx, vw, wf)?,

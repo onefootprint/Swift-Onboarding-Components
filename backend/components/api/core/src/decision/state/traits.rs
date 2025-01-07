@@ -3,6 +3,7 @@ use super::StateError;
 use super::WorkflowKind;
 // These are needed for enum_dispatch to work properly
 use super::{
+    adhoc_vendor_call::*,
     document::*,
     kyb::*,
     kyc::*,

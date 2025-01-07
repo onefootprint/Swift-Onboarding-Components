@@ -1,4 +1,3 @@
-use self::kyb::KybState;
 use crate::FpResult;
 use crate::State;
 use api_errors::FpErrorCode;
@@ -13,6 +12,7 @@ use tokio::time::Instant;
 
 pub mod actions;
 pub use actions::*;
+pub mod adhoc_vendor_call;
 pub mod common;
 pub mod document;
 pub mod kyb;
@@ -67,7 +67,9 @@ impl api_errors::FpErrorTrait for StateError {
 }
 
 use super::vendor::incode::IncodeStateMachine;
+use adhoc_vendor_call::AdhocVendorCallState;
 use document::DocumentState;
+use kyb::KybState;
 use kyc::KycState;
 
 #[enum_dispatch(Workflow)]
@@ -76,6 +78,7 @@ pub enum WorkflowKind {
     Kyc(KycState),
     Document(DocumentState),
     Kyb(KybState),
+    AdhocVendorCall(AdhocVendorCallState),
 }
 
 impl std::fmt::Debug for WorkflowKind {
@@ -90,6 +93,7 @@ impl From<&WorkflowKind> for newtypes::WorkflowState {
             WorkflowKind::Kyc(s) => s.name(),
             WorkflowKind::Document(s) => s.name(),
             WorkflowKind::Kyb(s) => s.name(),
+            WorkflowKind::AdhocVendorCall(s) => s.name(),
         }
     }
 }
@@ -112,6 +116,9 @@ impl WorkflowWrapper {
             newtypes::WorkflowState::AlpacaKyc(_) => todo!(), //throw an error
             newtypes::WorkflowState::Document(_) => DocumentState::init(state, workflow, seqno).await?.into(),
             newtypes::WorkflowState::Kyb(_) => KybState::init(state, workflow, seqno).await?.into(),
+            newtypes::WorkflowState::AdhocVendorCall(_) => {
+                AdhocVendorCallState::init(state, workflow, seqno).await?.into()
+            }
         };
         Ok(Self {
             state: s,

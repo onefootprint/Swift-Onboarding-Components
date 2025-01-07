@@ -30,6 +30,7 @@ use db_schema::schema::workflow;
 use diesel::dsl::not;
 use diesel::prelude::*;
 use itertools::Itertools;
+use newtypes::AdhocVendorCallState;
 use newtypes::AlpacaKycState;
 use newtypes::ApiKeyStatus;
 use newtypes::DocumentConfig;
@@ -348,6 +349,9 @@ impl Workflow {
             WorkflowKind::Kyc => WorkflowState::Kyc(KycState::DataCollection),
             WorkflowKind::Document => WorkflowState::Document(DocumentState::DataCollection),
             WorkflowKind::Kyb => WorkflowState::Kyb(KybState::DataCollection),
+            WorkflowKind::AdhocVendorCall => {
+                WorkflowState::AdhocVendorCall(AdhocVendorCallState::VendorCalls)
+            }
         };
         let new_workflow = NewWorkflow {
             created_at: Utc::now(),
