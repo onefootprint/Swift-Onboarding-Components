@@ -29,6 +29,7 @@ pub struct BillingProfile {
     #[diesel(deserialize_as = NonNullVec<BillingMinimum>)]
     pub minimums: Vec<BillingMinimum>,
     pub platform_fee_starts_on: Option<NaiveDate>,
+    pub pricing_doc: Option<String>,
 }
 
 #[derive(Debug, Clone, Insertable)]

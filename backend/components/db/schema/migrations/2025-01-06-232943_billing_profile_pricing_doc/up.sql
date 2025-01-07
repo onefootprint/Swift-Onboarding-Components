@@ -1,0 +1,1 @@
+ALTER TABLE billing_profile ADD COLUMN pricing_doc TEXT;

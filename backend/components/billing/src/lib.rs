@@ -151,9 +151,8 @@ impl BillingClient {
     ) -> BResult<()> {
         // NOTE: the stripe API won't let us clear a customer's email if it's removed from their billing
         // profile
-        let Some(email) = bp.and_then(|bp| bp.billing_email.as_deref()) else {
-            return Ok(());
-        };
+        let email = bp.and_then(|bp| bp.billing_email.as_deref());
+        let pricing_doc = bp.and_then(|bp| bp.pricing_doc.as_deref());
         let customer_id = stripe::CustomerId::from_str(customer_id)?;
         // Set the invoice prefix to the first word of the tenant's name
         let invoice_prefix = {
@@ -165,9 +164,12 @@ impl BillingClient {
                 .collect();
             alphabetic.to_ascii_uppercase()
         };
+        let metadata =
+            pricing_doc.map(|d| [("pricing-doc".to_string(), d.to_string())].into_iter().collect());
         let params = UpdateCustomer {
             invoice_prefix: Some(&invoice_prefix),
-            email: Some(email),
+            email,
+            metadata,
             ..Default::default()
         };
         Customer::update(&self.client, &customer_id, params).await?;
