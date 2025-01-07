@@ -1,6 +1,8 @@
 use crate::*;
+use chrono::NaiveDate;
 use newtypes::email::Email;
 use newtypes::AppClipExperienceId;
+use newtypes::BillingMinimum;
 use newtypes::PiiString;
 use newtypes::PreviewApi;
 use newtypes::Product;
@@ -65,9 +67,12 @@ pub struct PrivateTenantDetail {
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
 pub struct PrivateBillingProfile {
     pub prices: HashMap<Product, String>,
+    pub minimums: Vec<BillingMinimum>,
+    pub pricing_doc: Option<String>,
     pub billing_email: Option<String>,
     pub omit_billing: bool,
     pub send_automatically: bool,
+    pub platform_fee_starts_on: Option<NaiveDate>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
@@ -86,6 +91,11 @@ pub struct PrivateUpdateBillingProfile {
     pub prices: Option<HashMap<Product, Patch<String>>>,
     #[serde(default)]
     pub billing_email: Patch<Email>,
+    #[serde(default)]
+    pub pricing_doc: Patch<String>,
+    pub minimums: Option<Vec<BillingMinimum>>,
+    #[serde(default)]
+    pub platform_fee_starts_on: Patch<NaiveDate>,
     pub omit_billing: Option<bool>,
     pub send_automatically: Option<bool>,
 }

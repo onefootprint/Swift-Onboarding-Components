@@ -110,16 +110,22 @@ impl DbToApi<BillingProfile> for api_wire_types::PrivateBillingProfile {
     fn from_db(bp: BillingProfile) -> Self {
         let BillingProfile {
             prices,
+            minimums,
             billing_email,
+            pricing_doc,
             send_automatically,
             omit_billing,
+            platform_fee_starts_on,
             ..
         } = bp;
         api_wire_types::PrivateBillingProfile {
             prices: prices.into(),
+            minimums,
             billing_email,
+            pricing_doc,
             omit_billing,
             send_automatically,
+            platform_fee_starts_on,
         }
     }
 }

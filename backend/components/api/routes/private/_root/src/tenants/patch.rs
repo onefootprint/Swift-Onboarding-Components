@@ -154,6 +154,9 @@ fn make_bp_update(request: PrivateUpdateBillingProfile) -> UpdateBillingProfileA
     let PrivateUpdateBillingProfile {
         prices,
         billing_email,
+        pricing_doc,
+        minimums,
+        platform_fee_starts_on,
         omit_billing,
         send_automatically,
     } = request;
@@ -163,6 +166,9 @@ fn make_bp_update(request: PrivateUpdateBillingProfile) -> UpdateBillingProfileA
         billing_email: billing_email
             .map(|e| e.to_piistring().leak_to_string())
             .to_changeset(),
+        pricing_doc: pricing_doc.to_changeset(),
+        minimums,
+        platform_fee_starts_on: platform_fee_starts_on.to_changeset(),
         omit_billing,
         send_automatically,
     }

@@ -69,9 +69,12 @@ impl BillingProfile {
 
         let UpdateBillingProfileArgs {
             prices,
+            minimums,
             billing_email,
+            pricing_doc,
             omit_billing,
             send_automatically,
+            platform_fee_starts_on,
         } = args;
 
         let mut new_prices = existing.prices;
@@ -90,9 +93,12 @@ impl BillingProfile {
 
         let update = UpdateBillingProfileRow {
             prices: Some(new_prices),
+            minimums,
             billing_email,
+            pricing_doc,
             omit_billing,
             send_automatically,
+            platform_fee_starts_on,
         };
 
         // Apply onto existing prices
@@ -108,17 +114,23 @@ impl BillingProfile {
 #[diesel(table_name = billing_profile)]
 struct UpdateBillingProfileRow {
     prices: Option<PriceMap>,
+    minimums: Option<Vec<BillingMinimum>>,
     billing_email: Option<Option<String>>,
+    pricing_doc: Option<Option<String>>,
     omit_billing: Option<bool>,
     send_automatically: Option<bool>,
+    platform_fee_starts_on: Option<Option<NaiveDate>>,
 }
 
 #[derive(Debug, Clone, Default)]
 pub struct UpdateBillingProfileArgs {
     pub prices: Option<HashMap<Product, Option<Option<String>>>>,
+    pub minimums: Option<Vec<BillingMinimum>>,
+    pub pricing_doc: Option<Option<String>>,
     pub billing_email: Option<Option<String>>,
     pub omit_billing: Option<bool>,
     pub send_automatically: Option<bool>,
+    pub platform_fee_starts_on: Option<Option<NaiveDate>>,
 }
 
 #[cfg(test)]

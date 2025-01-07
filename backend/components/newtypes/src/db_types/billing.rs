@@ -5,6 +5,7 @@ use diesel::sql_types::Text;
 use diesel::AsExpression;
 use diesel::FromSqlRow;
 use diesel_as_jsonb::AsJsonb;
+use paperclip::actix::Apiv2Schema;
 use serde::Deserialize;
 use serde::Serialize;
 use serde_with::DeserializeFromStr;
@@ -83,8 +84,11 @@ impl_enum_string_diesel!(BillingEventKind);
     PartialOrd,
     DeserializeFromStr,
     SerializeDisplay,
+    Apiv2Schema,
+    macros::SerdeAttr,
 )]
 #[strum(serialize_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
 pub enum Product {
     /// A fixed amount charged monthly
     MonthlyPlatformFee,
@@ -297,11 +301,12 @@ impl From<PriceMap> for HashMap<Product, String> {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, AsJsonb)]
+#[derive(Debug, Clone, Serialize, Deserialize, AsJsonb, Apiv2Schema)]
 pub struct BillingMinimum {
     /// The set of products that apply towards this minimum
     pub products: Vec<Product>,
     /// The required minumum monthly spend, in cents
+    #[openapi(serialize_as = "String")]
     pub amount_cents: rust_decimal::Decimal,
     /// The human-readable name that displays on the invoice line item
     pub name: String,
