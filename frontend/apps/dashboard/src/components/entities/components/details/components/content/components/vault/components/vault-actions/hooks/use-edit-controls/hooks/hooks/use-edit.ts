@@ -5,6 +5,7 @@ import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
 import useEntityId from '@/entity/hooks/use-entity-id';
+import { getEntitiesByFpIdBusinessOwnersQueryKey } from '@onefootprint/axios/dashboard';
 
 const edit = async ({ entityId, fields }: EditRequest, authHeaders: AuthHeaders) => {
   const response = await requestWithoutCaseConverter<EditResponse>({
@@ -27,6 +28,9 @@ const useEdit = () => {
     mutationFn: (data: EditRequest) => edit(data, authHeaders),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['entity', entityId, 'timeline', authHeaders] });
+      queryClient.invalidateQueries({
+        queryKey: getEntitiesByFpIdBusinessOwnersQueryKey({ path: { fpId: entityId } }),
+      });
     },
   });
 };

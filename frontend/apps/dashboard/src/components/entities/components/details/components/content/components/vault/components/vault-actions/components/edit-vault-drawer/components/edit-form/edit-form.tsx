@@ -8,6 +8,7 @@ import isPlainObject from 'lodash/isPlainObject';
 import { useEffect } from 'react';
 import useEditControls from '../../../../hooks/use-edit-controls';
 import type { EditFormData } from '../../edit-vault-drawer.types';
+import { isBOStakeDI } from '../../utils/is-beneficial-owner-di';
 
 export type EditFormProps = {
   children: React.ReactNode;
@@ -26,7 +27,17 @@ const EditForm = ({ children, onSubmit }: EditFormProps) => {
   }, [editControls.isIdle]);
 
   const handleBeforeSubmit = (formValues: EditFormData) => {
-    onSubmit(flattenObject(formValues) as Record<string, VaultValue>);
+    const flattenedFormValues = flattenObject(formValues);
+
+    // Remove the '%' from BO ownership stake values
+    const processedValues = Object.fromEntries(
+      Object.entries(flattenedFormValues).map(([key, value]) => [
+        key,
+        isBOStakeDI(key) ? (value as string).replace('%', '') : value,
+      ]),
+    );
+
+    onSubmit(processedValues as Record<string, VaultValue>);
   };
 
   return (

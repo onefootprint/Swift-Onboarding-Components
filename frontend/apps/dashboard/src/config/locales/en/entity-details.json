@@ -54,7 +54,8 @@
             "phone-number": "+1555550100",
             "formation-date": "YYYY-MM-DD",
             "occupation": "Software Engineer",
-            "employer": "Acme Bank"
+            "employer": "Acme Bank",
+            "ownership-stake": "25%"
           },
           "legal-status": {
             "legal-status-mapping": {
@@ -133,6 +134,11 @@
               "moderate": "Moderate",
               "aggressive": "Aggressive"
             }
+          },
+          "beneficial-owners": {
+            "title": "Beneficial owners",
+            "business-owner": "Business owner",
+            "ownership-stake": "Ownership stake"
           },
           "errors": {
             "name": {
@@ -228,6 +234,9 @@
             },
             "risk-tolerance": {
               "required": "Cannot be empty"
+            },
+            "ownership-stake": {
+              "pattern": "Must be formatted as a percentage (e.g. 25%)"
             }
           }
         }

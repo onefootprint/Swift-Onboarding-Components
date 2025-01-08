@@ -1,7 +1,6 @@
 import type { DataIdentifier, Entity } from '@onefootprint/types';
-import { Form, Shimmer, Stack, Text, TextInput, Tooltip } from '@onefootprint/ui';
+import { Form, Shimmer, TextInput, Tooltip } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
 import useDecryptControls from '../../../../hooks/use-decrypt-controls';
 import { FIELD_VALUE_HEIGHT, FIELD_VALUE_WIDTH } from '../../constants';
 import useEditField from '../../hooks/use-edit-field';
@@ -12,13 +11,12 @@ import ErrorOrHint from './components/error-or-hint';
 export type EditFieldProps = {
   di: DataIdentifier;
   entity: Entity;
+  beneficialOwnerValue?: string | number;
 };
 
-const EditField = ({ di, entity }: EditFieldProps) => {
-  const { t } = useTranslation('entity-details', {
-    keyPrefix: 'header-default.actions.edit-vault-drawer.fieldsets',
-  });
-  const field = useEditField(entity)(di);
+const EditField = ({ di, entity, beneficialOwnerValue }: EditFieldProps) => {
+  const { t } = useTranslation('entity-details', { keyPrefix: 'header-default.actions.edit-vault-drawer.fieldsets' });
+  const field = useEditField(entity)(di, beneficialOwnerValue);
   const { label, value, canEdit, isDecrypted, isEmpty } = field;
   const decryptControls = useDecryptControls();
 
@@ -45,41 +43,20 @@ const EditField = ({ di, entity }: EditFieldProps) => {
   };
 
   return (
-    <Container
-      // biome-ignore lint/a11y/useSemanticElements: TODO: change to <tr />
-      role="row"
-      aria-label={label ?? di}
-    >
+    <tr className="[&>div]:items-start" aria-label={label ?? di}>
       <Form.Field variant="horizontal">
-        <LabelContainer>
+        <div className="flex items-center h-8 max-w-[75%]">
           <Form.Label>
-            <Text variant="body-3" color="tertiary">
-              {label}
-            </Text>
+            <p className="text-body-3 text-tertiary">{label}</p>
           </Form.Label>
-        </LabelContainer>
-        <Stack direction="column" align="flex-start" flex={1} maxWidth={FIELD_VALUE_WIDTH}>
+        </div>
+        <div className="flex flex-col items-start flex-1 max-w-[220px]">
           {renderValue()}
           <ErrorOrHint entity={entity} fieldName={di} />
-        </Stack>
+        </div>
       </Form.Field>
-    </Container>
+    </tr>
   );
 };
-
-const Container = styled.div`
-  > div {
-    align-items: flex-start;
-  }
-`;
-
-const LabelContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    align-items: center;
-    height: ${theme.spacing[8]};
-    max-width: 75%;
-  `};
-`;
 
 export default EditField;

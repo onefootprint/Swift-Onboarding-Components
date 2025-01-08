@@ -11,16 +11,32 @@ import { TenantPreviewApi } from '@onefootprint/types/src/api/get-tenants';
 import type { ParseKeys } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import useSession from 'src/hooks/use-session';
+import { isBONameDI, isBOStakeDI, isBeneficialOwnerDI } from '../../utils/is-beneficial-owner-di';
 
+// There are 2 types of fields in the edit vault drawer:
+// 1. Regular DI fields: these are DIs that are stored in the entity vault and correspond to DIs
+// 2. Beneficial owner fields: for each BO, there's a BO name and BO ownership stake. Neither correspond to a regular DI, so there's special handling for them
 const useEditField = (entity: Entity) => {
   const { t } = useTranslation('common', { keyPrefix: 'di' });
+  const { t: entityT } = useTranslation('entity-details', {
+    keyPrefix: 'header-default.actions.edit-vault-drawer.fieldsets.beneficial-owners',
+  });
   const { data: vaultData } = useEntityVault(entity.id, entity);
   const {
     data: { org },
   } = useSession();
 
-  const getLabel = (di: DataIdentifier, _isDecrypted: boolean) => {
-    const isInvestorProfileDI = (Object.values(InvestorProfileDI) as DataIdentifier[]).includes(di);
+  const getValue = (di: DataIdentifier, beneficialOwnerValue?: string | number) => {
+    if (isBONameDI(di)) return beneficialOwnerValue;
+    if (isBOStakeDI(di)) return `${beneficialOwnerValue}%`; // Ownership stake is displayed as a percentage
+    return vaultData?.vault[di as DataIdentifier];
+  };
+
+  const getLabel = (di: DataIdentifier) => {
+    if (isBONameDI(di)) return entityT('business-owner');
+    if (isBOStakeDI(di)) return entityT('ownership-stake');
+
+    const isInvestorProfileDI = (Object.values(InvestorProfileDI) as DataIdentifier[]).includes(di as DataIdentifier);
     if (isInvestorProfileDI) {
       const noLabelDIs = [
         InvestorProfileDI.annualIncome,
@@ -43,6 +59,9 @@ const useEditField = (entity: Entity) => {
   };
 
   const canEditField = (di: DataIdentifier) => {
+    if (isBONameDI(di)) return false;
+    if (isBOStakeDI(di)) return true;
+
     if (di === IdDI.ssn4) {
       // BE updates both ssn4 and ssn9 when ssn9 is changed and errors if only ssn4 is updated
       return !vaultData?.vault[IdDI.ssn9];
@@ -92,18 +111,18 @@ const useEditField = (entity: Entity) => {
       editableFields.push(IdDI.phoneNumber, IdDI.email);
     }
 
-    return editableFields.includes(di);
+    return editableFields.includes(di as DataIdentifier);
   };
 
-  const getProps = (di: DataIdentifier) => {
-    const value = vaultData?.vault[di];
-    const isDecrypted = isVaultDataDecrypted(value);
+  const getProps = (di: DataIdentifier, beneficialOwnerValue?: string | number) => {
+    const isBODI = isBeneficialOwnerDI(di);
+    const value = getValue(di, beneficialOwnerValue);
 
     return {
-      label: getLabel(di, isDecrypted),
+      label: getLabel(di),
       value,
-      transforms: vaultData?.transforms[di],
-      isDecrypted,
+      transforms: isBODI ? undefined : vaultData?.transforms[di as DataIdentifier],
+      isDecrypted: isBODI || isVaultDataDecrypted(value),
       isEmpty: isVaultDataEmpty(value),
       canEdit: canEditField(di),
     };

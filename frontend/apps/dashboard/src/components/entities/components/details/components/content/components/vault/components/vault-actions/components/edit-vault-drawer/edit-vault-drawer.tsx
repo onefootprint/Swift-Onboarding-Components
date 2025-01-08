@@ -1,6 +1,6 @@
 import { EDIT_VAULT_FORM_ID } from '@/entity/constants';
 import { EntityKind, type VaultValue } from '@onefootprint/types';
-import { Drawer, InlineAlert, Stack } from '@onefootprint/ui';
+import { Drawer, InlineAlert } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import useDecryptControls from '../../hooks/use-decrypt-controls';
 import useEditControls from '../../hooks/use-edit-controls';
@@ -8,8 +8,8 @@ import EditForm from './components/edit-form';
 
 import useEntityVault from '@/entities/hooks/use-entity-vault';
 import type { WithEntityProps } from '@/entity/components/with-entity';
+import { useEffect } from 'react';
 import getDecryptableDIs from 'src/utils/get-decryptable-dis';
-import { useEffectOnce } from 'usehooks-ts';
 import BusinessVaultFieldsets from './components/business-vault-fieldsets';
 import PersonVaultFieldsets from './components/person-vault-fieldsets';
 import convertFormData from './utils/convert-form-data';
@@ -20,19 +20,15 @@ type EditVaultDrawerProps = WithEntityProps & {
 };
 
 const EditVaultDrawer = ({ entity, open, onClose }: EditVaultDrawerProps) => {
-  const { t } = useTranslation('entity-details', {
-    keyPrefix: 'header-default.actions.edit-vault-drawer',
-  });
-
+  const { t } = useTranslation('entity-details', { keyPrefix: 'header-default.actions.edit-vault-drawer' });
   const decryptControls = useDecryptControls();
   const editControls = useEditControls();
-
   const { data: vaultData, update: updateVault, isAllDecrypted } = useEntityVault(entity.id, entity);
   const isPersonVault = entity.kind === EntityKind.person;
 
-  useEffectOnce(() => {
+  useEffect(() => {
     editControls.start();
-  });
+  }, [editControls]);
 
   const handleClose = () => {
     editControls.cancel();
@@ -84,7 +80,7 @@ const EditVaultDrawer = ({ entity, open, onClose }: EditVaultDrawerProps) => {
         onClick: handleClose,
       }}
     >
-      <Stack direction="column" gap={7}>
+      <div className="flex flex-col gap-6">
         {!isAllDecrypted && (
           <InlineAlert
             variant="info"
@@ -97,9 +93,9 @@ const EditVaultDrawer = ({ entity, open, onClose }: EditVaultDrawerProps) => {
           </InlineAlert>
         )}
         <EditForm onSubmit={handleBeforeEditSubmit}>
-          {isPersonVault ? <PersonVaultFieldsets entity={entity} /> : <BusinessVaultFieldsets />}
+          {isPersonVault ? <PersonVaultFieldsets entity={entity} /> : <BusinessVaultFieldsets id={entity.id} />}
         </EditForm>
-      </Stack>
+      </div>
     </Drawer>
   );
 };

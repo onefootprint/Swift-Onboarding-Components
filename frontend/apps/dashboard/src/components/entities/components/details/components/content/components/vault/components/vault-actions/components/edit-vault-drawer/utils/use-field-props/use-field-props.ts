@@ -31,6 +31,7 @@ import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import useEntityVault from 'src/components/entities/hooks/use-entity-vault';
 import { EMPTY_SELECT_VALUE } from '../../constants';
+import { isBONameDI, isBOStakeDI, isBeneficialOwnerDI } from '../is-beneficial-owner-di';
 import useFormValues, { type EditDetailsFormData } from '../use-form-values';
 import validateCitizenships, { CitizenshipsValidationError } from '../validate-citizenships';
 import validateName, { NameValidationError } from '../validate-name';
@@ -113,7 +114,7 @@ const useFieldProps = (entity: Entity, di: DataIdentifier): FieldProps => {
   const formValues = useFormValues();
   const fieldValue = get(formValues, di as keyof EditDetailsFormData);
   const { data: previousData } = useEntityVault(entity.id, entity);
-  const previousValue = (previousData?.vault[di] as string) ?? '';
+  const previousValue = isBeneficialOwnerDI(di) ? '' : ((previousData?.vault[di as DataIdentifier] as string) ?? '');
 
   // IdDI fields
   if (di === IdDI.firstName) {
@@ -806,6 +807,25 @@ const useFieldProps = (entity: Entity, di: DataIdentifier): FieldProps => {
       },
     };
   }
+
+  // Beneficial owner fields (don't correspond to regular DIs)
+  if (isBONameDI(di)) {
+    return {
+      inputOptions: {}, // not editable, so has options
+    };
+  }
+  if (isBOStakeDI(di)) {
+    return {
+      inputOptions: {
+        placeholder: entityT('placeholders.ownership-stake'),
+        pattern: {
+          value: /^(100|\d{1,2}(\.\d+)?)%$/,
+          message: entityT('errors.ownership-stake.pattern'),
+        },
+      },
+    };
+  }
+
   // fallback case - no validation
   if (Object.values(BusinessDI).includes(di as BusinessDI) || Object.values(IdDI).includes(di as IdDI)) {
     return {
