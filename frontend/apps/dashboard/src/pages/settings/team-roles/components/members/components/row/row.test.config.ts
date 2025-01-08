@@ -1,5 +1,7 @@
+import { getOrganizationMember } from '@onefootprint/fixtures/dashboard';
+import type { OrganizationMember } from '@onefootprint/request-types/dashboard';
 import { mockRequest } from '@onefootprint/test-utils';
-import type { Member, Role } from '@onefootprint/types';
+import type { Role } from '@onefootprint/types';
 import { RoleKind, RoleScopeKind } from '@onefootprint/types';
 import { asUser, resetUser } from 'src/config/tests';
 
@@ -25,25 +27,9 @@ afterAll(() => {
   resetUser();
 });
 
-export const memberFixture: Member = {
+export const memberFixture: OrganizationMember = getOrganizationMember({
   id: 'orguser_k0xUYuO2fFCwMHFPShuK77',
-  email: 'jack.doe@acme.com',
-  firstName: 'Jack',
-  lastName: 'Doe',
-  role: {
-    createdAt: '2022-09-19T16:24:34.368337Z',
-    id: 'Role_aExxJ6XgSBpvqIJ2VcHH6J',
-    isImmutable: true,
-    name: 'Admin',
-    numActiveUsers: 1,
-    numActiveApiKeys: 0,
-    scopes: [{ kind: RoleScopeKind.admin }],
-    kind: RoleKind.dashboardUser,
-  },
-  rolebinding: {
-    lastLoginAt: '2023-01-18T17:54:10.668420Z',
-  },
-};
+});
 
 export const RolesFixture: Role[] = [
   {
@@ -83,7 +69,7 @@ export const withRoles = (Roles: Role[] = RolesFixture) =>
     },
   });
 
-export const withEditMember = (member: Member, newRole: Role) =>
+export const withEditMember = (member: OrganizationMember, newRole: Role) =>
   mockRequest({
     method: 'patch',
     path: `/org/members/${member.id}`,

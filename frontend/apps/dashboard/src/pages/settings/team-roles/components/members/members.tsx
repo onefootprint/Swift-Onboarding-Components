@@ -1,4 +1,4 @@
-import { Box, Pagination, Portal } from '@onefootprint/ui';
+import { Pagination, Portal } from '@onefootprint/ui';
 
 import Invite from './components/invite';
 import MembersTable from './components/members-table';
@@ -8,7 +8,7 @@ const Members = () => {
   const { data: response, errorMessage, isPending, pagination } = useMembers();
 
   return (
-    <Box testID="people-table" tag="section">
+    <section className="flex flex-col" data-testid="people-table">
       <Portal selector="#team-roles-actions">
         <Invite />
       </Portal>
@@ -24,7 +24,7 @@ const Members = () => {
           totalNumResults={pagination.count}
         />
       )}
-    </Box>
+    </section>
   );
 };
 

@@ -1,13 +1,13 @@
-import type { Member } from '@onefootprint/types';
 import { Table } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
+import type { OrganizationMember } from '@onefootprint/request-types/dashboard';
 import useMembersFilters from '../../hooks/use-members-filters';
 import Row from '../row';
 import Filters from './components/filters';
 
 type MembersTableProps = {
-  data?: Member[];
+  data?: OrganizationMember[];
   errorMessage?: string;
   isPending?: boolean;
 };
@@ -28,7 +28,7 @@ const MembersTable = ({ data, isPending, errorMessage }: MembersTableProps) => {
   };
 
   return filters.isReady ? (
-    <Table<Member>
+    <Table<OrganizationMember>
       aria-label={t('table.aria-label')}
       columns={columns}
       emptyStateText={errorMessage || t('table.empty-state')}

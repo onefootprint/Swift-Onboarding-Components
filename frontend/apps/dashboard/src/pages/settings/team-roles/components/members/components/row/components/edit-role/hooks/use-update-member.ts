@@ -1,3 +1,4 @@
+import { getOrgMembersQueryKey } from '@onefootprint/axios/dashboard';
 import request, { getErrorMessage } from '@onefootprint/request';
 import type { UpdateMemberRequest, UpdateMemberResponse } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
@@ -35,7 +36,7 @@ const useUpdateMember = (memberId: string) => {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries();
+      queryClient.invalidateQueries({ queryKey: getOrgMembersQueryKey() });
     },
   });
 };

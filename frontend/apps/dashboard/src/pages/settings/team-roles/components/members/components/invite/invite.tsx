@@ -6,9 +6,7 @@ import PermissionGate from 'src/components/permission-gate';
 import Dialog from './components/dialog';
 
 const Invite = () => {
-  const { t } = useTranslation('settings', {
-    keyPrefix: 'pages.members.invite',
-  });
+  const { t } = useTranslation('settings', { keyPrefix: 'pages.members.invite' });
   const [isOpen, open, close] = useToggle(false);
 
   return (

@@ -1,12 +1,11 @@
 import { getOrgOptions } from '@onefootprint/axios/dashboard';
-import { Stack, Tabs, Text } from '@onefootprint/ui';
+import { Tabs } from '@onefootprint/ui';
 import { useQuery } from '@tanstack/react-query';
 import Head from 'next/head';
 import { parseAsString, useQueryState } from 'nuqs';
 import { useTranslation } from 'react-i18next';
 import DomainAccess from 'src/components/domain-access';
 import SectionHeader from 'src/components/section-header';
-import styled, { css } from 'styled-components';
 
 import Members from './components/members';
 import Roles from './components/roles';
@@ -32,29 +31,22 @@ const TeamRoles = () => {
       <Head>
         <title>{t('page-title')}</title>
       </Head>
-      <Stack direction="column" gap={7}>
-        <Text variant="heading-2">{t('meta-title')}</Text>
+      <div className="flex flex-col gap-6">
+        <h2 className="text-heading-2">{t('meta-title')}</h2>
         <section data-testid="team-roles-section">
           <SectionHeader title={t('header.title')} subtitle={t('header.subtitle')}>
             <div id="team-roles-actions" />
           </SectionHeader>
           <Tabs options={tabs} onChange={setTab} />
-          <Content>
+          <div className="w-full mt-4">
             {tab === TabName.members && <Members />}
             {tab === TabName.roles && <Roles />}
             {tab === TabName.domainAccess && orgQuery.data && <DomainAccess org={orgQuery.data} />}
-          </Content>
+          </div>
         </section>
-      </Stack>
+      </div>
     </>
   );
 };
-
-const Content = styled.div`
-  ${({ theme }) => css`
-    width: 100%;
-    margin-top: ${theme.spacing[5]};
-  `}
-`;
 
 export default TeamRoles;

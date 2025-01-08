@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
-import useMembersFilters from '../../../../../hooks/use-members-filters';
+import { getOrgMembersQueryKey } from '@onefootprint/axios/dashboard';
 
 const removeMemberRequest = async (authHeaders: AuthHeaders, id: string) => {
   const { data } = await request({
@@ -24,7 +24,6 @@ const useRemoveMember = (email: string) => {
   const toast = useToast();
   const session = useSession();
   const queryClient = useQueryClient();
-  const { requestParams } = useMembersFilters();
 
   return useMutation({
     mutationFn: (id: string) => removeMemberRequest(session.authHeaders, id),
@@ -41,7 +40,7 @@ const useRemoveMember = (email: string) => {
         description: t('notification.success.description', { email }),
       });
       queryClient.invalidateQueries({
-        queryKey: ['org', 'members', requestParams],
+        queryKey: getOrgMembersQueryKey(),
       });
     },
   });

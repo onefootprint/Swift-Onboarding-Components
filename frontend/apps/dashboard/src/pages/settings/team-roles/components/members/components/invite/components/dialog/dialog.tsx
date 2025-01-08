@@ -15,9 +15,7 @@ type DialogProps = {
 };
 
 const Dialog = ({ onClose, open }: DialogProps) => {
-  const { t } = useTranslation('settings', {
-    keyPrefix: 'pages.members.invite',
-  });
+  const { t } = useTranslation('settings', { keyPrefix: 'pages.members.invite' });
   const rolesQuery = useRoles(RoleKind.dashboardUser);
   const inviteMembersMutation = useInviteMembers();
 

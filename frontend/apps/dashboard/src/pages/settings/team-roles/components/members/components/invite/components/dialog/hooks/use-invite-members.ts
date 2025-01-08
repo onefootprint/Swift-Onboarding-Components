@@ -1,36 +1,36 @@
-import request, { getErrorMessage } from '@onefootprint/request';
-import type { CreateMembersRequest, CreateMembersResponse } from '@onefootprint/types';
+import { getOrgMembersQueryKey, postOrgMembers } from '@onefootprint/axios/dashboard';
+import { getErrorMessage } from '@onefootprint/request';
+import type { CreateTenantUserRequest } from '@onefootprint/request-types/dashboard';
 import { useToast } from '@onefootprint/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
-const inviteMemberRequest = async (authHeaders: AuthHeaders, payload: CreateMembersRequest) => {
-  const response = await request<CreateMembersResponse>({
-    method: 'POST',
-    url: '/org/members',
-    data: payload,
-    headers: authHeaders,
-  });
-
-  return response.data;
-};
-
 const useInviteMembers = () => {
-  const { t } = useTranslation('settings', {
-    keyPrefix: 'pages.members.invite',
-  });
+  const { t } = useTranslation('settings', { keyPrefix: 'pages.members.invite' });
   const toast = useToast();
-  const session = useSession();
+  const { authHeaders } = useSession();
   const queryClient = useQueryClient();
   const mutation = useMutation({
-    mutationFn: (payload: CreateMembersRequest[]) =>
-      Promise.all(payload.map(invitation => inviteMemberRequest(session.authHeaders, invitation))),
+    mutationFn: async (payload: CreateTenantUserRequest[]) => {
+      const responses = await Promise.all(
+        payload.map(invitation =>
+          postOrgMembers({
+            headers: {
+              'X-Fp-Dashboard-Authorization': authHeaders['x-fp-dashboard-authorization'],
+            },
+            body: invitation,
+            throwOnError: true,
+          }),
+        ),
+      );
+      // Return data from the first response only to satisfy the mutationFn type requirement
+      return responses[0].data;
+    },
   });
 
   const mutate = async (
-    invitations: CreateMembersRequest[],
+    invitations: CreateTenantUserRequest[],
     options?: {
       onSuccess?: () => void;
       onError?: (error: unknown) => void;
@@ -44,7 +44,7 @@ const useInviteMembers = () => {
             count: invitations.length,
           }),
         });
-        queryClient.invalidateQueries({ queryKey: ['org', 'members'] });
+        queryClient.invalidateQueries({ queryKey: getOrgMembersQueryKey() });
         options?.onSuccess?.();
       },
       onError: error => {

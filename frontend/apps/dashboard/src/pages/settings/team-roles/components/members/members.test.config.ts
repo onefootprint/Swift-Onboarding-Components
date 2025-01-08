@@ -1,6 +1,6 @@
+import { getOrganizationMember, getOrganizationRole } from '@onefootprint/fixtures/dashboard';
+import type { OrganizationMember, OrganizationRole } from '@onefootprint/request-types/dashboard';
 import { mockRequest } from '@onefootprint/test-utils';
-import type { Member, Role } from '@onefootprint/types';
-import { RoleKind, RoleScopeKind } from '@onefootprint/types';
 import { asUser, resetUser } from 'src/config/tests';
 
 beforeEach(() => {
@@ -16,121 +16,61 @@ afterAll(() => {
   resetUser();
 });
 
-export const membersFixture: Member[] = [
-  {
+export const membersFixture: OrganizationMember[] = [
+  getOrganizationMember({
     id: 'orguser_IJNDrl9WcqJi28ZUnpMlVO',
     email: 'jane.doe@acme.com',
     firstName: 'Jane',
     lastName: 'Doe',
-    role: {
-      createdAt: '2022-09-19T16:24:34.368337Z',
-      id: 'Role_aExxJ6XgSBpvqIJ2VcHH6J',
-      isImmutable: true,
-      name: 'Admin',
-      numActiveUsers: 1,
-      numActiveApiKeys: 0,
-      scopes: [{ kind: RoleScopeKind.admin }],
-      kind: RoleKind.dashboardUser,
-    },
     rolebinding: {
       lastLoginAt: '2023-01-18T17:54:10.668420Z',
     },
-  },
-  {
+  }),
+  getOrganizationMember({
     id: 'orguser_k0yUYuO2fFCwMHFPShuK77',
     email: 'ayrton@acme.com',
     firstName: 'Ayrton',
     lastName: 'Larson',
-    role: {
-      createdAt: '2022-09-19T16:24:34.368337Z',
-      id: 'Role_aExxJ6XgSBpvqIJ2VcHH6J',
-      isImmutable: true,
-      name: 'Member',
-      numActiveUsers: 5,
-      numActiveApiKeys: 0,
-      scopes: [{ kind: RoleScopeKind.read }],
-      kind: RoleKind.dashboardUser,
-    },
     rolebinding: {
       lastLoginAt: '2023-01-19T13:02:16.268743Z',
     },
-  },
-  {
+  }),
+  getOrganizationMember({
     id: 'orguser_1htKM3mwSfU6o5OIoXaSGO',
     email: 'gianluca@acme.com',
     firstName: 'Gianluca',
     lastName: 'Gilmore',
-    role: {
-      createdAt: '2022-09-19T16:24:34.368337Z',
-      id: 'Role_aExxJ6XgSBpvqIJ2VcHH6J',
-      isImmutable: true,
-      name: 'Member',
-      numActiveUsers: 5,
-      numActiveApiKeys: 0,
-      scopes: [{ kind: RoleScopeKind.read }],
-      kind: RoleKind.dashboardUser,
-    },
     rolebinding: {
       lastLoginAt: '2023-01-17T20:14:10.836665Z',
     },
-  },
-  {
+  }),
+  getOrganizationMember({
     id: 'orguser_yTpSomOQgspCRDrdPfVpLN',
     email: 'rosie@acme.com',
     firstName: 'Rosie',
     lastName: 'Jennings',
-    role: {
-      createdAt: '2022-09-19T16:24:34.368337Z',
-      id: 'Role_aExxJ6XgSBpvqIJ2VcHH6J',
-      isImmutable: true,
-      name: 'Member',
-      numActiveUsers: 5,
-      numActiveApiKeys: 0,
-      scopes: [{ kind: RoleScopeKind.read }],
-      kind: RoleKind.dashboardUser,
-    },
     rolebinding: {
       lastLoginAt: '2023-01-19T00:25:39.500544Z',
     },
-  },
-  {
+  }),
+  getOrganizationMember({
     id: 'orguser_HxUwoIsqyOuiWrfElXSsOV',
     email: 'teddy@acme.com',
     firstName: 'Teddy',
     lastName: 'Velez',
-    role: {
-      createdAt: '2022-09-19T16:24:34.368337Z',
-      id: 'Role_aExxJ6XgSBpvqIJ2VcHH6J',
-      isImmutable: true,
-      name: 'Member',
-      numActiveUsers: 5,
-      numActiveApiKeys: 0,
-      scopes: [{ kind: RoleScopeKind.read }],
-      kind: RoleKind.dashboardUser,
-    },
     rolebinding: {
       lastLoginAt: '2023-01-13T12:57:00.098715Z',
     },
-  },
-  {
+  }),
+  getOrganizationMember({
     id: 'orguser_KJ6uPe6jjs2STG7BAdvznx',
     email: 'felix@acme.com',
     firstName: 'Felix',
     lastName: 'Tate',
-    role: {
-      createdAt: '2022-09-19T16:24:34.368337Z',
-      id: 'Role_aExxJ6XgSBpvqIJ2VcHH6J',
-      isImmutable: true,
-      name: 'Member',
-      numActiveUsers: 5,
-      numActiveApiKeys: 0,
-      scopes: [{ kind: RoleScopeKind.read }],
-      kind: RoleKind.dashboardUser,
-    },
     rolebinding: {
       lastLoginAt: '2023-01-12T20:37:52.240432Z',
     },
-  },
+  }),
 ];
 
 export const membersRelativeTimeFixture = [
@@ -142,44 +82,33 @@ export const membersRelativeTimeFixture = [
   '7 days ago',
 ];
 
-export const RolesFixture: Role[] = [
-  {
+export const RolesFixture: OrganizationRole[] = [
+  getOrganizationRole({
     id: 'Role_aExxJ6XgSBpvqIJ2VcHH6J',
     name: 'Admin',
-    scopes: [{ kind: RoleScopeKind.admin }],
-    isImmutable: true,
-    createdAt: '2022-09-19T16:24:35.367322Z',
-    numActiveUsers: 1,
-    numActiveApiKeys: 0,
-    kind: RoleKind.dashboardUser,
-  },
-  {
+    scopes: [
+      {
+        kind: 'admin',
+      },
+    ],
+  }),
+  getOrganizationRole({
     id: 'Role_erflKNWEF13143EWRWELJN',
     name: 'Member',
-    isImmutable: true,
-    scopes: [{ kind: RoleScopeKind.read }],
-    createdAt: '2023-01-06T05:11:08.415924Z',
-    numActiveUsers: 5,
-    numActiveApiKeys: 0,
-    kind: RoleKind.dashboardUser,
-  },
-  {
+    scopes: [{ kind: 'read' }],
+  }),
+  getOrganizationRole({
     id: 'Role_bX2flKNWEF13143EWRWELJN',
     name: 'Developer',
-    isImmutable: true,
-    scopes: [{ kind: RoleScopeKind.apiKeys }],
-    createdAt: '2023-01-06T05:11:08.415924Z',
-    numActiveUsers: 0,
-    numActiveApiKeys: 1,
-    kind: RoleKind.dashboardUser,
-  },
+    scopes: [{ kind: 'api_keys' }],
+  }),
 ];
 
-export const memberToEdit = membersFixture.find(member => member.email === 'jane.doe@acme.com') as Member;
+export const memberToEdit = membersFixture.find(member => member.email === 'jane.doe@acme.com') as OrganizationMember;
 
-export const memberToEditRole = RolesFixture.find(role => role.name === 'Developer') as Role;
+export const memberToEditRole = RolesFixture.find(role => role.name === 'Developer') as OrganizationRole;
 
-export const withMembers = (members: Member[] = membersFixture) =>
+export const withMembers = (members: OrganizationMember[] = membersFixture) =>
   mockRequest({
     method: 'get',
     path: '/org/members',
@@ -219,7 +148,7 @@ export const withCreateMembersError = () =>
     },
   });
 
-export const withEditMember = (member: Member, newRole: Role) =>
+export const withEditMember = (member: OrganizationMember, newRole: OrganizationRole) =>
   mockRequest({
     method: 'patch',
     path: `/org/members/${member.id}`,
@@ -230,7 +159,7 @@ export const withEditMember = (member: Member, newRole: Role) =>
     },
   });
 
-export const withEditMemberError = (member: Member) =>
+export const withEditMemberError = (member: OrganizationMember) =>
   mockRequest({
     method: 'patch',
     path: `/org/members/${member.id}`,
@@ -257,7 +186,7 @@ export const withRemoveMemberError = (id: string) =>
     },
   });
 
-export const withRoles = (Roles: Role[] = RolesFixture) =>
+export const withRoles = (Roles: OrganizationRole[] = RolesFixture) =>
   mockRequest({
     method: 'get',
     path: '/org/roles',

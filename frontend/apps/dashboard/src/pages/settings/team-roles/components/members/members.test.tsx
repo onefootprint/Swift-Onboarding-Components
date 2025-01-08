@@ -7,9 +7,9 @@ import {
   waitForElementToBeRemoved,
   within,
 } from '@onefootprint/test-utils';
-import { RoleKind, RoleScopeKind } from '@onefootprint/types';
 import mockRouter from 'next-router-mock';
 
+import type { OrganizationMember } from '@onefootprint/request-types/dashboard';
 import Members from './members';
 import {
   RolesFixture,
@@ -79,10 +79,8 @@ describe('<Members />', () => {
     it('should show an error message', async () => {
       renderMembers();
 
-      await waitFor(() => {
-        const errorMessage = screen.getByText('Something went wrong');
-        expect(errorMessage).toBeInTheDocument();
-      });
+      const errorMessage = await screen.findByText('Something went wrong');
+      expect(errorMessage).toBeInTheDocument();
     });
   });
 
@@ -91,7 +89,7 @@ describe('<Members />', () => {
       withMembers();
     });
 
-    it('should render the name and email of each member', async () => {
+    it('should render the name, email, and last login of each member', async () => {
       await renderMembersAndWaitData();
 
       membersFixture.forEach((member, index) => {
@@ -181,14 +179,11 @@ describe('<Members />', () => {
           });
           await userEvent.click(inviteButton);
 
-          await waitFor(() => {
-            const dialog = screen.getByRole('dialog', {
-              name: 'Invite teammates',
-            });
-            const errorMessage = within(dialog).getByText('Something went wrong');
-
-            expect(errorMessage).toBeInTheDocument();
+          const dialog = await screen.findByRole('dialog', {
+            name: 'Invite teammates',
           });
+          const errorMessage = await within(dialog).getByText('Something went wrong');
+          expect(errorMessage).toBeInTheDocument();
         });
       });
 
@@ -222,8 +217,8 @@ describe('<Members />', () => {
             {
               id: 'orguser_IXNDrl9WcqJi18ZUnpMlVO',
               email: 'johnny@acme.com',
-              firstName: null,
-              lastName: null,
+              firstName: undefined,
+              lastName: undefined,
               role: {
                 createdAt: '2022-09-19T16:24:34.368337Z',
                 id: 'Role_aExxJ6XgSBpvqIJ2VcHH6J',
@@ -231,13 +226,13 @@ describe('<Members />', () => {
                 name: 'Admin',
                 numActiveUsers: 1,
                 numActiveApiKeys: 0,
-                scopes: [{ kind: RoleScopeKind.admin }],
-                kind: RoleKind.dashboardUser,
+                scopes: [{ kind: 'admin' }],
+                kind: 'dashboard_user',
               },
               rolebinding: {
                 lastLoginAt: '2023-01-18T17:54:10.668420Z',
               },
-            },
+            } as OrganizationMember,
           ]);
 
           const submitButton = screen.getByRole('button', {
@@ -247,15 +242,11 @@ describe('<Members />', () => {
 
           await waitForElementToBeRemoved(dialog);
 
-          await waitFor(() => {
-            const successMessage = screen.getByText('Invitation sent successfully.');
-            expect(successMessage).toBeInTheDocument();
-          });
+          const successMessage = await screen.findByText('Invitation sent successfully.');
+          expect(successMessage).toBeInTheDocument();
 
-          await waitFor(() => {
-            const name = screen.getByText('johnny@acme.com');
-            expect(name).toBeInTheDocument();
-          });
+          const name = await screen.findByText('johnny@acme.com');
+          expect(name).toBeInTheDocument();
         });
       });
 
@@ -284,10 +275,8 @@ describe('<Members />', () => {
           });
           await userEvent.click(submitButton);
 
-          await waitFor(() => {
-            const successMessage = screen.getByText("Invitation wasn't sent");
-            expect(successMessage).toBeInTheDocument();
-          });
+          const successMessage = await screen.findByText("Invitation wasn't sent");
+          expect(successMessage).toBeInTheDocument();
         });
       });
     });
@@ -306,18 +295,12 @@ describe('<Members />', () => {
           });
           await userEvent.click(roleButton);
 
-          await waitFor(() => {
-            const newRoleOption = screen.getByText(memberToEditRole.name);
-            expect(newRoleOption).toBeInTheDocument();
-          });
-
-          const newRoleOption = screen.getByText(memberToEditRole.name);
+          const newRoleOption = await screen.findByText(memberToEditRole.name);
+          expect(newRoleOption).toBeInTheDocument();
           await userEvent.click(newRoleOption);
 
-          await waitFor(() => {
-            const errorMessage = screen.getByText('Error updating role');
-            expect(errorMessage).toBeInTheDocument();
-          });
+          const errorMessage = await screen.findByText('Error updating role');
+          expect(errorMessage).toBeInTheDocument();
         });
       });
 
@@ -334,18 +317,12 @@ describe('<Members />', () => {
           });
           await userEvent.click(roleButton);
 
-          await waitFor(() => {
-            const newRoleOption = screen.getByText(memberToEditRole.name);
-            expect(newRoleOption).toBeInTheDocument();
-          });
-
-          const newRoleOption = screen.getByText(memberToEditRole.name);
+          const newRoleOption = await screen.findByText(memberToEditRole.name);
+          expect(newRoleOption).toBeInTheDocument();
           await userEvent.click(newRoleOption);
 
-          await waitFor(() => {
-            const newRole = screen.getByText(memberToEditRole.name);
-            expect(newRole).toBeInTheDocument();
-          });
+          const newRole = await screen.findByText(memberToEditRole.name);
+          expect(newRole).toBeInTheDocument();
         });
       });
     });
@@ -368,29 +345,22 @@ describe('<Members />', () => {
 
           const removeButton = screen.getByText('Remove');
           await userEvent.click(removeButton);
-          await waitFor(() => {
-            screen.getByRole('dialog', {
-              name: 'Remove team member',
-            });
-          });
 
-          const confirmationDialog = screen.getByRole('dialog', {
+          const confirmationDialog = await screen.findByRole('dialog', {
             name: 'Remove team member',
           });
-          const submitButton = within(confirmationDialog).getByRole('button', {
+          const submitButton = await within(confirmationDialog).findByRole('button', {
             name: 'Yes',
           });
           await userEvent.click(submitButton);
 
-          await waitFor(() => {
-            const errorMessage = screen.getByText('Something went wrong');
-            expect(errorMessage).toBeInTheDocument();
-          });
+          const errorMessage = await screen.findByText('Something went wrong');
+          expect(errorMessage).toBeInTheDocument();
         });
       });
 
       describe('when the request to remove a member succeeds', () => {
-        const [userToRemove] = membersFixture;
+        const userToRemove = membersFixture[1];
 
         beforeEach(() => {
           withRemoveMember(userToRemove.id);
@@ -406,30 +376,23 @@ describe('<Members />', () => {
 
           const removeButton = screen.getByText('Remove');
           await userEvent.click(removeButton);
-          await waitFor(() => {
-            screen.getByRole('dialog', {
-              name: 'Remove team member',
-            });
-          });
 
-          const confirmationDialog = screen.getByRole('dialog', {
+          const confirmationDialog = await screen.findByRole('dialog', {
             name: 'Remove team member',
           });
 
-          // Necessary to mock the fetch request without the
-          // user removed
-          withMembers(membersFixture.filter(m => m.id !== userToRemove.id));
+          // Necessary to mock the fetch request without the user removed
+          const updatedMembers = membersFixture.filter(m => m.id !== userToRemove.id);
+          withMembers(updatedMembers);
 
-          const submitButton = within(confirmationDialog).getByRole('button', {
+          const submitButton = await within(confirmationDialog).findByRole('button', {
             name: 'Yes',
           });
           await userEvent.click(submitButton);
           await waitForElementToBeRemoved(confirmationDialog);
 
-          await waitFor(() => {
-            const confirmationMessage = screen.getByText('Team member removed');
-            expect(confirmationMessage).toBeInTheDocument();
-          });
+          const confirmationMessage = await screen.findByText('Team member removed');
+          expect(confirmationMessage).toBeInTheDocument();
 
           await waitFor(() => {
             const userRemovedName = screen.queryByText(`${userToRemove.firstName} ${userToRemove.lastName}`);

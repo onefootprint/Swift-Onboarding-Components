@@ -20,7 +20,7 @@ const useMembersFilters = () => {
   const values = {
     role: queryToArray(query.members_role),
     page: query.members_page ? Number.parseInt(query.members_page, 10) : 0,
-    pageSize: query.members_page_size,
+    pageSize: query.members_page_size ? Number.parseInt(query.members_page_size, 10) : undefined,
     search: query.members_search,
   };
   const requestParams = {

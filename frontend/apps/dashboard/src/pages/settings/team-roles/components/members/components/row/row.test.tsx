@@ -71,7 +71,7 @@ describe('<Row />', () => {
   describe('when the name is not present', () => {
     it('should show a dash', () => {
       renderRow({
-        member: { ...memberFixture, firstName: null, lastName: null },
+        member: { ...memberFixture, firstName: undefined, lastName: undefined },
       });
       expect(screen.getByText('-')).toBeInTheDocument();
     });
@@ -80,7 +80,7 @@ describe('<Row />', () => {
   describe('when invite is pending', () => {
     it('should show the pending invite badge', () => {
       renderRow({
-        member: { ...memberFixture, rolebinding: { lastLoginAt: null } },
+        member: { ...memberFixture, rolebinding: { lastLoginAt: undefined } },
       });
       expect(screen.getByText('Pending')).toBeInTheDocument();
     });

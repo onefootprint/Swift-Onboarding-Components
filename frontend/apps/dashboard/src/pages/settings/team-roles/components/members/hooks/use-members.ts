@@ -1,34 +1,18 @@
+import { getOrgMembersOptions } from '@onefootprint/axios/dashboard';
 import { useIntl } from '@onefootprint/hooks';
-import type { PaginatedRequestResponse } from '@onefootprint/request';
-import request, { getErrorMessage } from '@onefootprint/request';
-import type { GetMembersRequest, GetMembersResponse, Member } from '@onefootprint/types';
+import { getErrorMessage } from '@onefootprint/request';
+import type { OrganizationMember } from '@onefootprint/request-types/dashboard';
 import { useQuery } from '@tanstack/react-query';
 import usePagination from 'src/hooks/use-pagination';
-import type { AuthHeaders } from 'src/hooks/use-session';
-import useSession from 'src/hooks/use-session';
-
 import useMembersFilters from './use-members-filters';
 
-const getMembers = async (authHeaders: AuthHeaders, params: GetMembersRequest) => {
-  const { data: response } = await request<PaginatedRequestResponse<GetMembersResponse>>({
-    method: 'GET',
-    url: '/org/members',
-    headers: authHeaders,
-    params,
-  });
-
-  return response;
-};
-
 const useMembers = () => {
-  const { authHeaders } = useSession();
   const { formatRelativeDate } = useIntl();
   const filters = useMembersFilters();
   const { requestParams } = filters;
 
   const membersQuery = useQuery({
-    queryKey: ['org', 'members', requestParams],
-    queryFn: () => getMembers(authHeaders, requestParams),
+    ...getOrgMembersOptions({ query: requestParams }),
     enabled: filters.isReady,
     select: response => ({
       meta: response.meta,
@@ -38,7 +22,6 @@ const useMembers = () => {
 
   const pagination = usePagination({
     count: membersQuery.data?.meta.count,
-    // @ts-expect-error: this will be fixed once we use the auto-generate requests
     next: membersQuery.data?.meta.nextPage,
     onChange: newPage => filters.push({ members_page: newPage.toString() }),
     page: filters.values.page,
@@ -54,10 +37,12 @@ const useMembers = () => {
   };
 };
 
-const formatMember = (member: Member, formatRelativeDate: (date: Date) => string) => ({
+const formatMember = (member: OrganizationMember, formatRelativeDate: (date: Date) => string) => ({
   ...member,
   rolebinding: {
-    lastLoginAt: member.rolebinding?.lastLoginAt ? formatRelativeDate(new Date(member.rolebinding.lastLoginAt)) : null,
+    lastLoginAt: member.rolebinding?.lastLoginAt
+      ? formatRelativeDate(new Date(member.rolebinding.lastLoginAt))
+      : undefined,
   },
 });
 

@@ -1,19 +1,19 @@
-import { Shimmer, Stack } from '@onefootprint/ui';
+import { Shimmer } from '@onefootprint/ui';
 
 const Loading = () => (
-  <Stack testID="members-roles-loading" width="100%">
-    <Stack direction="column" gap={4} marginBottom={5}>
-      <Stack direction="column" gap={3}>
+  <div className="flex w-full" data-testid="members-roles-loading">
+    <div className="flex flex-col gap-3 mb-4">
+      <div className="flex flex-col gap-2">
         <EmailLabel />
         <EmailInput />
-      </Stack>
-      <Stack direction="column" gap={3}>
+      </div>
+      <div className="flex flex-col gap-2">
         <RoleLabel />
         <RoleInput />
-      </Stack>
-    </Stack>
+      </div>
+    </div>
     <AddMoreButton />
-  </Stack>
+  </div>
 );
 
 const EmailLabel = () => <Shimmer height="20px" width="93px" />;

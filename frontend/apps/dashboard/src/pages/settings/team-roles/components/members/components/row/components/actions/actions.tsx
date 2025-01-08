@@ -1,4 +1,3 @@
-import type { Member } from '@onefootprint/types';
 import { Box, Dialog, Dropdown, IconButton, Stack, Text, createFontStyles } from '@onefootprint/ui';
 import { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
@@ -6,10 +5,11 @@ import PermissionGate from 'src/components/permission-gate';
 import styled from 'styled-components';
 
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
+import type { OrganizationMember } from '@onefootprint/request-types/dashboard';
 import useRemoveMember from './hooks/use-remove-org-member';
 
 export type ActionsProps = {
-  member: Member;
+  member: OrganizationMember;
 };
 
 const Actions = ({ member }: ActionsProps) => {
