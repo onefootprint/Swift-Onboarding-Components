@@ -57,27 +57,29 @@ type BasicArticle = {
 export const getAllMarkdownFiles = async <TArticle extends BasicArticle>(relativePath: string): Promise<TArticle[]> => {
   const contentPaths = await glob(relativePath);
   return Promise.all(
-    contentPaths.map(async contentPath => {
-      try {
-        const fileContent = await fs.promises.readFile(contentPath, {
-          encoding: 'utf8',
-        });
-        const matterFile = matter(fileContent) as unknown as TArticle;
-        const content = replaceContent(matterFile.content);
-        return {
-          ...matterFile,
-          content,
-          data: {
-            ...matterFile.data,
-            readingTime: readingTime(content),
-            sections: [getSectionMeta(`#${matterFile.data.title}`), ...getSections(content)],
-          },
-        };
-      } catch (e) {
-        console.log(contentPath);
-        throw e;
-      }
-    }),
+    contentPaths
+      .sort((a, b) => a.localeCompare(b))
+      .map(async contentPath => {
+        try {
+          const fileContent = await fs.promises.readFile(contentPath, {
+            encoding: 'utf8',
+          });
+          const matterFile = matter(fileContent) as unknown as TArticle;
+          const content = replaceContent(matterFile.content);
+          return {
+            ...matterFile,
+            content,
+            data: {
+              ...matterFile.data,
+              readingTime: readingTime(content),
+              sections: [getSectionMeta(`#${matterFile.data.title}`), ...getSections(content)],
+            },
+          };
+        } catch (e) {
+          console.log(contentPath);
+          throw e;
+        }
+      }),
   );
 };
 
