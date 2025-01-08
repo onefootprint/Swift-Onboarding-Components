@@ -25,7 +25,7 @@ const Logo = ({ organization }: LogoProps) => {
     }
     const form = new FormData();
     form.set('file', files[0]);
-    updateOrgLogoMutation.mutate(form);
+    updateOrgLogoMutation.mutate({ body: form });
   };
 
   return (

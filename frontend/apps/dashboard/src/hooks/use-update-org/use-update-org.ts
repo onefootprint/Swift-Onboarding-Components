@@ -1,20 +1,8 @@
+import { getOrgQueryKey, patchOrgMutation } from '@onefootprint/axios/dashboard';
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import request from '@onefootprint/request';
-import type { UpdateOrgRequest, UpdateOrgResponse } from '@onefootprint/types';
+import type { Organization, UpdateTenantRequest } from '@onefootprint/request-types/dashboard';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
-
-const updateOrgRequest = async (authHeaders: AuthHeaders, payload: UpdateOrgRequest) => {
-  const { data } = await request<UpdateOrgResponse>({
-    method: 'PATCH',
-    url: '/org',
-    headers: authHeaders,
-    data: payload,
-  });
-
-  return data;
-};
 
 const useUpdateOrg = () => {
   const showErrorToast = useRequestErrorToast();
@@ -22,11 +10,18 @@ const useUpdateOrg = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (payload: UpdateOrgRequest) => updateOrgRequest(session.authHeaders, payload),
+    mutationFn: (payload: UpdateTenantRequest) =>
+      patchOrgMutation({
+        headers: {
+          'X-Fp-Dashboard-Authorization': session.authHeaders['x-fp-dashboard-authorization'],
+        },
+      }).mutationFn!({ body: payload }),
     onError: showErrorToast,
-    onSuccess: (response: UpdateOrgResponse) => {
+    onSuccess: (response: Organization) => {
       queryClient.invalidateQueries({ queryKey: ['org'] });
+      queryClient.invalidateQueries({ queryKey: getOrgQueryKey() });
       queryClient.setQueryData(['org'], response);
+      queryClient.setQueryData(getOrgQueryKey(), response);
       session.setOrg({
         name: response.name,
         logoUrl: response.logoUrl,
