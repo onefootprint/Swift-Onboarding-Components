@@ -1,22 +1,19 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IcoLock24, IcoLockOpen24 } from '@onefootprint/icons';
 import type { Organization } from '@onefootprint/request-types/dashboard';
-import { Divider, Text, Toggle, Tooltip } from '@onefootprint/ui';
+import { Divider, Toggle, Tooltip } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
 import useUpdateOrg from 'src/hooks/use-update-org';
 import createStringList from 'src/utils/create-string-list';
-import styled, { css } from 'styled-components';
 
 export type DomainAccessProps = {
   org: Organization;
 };
 
 const DomainAccess = ({ org }: DomainAccessProps) => {
-  const { t } = useTranslation('onboarding', {
-    keyPrefix: 'invite.allow-domain-access',
-  });
+  const { t } = useTranslation('onboarding', { keyPrefix: 'invite.allow-domain-access' });
   const updateOrgMutation = useUpdateOrg();
   const showRequestErrorToast = useRequestErrorToast();
   const [allowDomainAccess, setAllowDomainAccess] = useState(org.allowDomainAccess);
@@ -49,27 +46,24 @@ const DomainAccess = ({ org }: DomainAccessProps) => {
   }
 
   return (
-    <Container data-testid="domain-access">
-      <HeaderContainer>
-        <Header>
+    <div
+      className="flex flex-col gap-4 items-start mt-4 p-4 border border-solid border-tertiary rounded self-stretch"
+      data-testid="domain-access"
+    >
+      <div className="flex flex-col items-start gap-3">
+        <div className="flex items-center gap-2 self-stretch">
           {allowDomainAccess ? <IcoLockOpen24 testID="lock-open" /> : <IcoLock24 testID="lock-closed" />}
-          <Text variant="label-3">{t('title')}</Text>
-        </Header>
-        <Text color="secondary" variant="body-3">
-          {t('subtitle')}
-        </Text>
-      </HeaderContainer>
+          <h3 className="text-label-3">{t('title')}</h3>
+        </div>
+        <h4 className="text-body-3 text-secondary">{t('subtitle')}</h4>
+      </div>
       <Divider />
-      <EnableContainer>
-        <EnableSubContainer>
-          <Text color="secondary" variant="body-3">
-            {t('action')}
-          </Text>
+      <div className="flex justify-between w-full">
+        <div className="flex">
+          <p className="text-body-3 text-secondary">{t('action')}</p>
           &nbsp;
-          <Text color="secondary" variant="label-3">
-            {createStringList(org.domains)}
-          </Text>
-        </EnableSubContainer>
+          <h4 className="text-label-3 text-secondary">{createStringList(org.domains)}</h4>
+        </div>
         {disableTogle ? (
           <Tooltip
             text={t('toggle.domain-already-claimed', {
@@ -83,54 +77,9 @@ const DomainAccess = ({ org }: DomainAccessProps) => {
             {toggle}
           </PermissionGate>
         )}
-      </EnableContainer>
-    </Container>
+      </div>
+    </div>
   );
 };
-
-const Container = styled.div`
-  ${({ theme }) => css`
-    align-items: flex-start;
-    align-self: stretch;
-    background: ${theme.backgroundColor.primary};
-    border-radius: ${theme.borderRadius.default};
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[5]};
-    margin-top: ${theme.spacing[5]};
-    padding: ${theme.spacing[5]};
-  `}
-`;
-
-const EnableSubContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-`;
-
-const EnableContainer = styled.div`
-  display: flex;
-  width: 100%;
-  flex-direction: row;
-  justify-content: space-between;
-`;
-
-const Header = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    align-items: center;
-    gap: ${theme.spacing[3]};
-    align-self: stretch;
-  `}
-`;
-
-const HeaderContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: ${theme.spacing[4]};
-  `}
-`;
 
 export default DomainAccess;

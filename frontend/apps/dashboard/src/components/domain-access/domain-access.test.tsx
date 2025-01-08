@@ -67,12 +67,10 @@ describe('<DomainAccess />', () => {
       expect(toggle).toBeDisabled();
 
       await userEvent.hover(toggle);
-      await waitFor(() => {
-        const tooltip = screen.getByRole('tooltip', {
-          name: "You're not allowed to toggle domain access",
-        });
-        expect(tooltip).toBeInTheDocument();
+      const tooltip = await screen.findByRole('tooltip', {
+        name: "You're not allowed to toggle domain access",
       });
+      expect(tooltip).toBeInTheDocument();
     });
 
     it('when domain is already claimed, toggle is disabled', async () => {
@@ -87,13 +85,11 @@ describe('<DomainAccess />', () => {
       expect(toggle).toBeDisabled();
 
       await userEvent.hover(toggle);
-      await waitFor(() => {
-        const domains = createStringList(orgDomainAlreadyClaimed.domains);
-        const tooltip = screen.getByRole('tooltip', {
-          name: `Domain access for ${domains} has already been claimed. Please contact your admin to invite you to the existing organization.`,
-        });
-        expect(tooltip).toBeInTheDocument();
+      const domains = createStringList(orgDomainAlreadyClaimed.domains);
+      const tooltip = await screen.findByRole('tooltip', {
+        name: `Domain access for ${domains} has already been claimed. Please contact your admin to invite you to the existing organization.`,
       });
+      expect(tooltip).toBeInTheDocument();
     });
   });
 });
