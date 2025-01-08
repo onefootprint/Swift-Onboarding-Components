@@ -17,9 +17,6 @@ const GlobalStyles = createGlobalStyle`
     color: rgb(0, 0, 0);
     outline: none;
     width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
 
     &:hover {
       background: rgb(255, 255, 255);
@@ -51,7 +48,20 @@ const GlobalStyles = createGlobalStyle`
       }
     }
   }
-  
+
+  .fp-pin-input {
+    width: 40px;
+    height: 44px;
+    padding: 0;
+    text-align: center;
+  }
+
+  .fp-input-active {
+    background: rgb(255, 255, 255);
+    border-color: rgb(74, 36, 219);
+    box-shadow: rgba(74, 36, 219, 0.12) 0px 0px 0px 4px;
+  }
+
   .fp-select {
     font-family: inherit;
     font-size: 0.9375rem;
