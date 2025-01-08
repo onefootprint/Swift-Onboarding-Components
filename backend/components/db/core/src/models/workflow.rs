@@ -52,7 +52,6 @@ use newtypes::OnboardingStatusChangedPayload;
 use newtypes::PreviewApi;
 use newtypes::ScopedVaultId;
 use newtypes::TenantScope;
-use newtypes::VaultId;
 use newtypes::VaultKind;
 use newtypes::WebhookEvent;
 use newtypes::WorkflowConfig;
@@ -139,10 +138,6 @@ pub struct NewWorkflowArgs {
 pub enum WorkflowIdentifier<'a> {
     Id {
         id: &'a WorkflowId,
-    },
-    ConfigId {
-        vault_id: &'a VaultId,
-        ob_config_id: &'a ObConfigurationId,
     },
     ScopedVaultId {
         scoped_vault_id: &'a ScopedVaultId,
@@ -395,18 +390,6 @@ impl Workflow {
                 .filter(workflow::id.eq(workflow_id))
                 .filter(workflow::scoped_vault_id.eq(scoped_vault_id))
                 .get_result(conn)?,
-            WorkflowIdentifier::ConfigId {
-                vault_id,
-                ob_config_id,
-            } => {
-                use db_schema::schema::scoped_vault;
-                workflow::table
-                    .inner_join(scoped_vault::table)
-                    .filter(scoped_vault::vault_id.eq(vault_id))
-                    .filter(workflow::ob_configuration_id.eq(ob_config_id))
-                    .select(workflow::all_columns)
-                    .get_result(conn)?
-            }
         };
 
         Ok(result)
@@ -482,14 +465,6 @@ impl Workflow {
                 query = query
                     .filter(workflow::id.eq(workflow_id))
                     .filter(workflow::scoped_vault_id.eq(scoped_vault_id));
-            }
-            WorkflowIdentifier::ConfigId {
-                vault_id,
-                ob_config_id,
-            } => {
-                query = query
-                    .filter(scoped_vault::vault_id.eq(vault_id))
-                    .filter(workflow::ob_configuration_id.eq(ob_config_id));
             }
         }
         let res = query.get_result(conn)?;
