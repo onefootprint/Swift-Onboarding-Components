@@ -54,7 +54,7 @@ const BaseCode = ({ children, size, disabled, isPrivate }: CodeInlineProps) => {
         'border border-solid border-tertiary text-primary',
         'max-w-full w-fit',
         {
-          'cursor-default select-none pointer-events-none': disabled,
+          'cursor-default': disabled,
           'cursor-pointer hover:text-primary hover:border-primary': !disabled,
         },
       )}
