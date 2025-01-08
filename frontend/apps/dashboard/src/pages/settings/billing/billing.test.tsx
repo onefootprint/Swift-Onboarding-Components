@@ -1,46 +1,31 @@
-import { customRender, screen } from '@onefootprint/test-utils';
+import { customRender, screen, waitFor } from '@onefootprint/test-utils';
+import mockRouter from 'next-router-mock';
+import { asAdminUser } from 'src/config/tests/session';
 import Billing from './billing';
-
-const renderBilling = () => customRender(<Billing />);
-
-import useGetPreviewInvoice from './hooks/use-get-preview-invoice';
-
-jest.mock('./hooks/use-get-preview-invoice');
-
-const mockInvoiceDataWithLineItems = {
-  lineItems: [
-    {
-      id: 'ii_1PpYzJGerPBo41PtciJQwXDR',
-      description: 'Hot vaults',
-      quantity: 34229,
-      unitPriceCents: '8',
-      notionalCents: 273832,
-    },
-    {
-      id: 'ii_1PpYzJGerPBo41PtxkRIno1q',
-      description: 'KYC',
-      quantity: 13373,
-      unitPriceCents: '55',
-      notionalCents: 735515,
-    },
-  ],
-  lastUpdatedAt: '23 minutes ago',
-};
-
-const mockInvoiceDataWithoutLineItems = {
-  lineItems: [],
-  lastUpdatedAt: '23 minutes ago',
-};
+import { invoiceWithLineItemsFixture, invoiceWithoutLineItemsFixture, withInvoicePreview } from './billing.test.config';
 
 describe.skip('<Billing />', () => {
-  it('should render with line items and display the info text', () => {
-    (useGetPreviewInvoice as jest.Mock).mockReturnValue({
-      data: mockInvoiceDataWithLineItems,
-      isPending: false,
-      isError: false,
-    });
+  beforeEach(() => {
+    mockRouter.setCurrentUrl('/settings/billing');
+    asAdminUser();
+  });
 
+  const renderBilling = () => customRender(<Billing />);
+
+  const renderBillingAndWaitData = async () => {
     renderBilling();
+
+    await waitFor(() => {
+      const table = screen.getByRole('table');
+      const isPending = table.getAttribute('aria-busy');
+      expect(isPending).toBe('false');
+    });
+  };
+
+  it('should render with line items and display the info text', async () => {
+    withInvoicePreview(invoiceWithLineItemsFixture);
+    await renderBillingAndWaitData();
+
     expect(screen.getByText('Billing')).toBeInTheDocument();
     expect(
       screen.getByText(
@@ -49,14 +34,10 @@ describe.skip('<Billing />', () => {
     ).toBeInTheDocument();
   });
 
-  it('should render without line items and display the no invoice text', () => {
-    (useGetPreviewInvoice as jest.Mock).mockReturnValue({
-      data: mockInvoiceDataWithoutLineItems,
-      isPending: false,
-      isError: false,
-    });
+  it('should render without line items and display the no invoice text', async () => {
+    withInvoicePreview(invoiceWithoutLineItemsFixture);
+    await renderBillingAndWaitData();
 
-    renderBilling();
     expect(screen.getByText('Billing')).toBeInTheDocument();
     expect(screen.getByText("An invoice hasn't yet been generated.")).toBeInTheDocument();
   });

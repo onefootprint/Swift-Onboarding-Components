@@ -1,11 +1,13 @@
+import { getOrgInvoicePreviewOptions } from '@onefootprint/axios/dashboard';
+import { useIntl } from '@onefootprint/hooks';
 import { IcoInfo16 } from '@onefootprint/icons';
-import { Box, Divider, Stack, Table, Text } from '@onefootprint/ui';
+import type { InvoicePreview, LineItem } from '@onefootprint/request-types/dashboard';
+import { Divider, Table } from '@onefootprint/ui';
+import { useQuery } from '@tanstack/react-query';
 import Head from 'next/head';
 import { useTranslation } from 'react-i18next';
 import usePermissions from 'src/hooks/use-permissions';
 import useSession from 'src/hooks/use-session';
-import styled, { css } from 'styled-components';
-import useGetPreviewInvoice, { type InvoiceItem } from './hooks/use-get-preview-invoice';
 
 const dollarAmountFromCents = (v: number) => {
   const vString = (v / 100).toFixed(2).toString();
@@ -15,7 +17,19 @@ const withCommas = (v: string) => v.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
 const Billing = () => {
   const { t } = useTranslation('settings', { keyPrefix: 'pages.billing' });
-  const { data: invoice, isPending, isError } = useGetPreviewInvoice();
+  const { formatRelativeDate } = useIntl();
+  const {
+    data: invoice,
+    isPending,
+    error,
+  } = useQuery({
+    ...getOrgInvoicePreviewOptions(),
+    select: (data: InvoicePreview) => ({
+      ...data,
+      lastUpdatedAt: data?.lastUpdatedAt ? formatRelativeDate(new Date(data.lastUpdatedAt)) : null,
+    }),
+  });
+
   const {
     data: { user, org },
   } = useSession();
@@ -41,84 +55,52 @@ const Billing = () => {
       <Head>
         <title>{t('page-title')}</title>
       </Head>
-      <Stack direction="column" gap={7}>
-        <Text variant="heading-2">{t('meta-title')}</Text>
-        <Stack direction="column">
-          <Text variant="heading-5">{t('title')}</Text>
-          <Text variant="body-2" marginTop={2}>
-            {t('subtitle')}
-          </Text>
-          <Divider marginTop={5} marginBottom={7} />
-          <TableContainer direction="column">
-            <Table<InvoiceItem>
-              aria-label={t('table.aria-label')}
-              columns={columns}
-              emptyStateText={isError ? t('table.error') : t('table.no-results')}
-              getKeyForRow={(r: InvoiceItem) => r.id}
-              isLoading={isPending}
-              items={invoice?.lineItems}
-              renderTr={({ item }) => (
-                <>
-                  <td>{item.description}</td>
-                  <QuantityTd>{withCommas(item.quantity.toString())}</QuantityTd>
-                  <QuantityTd>
-                    {dollarAmountFromCents(item.unitPriceCents ? Number.parseFloat(item.unitPriceCents) : 0)}
-                  </QuantityTd>
-                  <QuantityTd>{dollarAmountFromCents(item.notionalCents)}</QuantityTd>
-                </>
-              )}
-            />
+      <div className="flex flex-col gap-6">
+        <h1 className="text-heading-2">{t('meta-title')}</h1>
+        <div className="flex flex-col">
+          <p className="text-heading-5">{t('title')}</p>
+          <p className="text-body-2 mt-1">{t('subtitle')}</p>
+          <Divider className="mt-4 mb-6" />
+          <div className="flex flex-col rounded border border-solid border-tertiary">
+            <div className="-m-[1px] w-[calc(100%+2px)]">
+              <Table<LineItem>
+                aria-label={t('table.aria-label')}
+                columns={columns}
+                emptyStateText={error ? t('table.error') : t('table.no-results')}
+                getKeyForRow={(r: LineItem) => r.id}
+                isLoading={isPending}
+                items={invoice?.lineItems}
+                renderTr={({ item }) => (
+                  <>
+                    <td>{item.description}</td>
+                    <td className="text-right">{withCommas(item.quantity.toString())}</td>
+                    <td className="text-right">
+                      {dollarAmountFromCents(item.unitPriceCents ? Number.parseFloat(item.unitPriceCents) : 0)}
+                    </td>
+                    <td className="text-right">{dollarAmountFromCents(item.notionalCents)}</td>
+                  </>
+                )}
+              />
+            </div>
             {invoice?.lineItems.length ? (
-              <Stack gap={5} padding={5} direction="column">
-                <Stack gap={11} justifyContent="right">
-                  <Text variant="label-3">{t('table.subtotal')}</Text>
-                  <Text variant="label-3">{totalAmountDue ? dollarAmountFromCents(totalAmountDue) : '-'}</Text>
-                </Stack>
-                <InfoContainer padding={5} gap={3}>
-                  <Box marginTop={1}>
+              <div className="flex flex-col gap-4 p-4">
+                <div className="flex flex-col items-end gap-24">
+                  <p className="text-label-3">{t('table.subtotal')}</p>
+                  <p className="text-label-3">{totalAmountDue ? dollarAmountFromCents(totalAmountDue) : '-'}</p>
+                </div>
+                <div className="flex gap-2 p-4 rounded bg-primary border border-solid border-tertiary">
+                  <div className="flex mt-0.5">
                     <IcoInfo16 />
-                  </Box>
-                  <Text variant="body-3" color="secondary" lineHeight={'20px'}>
-                    {t('table.info', { lastUpdatedAt })}
-                  </Text>
-                </InfoContainer>
-              </Stack>
+                  </div>
+                  <p className="text-body-3 text-secondary leading-5">{t('table.info', { lastUpdatedAt })}</p>
+                </div>
+              </div>
             ) : null}
-          </TableContainer>
-        </Stack>
-      </Stack>
+          </div>
+        </div>
+      </div>
     </>
   );
 };
-
-const TableContainer = styled(Stack)`
-  ${({ theme }) => css`
-    border-radius: ${theme.borderRadius.default};
-    background-color: ${theme.backgroundColor.secondary};
-    border: 1px solid ${theme.borderColor.tertiary};
-
-    table {
-      // To sit on top of the border of the container
-      margin: -1px;
-      width: calc(100% + 2px);
-    }
-
-    tbody {
-      background-color: ${theme.backgroundColor.primary};
-    }
-  `};
-`;
-
-const InfoContainer = styled(Stack)`
-  ${({ theme }) => css`
-    border-radius: ${theme.borderRadius.default};
-    background-color: ${theme.backgroundColor.primary};
-    border: 1px solid ${theme.borderColor.tertiary};
-  `};
-`;
-
-const QuantityTd = styled.td`
-  text-align: right;
-`;
 
 export default Billing;
