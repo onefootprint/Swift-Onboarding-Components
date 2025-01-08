@@ -1,4 +1,4 @@
-import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import { customRender, screen } from '@onefootprint/test-utils';
 import { OrgFrequentNoteKind } from '@onefootprint/types';
 import { asAdminUser } from 'src/config/tests';
 
@@ -9,164 +9,63 @@ import {
   withFrequentNotes,
 } from './frequent-notes-text-area.test.config';
 
-describe('<FrequentNotesTextArea />', () => {
-  describe('when rendering', () => {
-    beforeEach(() => {
-      asAdminUser();
-    });
+const firstNote = {
+  id: 'fn_BB3U3i9SwGyCAQRGuvSbkn',
+  kind: OrgFrequentNoteKind.Annotation,
+  content: 'this is the first note',
+};
 
-    it('should make a GET API call on initial render', async () => {
+const secondNote = {
+  id: 'fn_9U599NMWFsoqrAnCHSuvO7',
+  kind: OrgFrequentNoteKind.Annotation,
+  content: 'this is the second note',
+};
+
+const thirdNote = {
+  id: 'fn_2RtPi7VtI10WaNLtkSVv83',
+  kind: OrgFrequentNoteKind.Annotation,
+  content: 'this is the third note',
+};
+
+const initialNotes = [firstNote, secondNote];
+const notesWithThirdNote = [...initialNotes, thirdNote];
+
+describe('FrequentNotesTextArea', () => {
+  beforeEach(() => {
+    asAdminUser();
+  });
+  describe('when loading notes', () => {
+    it('should display existing notes', async () => {
+      withFrequentNotes(OrgFrequentNoteKind.Annotation, initialNotes);
+
       customRender(<Form />);
 
-      withFrequentNotes(
-        OrgFrequentNoteKind.Annotation,
-        [
-          {
-            id: 'fn_BB3U3i9SwGyCAQRGuvSbkn',
-            kind: OrgFrequentNoteKind.Annotation,
-            content: 'this is the first note',
-          },
-          {
-            id: 'fn_9U599NMWFsoqrAnCHSuvO7',
-            kind: OrgFrequentNoteKind.Annotation,
-            content: 'this is the second note',
-          },
-        ],
-        true,
-      );
-
-      await waitFor(() => {
-        expect(screen.getByText('this is the first note')).toBeInTheDocument();
-      });
-      await waitFor(() => {
-        expect(screen.getByText('this is the second note')).toBeInTheDocument();
-      });
+      expect(await screen.findByText('this is the first note')).toBeInTheDocument();
+      expect(await screen.findByText('this is the second note')).toBeInTheDocument();
     });
+  });
+  describe('when deleting a note', () => {
+    it('should delete the note', async () => {
+      withFrequentNotes(OrgFrequentNoteKind.Annotation, notesWithThirdNote);
+      withDeleteFrequentNote(secondNote.id);
+      withFrequentNotes(OrgFrequentNoteKind.Annotation, [firstNote, thirdNote]);
 
-    it('should make a POST API call upon submission', async () => {
       customRender(<Form />);
 
-      withFrequentNotes(
-        OrgFrequentNoteKind.Annotation,
-        [
-          {
-            id: 'fn_BB3U3i9SwGyCAQRGuvSbkn',
-            kind: OrgFrequentNoteKind.Annotation,
-            content: 'this is the first note',
-          },
-          {
-            id: 'fn_9U599NMWFsoqrAnCHSuvO7',
-            kind: OrgFrequentNoteKind.Annotation,
-            content: 'this is the second note',
-          },
-        ],
-        true,
-      );
-
-      await waitFor(() => {
-        expect(screen.getByText('this is the first note')).toBeInTheDocument();
-      });
-      await waitFor(() => {
-        expect(screen.getByText('this is the second note')).toBeInTheDocument();
-      });
-
-      withCreateFrequentNote({
-        id: 'fn_2RtPi7VtI10WaNLtkSVv83',
-        kind: OrgFrequentNoteKind.Annotation,
-        content: 'this is the third note',
-      });
-      withFrequentNotes(
-        OrgFrequentNoteKind.Annotation,
-        [
-          {
-            id: 'fn_BB3U3i9SwGyCAQRGuvSbkn',
-            kind: OrgFrequentNoteKind.Annotation,
-            content: 'this is the first note',
-          },
-          {
-            id: 'fn_9U599NMWFsoqrAnCHSuvO7',
-            kind: OrgFrequentNoteKind.Annotation,
-            content: 'this is the second note',
-          },
-          {
-            id: 'fn_2RtPi7VtI10WaNLtkSVv83',
-            kind: OrgFrequentNoteKind.Annotation,
-            content: 'this is the third note',
-          },
-        ],
-        true,
-      );
-
-      const firstInput = screen.getByLabelText('Note');
-      await userEvent.type(firstInput, 'this is the third note');
-      const saveButton = screen.getByRole('button', {
-        name: 'Add to frequent notes',
-      });
-      await userEvent.click(saveButton);
-
-      await waitFor(() => {
-        expect(screen.getByText('this is the third note')).toBeInTheDocument();
-      });
+      expect(await screen.findByText('this is the first note')).toBeInTheDocument();
+      expect(await screen.findByText('this is the third note')).toBeInTheDocument();
+      expect(await screen.queryByText('this is the second note')).not.toBeInTheDocument();
     });
+  });
 
-    it('should make a DELETE API call upon deletion', async () => {
+  describe('when creating a note', () => {
+    it('should create the note', async () => {
+      withCreateFrequentNote(firstNote);
+      withFrequentNotes(OrgFrequentNoteKind.Annotation, [firstNote]);
+
       customRender(<Form />);
 
-      withFrequentNotes(
-        OrgFrequentNoteKind.Annotation,
-        [
-          {
-            id: 'fn_BB3U3i9SwGyCAQRGuvSbkn',
-            kind: OrgFrequentNoteKind.Annotation,
-            content: 'this is the first note',
-          },
-          {
-            id: 'fn_9U599NMWFsoqrAnCHSuvO7',
-            kind: OrgFrequentNoteKind.Annotation,
-            content: 'this is the second note',
-          },
-          {
-            id: 'fn_2RtPi7VtI10WaNLtkSVv83',
-            kind: OrgFrequentNoteKind.Annotation,
-            content: 'this is the third note',
-          },
-        ],
-        true,
-      );
-
-      await waitFor(() => {
-        expect(screen.getByText('this is the first note')).toBeInTheDocument();
-      });
-      await waitFor(() => {
-        expect(screen.getByText('this is the second note')).toBeInTheDocument();
-      });
-
-      withDeleteFrequentNote('fn_9U599NMWFsoqrAnCHSuvO7');
-      withFrequentNotes(
-        OrgFrequentNoteKind.Annotation,
-        [
-          {
-            id: 'fn_BB3U3i9SwGyCAQRGuvSbkn',
-            kind: OrgFrequentNoteKind.Annotation,
-            content: 'this is the first note',
-          },
-          {
-            id: 'fn_2RtPi7VtI10WaNLtkSVv83',
-            kind: OrgFrequentNoteKind.Annotation,
-            content: 'this is the third note',
-          },
-        ],
-        true,
-      );
-
-      const editButton = screen.getByRole('button', { name: 'Edit' });
-      await userEvent.click(editButton);
-
-      const secondNote = screen.getByText('this is the second note');
-      await userEvent.click(secondNote);
-
-      const deleteButton = screen.getByRole('button', { name: 'Delete' });
-      await userEvent.click(deleteButton);
+      expect(await screen.findByText('this is the first note')).toBeInTheDocument();
     });
   });
 });

@@ -520,12 +520,19 @@
       "public-key-link-title": "Footprint's PGP public key"
     },
     "frequent-notes": {
-      "title": "Frequent Notes",
-      "edit": "Edit",
-      "done": "Done",
-      "warning": "This note will be deleted for the entire organization.",
+      "title": "Frequent notes",
+      "subtitle": "These notes are scoped to the organization",
+      "add-note": "Add",
+      "new-note": "New note",
+      "use-note": "Use this note",
+      "confirm-paste": "Note added",
       "delete": "Delete",
-      "save": "Add to frequent notes",
+      "confirm-delete": "Confirm delete",
+      "are-you-sure": "Are you sure?",
+      "warning": "This note will be deleted for the entire organization.",
+      "save": "Save",
+      "keep-note": "Keep note",
+      "cancel": "Cancel",
       "created-toast": {
         "title": "Success",
         "description": "Saved frequent note for organization."

@@ -15,6 +15,7 @@ type IconPosition = 'left' | 'right';
 export type LinkButtonProps = {
   ariaLabel?: string;
   children: string;
+  className?: string;
   href?: string;
   iconComponent?: Icon;
   iconPosition?: IconPosition;

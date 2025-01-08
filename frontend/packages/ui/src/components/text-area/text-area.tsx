@@ -3,12 +3,13 @@ import type React from 'react';
 import { forwardRef, useId } from 'react';
 import styled, { css } from 'styled-components';
 
+import { cx } from 'class-variance-authority';
 import { createText } from '../../utils';
-import Box from '../box';
 import Hint from '../hint';
 import Label from '../label';
 
 export type TextAreaProps = {
+  className?: string;
   hasError?: boolean;
   hint?: string;
   label?: string;
@@ -17,7 +18,17 @@ export type TextAreaProps = {
 
 const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
   (
-    { hasError = false, hint, id: baseID, label, onChange, onChangeText, placeholder, ...props }: TextAreaProps,
+    {
+      hasError = false,
+      hint,
+      id: baseID,
+      label,
+      onChange,
+      onChangeText,
+      placeholder,
+      className,
+      ...props
+    }: TextAreaProps,
     ref,
   ) => {
     const internalId = useId();
@@ -33,10 +44,10 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
     };
 
     return (
-      <Box>
+      <div>
         {label && <Label htmlFor={id}>{label}</Label>}
         <Textarea
-          className="fp-textarea"
+          className={cx('fp-textarea', className)}
           data-has-error={hasError}
           id={id}
           onChange={handleChange}
@@ -45,7 +56,7 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
           {...props}
         />
         {hint && <Hint hasError={hasError}>{hint}</Hint>}
-      </Box>
+      </div>
     );
   },
 );

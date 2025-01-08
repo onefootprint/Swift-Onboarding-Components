@@ -122,6 +122,9 @@ const config: Omit<Config, 'content'> = {
       full: '9999px',
     },
     extend: {
+      outlineColor: {
+        DEFAULT: 'var(--purple-500)',
+      },
       backgroundColor: {
         primary: 'var(--bg-primary)',
         secondary: 'var(--bg-secondary)',
