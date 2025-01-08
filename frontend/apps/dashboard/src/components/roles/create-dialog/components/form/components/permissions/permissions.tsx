@@ -1,12 +1,11 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
-import type { TenantRoleKindDiscriminant } from '@onefootprint/request-types/dashboard';
-import { type RoleKind, RoleScopeKind, supportedRoleKinds } from '@onefootprint/types';
-import { Box, Checkbox, MultiSelect, Text, createFontStyles } from '@onefootprint/ui';
+import { possibleTenantScopes, supportedTenantRoleKinds } from '@onefootprint/core';
+import type { TenantRoleKindDiscriminant, TenantScope } from '@onefootprint/request-types/dashboard';
+import { Checkbox, MultiSelect } from '@onefootprint/ui';
 import { useEffect } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useDecryptOptions, useVaultProxyOptions } from 'src/components/roles';
-import styled, { css } from 'styled-components';
 
 export type PermissionsProps = {
   kind: TenantRoleKindDiscriminant;
@@ -36,39 +35,39 @@ const Permissions = ({ kind }: PermissionsProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showProxySelect]);
 
-  // TODO: find a good place to do something like supportedRoleKinds with the new types
-  const supportedScopeKinds: RoleScopeKind[] = Object.values(RoleScopeKind).filter(s => {
-    // For legacy roles, all scopes are supported
+  // Here we determine, based on a role kind, which scopes are supported
+  // We will only show the user the scopes that would be possible for a given role kind
+  const supportedScopeKinds = possibleTenantScopes.filter(s => {
     if (!kind) {
+      // legacy roles support all types
       return true;
     }
-
-    return supportedRoleKinds[s].includes(kind as RoleKind);
+    return supportedTenantRoleKinds[s].includes(kind);
   });
 
   return (
     <>
-      <Box marginBottom={5}>
-        <Text variant="label-2">{t('form.permissions.title')}</Text>
-      </Box>
-      <ToggleContainer>
-        {supportedScopeKinds.includes(RoleScopeKind.read) && (
+      <div className="mb-4">
+        <h2 className="text-label-2 text-primary">{t('form.permissions.title')}</h2>
+      </div>
+      <div className="flex flex-col gap-3">
+        {supportedScopeKinds.includes('read') && (
           <Checkbox disabled label={t('scopes.read')} hint={t('scopes.hints.read')} checked />
         )}
-        {supportedScopeKinds.includes(RoleScopeKind.onboardingConfiguration) && (
+        {supportedScopeKinds.includes('onboarding_configuration') && (
           <Checkbox
             label={t('scopes.onboarding_configuration')}
             hint={t('scopes.hints.playbooks')}
-            value={RoleScopeKind.onboardingConfiguration}
+            value={'onboarding_configuration' as TenantScope['kind']}
             {...register('scopeKinds')}
           />
         )}
-        {supportedScopeKinds.includes(RoleScopeKind.decrypt) && (
+        {supportedScopeKinds.includes('decrypt') && (
           <div>
             <Checkbox label={t('form.decrypt.label')} hint={t('scopes.hints.decrypt')} {...register('showDecrypt')} />
             <div ref={animateDecryptSelect}>
               {showDecryptSelect && (
-                <MultiSelectContainer>
+                <div className="mt-3 ml-7">
                   <Controller
                     control={control}
                     name="decryptOptions"
@@ -92,101 +91,101 @@ const Permissions = ({ kind }: PermissionsProps) => {
                       />
                     )}
                   />
-                </MultiSelectContainer>
+                </div>
               )}
             </div>
           </div>
         )}
-        {supportedScopeKinds.includes(RoleScopeKind.apiKeys) && (
+        {supportedScopeKinds.includes('api_keys') && (
           <Checkbox
             label={t('scopes.api_keys')}
             hint={t('scopes.hints.api_keys')}
-            value={RoleScopeKind.apiKeys}
+            value={'api_keys' as TenantScope['kind']}
             {...register('scopeKinds')}
           />
         )}
 
-        {supportedScopeKinds.includes(RoleScopeKind.orgSettings) && (
+        {supportedScopeKinds.includes('org_settings') && (
           <Checkbox
             label={t('scopes.org_settings')}
             hint={t('scopes.hints.org_settings')}
-            value={RoleScopeKind.orgSettings}
+            value={'org_settings' as TenantScope['kind']}
             {...register('scopeKinds')}
           />
         )}
-        {supportedScopeKinds.includes(RoleScopeKind.manualReview) && (
+        {supportedScopeKinds.includes('manual_review') && (
           <Checkbox
             label={t('scopes.manual_review')}
             hint={t('scopes.hints.manual_review')}
-            value={RoleScopeKind.manualReview}
+            value={'manual_review' as TenantScope['kind']}
             {...register('scopeKinds')}
           />
         )}
-        {supportedScopeKinds.includes(RoleScopeKind.writeEntities) && (
+        {supportedScopeKinds.includes('write_entities') && (
           <Checkbox
             label={t('scopes.write_entities')}
             hint={t('scopes.hints.write_entities')}
-            value={RoleScopeKind.writeEntities}
+            value={'write_entities' as TenantScope['kind']}
             {...register('scopeKinds')}
           />
         )}
-        {supportedScopeKinds.includes(RoleScopeKind.cipIntegration) && (
+        {supportedScopeKinds.includes('cip_integration') && (
           <Checkbox
             label={t('scopes.cip_integration')}
             hint={t('scopes.hints.cip_integration')}
-            value={RoleScopeKind.cipIntegration}
+            value={'cip_integration' as TenantScope['kind']}
             {...register('scopeKinds')}
           />
         )}
-        {supportedScopeKinds.includes(RoleScopeKind.triggerKyc) && (
+        {supportedScopeKinds.includes('trigger_kyc') && (
           <Checkbox
             label={t('scopes.trigger_kyc')}
             hint={t('scopes.hints.trigger_kyc')}
-            value={RoleScopeKind.triggerKyc}
+            value={'trigger_kyc' as TenantScope['kind']}
             {...register('scopeKinds')}
           />
         )}
-        {supportedScopeKinds.includes(RoleScopeKind.triggerKyb) && (
+        {supportedScopeKinds.includes('trigger_kyb') && (
           <Checkbox
             label={t('scopes.trigger_kyb')}
             hint={t('scopes.hints.trigger_kyb')}
-            value={RoleScopeKind.triggerKyb}
+            value={'trigger_kyb' as TenantScope['kind']}
             {...register('scopeKinds')}
           />
         )}
-        {supportedScopeKinds.includes(RoleScopeKind.authToken) && (
+        {supportedScopeKinds.includes('auth_token') && (
           <Checkbox
             label={t('scopes.auth_token')}
             hint={t('scopes.hints.auth_token')}
-            value={RoleScopeKind.authToken}
+            value={'auth_token' as TenantScope['kind']}
             {...register('scopeKinds')}
           />
         )}
-        {supportedScopeKinds.includes(RoleScopeKind.onboarding) && (
+        {supportedScopeKinds.includes('onboarding') && (
           <Checkbox
             label={t('scopes.onboarding')}
             hint={t('scopes.hints.onboarding')}
-            value={RoleScopeKind.onboarding}
+            value={'onboarding' as TenantScope['kind']}
             {...register('scopeKinds')}
           />
         )}
-        {supportedScopeKinds.includes(RoleScopeKind.manageWebhooks) && (
+        {supportedScopeKinds.includes('manage_webhooks') && (
           <Checkbox
             label={t('scopes.manage_webhooks')}
             hint={t('scopes.hints.manage_webhooks')}
-            value={RoleScopeKind.manageWebhooks}
+            value={'manage_webhooks' as TenantScope['kind']}
             {...register('scopeKinds')}
           />
         )}
-        {supportedScopeKinds.includes(RoleScopeKind.manageVaultProxy) && (
+        {supportedScopeKinds.includes('manage_vault_proxy') && (
           <Checkbox
             label={t('scopes.manage_vault_proxy')}
             hint={t('scopes.hints.manage_vault_proxy')}
-            value={RoleScopeKind.manageVaultProxy}
+            value={'manage_vault_proxy' as TenantScope['kind']}
             {...register('scopes')}
           />
         )}
-        {supportedScopeKinds.includes(RoleScopeKind.invokeVaultProxy) && (
+        {supportedScopeKinds.includes('invoke_vault_proxy') && (
           <div>
             <Checkbox
               label={t('scopes.invoke_vault_proxy.checkbox')}
@@ -195,7 +194,7 @@ const Permissions = ({ kind }: PermissionsProps) => {
             />
             <div ref={animateProxyConfigSelect}>
               {showProxySelect && (
-                <MultiSelectContainer>
+                <div className="mt-3 ml-7">
                   <Controller
                     control={control}
                     name="vaultProxyConfigs"
@@ -219,33 +218,14 @@ const Permissions = ({ kind }: PermissionsProps) => {
                       />
                     )}
                   />
-                </MultiSelectContainer>
+                </div>
               )}
             </div>
           </div>
         )}
-      </ToggleContainer>
+      </div>
     </>
   );
 };
-
-const ToggleContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[4]};
-
-    label {
-      ${createFontStyles('body-3')};
-    }
-  `}
-`;
-
-const MultiSelectContainer = styled.div`
-  ${({ theme }) => css`
-    margin-top: ${theme.spacing[4]};
-    margin-left: calc(${theme.spacing[7]} + ${theme.spacing[2]});
-  `}
-`;
 
 export default Permissions;

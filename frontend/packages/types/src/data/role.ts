@@ -34,7 +34,10 @@ export enum RoleKind {
   compliancePartnerDashboardUser = 'compliance_partner_dashboard_user',
 }
 
-// Specify which kinds of roles are able to have the given scope
+/**
+ * @deprecated Use types from @onefootprint/request-types/dashboard instead.
+ * These types are no longer maintained and may be out of sync with the API.
+ */
 export const supportedRoleKinds: Record<RoleScopeKind, RoleKind[]> = {
   [RoleScopeKind.read]: [RoleKind.dashboardUser, RoleKind.apiKey],
   [RoleScopeKind.admin]: [RoleKind.dashboardUser, RoleKind.apiKey],

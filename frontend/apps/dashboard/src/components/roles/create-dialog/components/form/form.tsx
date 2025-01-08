@@ -43,13 +43,17 @@ const Form = ({
   const handleAfterSubmit = (formData: FormData) => {
     const { name, scopeKinds, decryptOptions, vaultProxyConfigs } = formData;
     const decryptScopes = decryptOptions.map(({ value }) => DecryptOptionToTenantScope[value]);
-    const vaultProxyScopes: TenantScope[] = vaultProxyConfigs.map(({ value }) =>
-      tenantScopeFromVaultProxyOption(value),
-    );
-    if (!scopeKinds.some(s => s.kind === 'read')) {
-      scopeKinds.push({ kind: 'read' });
+    const vaultProxyScopes = vaultProxyConfigs.map(({ value }) => tenantScopeFromVaultProxyOption(value));
+    // NOTE: Clunky solution. We need to do this becuase the values from the checkboxes (as specified by the DS)
+    // must be strings, rather than TenantScopes
+    const tenantScopeKinds = scopeKinds.map(s => ({ kind: s }) as unknown as TenantScope);
+
+    // Add read scope if not present
+    if (!tenantScopeKinds.some(s => s.kind === 'read')) {
+      tenantScopeKinds.push({ kind: 'read' } as TenantScope);
     }
-    const allScopes: TenantScope[] = [...scopeKinds, ...decryptScopes, ...vaultProxyScopes];
+    const allScopes = [...tenantScopeKinds, ...decryptScopes, ...vaultProxyScopes];
+
     onSubmit({
       name,
       scopes: allScopes,
