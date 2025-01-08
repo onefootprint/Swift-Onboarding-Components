@@ -1,3 +1,4 @@
+import co.touchlab.skie.configuration.FunctionInterop
 import com.vanniktech.maven.publish.SonatypeHost
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -9,6 +10,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.skie)
     id("com.vanniktech.maven.publish") version "0.28.0"
 }
 
@@ -67,6 +69,7 @@ kotlin {
             implementation(libs.kotlinx.coroutines)
             implementation(libs.kotlinx.serialization)
             implementation(libs.ktor.client.logging)
+            implementation(libs.skie)
 
             api(libs.ktor.client.core)
             api(libs.ktor.client.serialization)
@@ -77,6 +80,7 @@ kotlin {
         }
         iosMain.dependencies {
             api(libs.ktor.client.ios)
+            implementation(libs.skie)
         }
     }
 }

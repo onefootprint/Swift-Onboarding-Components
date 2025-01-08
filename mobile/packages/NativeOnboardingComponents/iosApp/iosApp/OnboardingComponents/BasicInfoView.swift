@@ -60,16 +60,16 @@ struct BasicInfoView: View {
         Task {
             do {
                 let fetchedVaultData = try await Footprint.shared.getVaultData(fields:
-                    [DataIdentifier.idfirstname,
-                    DataIdentifier.idmiddlename,
-                    DataIdentifier.idlastname,
-                    DataIdentifier.iddob,
-                     DataIdentifier.idaddressline1,
-                     DataIdentifier.idaddressline2,
-                     DataIdentifier.idcity,
-                     DataIdentifier.idstate,
-                     DataIdentifier.idzip,
-                     DataIdentifier.idcountry
+                    [DataIdentifier.idFirstName,
+                    DataIdentifier.idMiddleName,
+                    DataIdentifier.idLastName,
+                    DataIdentifier.idDob,
+                     DataIdentifier.idAddressLine1,
+                     DataIdentifier.idAddressLine2,
+                     DataIdentifier.idCity,
+                     DataIdentifier.idState,
+                     DataIdentifier.idZip,
+                     DataIdentifier.idCountry
                      // SSN can't be decrypted
                 ])
                 DispatchQueue.main.async {
@@ -154,8 +154,7 @@ struct BasicInfoView: View {
                     onError: { error in
                         print("Error occurred during handoff: \(error)")
                         errorMessage = "An error occurred during verification. Please try again."
-                    },
-                    appearance: nil
+                    }                    
                 )
             } catch {
                 print("Error during handoff: \(error)")

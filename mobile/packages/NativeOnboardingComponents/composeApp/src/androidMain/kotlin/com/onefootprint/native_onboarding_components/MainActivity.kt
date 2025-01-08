@@ -148,11 +148,10 @@ fun Init(
         Button(
             onClick = {
                 coroutineScope.launch {
-                    val authRequirement = Footprint.initialize(
+                    val authRequirement = Footprint.initializeWithPublicKey(
                         publicKey = "pb_test_fvM7uG6JY41t0JLrYP2aEG",
-//                        authToken = "utok_MhyAZwlmbZVLaxH6Kr7aeBe564fi13buhp",
-//                        sandboxId = "sandboxhfvjh367824dcsdvcsd6bdf1",
                         sandboxOutcome = SandboxOutcome(
+                            id = "sandboxhfvjh367824dcsdvcsd6bdf1",
                             overallOutcome = OverallOutcome.fail
                         )
                     )

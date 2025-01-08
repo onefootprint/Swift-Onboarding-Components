@@ -31,51 +31,51 @@ internal func getVaultDiFromFieldNames(_ fieldName: FpFieldName) -> DataIdentifi
     // since switch makes sure that the cases are exhaustive
     switch fieldName {
     case .idFirstName:
-        return .idfirstname
+        return .idFirstName
     case .idMiddleName:
-        return .idmiddlename
+        return .idMiddleName
     case .idLastName:
-        return .idlastname
+        return .idLastName
     case .idDob:
-        return .iddob
+        return .idDob
     case .idSsn4:
-        return .idssn4
+        return .idSsn4
     case .idSsn9:
-        return .idssn9
+        return .idSsn9
     case .idAddressLine1:
-        return .idaddressline1
+        return .idAddressLine1
     case .idAddressLine2:
-        return .idaddressline2
+        return .idAddressLine2
     case .idCity:
-        return .idcity
+        return .idCity
     case .idState:
-        return .idstate
+        return .idState
     case .idZip:
-        return .idzip
+        return .idZip
     case .idCountry:
-        return .idcountry
+        return .idCountry
     case .idEmail:
-        return .idemail
+        return .idEmail
     case .idPhoneNumber:
-        return .idphonenumber
+        return .idPhoneNumber
     case .idUsLegalStatus:
-        return .iduslegalstatus
+        return .idUsLegalStatus
     case .idVisaKind:
-        return .idvisakind
+        return .idVisaKind
     case .idVisaExpirationDate:
-        return .idvisaexpirationdate
+        return .idVisaExpirationDate
     case .idNationality:
-        return .idnationality
+        return .idNationality
     case .idCitizenships:
-        return .idcitizenships
+        return .idCitizenships
     case .idDriversLicenseNumber:
-        return .iddriverslicensenumber
+        return .idDriversLicenseNumber
     case .idDriversLicenseState:
-        return .iddriverslicensestate
+        return .idDriversLicenseState
     case .idItin:
-        return .iditin
+        return .idItin
     case .idUsTaxId:
-        return .idustaxid
+        return .idUsTaxId
     }
 }
 

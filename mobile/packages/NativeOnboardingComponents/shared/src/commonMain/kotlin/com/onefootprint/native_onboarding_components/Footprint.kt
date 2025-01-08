@@ -1,5 +1,6 @@
 package com.onefootprint.native_onboarding_components
 
+import co.touchlab.skie.configuration.annotations.DefaultArgumentInterop
 import com.onefootprint.native_onboarding_components.models.AuthTokenStatus
 import com.onefootprint.native_onboarding_components.models.FootprintAuthMethods
 import com.onefootprint.native_onboarding_components.models.FootprintAuthRequirement
@@ -14,8 +15,6 @@ import com.onefootprint.native_onboarding_components.utils.AuthUtils
 import com.onefootprint.native_onboarding_components.utils.RequirementUtil
 import com.onefootprint.native_onboarding_components.utils.VaultUtils
 import com.onefootprint.native_onboarding_components.utils.generateRandomString
-import io.ktor.client.engine.ProxyBuilder
-import io.ktor.client.engine.http
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.header
 import kotlinx.coroutines.sync.Mutex
@@ -43,7 +42,6 @@ object Footprint {
     internal var onboardingConfig: PublicOnboardingConfiguration? = null
     private var challenge: IdentifyChallengeResponse? = null
 
-    internal var sandboxId: String? = null
     internal var sandboxOutcome: SandboxOutcome? = null
     private var isReady: Boolean = false
     var l10n: FootprintL10n = FootprintL10n(
@@ -65,7 +63,6 @@ object Footprint {
         vaultData = null
         onboardingConfig = null
         challenge = null
-        sandboxId = null
         sandboxOutcome = null
         isReady = false
         l10n = FootprintL10n(
@@ -77,14 +74,36 @@ object Footprint {
 
     @Throws(FootprintException::class, CancellationException::class)
     @OptIn(ExperimentalUuidApi::class)
-    suspend fun initialize(
+    @DefaultArgumentInterop.Enabled
+    suspend fun initializeWithPublicKey(
         publicKey: String? = null,
-        authToken: String? = null,
-        sandboxId: String? = null,
         sandboxOutcome: SandboxOutcome? = null,
         l10n: FootprintL10n? = null,
         sessionId: String? = Uuid.random().toString(),
     ): FootprintAuthRequirement {
+        return init(publicKey, null, sandboxOutcome, l10n, sessionId)
+    }
+
+    @Throws(FootprintException::class, CancellationException::class)
+    @OptIn(ExperimentalUuidApi::class)
+    @DefaultArgumentInterop.Enabled
+    suspend fun initializeWithAuthToken(
+        authToken: String? = null,
+        sandboxOutcome: SandboxOutcome? = null,
+        l10n: FootprintL10n? = null,
+        sessionId: String? = Uuid.random().toString(),
+    ): FootprintAuthRequirement {
+        return init(null, authToken, sandboxOutcome, l10n, sessionId)
+    }
+
+    private suspend fun init(
+        publicKey: String? = null,
+        authToken: String? = null,
+        sandboxOutcome: SandboxOutcome? = null,
+        l10n: FootprintL10n? = null,
+        sessionId: String?
+    ): FootprintAuthRequirement {
+
         mutex.withLock {
             reset()
             this.sessionId = sessionId
@@ -138,22 +157,21 @@ object Footprint {
             }
 
             if (onboardingConfig!!.isLive) {
-                this.sandboxId = null
                 this.sandboxOutcome = null
             } else {
-                if (sandboxId?.any { !it.isLetterOrDigit() } == true) {
+                if (sandboxOutcome?.id?.any { !it.isLetterOrDigit() } == true) {
                     reset()
                     throw FootprintException(
                         kind = FootprintException.ErrorKind.INITIALIZATION_ERROR,
                         message = "Invalid sandboxId. Can only contain alphanumeric characters."
                     )
                 }
-                this.sandboxId = sandboxId ?: generateRandomString()
                 val requiresDocument = onboardingConfig!!.requiresIdDoc
                 val overallOutcome = sandboxOutcome?.overallOutcome ?: WorkflowFixtureResult.pass
                 val documentOutcome = if (requiresDocument) sandboxOutcome?.documentOutcome
                     ?: DocumentFixtureResult.pass else null
                 this.sandboxOutcome = SandboxOutcome(
+                    id = sandboxOutcome?.id ?: generateRandomString(),
                     overallOutcome = overallOutcome,
                     documentOutcome = documentOutcome
                 )
@@ -187,6 +205,7 @@ object Footprint {
         }
     }
 
+    @DefaultArgumentInterop.Enabled
     @Throws(FootprintException::class, CancellationException::class)
     suspend fun createChallenge(email: String? = null, phoneNumber: String? = null): String {
         mutex.withLock {
@@ -196,7 +215,7 @@ object Footprint {
                 phoneNumber = phoneNumber,
                 onboardingConfig = onboardingConfig,
                 authToken = authToken,
-                sandboxId = sandboxId
+                sandboxId = this.sandboxOutcome?.id
             )
             return challenge!!.challengeData.challengeKind.toString()
         }

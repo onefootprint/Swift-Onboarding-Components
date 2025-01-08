@@ -1,11 +1,9 @@
 package com.onefootprint.native_onboarding_components.hosted
-
 import com.onefootprint.native_onboarding_components.Footprint.authToken
 import com.onefootprint.native_onboarding_components.Footprint.authValidationToken
 import com.onefootprint.native_onboarding_components.Footprint.l10n
 import com.onefootprint.native_onboarding_components.Footprint.onboardingConfig
 import com.onefootprint.native_onboarding_components.Footprint.publicKey
-import com.onefootprint.native_onboarding_components.Footprint.sandboxId
 import com.onefootprint.native_onboarding_components.Footprint.sandboxOutcome
 import com.onefootprint.native_onboarding_components.Footprint.sessionId
 import com.onefootprint.native_onboarding_components.Footprint.vaultingToken
@@ -106,7 +104,7 @@ internal object FootprintHostedCommon {
             onError = onError,
             overallOutcome = sandboxOutcome?.overallOutcome,
             documentOutcome = sandboxOutcome?.documentOutcome,
-            sandboxId = sandboxId,
+            sandboxId = sandboxOutcome?.id,
             isAuthPlaybook = configKind == ObConfigurationKind.auth,
             shouldRelayToComponents = true,
             isComponentSdk = true,
@@ -119,7 +117,6 @@ internal object FootprintHostedCommon {
             config = config
         )
     }
-
     suspend fun handoff(
         context: PlatformContext,
         scheme: String,
@@ -160,7 +157,7 @@ internal object FootprintHostedCommon {
             onError = onError,
             overallOutcome = sandboxOutcome?.overallOutcome,
             documentOutcome = sandboxOutcome?.documentOutcome,
-            sandboxId = sandboxId,
+            sandboxId = sandboxOutcome?.id,
             isAuthPlaybook = false,
             shouldRelayToComponents = false,
             isComponentSdk = true,

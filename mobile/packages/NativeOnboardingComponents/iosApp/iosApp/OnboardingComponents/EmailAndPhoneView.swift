@@ -26,31 +26,24 @@ struct EmailAndPhoneView: View {
                         print("Error creating challenge: \(error)")
                         print("is FootprintException \(isFootprintException(error))")
                         if isFootprintException(error), let fpException = extractFootprintException(error) {
-                            if(fpException.kind == .inlineOtpNotSupported) {
-                                print("This is an inline OTP not supported issue")
-                            }
-                        }
-                        if let footprintError = error as? FootprintError {
-                            switch footprintError.kind {
+                            switch fpException.kind {
                             case .inlineOtpNotSupported:
-                                try await FootprintHosted.shared.launchIdentify(                                    
+                                try await FootprintHosted.shared.launchIdentify(
                                     email: vaultData.idEmail,
                                     phone: vaultData.idPhoneNumber,
-                                    onCancel: {
-                                        print("User cancelled hosted identity flow")
-                                    },
                                     onAuthenticated: { response in
                                         print("Hosted identity flow completed: \(response)")
                                         shouldNavigateToNextView = true
                                         isLoading = false
                                         otpComplete = true
                                     },
+                                    onCancel: {
+                                        print("User cancelled hosted identity flow")
+                                    },
                                     onError: { error in
                                         print("Error occurred: \(error)")
-                                    },
-                                    appearance: nil
+                                    }
                                 )
-                                
                             default:
                                 print("Error occurred: \(error)")
                                 shouldNavigateToNextView = false
@@ -96,14 +89,14 @@ struct EmailAndPhoneView: View {
                                 .frame(width: 100, height: 50)
                                 .background(Color.blue)
                                 .cornerRadius(10)
-                                
+                            
                         } else {
                             Text("Submit")
                                 .font(.headline)
                                 .foregroundColor(.white)
                                 .frame(width: 100, height: 50)
                                 .background(Color.blue)
-                                .cornerRadius(10)   
+                                .cornerRadius(10)
                         }
                     }
                     .disabled(isLoading)
@@ -116,9 +109,8 @@ struct EmailAndPhoneView: View {
         .onAppear {
             Task {
                 do {
-                    let sandboxOutcome = SandboxOutcome(overallOutcome: .stepUp, documentOutcome: .pass)
-                    // TODO: fix optional fields
-                    try await Footprint.shared.initialize(publicKey: "pb_test_fvM7uG6JY41t0JLrYP2aEG", authToken: nil, sandboxId: nil, sandboxOutcome: sandboxOutcome, l10n: nil, sessionId: "" )
+                    let sandboxOutcome = SandboxOutcome(id: nil, overallOutcome: .stepUp, documentOutcome: .pass)
+                    try await Footprint.shared.initializeWithPublicKey(publicKey: "pb_test_fvM7uG6JY41t0JLrYP2aEG",  sandboxOutcome: sandboxOutcome )
                 } catch {
                     print("Error: \(error)")
                 }

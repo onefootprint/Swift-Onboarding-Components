@@ -23,13 +23,13 @@ struct AuthTokenView: View {
                     Task {
                         do {
                             // TODO: fix optional fields
-                            let requiresAuthResponse = try await Footprint.shared.initialize(publicKey: "pb_test_qGrzwX22Vu5IGRsjbBFS4s", authToken: authToken, sandboxId: nil, sandboxOutcome: nil, l10n: nil, sessionId: "" )
+                            let requiresAuthResponse = try await Footprint.shared.initializeWithAuthToken(authToken: authToken )
                                                                   
                             
                             print("Requires auth response: \(requiresAuthResponse.requiresAuth)")
                             if requiresAuthResponse.requiresAuth {
                                 // TODO: fix optional fields
-                                let challengeKind = try await Footprint.shared.createChallenge(email: nil, phoneNumber: nil)
+                                let challengeKind = try await Footprint.shared.createChallenge()
                                 self.challengeKind = challengeKind
                                 shouldNavigateToNextView = true
                                 self.requiresAuth = true
@@ -38,30 +38,30 @@ struct AuthTokenView: View {
                                 self.requiresAuth = false
                             }
                         } catch {
-//                            if let footprintError = error as? FootprintError {
-//                                switch footprintError.kind {
-//                                case .inlineOtpNotSupported:
-//                                    try await Footprint.shared.launchIdentify(
-//                                        onCancel: {
-//                                            print("User cancelled hosted identity flow")
-//                                        },
-//                                        onAuthenticated: { response in
-//                                            print("Hosted identity flow completed: \(response)")
-//                                            shouldNavigateToNextView = true
-//                                            isLoading = false
-//                                            self.requiresAuth = false
-//                                        },
-//                                        onError: { error in
-//                                            print("Error occurred: \(error)")
-//                                        }
-//                                    )
-//                                    
-//                                default:
-//                                    print("Error occurred: \(error)")
-//                                    shouldNavigateToNextView = false
-//                                    isLoading = false
-//                                }
-//                            }
+                            
+                            if isFootprintException(error), let fpException = extractFootprintException(error) {
+                                switch fpException.kind {
+                                case .inlineOtpNotSupported:
+                                    try await FootprintHosted.shared.launchIdentify(
+                                        onAuthenticated: { response in
+                                            print("Hosted identity flow completed: \(response)")
+                                            shouldNavigateToNextView = true
+                                            isLoading = false
+                                            self.requiresAuth = false
+                                        },
+                                        onCancel: {
+                                            print("User cancelled hosted identity flow")
+                                        },
+                                        onError: { error in
+                                            print("Error occurred: \(error)")
+                                        }
+                                    )
+                                default:
+                                    print("Error occurred: \(error)")
+                                    shouldNavigateToNextView = false
+                                    isLoading = false
+                                }
+                            }
                         }
                         isLoading = false
                     }

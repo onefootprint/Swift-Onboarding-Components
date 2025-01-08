@@ -1,5 +1,6 @@
 package com.onefootprint.native_onboarding_components.hosted
 
+import co.touchlab.skie.configuration.annotations.DefaultArgumentInterop
 import platform.AuthenticationServices.ASWebAuthenticationSession
 import platform.Foundation.NSURL
 import com.onefootprint.native_onboarding_components.models.VerificationResponse
@@ -77,11 +78,12 @@ internal actual fun handleSdkArgsToken(
 
 
 object FootprintHosted {
+    @DefaultArgumentInterop.Enabled
     suspend fun launchIdentify(
         email: String? = null,
         phone: String? = null,
+        onAuthenticated: ((response: VerificationResponse) -> Unit),
         onCancel: (() -> Unit)? = null,
-        onAuthenticated: ((response: VerificationResponse) -> Unit)? = null,
         onError: ((error: String) -> Unit)? = null,
         appearance: FootprintAppearance? = null
     ) {
@@ -96,9 +98,9 @@ object FootprintHosted {
             appearance
         )
     }
-
+    @DefaultArgumentInterop.Enabled
     suspend fun handoff(
-        onComplete: ((validationToken: String) -> Unit)? = null,
+        onComplete: ((validationToken: String) -> Unit),
         onCancel: (() -> Unit)? = null,
         onError: ((error: String) -> Unit)? = null,
         appearance: FootprintAppearance? = null

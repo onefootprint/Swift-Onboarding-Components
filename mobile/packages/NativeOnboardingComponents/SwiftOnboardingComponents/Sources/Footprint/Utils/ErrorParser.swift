@@ -1,3 +1,5 @@
+import Foundation
+
 public func isFootprintException(_ error: Any) -> Bool {
     if let nsError = error as? NSError,
        nsError.domain == "KotlinException",
