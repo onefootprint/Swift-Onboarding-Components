@@ -1,7 +1,6 @@
-import { Dialog, Stack, Text } from '@onefootprint/ui';
+import { Dialog } from '@onefootprint/ui';
 import Image from 'next/image';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
 
 export type HelpDialogProps = {
   open: boolean;
@@ -9,39 +8,24 @@ export type HelpDialogProps = {
 };
 
 const HelpDialog = ({ open, onClose }: HelpDialogProps) => {
-  const { t } = useTranslation('settings', {
-    keyPrefix: 'pages.business-profile.support-links.dialog',
-  });
+  const { t } = useTranslation('settings', { keyPrefix: 'pages.business-profile.support-links.dialog' });
 
   return (
     <Dialog title={t('title')} open={open} onClose={onClose} size="compact">
-      <Stack direction="column" gap={4}>
-        <Text variant="body-3">{t('body')}</Text>
-        <ImageContainer>
-          <StyledImage alt={t('img-alt')} src="/settings/support-links.png" width={548} height={244} />
-        </ImageContainer>
-      </Stack>
+      <div className="flex flex-col gap-3">
+        <p className="text-body-3">{t('body')}</p>
+        <div className="w-full h-full max-w-[548px] max-h-[244px] overflow-hidden bg-secondary rounded border border-solid border-tertiary">
+          <Image
+            className="w-full h-full object-contain"
+            alt={t('img-alt')}
+            src="/settings/support-links.png"
+            width={548}
+            height={244}
+          />
+        </div>
+      </div>
     </Dialog>
   );
 };
-
-const StyledImage = styled(Image)`
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-`;
-
-const ImageContainer = styled(Stack)`
-  ${({ theme }) => css`
-    width: 100%;
-    height: 100%;
-    max-width: 548px;
-    max-height: 244px;
-    overflow: hidden;
-    background-color: ${theme.backgroundColor.secondary};
-    border-radius: ${theme.borderRadius.default};
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-  `}
-`;
 
 export default HelpDialog;

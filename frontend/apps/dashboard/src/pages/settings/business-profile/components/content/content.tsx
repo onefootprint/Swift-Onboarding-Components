@@ -1,15 +1,14 @@
-import { Button, CopyButton, Form, LinkButton, Stack, Text, TextInput, useToast } from '@onefootprint/ui';
+import type { Organization } from '@onefootprint/request-types/dashboard';
+import { Button, CopyButton, Form, LinkButton, TextInput, useToast } from '@onefootprint/ui';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import usePermissions from 'src/hooks/use-permissions';
 import useUpdateOrg from 'src/hooks/use-update-org';
-import styled from 'styled-components';
 import BusinessProfileInput from './components/business-profile-input';
 import HelpDialog from './components/help-dialog';
 import Logo from './components/logo';
 import ThemeSelector from './components/theme-selector';
-import type { ContentProps } from './content.types';
 
 type FormData = {
   name: string;
@@ -20,10 +19,12 @@ type FormData = {
   supportWebsite: string;
 };
 
+export type ContentProps = {
+  organization: Organization;
+};
+
 const Content = ({ organization }: ContentProps) => {
-  const { t } = useTranslation('settings', {
-    keyPrefix: 'pages.business-profile',
-  });
+  const { t } = useTranslation('settings', { keyPrefix: 'pages.business-profile' });
   const updateOrgMutation = useUpdateOrg();
   const toast = useToast();
   const { hasPermission } = usePermissions();
@@ -50,7 +51,6 @@ const Content = ({ organization }: ContentProps) => {
           description: t('form.success.description'),
         });
       },
-      // no error toast here because updateOrgMutation already handles
     });
   };
 
@@ -64,11 +64,11 @@ const Content = ({ organization }: ContentProps) => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <Stack direction="column" gap={9}>
-        <Stack direction="column" gap={7}>
+      <div className="flex flex-col gap-10">
+        <div className="flex flex-col gap-6">
           <Logo organization={organization} />
-          <Stack direction="column" gap={10}>
-            <Stack direction="column" gap={5} style={{ maxWidth: '640px' }}>
+          <div className="flex flex-col gap-16">
+            <div className="flex flex-col gap-4 max-w-screen-sm">
               <Form.Field variant="horizontal">
                 <Form.Label>{t('name.label')}</Form.Label>
                 <BusinessProfileInput
@@ -88,33 +88,34 @@ const Content = ({ organization }: ContentProps) => {
               </Form.Field>
               <Form.Field variant="horizontal">
                 <Form.Label>{t('id.label')}</Form.Label>
-                <InputContainer direction="column">
-                  <Stack direction="row" gap={4}>
-                    <StyledTextInput
+                <div className="flex flex-col min-w-[350px]">
+                  <div className="flex gap-3">
+                    <TextInput
                       {...register('id')}
                       size="compact"
                       disabled
                       type="text"
                       readOnly
                       placeholder={t('id.form.placeholder')}
+                      className="min-w-[300px]"
                     />
                     <CopyButton contentToCopy={organization.id} />
-                  </Stack>
-                </InputContainer>
+                  </div>
+                </div>
               </Form.Field>
-            </Stack>
-            <Stack direction="column" gap={7} style={{ maxWidth: '640px' }}>
-              <Stack direction="column" gap={3}>
-                <Text variant="heading-5">{t('support-links.title')}</Text>
-                <Stack direction="row" inline gap={2} align="center">
-                  <Text variant="body-2">{t('support-links.subtitle')}</Text>
+            </div>
+            <div className="flex flex-col gap-6 max-w-screen-sm">
+              <div className="flex flex-col gap-2">
+                <p className="text-heading-5">{t('support-links.title')}</p>
+                <div className="flex gap-1 items-center">
+                  <p className="text-body-2">{t('support-links.subtitle')}</p>
                   <LinkButton variant="label-2" onClick={handleHelpDialogOpen}>
                     {t('support-links.more-details')}
                   </LinkButton>
                   <HelpDialog open={helpDialogOpen} onClose={handleHelpDialogClose} />
-                </Stack>
-              </Stack>
-              <Stack gap={5} direction="column">
+                </div>
+              </div>
+              <div className="flex flex-col gap-4">
                 <Form.Field variant="horizontal">
                   <Form.Label>{t('support-email.label')}</Form.Label>
                   <BusinessProfileInput
@@ -141,30 +142,22 @@ const Content = ({ organization }: ContentProps) => {
                     disabled={!canEdit}
                   />
                 </Form.Field>
-              </Stack>
-            </Stack>
-            <Stack direction="column" gap={5} style={{ maxWidth: '640px' }}>
-              <Text variant="heading-5">{t('preferences.title')}</Text>
+              </div>
+            </div>
+            <div className="flex flex-col gap-4 max-w-screen-sm">
+              <p className="text-heading-5">{t('preferences.title')}</p>
               <ThemeSelector />
-            </Stack>
-          </Stack>
-        </Stack>
+            </div>
+          </div>
+        </div>
         <div>
           <Button type="submit" loading={updateOrgMutation.isPending} disabled={!canEdit}>
             {t('save-changes')}
           </Button>
         </div>
-      </Stack>
+      </div>
     </form>
   );
 };
-
-const StyledTextInput = styled(TextInput)`
-  width: 300px;
-`;
-
-const InputContainer = styled(Stack)`
-  min-width: 350px;
-`;
 
 export default Content;

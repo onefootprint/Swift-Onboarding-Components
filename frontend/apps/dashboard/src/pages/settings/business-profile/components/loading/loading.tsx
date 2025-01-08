@@ -1,38 +1,36 @@
-import { Box, Shimmer, Stack } from '@onefootprint/ui';
+import { Shimmer } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
 const Loading = () => {
-  const { t } = useTranslation('settings', {
-    keyPrefix: 'pages.business-profile',
-  });
+  const { t } = useTranslation('settings', { keyPrefix: 'pages.business-profile' });
 
   return (
-    <Box aria-label={t('loading-aria')}>
-      <Stack direction="column" gap={9}>
-        <Stack direction="column" gap={7}>
+    <div aria-label={t('loading-aria')}>
+      <div className="flex flex-col gap-10">
+        <div className="flex flex-col gap-6">
           <Avatar />
-          <Stack direction="column" gap={10}>
-            <Stack direction="column" gap={5} style={{ maxWidth: '640px' }}>
+          <div className="flex flex-col gap-16">
+            <div className="flex flex-col gap-4 max-w-screen-sm">
               <InputRow />
               <InputRow />
               <InputRow />
-            </Stack>
-            <Stack direction="column" gap={7} style={{ maxWidth: '640px' }}>
-              <Stack direction="column" gap={3}>
+            </div>
+            <div className="flex flex-col gap-6 max-w-screen-sm">
+              <div className="flex flex-col gap-2">
                 <Label />
                 <Shimmer height="20px" width="300px" borderRadius="default" />
-              </Stack>
-              <Stack gap={5} direction="column">
+              </div>
+              <div className="flex flex-col gap-4">
                 <InputRow />
                 <InputRow />
                 <InputRow />
-              </Stack>
-            </Stack>
-          </Stack>
-        </Stack>
+              </div>
+            </div>
+          </div>
+        </div>
         <Shimmer height="40px" width="120px" borderRadius="default" />
-      </Stack>
-    </Box>
+      </div>
+    </div>
   );
 };
 
@@ -41,10 +39,10 @@ const Avatar = () => <Shimmer height="80px" width="80px" borderRadius="default" 
 const Label = () => <Shimmer height="24px" width="143px" borderRadius="default" />;
 
 const InputRow = () => (
-  <Stack direction="row" justify="space-between" align="center">
+  <div className="flex justify-between items-center">
     <Label />
     <Shimmer height="36px" width="300px" borderRadius="default" />
-  </Stack>
+  </div>
 );
 
 export default Loading;

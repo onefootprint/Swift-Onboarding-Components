@@ -1,10 +1,11 @@
 import type { Organization } from '@onefootprint/request-types/dashboard';
-import { Avatar, createFontStyles } from '@onefootprint/ui';
+import { Avatar } from '@onefootprint/ui';
 import type React from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
-import styled, { css } from 'styled-components';
 
+import { cx } from 'class-variance-authority';
+import usePermissions from 'src/hooks/use-permissions';
 import useUpdateOrgLogo from './hooks/use-update-org-logo';
 
 type LogoProps = {
@@ -12,10 +13,10 @@ type LogoProps = {
 };
 
 const Logo = ({ organization }: LogoProps) => {
-  const { t } = useTranslation('settings', {
-    keyPrefix: 'pages.business-profile.logo',
-  });
+  const { t } = useTranslation('settings', { keyPrefix: 'pages.business-profile.logo' });
   const updateOrgLogoMutation = useUpdateOrgLogo();
+  const { hasPermission } = usePermissions();
+  const canEdit = hasPermission('org_settings');
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = event.target;
@@ -28,52 +29,27 @@ const Logo = ({ organization }: LogoProps) => {
   };
 
   return (
-    <LogoContainer>
+    <div className="flex gap-4">
       <Avatar name={organization.name} size="xlarge" src={organization.logoUrl} />
-
-      <ButtonContainer>
+      <div className="flex items-center justify-center">
         <PermissionGate scopeKind="org_settings" fallbackText={t('not-allowed')}>
-          <Label>
+          <label
+            className={cx('cursor-pointer text-accent text-label-3', {
+              'pointer-events-none opacity-50': !canEdit,
+            })}
+          >
             {t('cta')}
-            <StyledInput type="file" accept="image/svg+xml, image/png, image/jpeg" onChange={handleChange} />
-          </Label>
+            <input
+              type="file"
+              accept="image/svg+xml, image/png, image/jpeg"
+              onChange={handleChange}
+              className="hidden"
+            />
+          </label>
         </PermissionGate>
-      </ButtonContainer>
-    </LogoContainer>
+      </div>
+    </div>
   );
 };
-
-const Label = styled.label<{ disabled?: boolean }>`
-  ${({ theme, disabled }) => css`
-    ${createFontStyles('label-3')};
-    color: ${theme.color.accent};
-    cursor: pointer;
-
-    ${
-      disabled &&
-      css`
-      pointer-events: none;
-      opacity: 0.5;
-    `
-    }
-  `}
-`;
-
-const StyledInput = styled.input`
-  display: none;
-`;
-
-const LogoContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    gap: ${theme.spacing[5]};
-  `}
-`;
-
-const ButtonContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
 
 export default Logo;

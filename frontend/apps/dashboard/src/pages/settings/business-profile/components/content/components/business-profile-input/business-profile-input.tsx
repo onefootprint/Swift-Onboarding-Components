@@ -1,23 +1,14 @@
 import { Form } from '@onefootprint/ui';
 import React from 'react';
-import styled from 'styled-components';
 
 const BusinessProfileInput = React.forwardRef<HTMLInputElement, React.ComponentPropsWithoutRef<typeof Form.Input>>(
   (props, ref) => {
     return (
-      <OuterContainer>
-        <InnerContainer size="compact" {...props} ref={ref} />
-      </OuterContainer>
+      <div className="min-w-[350px]">
+        <Form.Input className="max-w-[300px] w-full" size="compact" {...props} ref={ref} />
+      </div>
     );
   },
 );
-
-const InnerContainer = styled(Form.Input)`
-  width: 300px;
-`;
-
-const OuterContainer = styled.div`
-  min-width: 350px;
-`;
 
 export default BusinessProfileInput;

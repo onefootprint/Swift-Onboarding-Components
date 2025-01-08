@@ -1,4 +1,3 @@
-import { Box, Text } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
 export type ErrorDisplayProps = {
@@ -7,13 +6,12 @@ export type ErrorDisplayProps = {
 
 const ErrorDisplay = ({ message }: ErrorDisplayProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'notifications' });
+
   return (
-    <Box aria-label={t('error')}>
-      <Text variant="label-3" color="tertiary" marginBottom={2}>
-        {t('error')}
-      </Text>
-      <Text variant="body-3">{message}</Text>
-    </Box>
+    <div className="flex flex-col" aria-label={t('error')}>
+      <div className="text-label-3 text-tertiary mb-1">{t('error')}</div>
+      <div className="text-body-3">{message}</div>
+    </div>
   );
 };
 
