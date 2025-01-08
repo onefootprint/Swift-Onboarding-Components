@@ -28,7 +28,7 @@ def test_get_org_config_no_key(sandbox_tenant, sandbox_user):
     body = get("hosted/onboarding/config", None, status_code=401)
     assert (
         body["message"]
-        == "Missing header: X-Onboarding-Config-Key or X-Fp-Authorization"
+        == "Missing or invalid header value for X-Onboarding-Config-Key and X-Fp-Authorization"
     )
 
 

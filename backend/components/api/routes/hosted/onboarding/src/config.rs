@@ -5,12 +5,12 @@ use api_core::auth::ob_config::PublicOnboardingContext;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::user::UserSessionContext;
 use api_core::auth::Any;
-use api_core::auth::AuthError;
 use api_core::errors::onboarding::OnboardingError;
 use api_core::types::ApiResponse;
 use api_errors::BadRequestWithCode;
 use api_errors::FpErrorCode;
 use api_errors::FpResult;
+use api_errors::UnauthorizedInto;
 use db::models::appearance::Appearance;
 use db::models::rule_instance::IncludeRules;
 use db::models::rule_instance::RuleInstance;
@@ -56,11 +56,11 @@ pub fn get(
             (tenant, playbook, ob_config, None)
         }
         (None, None) => {
-            let missing_headers = vec![
+            return UnauthorizedInto!(
+                "Missing or invalid header value for {} and {}",
                 PublicOnboardingContext::HEADER_NAME.to_owned(),
                 UserSessionContext::HEADER_NAME.to_owned(),
-            ];
-            return Err(AuthError::MissingHeader(missing_headers).into());
+            );
         }
     };
 
