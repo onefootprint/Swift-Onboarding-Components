@@ -18,10 +18,14 @@ export type DetailsProps = {
 
 const Details = ({ kind, listPath }: DetailsProps) => {
   const id = useEntityId();
-  const { isPending, error } = useEntity(id);
+  const { data, isPending, error } = useEntity(id);
 
   if (isPending) {
     return <Loading />;
+  }
+
+  if (data?.kind !== kind) {
+    return <Page404 />;
   }
 
   if (error) {
