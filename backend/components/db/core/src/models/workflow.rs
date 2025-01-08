@@ -358,6 +358,13 @@ impl Workflow {
                 WorkflowState::AdhocVendorCall(AdhocVendorCallState::VendorCalls)
             }
         };
+        let initial_status = match kind {
+            WorkflowKind::AlpacaKyc | WorkflowKind::Kyc | WorkflowKind::Document | WorkflowKind::Kyb => {
+                OnboardingStatus::Incomplete
+            }
+            WorkflowKind::AdhocVendorCall => OnboardingStatus::Pending,
+        };
+
         let new_workflow = NewWorkflow {
             created_at: Utc::now(),
             scoped_vault_id,
@@ -365,7 +372,7 @@ impl Workflow {
             state: initial_state,
             config,
             fixture_result,
-            status: OnboardingStatus::Incomplete,
+            status: initial_status,
             ob_configuration_id,
             insight_event_id,
             authorized_at: authorized.then_some(Utc::now()),

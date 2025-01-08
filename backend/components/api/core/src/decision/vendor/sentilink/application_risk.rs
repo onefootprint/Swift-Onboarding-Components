@@ -64,8 +64,9 @@ pub async fn run_sentilink_application_risk(
     .await?
     .ok();
 
-    if existing_result.is_some() {
-        return Ok(None);
+    if let Some((existing_result, vres_id)) = existing_result {
+        let validated = existing_result.validate().map_err(into_fp_error)?;
+        return Ok(Some((validated, vres_id)));
     }
 
     // Make the call

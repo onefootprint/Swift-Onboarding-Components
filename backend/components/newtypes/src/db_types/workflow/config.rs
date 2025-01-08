@@ -97,6 +97,7 @@ pub struct AdhocVendorCallConfig {
     pub verification_checks: Vec<VerificationCheck>,
 }
 
+
 impl From<AdhocVendorCallConfig> for WorkflowConfig {
     fn from(value: AdhocVendorCallConfig) -> Self {
         Self::AdhocVendorCall(value)

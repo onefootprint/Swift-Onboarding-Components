@@ -26,14 +26,17 @@ pub enum AdhocVendorCallState {
 
 impl AdhocVendorCallState {
     pub async fn init(state: &State, workflow: DbWorkflow, _seqno: DataLifetimeSeqno) -> FpResult<Self> {
+        let newtypes::WorkflowConfig::AdhocVendorCall(c) = workflow.config.clone() else {
+            return Err(StateError::UnexpectedConfigForWorkflow(workflow.config, workflow.id).into());
+        };
         if let newtypes::WorkflowState::AdhocVendorCall(s) = workflow.state {
             match s {
-                NTAdhocVendorCallState::VendorCalls => AdhocVendorCallVendorCalls::init(state, workflow)
-                    .await
-                    .map(AdhocVendorCallState::from),
-                NTAdhocVendorCallState::Complete => AdhocVendorCallComplete::init(state, workflow)
-                    .await
-                    .map(AdhocVendorCallState::from),
+                NTAdhocVendorCallState::VendorCalls => {
+                    AdhocVendorCallVendorCalls::init(state, workflow, c).map(AdhocVendorCallState::from)
+                }
+                NTAdhocVendorCallState::Complete => {
+                    AdhocVendorCallComplete::init(state, workflow, c).map(AdhocVendorCallState::from)
+                }
             }
         } else {
             Err(StateError::UnexpectedStateForWorkflow(workflow.state, workflow.id).into())

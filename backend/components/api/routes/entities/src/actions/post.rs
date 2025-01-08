@@ -1,3 +1,4 @@
+use crate::actions::decision::apply_adhoc_vendor_call;
 use crate::actions::decision::apply_manual_decision;
 use crate::actions::decision::clear_review;
 use crate::actions::triggers::apply_trigger_request;
@@ -65,6 +66,9 @@ pub async fn post(
                             insight.clone(),
                             tenant_id.clone(),
                         )?,
+                        EntityAction::AdhocVendorCall(req) => {
+                            apply_adhoc_vendor_call(conn, req.config, &sv, actor.clone())?
+                        }
                     };
                     Ok(action)
                 })

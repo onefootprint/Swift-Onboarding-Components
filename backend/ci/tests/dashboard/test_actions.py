@@ -1,6 +1,7 @@
+import pytest
 from tests.bifrost_client import BifrostClient
 from tests.identify_client import IdentifyClient
-from tests.utils import post, get
+from tests.utils import post, get, try_until_success
 from tests.headers import FpAuth
 from tests.dashboard.utils import (
     assert_has_audit_event_with_details,
@@ -133,3 +134,52 @@ def test_trigger_and_clear_review(sandbox_tenant):
     # Make sure manual review is cleared
     body = get(f"entities/{user.fp_id}", data, *sandbox_tenant.db_auths)
     assert not body["requires_manual_review"]
+
+
+@pytest.mark.flaky
+def test_adhoc_vendor_call(sandbox_tenant):
+    bifrost = BifrostClient.new_user(
+        sandbox_tenant.default_ob_config, fixture_result="pass"
+    )
+    user = bifrost.run()
+
+    body = get(f"entities/{user.fp_id}/onboardings", None, *sandbox_tenant.db_auths)
+    assert len(body["data"]) == 1
+    bifrost_ob = body["data"][0]
+    assert bifrost_ob["status"] == "pass"
+    bifrost_ob_timestamp = bifrost_ob["timestamp"]
+
+    # Make an adhoc vendor call action req
+    action = dict(verification_checks=[dict(kind="sentilink", data=dict())])
+    adhoc_vendor_call_action = dict(kind="adhoc_vendor_call", config=action)
+    data = dict(actions=[adhoc_vendor_call_action])
+    body = post(f"entities/{user.fp_id}/actions", data, *sandbox_tenant.db_auths)
+
+    assert len(body) == 0
+
+    # Check OBs
+    def check_adhoc_vendor_call_results(user, sandbox_tenant, bifrost_ob_timestamp):
+        body = get(f"entities/{user.fp_id}/onboardings", None, *sandbox_tenant.db_auths)
+        assert len(body["data"]) == 2
+        adhoc_ob = body["data"][0]
+        assert adhoc_ob["status"] == "none"
+        assert adhoc_ob["kind"] == "adhoc_vendor_call"
+        assert len(adhoc_ob["rule_set_results"]) == 0
+        
+        # Check we wrote risk signals
+        risk_signals = get(
+            f"entities/{user.fp_id}/onboardings/{adhoc_ob['id']}/risk_signals",
+            None,
+            *sandbox_tenant.db_auths,
+        )
+        assert all(["sentilink" in rs["reason_code"] for rs in risk_signals])
+
+        # Also assert that the onboarding isn't visible from the tenant facing API
+        body = get(f"users/{user.fp_id}/onboardings", None, sandbox_tenant.s_sk)
+        assert len(body["data"]) == 1
+        assert body["data"][0]["timestamp"] == bifrost_ob_timestamp
+
+    try_until_success(lambda: check_adhoc_vendor_call_results(user, sandbox_tenant, bifrost_ob_timestamp), 60, retry_interval_s=0.1)
+
+
+

@@ -1,3 +1,4 @@
+use super::WfrAdhocVendorCallConfig;
 use crate::DecisionStatus;
 use crate::FpId;
 use crate::WorkflowRequestConfig;
@@ -42,6 +43,12 @@ pub struct TriggerRequest {
 }
 
 #[derive(Debug, Clone, Deserialize, Apiv2Schema)]
+pub struct AdhocVendorCallRequest {
+    pub config: WfrAdhocVendorCallConfig,
+}
+
+
+#[derive(Debug, Clone, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "kind")]
 pub enum EntityAction {
@@ -51,4 +58,5 @@ pub enum EntityAction {
     Trigger(TriggerRequest),
     ClearReview,
     ManualDecision(ManualDecisionRequest),
+    AdhocVendorCall(AdhocVendorCallRequest),
 }

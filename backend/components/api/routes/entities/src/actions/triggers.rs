@@ -81,9 +81,9 @@ fn validate(
                 return BadRequestInto("fp_bid and business_configs must both be provided together");
             }
         }
-        WorkflowRequestConfig::AdhocVendorCall { .. } => {
-            // TODO
-            unimplemented!()
+        WorkflowRequestConfig::AdhocVendorCall(_) => {
+            // MOVE this
+            todo!()
         }
     }
     Ok(())
@@ -111,6 +111,10 @@ pub(super) fn apply_trigger_request(
         return BadRequestInto("Must be a person vault");
     }
 
+    if let WorkflowRequestConfig::AdhocVendorCall(_) = &trigger {
+        return BadRequestInto("Adhoc vendor call not a trigger request");
+    }
+
     let sb = fp_bid
         .as_ref()
         .map(|fp_bid| {
@@ -133,7 +137,7 @@ pub(super) fn apply_trigger_request(
             let (_, obc) = ObConfiguration::get(conn, (&cfg.playbook_id, &sv.tenant_id, sv.is_live))?;
             obc
         }
-        WorkflowRequestConfig::Document(_) => {
+        WorkflowRequestConfig::Document(_) | WorkflowRequestConfig::AdhocVendorCall(_) => {
             // For all other trigger kinds, just associate the last playbook with the WFR.
             // This is mostly just used to serialize information on the tenant. Would be nice if we could stop
             // associating a playbook with these WFRs
@@ -170,9 +174,6 @@ pub(super) fn apply_trigger_request(
             // effects in bifrost any place where bifrost reads a playbook setting that
             // is technically not pertinent to the document workflow.
             // https://github.com/onefootprint/monorepo/blob/bf8d6eb7e391e66ccafe73bbd2866d427160da54/frontend/packages/types/src/data/onboarding-config.ts#L51
-        }
-        WorkflowRequestConfig::AdhocVendorCall { .. } => {
-            unimplemented!()
         }
     };
     if obc.kind == ObConfigurationKind::Auth {
