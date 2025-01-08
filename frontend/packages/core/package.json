@@ -10,13 +10,8 @@
   "sideEffects": false,
   "author": "Footprint",
   "license": "MIT",
-  "files": [
-    "dist"
-  ],
-  "keywords": [
-    "kyc",
-    "identity verification"
-  ],
+  "files": ["dist"],
+  "keywords": ["kyc", "identity verification"],
   "scripts": {
     "build": "tsup",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
@@ -29,7 +24,8 @@
     "typecheck": "pnpm tsc --noEmit"
   },
   "dependencies": {
-    "date-fns": "^2.30.0"
+    "date-fns": "^2.30.0",
+    "@onefootprint/request-types": "workspace:*"
   },
   "devDependencies": {
     "@happy-dom/global-registrator": "^14.7.1",

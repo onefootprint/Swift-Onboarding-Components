@@ -31,3 +31,4 @@ export { default as isTin } from './validations/is-tin';
 export { default as isTokenFormat } from './validations/is-token-format';
 export { default as isURL, isURLWithProtocol } from './validations/is-url';
 export { getIsoDate, isValidIsoDate } from './validations/date';
+export { supportedTenantRoleKinds, possibleTenantScopes } from './shared/roles';

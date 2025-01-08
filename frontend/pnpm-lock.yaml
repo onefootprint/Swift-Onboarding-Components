@@ -1773,6 +1773,9 @@ importers:
 
   packages/core:
     dependencies:
+      '@onefootprint/request-types':
+        specifier: workspace:*
+        version: link:../request-types
       date-fns:
         specifier: ^2.30.0
         version: 2.30.0
