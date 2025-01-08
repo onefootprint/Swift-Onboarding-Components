@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import TruncatedText from '@/entities/components/details/components/truncated-text';
 import useCurrentEntityUpdateAnnotation from '@/entity/hooks/use-current-entity-update-annotation';
+import PermissionGate from 'src/components/permission-gate';
 
 type AnnotationNoteProps = {
   annotation: Annotation;
@@ -15,7 +16,7 @@ const DEFAULT_TEXT_VIEW_HEIGHT = 90;
 
 const AnnotationNote = ({ annotation, hidePinToggle }: AnnotationNoteProps) => {
   const { t } = useTranslation('entity-details', {
-    keyPrefix: 'audit-trail.timeline.onboarding-decision-event',
+    keyPrefix: 'audit-trail.timeline.onboarding-decision-event.human-decision',
   });
   const [isNotePinned, setIsNotePinned] = useState(!!annotation?.isPinned);
   const updateMutation = useCurrentEntityUpdateAnnotation();
@@ -51,12 +52,9 @@ const AnnotationNote = ({ annotation, hidePinToggle }: AnnotationNoteProps) => {
         }}
       />
       {!hidePinToggle && (
-        <Toggle
-          checked={isNotePinned}
-          onChange={handlePinNoteChange}
-          size="compact"
-          label={t('human-decision.pin-note')}
-        />
+        <PermissionGate scopeKind="manual_review" fallbackText="">
+          <Toggle checked={isNotePinned} onChange={handlePinNoteChange} size="compact" label={t('pin-note')} />
+        </PermissionGate>
       )}
     </>
   ) : null;

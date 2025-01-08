@@ -5,6 +5,7 @@ import styled, { css } from 'styled-components';
 
 import TruncatedText from '@/entities/components/details/components/truncated-text';
 import useCurrentEntityUpdateAnnotation from '@/entity/hooks/use-current-entity-update-annotation';
+import PermissionGate from 'src/components/permission-gate';
 
 export type PinnedNoteProps = {
   note: string;
@@ -16,9 +17,7 @@ export type PinnedNoteProps = {
 const DEFAULT_TEXT_VIEW_HEIGHT = 60;
 
 const PinnedNote = ({ note, author, timestamp, noteId }: PinnedNoteProps) => {
-  const { t } = useTranslation('entity-details', {
-    keyPrefix: 'pinned-notes',
-  });
+  const { t } = useTranslation('entity-details');
   const updateMutation = useCurrentEntityUpdateAnnotation();
 
   const handleUnpinNote = (annotationId: string) => {
@@ -32,13 +31,15 @@ const PinnedNote = ({ note, author, timestamp, noteId }: PinnedNoteProps) => {
     <Container>
       <Header>
         <TitleContainer>
-          <Text variant="label-3">{author && t('title-by-author', { author })}</Text>
+          <Text variant="label-3">{author && t('pinned-notes.title-by-author', { author })}</Text>
           <Text variant="label-3" marginLeft={2}>
             &middot;
           </Text>
-          <LinkButton $marginLeft={2} onClick={() => handleUnpinNote(noteId)}>
-            {t('unpin-button-text')}
-          </LinkButton>
+          <PermissionGate scopeKind="manual_review" fallbackText={t('manual-review-not-allowed')}>
+            <LinkButton $marginLeft={2} onClick={() => handleUnpinNote(noteId)}>
+              {t('pinned-notes.unpin-button-text')}
+            </LinkButton>
+          </PermissionGate>
         </TitleContainer>
         <Text variant="body-3" color="secondary">
           {timestamp}
