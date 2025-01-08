@@ -63,6 +63,7 @@ use newtypes::WorkflowSource;
 use newtypes::WorkflowStartedInfo;
 use newtypes::WorkflowState;
 use std::collections::HashMap;
+use strum::IntoEnumIterator;
 
 #[derive(Debug, Clone, Queryable, Identifiable, QueryableByName, Selectable)]
 #[diesel(table_name = workflow)]
@@ -163,14 +164,46 @@ pub struct OnboardingWorkflowArgs<'a> {
 
 pub type IsNew = bool;
 
+
+// This enum represents groupings of workflows where we expect to only
+// have a single active workflow in at a time. So, you could have an active
+// onboarding and an active adhoc vendor call, but not two active onboardings.
+// Similarly, starting an adhoc workflow should not influence the active status
+// of a bifrost onboarding and vice versa
+#[derive(Debug, PartialEq, Eq)]
+enum WorkflowGroup {
+    Onboarding,
+    Adhoc,
+}
+impl WorkflowGroup {
+    fn kinds_to_deactivate(&self) -> Vec<WorkflowKind> {
+        WorkflowKind::iter().filter(|k| *self == k.into()).collect()
+    }
+}
+
+impl From<&WorkflowKind> for WorkflowGroup {
+    fn from(kind: &WorkflowKind) -> Self {
+        match kind {
+            WorkflowKind::AdhocVendorCall => Self::Adhoc,
+            WorkflowKind::Kyc | WorkflowKind::AlpacaKyc | WorkflowKind::Document | WorkflowKind::Kyb => {
+                Self::Onboarding
+            }
+        }
+    }
+}
+
+
 impl Workflow {
     #[tracing::instrument("Workflow::insert", skip_all)]
     pub fn insert(conn: &mut TxnPgConn, new_workflow: NewWorkflow) -> FpResult<Self> {
+        // We only want to deactivate other workflows in the same group
+        let wf_group: WorkflowGroup = (&new_workflow.kind).into();
         // Deactivate existing workflow, if any. We also set the deactivated_at of the previous
         // workflow to the created_at of the new workflow, just for convenience
         let deactivated_wf = diesel::update(workflow::table)
             .filter(workflow::scoped_vault_id.eq(&new_workflow.scoped_vault_id))
             .filter(workflow::deactivated_at.is_null())
+            .filter(workflow::kind.eq_any(wf_group.kinds_to_deactivate()))
             .set(workflow::deactivated_at.eq(new_workflow.created_at))
             .returning(workflow::id)
             .get_result::<WorkflowId>(conn.conn())
@@ -244,6 +277,7 @@ impl Workflow {
                 .filter(workflow::scoped_vault_id.eq(&scoped_vault_id))
                 .filter(ob_configuration::playbook_id.eq(&obc.playbook_id))
                 .filter(workflow::deactivated_at.is_null())
+                .filter(not(workflow::kind.eq(WorkflowKind::AdhocVendorCall)))
                 .select(Workflow::as_select())
                 .first(conn.conn())
                 .optional()?;
@@ -253,6 +287,7 @@ impl Workflow {
                 .filter(workflow::scoped_vault_id.eq(&scoped_vault_id))
                 .filter(ob_configuration::playbook_id.eq(&obc.playbook_id))
                 .filter(not(workflow::completed_at.is_null()))
+                .filter(not(workflow::kind.eq(WorkflowKind::AdhocVendorCall)))
                 .select(Workflow::as_select())
                 .first(conn.conn())
                 .optional()?;
@@ -430,6 +465,7 @@ impl Workflow {
             .inner_join(ob_configuration::table.inner_join(playbook::table))
             .filter(workflow::scoped_vault_id.eq(sv_id))
             .filter(ob_configuration::kind.eq_any(ObConfigurationKind::reonboardable()))
+            .filter(not(workflow::kind.eq(WorkflowKind::AdhocVendorCall)))
             .filter(playbook::status.eq(ApiKeyStatus::Enabled))
             .select((workflow::all_columns, ob_configuration::all_columns))
             .into_boxed();
@@ -706,6 +742,7 @@ impl Workflow {
             .inner_join(scoped_vault::table.inner_join(tenant::table))
             .filter(workflow::completed_at.is_null())
             .filter(workflow::deactivated_at.is_null())
+            .filter(not(workflow::kind.eq(WorkflowKind::AdhocVendorCall)))
             .filter(workflow::scoped_vault_id.eq_any(sv_ids))
             .select((
                 workflow::all_columns,

@@ -1,0 +1,1 @@
+DROP INDEX CONCURRENTLY IF EXISTS workflow_one_active_per_scoped_vault_non_adhoc;

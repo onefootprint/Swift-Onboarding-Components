@@ -156,9 +156,7 @@ def test_adhoc_vendor_call(sandbox_tenant):
     body = post(f"entities/{user.fp_id}/actions", data, *sandbox_tenant.db_auths)
 
     assert len(body) == 0
-
-    # Check OBs
-    def check_adhoc_vendor_call_results(user, sandbox_tenant, bifrost_ob_timestamp):
+    def check_adhoc_vendor_call_results():
         body = get(f"entities/{user.fp_id}/onboardings", None, *sandbox_tenant.db_auths)
         assert len(body["data"]) == 2
         adhoc_ob = body["data"][0]
@@ -179,7 +177,49 @@ def test_adhoc_vendor_call(sandbox_tenant):
         assert len(body["data"]) == 1
         assert body["data"][0]["timestamp"] == bifrost_ob_timestamp
 
-    try_until_success(lambda: check_adhoc_vendor_call_results(user, sandbox_tenant, bifrost_ob_timestamp), 60, retry_interval_s=0.1)
+    try_until_success(check_adhoc_vendor_call_results, 60, retry_interval_s=0.1)
+
+def test_adhoc_vendor_call_does_not_break_in_progress_workflows(sandbox_tenant):
+    # user is in progress in a workflow
+    bifrost = BifrostClient.new_user(
+        sandbox_tenant.default_ob_config, fixture_result="pass"
+    )
+    user = bifrost.run()
+
+    data = dict(kind="onboard", key=sandbox_tenant.default_ob_config.key.value)
+    body = post(f"users/{user.fp_id}/token", data, sandbox_tenant.s_sk)
+    token = FpAuth(body["token"])
+    token = IdentifyClient.from_token(token).login()
+    bifrost = BifrostClient.raw_auth(sandbox_tenant.default_ob_config, token, user.client.sandbox_id)
+
+
+    body = get(f"entities/{user.fp_id}/onboardings", None, *sandbox_tenant.db_auths)
+    assert len(body["data"]) == 2
+    bifrost_ob = body["data"][0]
+    assert bifrost_ob["status"] == "incomplete"
+
+    # Make an adhoc vendor call action req
+    action = dict(verification_checks=[dict(kind="sentilink", data=dict())])
+    adhoc_vendor_call_action = dict(kind="adhoc_vendor_call", config=action)
+    data = dict(actions=[adhoc_vendor_call_action])
+    body = post(f"entities/{user.fp_id}/actions", data, *sandbox_tenant.db_auths)
+
+    assert len(body) == 0
+
+    # Check OBs
+    def check_adhoc_vendor_call_results():
+        body = get(f"entities/{user.fp_id}/onboardings", None, *sandbox_tenant.db_auths)
+        assert len(body["data"]) == 3
+        adhoc_ob = body["data"][0]
+        assert adhoc_ob["status"] == "none"
+    try_until_success(check_adhoc_vendor_call_results, 60, retry_interval_s=0.1)
+
+
+    # Now handle the original workflow
+    bifrost.run()
+    body = get(f"users/{user.fp_id}/onboardings", None, sandbox_tenant.s_sk)
+    assert len(body["data"]) == 2
+    assert set([r['status'] for r in body["data"]]) == set(["pass"])
 
 
 
