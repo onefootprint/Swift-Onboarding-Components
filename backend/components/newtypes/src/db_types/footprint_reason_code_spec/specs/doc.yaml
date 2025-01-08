@@ -1,0 +1,14 @@
+categories:
+  - name: overall
+    sub_categories:
+      - name: document
+        reason_codes:
+          - document_verified
+          - document_not_verified
+      - name: selfie
+        reason_codes:
+          - document_selfie_matches
+          - document_selfie_does_not_match
+      - name: liveness
+        reason_codes:
+          - document_selfie_not_live_image

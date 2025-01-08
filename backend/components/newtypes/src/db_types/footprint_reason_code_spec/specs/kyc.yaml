@@ -1,0 +1,27 @@
+categories:
+  - name: name
+    sub_categories:
+      - name: matching
+        reason_codes:
+          - name_does_not_match
+          - name_matches
+          - name_partially_matches
+      - name: First
+        reason_codes:
+          - name_first_matches
+          - name_first_does_not_match
+          - name_first_partially_matches
+  - name: address
+    sub_categories:
+      - name: matching
+        reason_codes:
+          - address_matches
+          - address_does_not_match
+          - address_partially_matches
+  - name: dob
+    sub_categories:
+      - name: matching
+        reason_codes:
+          - dob_matches
+          - dob_does_not_match
+          - dob_partial_match

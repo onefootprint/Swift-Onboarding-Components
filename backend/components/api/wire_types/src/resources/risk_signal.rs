@@ -1,10 +1,13 @@
 use crate::*;
+use itertools::Itertools;
+use newtypes::footprint_reason_code_spec::RiskSignalSpec;
 use newtypes::FootprintReasonCode;
 use newtypes::OnboardingDecisionId;
 use newtypes::RiskSignalGroupKind;
 use newtypes::RiskSignalId;
 use newtypes::SignalScope;
 use newtypes::SignalSeverity;
+use std::collections::HashMap;
 
 /// RiskSignal information, including severity, impacted scopes, and more.
 #[derive(Debug, Clone, Serialize, Deserialize, Apiv2Response, macros::JsonResponder)]
@@ -61,4 +64,76 @@ pub struct PublicRiskSignalDescription {
     pub severity: SignalSeverity,
     /// What the reason code applies to (Name, Document, Business, etc)
     pub scopes: Vec<SignalScope>,
+}
+
+
+#[derive(Debug, Serialize, Apiv2Response, macros::JsonResponder)]
+pub struct PublicRiskSignalSpecDescription(HashMap<RiskSignalGroupKind, PublicRiskSignalSpec>);
+
+#[derive(Debug, Serialize, Apiv2Response)]
+#[serde(rename_all = "snake_case")]
+pub struct PublicRiskSignalSpec {
+    pub category: Vec<PublicRiskSignalCategory>,
+}
+
+#[derive(Debug, Serialize, Apiv2Response)]
+#[serde(rename_all = "snake_case")]
+pub struct PublicRiskSignalCategory {
+    pub name: String,
+    pub sub_categories: Vec<PublicRiskSignalSubCategory>,
+}
+
+#[derive(Debug, Serialize, Apiv2Response)]
+#[serde(rename_all = "snake_case")]
+pub struct PublicRiskSignalSubCategory {
+    pub name: String,
+    pub reason_codes: Vec<PublicRiskSignalDescription>,
+}
+
+impl From<HashMap<RiskSignalGroupKind, RiskSignalSpec>> for PublicRiskSignalSpecDescription {
+    fn from(specs: HashMap<RiskSignalGroupKind, RiskSignalSpec>) -> Self {
+        let public_specs = specs
+            .into_iter()
+            .map(|(k, v)| {
+                let categories = v
+                    .categories
+                    .into_iter()
+                    .map(|category| {
+                        let sub_categories = category
+                            .sub_categories
+                            .into_iter()
+                            .map(|subcategory| {
+                                let reason_codes = subcategory
+                                    .reason_codes
+                                    .into_iter()
+                                    .filter(|code| !code.to_be_deprecated())
+                                    .filter(|code| !code.in_preview())
+                                    .filter(|code| !matches!(code, FootprintReasonCode::Other(_)))
+                                    .map(|code| PublicRiskSignalDescription {
+                                        reason_code: code.clone(),
+                                        note: code.note(),
+                                        description: code.description(),
+                                        severity: code.severity(),
+                                        scopes: code.scopes(),
+                                    })
+                                    .collect();
+                                PublicRiskSignalSubCategory {
+                                    name: subcategory.name,
+                                    reason_codes,
+                                }
+                            })
+                            .collect();
+                        PublicRiskSignalCategory {
+                            name: category.name,
+                            sub_categories,
+                        }
+                    })
+                    .collect_vec();
+
+                (k, PublicRiskSignalSpec { category: categories })
+            })
+            .collect();
+
+        PublicRiskSignalSpecDescription(public_specs)
+    }
 }

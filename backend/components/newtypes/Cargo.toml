@@ -40,6 +40,7 @@ rand = { workspace = true }
 diesel = { workspace = true }
 actix-web = { workspace = true }
 rust_decimal = { workspace = true }
+serde_yaml = { version = "0.9" }
 
 diesel_as_jsonb = { workspace = true }
 phonenumber = { workspace = true }

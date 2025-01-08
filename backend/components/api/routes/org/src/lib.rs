@@ -44,6 +44,7 @@ pub fn routes(config: &mut ServiceConfig) {
         .service(roles::patch)
         .service(roles::deactivate)
         .service(risk_signals::get)
+        .service(risk_signals::get_spec)
         .service(audit_events::get)
         .service(logo::put)
         .service(metrics_api::get)

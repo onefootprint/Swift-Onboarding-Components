@@ -7,8 +7,8 @@ use serde_with::DeserializeFromStr;
 use serde_with::SerializeDisplay;
 use strum::AsRefStr;
 use strum_macros::Display;
+use strum_macros::EnumIter;
 use strum_macros::EnumString;
-
 #[derive(
     Display,
     SerializeDisplay,
@@ -25,6 +25,7 @@ use strum_macros::EnumString;
     Hash,
     Apiv2Schema,
     macros::SerdeAttr,
+    EnumIter,
 )]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]

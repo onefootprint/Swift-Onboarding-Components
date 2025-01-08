@@ -139,3 +139,5 @@ mod sentilink_credentials;
 pub use sentilink_credentials::*;
 mod business_workflow_link_source;
 pub use business_workflow_link_source::*;
+
+pub mod footprint_reason_code_spec;

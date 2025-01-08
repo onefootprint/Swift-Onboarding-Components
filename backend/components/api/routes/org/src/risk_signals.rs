@@ -4,7 +4,9 @@ use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::auth::Either;
 use api_core::types::ApiListResponse;
+use api_core::ApiResponse;
 use api_wire_types::PublicRiskSignalDescription;
+use newtypes::footprint_reason_code_spec::load_reason_code_specs;
 use newtypes::FootprintReasonCode;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
@@ -29,6 +31,20 @@ pub fn get(
             scopes: frc.scopes(),
         })
         .collect();
+
+    Ok(response)
+}
+
+
+#[api_v2_operation(description = "List all Footprint Risk Signals", tags(Org, Hosted))]
+#[get("/org/risk_signals_spec")]
+pub fn get_spec(
+    auth: Either<TenantSessionAuth, TenantApiKeyAuth>,
+) -> ApiResponse<api_wire_types::PublicRiskSignalSpecDescription> {
+    let _auth = auth.check_guard(TenantGuard::Read)?;
+
+    let response = load_reason_code_specs()?.into();
+
 
     Ok(response)
 }
