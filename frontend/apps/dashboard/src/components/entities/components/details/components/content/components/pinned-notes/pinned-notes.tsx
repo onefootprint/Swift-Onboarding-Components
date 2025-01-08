@@ -32,9 +32,9 @@ const PinnedNotes = ({ isDisabled }: PinnedNotesProps) => {
 
   useEffect(() => {
     if (data && sortDirection === SortOrder.descending) {
-      setSortedData(data.sort(sortDataDescending));
+      setSortedData([...data].sort(sortDataDescending));
     } else if (data && sortDirection === SortOrder.ascending) {
-      setSortedData(data.sort(sortDataAscending));
+      setSortedData([...data].sort(sortDataAscending));
     }
   }, [data, sortDirection]);
 

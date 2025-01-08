@@ -93,6 +93,7 @@ const Details = ({ document, isDecryptable, isDecrypted, open, onDecrypt, title,
             {failedUploads.length > 0 &&
               groupedFailedUploads.map((sameSideUploads, index) => (
                 <FailedUploads
+                  key={`${sameSideUploads[0].identifier}:${sameSideUploads[0].version}`}
                   uploads={sameSideUploads as (DocumentUpload & { isLatest: boolean })[]}
                   vault={vault}
                   ref={el => (uploadRefs.current[successfulUploads.length + index] = el)}
