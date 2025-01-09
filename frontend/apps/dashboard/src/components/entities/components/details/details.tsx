@@ -24,7 +24,7 @@ const Details = ({ kind, listPath }: DetailsProps) => {
     return <Loading />;
   }
 
-  if (data?.kind !== kind) {
+  if (data && data.kind !== kind) {
     return <Page404 />;
   }
 
