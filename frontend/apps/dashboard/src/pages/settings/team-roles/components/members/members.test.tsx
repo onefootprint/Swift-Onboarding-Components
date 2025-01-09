@@ -29,6 +29,8 @@ import {
   withRolesError,
 } from './members.test.config';
 
+window.scrollTo = jest.fn();
+
 jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
 const testDate = new Date('2023-01-19T14:10:20.503Z');
@@ -204,10 +206,6 @@ describe('<Members />', () => {
             name: 'Invite teammates',
           });
 
-          await waitFor(() => {
-            screen.getByTestId('members-roles-data');
-          });
-
           const emailField = screen.getByLabelText('Email address');
           await userEvent.type(emailField, 'johnny@acme.com');
 
@@ -263,9 +261,11 @@ describe('<Members />', () => {
           });
           await userEvent.click(inviteButton);
 
-          await waitFor(() => {
-            screen.getByTestId('members-roles-data');
+          const dialog = screen.getByRole('dialog', {
+            name: 'Invite teammates',
           });
+
+          expect(dialog).toBeInTheDocument();
 
           const emailField = screen.getByLabelText('Email address');
           await userEvent.type(emailField, 'johnny@acme.com');

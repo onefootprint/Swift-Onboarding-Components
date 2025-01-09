@@ -22,7 +22,6 @@
   "dependencies": {
     "@datadog/browser-logs": "^5.20.0",
     "@datadog/browser-rum": "^5.20.0",
-    "@formkit/auto-animate": "^1.0.0-beta.6",
     "@juggle/resize-observer": "^3.4.0",
     "@onefootprint/appearance": "workspace:*",
     "@onefootprint/axios": "workspace:*",

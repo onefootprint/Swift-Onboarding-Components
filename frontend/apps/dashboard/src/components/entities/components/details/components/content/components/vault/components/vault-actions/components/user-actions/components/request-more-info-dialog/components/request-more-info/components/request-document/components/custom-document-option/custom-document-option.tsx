@@ -61,7 +61,10 @@ const CustomDocumentOption = () => {
         onChange={handleCustomDocumentChange}
         ref={ref}
       />
-      <AnimatedContainer isExpanded={triggerKinds.includes(RequestMoreInfoKind.CustomDocument)}>
+      <AnimatedContainer
+        isExpanded={triggerKinds.includes(RequestMoreInfoKind.CustomDocument)}
+        className="flex flex-col"
+      >
         <Stack direction="column" gap={7}>
           {customDocumentFields.map((field, index) => (
             <Stack key={field.id} direction="column" gap={5}>

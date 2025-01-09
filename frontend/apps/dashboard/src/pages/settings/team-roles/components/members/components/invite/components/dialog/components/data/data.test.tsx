@@ -4,6 +4,12 @@ import type { DataProps } from './data';
 import Data from './data';
 
 describe('<Data />', () => {
+  beforeAll(() => {
+    Object.defineProperty(window, 'scrollTo', {
+      value: jest.fn(),
+      writable: true,
+    });
+  });
   const defaultRoles = [
     {
       label: 'Admin',

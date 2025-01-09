@@ -1,12 +1,12 @@
-import { useAutoAnimate } from '@formkit/auto-animate/react';
-import { Box, media } from '@onefootprint/ui';
 import { useState } from 'react';
 import type { PageNavigation } from 'src/types/page';
-import styled, { css } from 'styled-components';
 import { useLockedBody } from 'usehooks-ts';
 
+import { fromTopToTop } from '@onefootprint/ui';
+import { AnimatePresence, motion } from 'framer-motion';
+import AppNav from 'src/components/app-nav';
+import NavigationFooter from 'src/components/navigation-footer';
 import MobileHeader from '../../app-header/components/mobile-header';
-import MenuLinks from './components/menu-links';
 
 type MobileNavProps = {
   navigation?: PageNavigation;
@@ -14,7 +14,6 @@ type MobileNavProps = {
 
 const MobileNav = ({ navigation }: MobileNavProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [animateNavMenu] = useAutoAnimate<HTMLDivElement>();
   useLockedBody(isExpanded);
 
   const handleToggleNav = () => {
@@ -26,31 +25,24 @@ const MobileNav = ({ navigation }: MobileNavProps) => {
   };
 
   return (
-    <MobileNavContainer>
+    <div className="flex flex-col h-full md:hidden">
       <MobileHeader onClick={handleToggleNav} isExpanded={isExpanded} />
-      <Box ref={animateNavMenu}>
+      <AnimatePresence>
         {isExpanded && navigation && (
-          <NavMenu>
-            <MenuLinks navigation={navigation} onNavItemClick={handleNavItemClick} />
-          </NavMenu>
+          <motion.nav
+            variants={fromTopToTop}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="flex flex-col flex-1 max-h-[calc(100vh-var(--header-height))]"
+          >
+            <AppNav navigation={navigation} onItemClick={handleNavItemClick} />
+            <NavigationFooter />
+          </motion.nav>
         )}
-      </Box>
-    </MobileNavContainer>
+      </AnimatePresence>
+    </div>
   );
 };
-
-const MobileNavContainer = styled.div`
-  ${media.greaterThan('md')`
-    display: none;
-  `}
-`;
-
-const NavMenu = styled.nav`
-  ${({ theme }) => css`
-    background: ${theme.backgroundColor.primary};
-    height: calc(100vh - var(--header-height));
-    overflow: auto;
-  `};
-`;
 
 export default MobileNav;

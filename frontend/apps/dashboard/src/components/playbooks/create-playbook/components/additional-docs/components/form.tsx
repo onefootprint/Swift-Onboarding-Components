@@ -59,15 +59,13 @@ const Form = ({ onClose }: FormProps) => {
         <Checkbox label={t('form.possn.label')} hint={t('form.possn.hint')} {...register('docs.possn')} />
         <Divider variant="secondary" />
         <CustomDocs />
-        <AnimatedContainer isExpanded={hasDoc}>
-          <Stack gap={4} direction="column">
-            <Divider variant="secondary" />
-            <Checkbox
-              label={t('form.require-manual-review.label')}
-              hint={t('form.require-manual-review.description')}
-              {...register('docs.requireManualReview')}
-            />
-          </Stack>
+        <AnimatedContainer isExpanded={hasDoc} className="flex flex-col gap-3">
+          <Divider variant="secondary" />
+          <Checkbox
+            label={t('form.require-manual-review.label')}
+            hint={t('form.require-manual-review.description')}
+            {...register('docs.requireManualReview')}
+          />
         </AnimatedContainer>
       </Stack>
       <Stack gap={4} direction="column">

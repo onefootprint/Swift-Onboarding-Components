@@ -1,57 +1,18 @@
-import { media } from '@onefootprint/ui';
 import AppNav from 'src/components/app-nav';
 import NavigationFooter from 'src/components/navigation-footer';
 import type { PageNavigation } from 'src/types/page';
-import styled, { css } from 'styled-components';
 
 type DesktopNavProps = {
   navigation: PageNavigation;
 };
 
 const DesktopNav = ({ navigation }: DesktopNavProps) => (
-  <DesktopNavContainer>
-    <NavContainer>
+  <aside className="hidden md:flex flex-col fixed top-[var(--header-height)] left-0 w-[var(--page-aside-nav-width)] h-[calc(100vh-var(--header-height))] bg-primary border-solid border-r border-tertiary justify-between z-1 isolate">
+    <div className="flex flex-col px-2 overflow-auto py-7 gap-7 scrollbar-none">
       <AppNav navigation={navigation} />
-    </NavContainer>
+    </div>
     <NavigationFooter />
-  </DesktopNavContainer>
+  </aside>
 );
-
-const DesktopNavContainer = styled.aside`
-  ${({ theme }) => css`
-    display: none;
-
-    ${media.greaterThan('md')`
-      background: ${theme.backgroundColor.primary};
-      border-right: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-      display: flex;
-      flex-direction: column;
-      height: calc(100vh - var(--header-height));
-      justify-content: space-between;
-      left: 0;
-      position: fixed;
-      top: var(--header-height);
-      width: var(--page-aside-nav-width);
-      z-index: 1;
-      isolation: isolate;
-    `};
-  `}
-`;
-
-const NavContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[6]};
-    overflow: auto;
-    padding: ${theme.spacing[7]} ${theme.spacing[3]};
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-
-    &::-webkit-scrollbar {
-      display: none;
-    }
-  `}
-`;
 
 export default DesktopNav;

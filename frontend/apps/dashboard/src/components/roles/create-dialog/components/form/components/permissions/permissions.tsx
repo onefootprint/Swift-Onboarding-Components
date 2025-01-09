@@ -1,7 +1,7 @@
-import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { possibleTenantScopes, supportedTenantRoleKinds } from '@onefootprint/core';
 import type { TenantRoleKindDiscriminant, TenantScope } from '@onefootprint/request-types/dashboard';
-import { Checkbox, MultiSelect } from '@onefootprint/ui';
+import { Checkbox, MultiSelect, fromTopToTop } from '@onefootprint/ui';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -12,8 +12,6 @@ export type PermissionsProps = {
 };
 
 const Permissions = ({ kind }: PermissionsProps) => {
-  const [animateDecryptSelect] = useAutoAnimate<HTMLDivElement>();
-  const [animateProxyConfigSelect] = useAutoAnimate<HTMLDivElement>();
   const { t } = useTranslation('roles');
   const { register, watch, control, setValue, formState } = useFormContext();
   const { errors } = formState;
@@ -63,11 +61,11 @@ const Permissions = ({ kind }: PermissionsProps) => {
           />
         )}
         {supportedScopeKinds.includes('decrypt') && (
-          <div>
+          <div className="flex flex-col gap-3">
             <Checkbox label={t('form.decrypt.label')} hint={t('scopes.hints.decrypt')} {...register('showDecrypt')} />
-            <div ref={animateDecryptSelect}>
+            <AnimatePresence>
               {showDecryptSelect && (
-                <div className="mt-3 ml-7">
+                <motion.div className="ml-7" variants={fromTopToTop} initial="initial" animate="animate" exit="exit">
                   <Controller
                     control={control}
                     name="decryptOptions"
@@ -91,9 +89,9 @@ const Permissions = ({ kind }: PermissionsProps) => {
                       />
                     )}
                   />
-                </div>
+                </motion.div>
               )}
-            </div>
+            </AnimatePresence>
           </div>
         )}
         {supportedScopeKinds.includes('api_keys') && (
@@ -192,9 +190,9 @@ const Permissions = ({ kind }: PermissionsProps) => {
               hint={t('scopes.hints.invoke_vault_proxy')}
               {...register('showProxyConfigs')}
             />
-            <div ref={animateProxyConfigSelect}>
+            <AnimatePresence>
               {showProxySelect && (
-                <div className="mt-3 ml-7">
+                <motion.div className="ml-10" variants={fromTopToTop} initial="initial" animate="animate" exit="exit">
                   <Controller
                     control={control}
                     name="vaultProxyConfigs"
@@ -218,9 +216,9 @@ const Permissions = ({ kind }: PermissionsProps) => {
                       />
                     )}
                   />
-                </div>
+                </motion.div>
               )}
-            </div>
+            </AnimatePresence>
           </div>
         )}
       </div>

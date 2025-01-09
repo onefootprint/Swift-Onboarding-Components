@@ -1,6 +1,6 @@
-import { useAutoAnimate } from '@formkit/auto-animate/react';
 import type { SelectOption } from '@onefootprint/ui';
-import { Box, Checkbox } from '@onefootprint/ui';
+import { Box, Checkbox, fromTopToTop } from '@onefootprint/ui';
+import { AnimatePresence, motion } from 'framer-motion';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import useSession from 'src/hooks/use-session';
@@ -26,7 +26,6 @@ const Data = ({ roles, defaultRole, onSubmit }: DataProps) => {
   const { t } = useTranslation('settings', {
     keyPrefix: 'pages.members.onboarding.invite',
   });
-  const [animate] = useAutoAnimate<HTMLFormElement>();
   const {
     data: { user },
   } = useSession();
@@ -62,12 +61,16 @@ const Data = ({ roles, defaultRole, onSubmit }: DataProps) => {
   };
 
   return (
-    <Box testID="members-roles-data">
+    <section>
       <FormProvider {...methods}>
-        <Form id="members-invite-form" onSubmit={handleSubmit(handleAfterSubmit)} ref={animate}>
-          {fields.map((field, index) => (
-            <InviteFields index={index} key={field.id} roles={roles} />
-          ))}
+        <Form id="members-invite-form" onSubmit={handleSubmit(handleAfterSubmit)} className="flex flex-col gap-4">
+          <AnimatePresence>
+            {fields.map((field, index) => (
+              <motion.div key={field.id} variants={fromTopToTop} initial="initial" animate="animate" exit="exit">
+                <InviteFields index={index} roles={roles} />
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </Form>
         <AddButton onClick={handleAddMore} />
         {user?.isFirmEmployee && (
@@ -77,7 +80,7 @@ const Data = ({ roles, defaultRole, onSubmit }: DataProps) => {
         )}
       </FormProvider>
       {shouldShowError && <ErrorComponent>{t('form.errors.invalid')}</ErrorComponent>}
-    </Box>
+    </section>
   );
 };
 

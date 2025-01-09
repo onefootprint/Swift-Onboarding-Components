@@ -32,6 +32,9 @@ import {
 
 jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
+// Mock window.scrollTo
+window.scrollTo = jest.fn();
+
 const testDate = new Date('2023-01-19T14:10:20.503Z');
 
 describe('<Roles />', () => {
@@ -183,10 +186,6 @@ describe('<Roles />', () => {
           });
           await userEvent.click(createButton);
 
-          const dialog = screen.getByRole('dialog', {
-            name: 'Create role',
-          });
-
           const nameField = screen.getByLabelText('Name');
           await userEvent.type(nameField, 'Customer Support');
 
@@ -217,7 +216,7 @@ describe('<Roles />', () => {
           });
 
           await waitFor(() => {
-            expect(dialog).not.toBeInTheDocument();
+            expect(screen.queryByRole('dialog', { name: 'Create role' })).not.toBeInTheDocument();
           });
 
           await waitFor(() => {
@@ -295,9 +294,6 @@ describe('<Roles />', () => {
               name: 'Edit role',
             });
           });
-          const dialog = screen.getByRole('dialog', {
-            name: 'Edit role',
-          });
 
           const manualReviewField = screen.getByRole('checkbox', {
             name: 'Perform manual review',
@@ -309,7 +305,7 @@ describe('<Roles />', () => {
           });
           await userEvent.click(submitButton);
 
-          await waitForElementToBeRemoved(dialog);
+          await waitForElementToBeRemoved(() => screen.queryByRole('dialog', { name: 'Edit role' }));
 
           await waitFor(() => {
             const confirmationMessage = screen.getByText(`Role ${roleToEdit.name} was updated successfully.`);
@@ -391,7 +387,8 @@ describe('<Roles />', () => {
             name: 'Yes',
           });
           await userEvent.click(submitButton);
-          await waitForElementToBeRemoved(confirmationDialog);
+
+          await waitForElementToBeRemoved(() => screen.queryByRole('dialog', { name: 'Delete role' }));
 
           await waitFor(() => {
             const confirmationMessage = screen.getByText('Role deleted');

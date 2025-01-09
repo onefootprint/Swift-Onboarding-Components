@@ -520,9 +520,6 @@ importers:
       '@datadog/browser-rum':
         specifier: ^5.20.0
         version: 5.20.0(@datadog/browser-logs@5.28.0)
-      '@formkit/auto-animate':
-        specifier: ^0.8.2
-        version: 0.8.2
       '@googlemaps/js-api-loader':
         specifier: ^1.16.6
         version: 1.16.6
@@ -888,9 +885,6 @@ importers:
 
   apps/docs:
     dependencies:
-      '@formkit/auto-animate':
-        specifier: ^1.0.0-beta.5
-        version: 1.0.0-beta.6
       '@onefootprint/design-tokens':
         specifier: workspace:*
         version: link:../../packages/design-tokens
@@ -924,6 +918,9 @@ importers:
       '@vercel/og':
         specifier: ^0.0.27
         version: 0.0.27
+      class-variance-authority:
+        specifier: ^0.7.0
+        version: 0.7.0
       deepmerge:
         specifier: ^4.3.1
         version: 4.3.1
@@ -2149,9 +2146,6 @@ importers:
       '@datadog/browser-rum':
         specifier: ^5.20.0
         version: 5.20.0(@datadog/browser-logs@5.28.0)
-      '@formkit/auto-animate':
-        specifier: ^1.0.0-beta.6
-        version: 1.0.0-beta.6
       '@juggle/resize-observer':
         specifier: ^3.4.0
         version: 3.4.0
@@ -6386,14 +6380,6 @@ packages:
     resolution: {integrity: sha512-zTwEpWOzZ2CiKcB93BLngUX59hQkuZjT2+SAQEscSm52peDW/getsawMcWF1rGRpMCX6D7nSJA3CzJ8gn13N/g==}
     dependencies:
       tslib: 2.6.2
-    dev: false
-
-  /@formkit/auto-animate@0.8.2:
-    resolution: {integrity: sha512-SwPWfeRa5veb1hOIBMdzI+73te5puUBHmqqaF1Bu7FjvxlYSz/kJcZKSa9Cg60zL0uRNeJL2SbRxV6Jp6Q1nFQ==}
-    dev: false
-
-  /@formkit/auto-animate@1.0.0-beta.6:
-    resolution: {integrity: sha512-PVDhLAlr+B4Xb7e+1wozBUWmXa6BFU8xUPR/W/E+TsQhPS1qkAdAsJ25keEnFrcePSnXHrOsh3tiFbEToOzV9w==}
     dev: false
 
   /@google-cloud/common@5.0.2:

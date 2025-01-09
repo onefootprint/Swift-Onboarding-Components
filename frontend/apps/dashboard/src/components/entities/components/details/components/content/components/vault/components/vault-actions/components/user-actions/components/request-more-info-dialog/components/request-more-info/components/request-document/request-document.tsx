@@ -18,7 +18,10 @@ const RequestDocument = () => {
       <Text variant="label-3">{t('title')}</Text>
       <Stack direction="column" gap={4}>
         <Checkbox label={t('id-photo.title')} value={RequestMoreInfoKind.IdDocument} {...register('kinds')} />
-        <AnimatedContainer isExpanded={triggerKinds.includes(RequestMoreInfoKind.IdDocument)} marginLeft={7}>
+        <AnimatedContainer
+          isExpanded={triggerKinds.includes(RequestMoreInfoKind.IdDocument)}
+          className="flex flex-col ml-6"
+        >
           <Checkbox
             label={t('id-photo.collect-selfie')}
             checked={watch('collectSelfie')}
