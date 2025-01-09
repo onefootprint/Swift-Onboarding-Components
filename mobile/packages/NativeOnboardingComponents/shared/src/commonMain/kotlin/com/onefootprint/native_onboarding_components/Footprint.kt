@@ -76,7 +76,7 @@ object Footprint {
     @OptIn(ExperimentalUuidApi::class)
     @DefaultArgumentInterop.Enabled
     suspend fun initializeWithPublicKey(
-        publicKey: String? = null,
+        publicKey: String,
         sandboxOutcome: SandboxOutcome? = null,
         l10n: FootprintL10n? = null,
         sessionId: String? = Uuid.random().toString(),
@@ -88,7 +88,7 @@ object Footprint {
     @OptIn(ExperimentalUuidApi::class)
     @DefaultArgumentInterop.Enabled
     suspend fun initializeWithAuthToken(
-        authToken: String? = null,
+        authToken: String,
         sandboxOutcome: SandboxOutcome? = null,
         l10n: FootprintL10n? = null,
         sessionId: String? = Uuid.random().toString(),

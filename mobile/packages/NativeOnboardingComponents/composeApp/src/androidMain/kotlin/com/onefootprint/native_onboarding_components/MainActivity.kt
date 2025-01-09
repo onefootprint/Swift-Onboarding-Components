@@ -151,7 +151,7 @@ fun Init(
                     val authRequirement = Footprint.initializeWithPublicKey(
                         publicKey = "pb_test_fvM7uG6JY41t0JLrYP2aEG",
                         sandboxOutcome = SandboxOutcome(
-                            id = "sandboxhfvjh367824dcsdvcsd6bdf1",
+//                            id = "sandboxhfv7824dcsdvcsd6bdf1",
                             overallOutcome = OverallOutcome.fail
                         )
                     )

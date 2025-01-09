@@ -5,7 +5,7 @@ on:
     branches:
       - master
     paths:
-      - mobile/NativeOnboardingComponents/android-changelog.md
+      - mobile/packages/NativeOnboardingComponents/android-changelog.md
 
 jobs:
   publish:
@@ -27,12 +27,12 @@ jobs:
 
       # Ensure gradlew has execute permissions
       - name: Give gradlew execute permission
-        run: chmod +x ./mobile/NativeOnboardingComponents/gradlew
+        run: chmod +x ./mobile/packages/NativeOnboardingComponents/gradlew
 
       # Publish to Maven Central using the specific Gradle task
       - name: Publish to Maven Central
         run: |
-          ./mobile/NativeOnboardingComponents/gradlew -p ./mobile/NativeOnboardingComponents/ shared:publishAndroidReleasePublicationToMavenCentralRepository
+          ./mobile/packages/NativeOnboardingComponents/gradlew -p ./mobile/packages/NativeOnboardingComponents/ shared:publishAndroidReleasePublicationToMavenCentralRepository
         env:
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.KMM_ANDROID_SIGNING_SECRET_KEY }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.KMM_ANDROID_SIGNING_PASSWORD }}

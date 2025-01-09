@@ -5,4 +5,4 @@
 Test publish version to mavenCentral
 
 # v1.0.0-beta-1
-Publish first beta version to mavenCentral
+Publish first beta version v1.0.0-beta-1 to mavenCentral
