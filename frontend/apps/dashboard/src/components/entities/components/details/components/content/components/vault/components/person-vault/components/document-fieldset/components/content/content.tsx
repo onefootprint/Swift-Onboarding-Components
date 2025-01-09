@@ -1,20 +1,18 @@
-import useEntitySeqno from '@/entity/hooks/use-entity-seqno';
 import { getErrorMessage } from '@onefootprint/request';
-import type { Document, Entity, SupportedIdDocTypes } from '@onefootprint/types';
-import useEntityVault from 'src/components/entities/hooks/use-entity-vault';
+import type { Document, Entity, EntityVault, SupportedIdDocTypes } from '@onefootprint/types';
+import type { VaultType } from 'src/components/entities/hooks/use-entity-vault';
 import { useDecryptControls } from '../../../../../vault-actions';
-import useDocuments from '../../hooks/use-documents';
 import DocumentItem from '../document-item';
 
 type ContentProps = {
   entity: Entity;
+  error: Error | null;
+  documents: Document[] | undefined;
+  updateVault: (newData: VaultType) => void;
+  vault: EntityVault | undefined;
 };
 
-const Content = ({ entity }: ContentProps) => {
-  const seqno = useEntitySeqno();
-  const { data: documents, error } = useDocuments(entity.id, seqno);
-  const { data: vaultData, update: updateVault } = useEntityVault(entity.id, entity);
-  const { vault } = vaultData || {};
+const Content = ({ entity, error, documents, vault, updateVault }: ContentProps) => {
   const decryptControls = useDecryptControls();
 
   const handleDecryptDocument = (documentKind: SupportedIdDocTypes) => {

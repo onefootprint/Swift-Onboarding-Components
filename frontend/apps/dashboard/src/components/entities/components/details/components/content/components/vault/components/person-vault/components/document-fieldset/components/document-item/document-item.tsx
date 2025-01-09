@@ -36,7 +36,7 @@ const DocumentItem = ({ document, entity, vault, onDecrypt }: DocumentItemProps)
     <>
       <div className="flex justify-between">
         {field.showCheckbox ? (
-          <Tooltip disabled={field.isDecryptable} position="right" text={t('decrypt.not-allowed')} asChild>
+          <Tooltip disabled={field.canSelect} position="right" text={t('decrypt.not-allowed')} asChild>
             <Checkbox
               checked={field.isChecked || undefined}
               {...register(`documents.${kind}`)}

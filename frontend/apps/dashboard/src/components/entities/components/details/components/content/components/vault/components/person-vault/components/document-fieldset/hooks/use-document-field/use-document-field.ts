@@ -28,6 +28,7 @@ export const useDocumentField = (entity: Entity, vault: EntityVault) => {
     return {
       isDecryptable,
       isDecrypted,
+      canSelect: isDecryptable && !isDecrypted,
       showCheckbox: decryptControls.inProgress,
       isChecked: isDecrypted || decryptControls.inProgressDecryptingAll,
       disabled: !isDecryptable || isDecrypted,

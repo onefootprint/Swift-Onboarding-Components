@@ -1,32 +1,36 @@
 import type { WithEntityProps } from '@/entity/components/with-entity';
 import useEntitySeqno from '@/entity/hooks/use-entity-seqno';
 import { IcoFileText16 } from '@onefootprint/icons';
-import { Divider, LinkButton, Text } from '@onefootprint/ui';
+import type { DataIdentifier } from '@onefootprint/types';
+import { Divider, LinkButton } from '@onefootprint/ui';
 import { cx } from 'class-variance-authority';
 import { useTranslation } from 'react-i18next';
+import useEntityVault from 'src/components/entities/hooks/use-entity-vault';
 import useDecryptForm from '../../../../hooks/use-decrypt-form';
-import useField from '../../../../hooks/use-field';
-import type { DiField } from '../../../../vault.types';
 import RiskSignalsOverview from '../../../risk-signals-overview';
 import { useDecryptControls } from '../../../vault-actions';
 import Content from './components/content';
+import useDocumentField from './hooks/use-document-field';
+import useDocuments from './hooks/use-documents';
 
-export type DocumentFieldsetProps = WithEntityProps & {
-  fields: DiField[];
-};
+export type DocumentFieldsetProps = WithEntityProps;
 
-const DocumentFieldset = ({ entity, fields }: DocumentFieldsetProps) => {
-  const { t } = useTranslation('entity-details', {
-    keyPrefix: 'fieldset',
-  });
-  const isViewingHistorical = Boolean(useEntitySeqno());
+const DocumentFieldset = ({ entity }: DocumentFieldsetProps) => {
+  const { t } = useTranslation('entity-details', { keyPrefix: 'fieldset' });
+  const seqno = useEntitySeqno();
+  const { data: documents, error } = useDocuments(entity.id, seqno);
+  const { data: vaultData, update: updateVault } = useEntityVault(entity.id, entity);
+  const vault = vaultData?.vault ?? {};
+  const getFieldProps = useDocumentField(entity, vault);
   const decrypt = useDecryptControls();
   const decryptForm = useDecryptForm();
-  const dis = fields.map(field => field.di);
-  const getFieldProps = useField(entity);
-  const selectableFields = dis.filter(di => getFieldProps(di).canSelect);
-  const allSelected = selectableFields.every(decryptForm.isChecked);
-  const shouldShowSelectAll = decrypt.inProgress && selectableFields.length > 0;
+  const selectableFields =
+    documents
+      ?.filter(document => getFieldProps(document).canSelect)
+      .map(({ kind }) => `documents.${kind}` as DataIdentifier) ?? [];
+  const shouldShowSelectAll = documents && decrypt.inProgress && selectableFields.length > 0;
+  const allSelected = selectableFields.every(di => decryptForm.isChecked(di));
+  const isViewingHistorical = Boolean(seqno);
 
   const handleSelectAll = () => {
     decryptForm.set(selectableFields, true);
@@ -41,9 +45,7 @@ const DocumentFieldset = ({ entity, fields }: DocumentFieldsetProps) => {
       aria-label={t('documents.title')}
       className={cx(
         'rounded-md border border-solid rounded border-tertiary flex flex-col w-full h-full justify-between',
-        {
-          'bg-primary': isViewingHistorical,
-        },
+        { 'bg-primary': isViewingHistorical },
       )}
     >
       <header
@@ -54,9 +56,7 @@ const DocumentFieldset = ({ entity, fields }: DocumentFieldsetProps) => {
       >
         <div className="flex items-center gap-3 ">
           <IcoFileText16 />
-          <Text variant="label-3" tag="h2">
-            {t('documents.title')}
-          </Text>
+          <h2 className="text-label-3">{t('documents.title')}</h2>
         </div>
         {shouldShowSelectAll && (
           <LinkButton onClick={allSelected ? handleDeselectAll : handleSelectAll}>
@@ -65,7 +65,7 @@ const DocumentFieldset = ({ entity, fields }: DocumentFieldsetProps) => {
         )}
       </header>
       <div className="flex flex-col gap-5 p-5 pb-4">
-        <Content entity={entity} />
+        <Content entity={entity} error={error} documents={documents} updateVault={updateVault} vault={vault} />
         <footer className="flex flex-col gap-4">
           <Divider />
           <RiskSignalsOverview type="document" />
