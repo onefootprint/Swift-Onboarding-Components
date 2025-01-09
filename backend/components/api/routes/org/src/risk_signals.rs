@@ -36,7 +36,7 @@ pub fn get(
 }
 
 
-#[api_v2_operation(description = "List all Footprint Risk Signals", tags(Org, Hosted))]
+#[api_v2_operation(description = "List all Footprint Risk Signals", tags(Org, Private))]
 #[get("/org/risk_signals_spec")]
 pub fn get_spec(
     auth: Either<TenantSessionAuth, TenantApiKeyAuth>,

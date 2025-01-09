@@ -68,6 +68,7 @@ pub struct PublicRiskSignalDescription {
 
 
 #[derive(Debug, Serialize, Apiv2Response, macros::JsonResponder)]
+#[openapi(inline)]
 pub struct PublicRiskSignalSpecDescription(HashMap<RiskSignalGroupKind, PublicRiskSignalSpec>);
 
 #[derive(Debug, Serialize, Apiv2Response)]

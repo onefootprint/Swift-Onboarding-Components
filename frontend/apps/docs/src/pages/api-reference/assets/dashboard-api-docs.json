@@ -7068,6 +7068,41 @@
                 ]
             }
         },
+        "/org/risk_signals_spec": {
+            "get": {
+                "tags": [
+                    "Org",
+                    "Private"
+                ],
+                "description": "List all Footprint Risk Signals",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
+                    },
+                    {
+                        "Secret API Key": []
+                    },
+                    {
+                        "Firm Employee Assume Token": []
+                    }
+                ]
+            }
+        },
         "/org/roles": {
             "get": {
                 "tags": [
@@ -22476,7 +22511,8 @@
                 "enum": [
                     "hosted",
                     "tenant",
-                    "unknown"
+                    "unknown",
+                    "footprint"
                 ]
             },
             "WorkflowStarted": {
