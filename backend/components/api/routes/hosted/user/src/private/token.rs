@@ -5,6 +5,7 @@ use api_core::State;
 use db::models::scoped_vault::ScopedVault;
 use newtypes::FpId;
 use newtypes::ScopedVaultId;
+use newtypes::UserAuthScope;
 use newtypes::VaultId;
 use newtypes::WorkflowId;
 use paperclip::actix::api_v2_operation;
@@ -22,6 +23,7 @@ pub struct PrivateUserInfo {
     sb_id: Option<ScopedVaultId>,
     biz_wf_id: Option<WorkflowId>,
     vault_id: VaultId,
+    scopes: Vec<UserAuthScope>,
 }
 
 #[api_v2_operation(
@@ -44,6 +46,7 @@ pub async fn get(state: web::Data<State>, user_auth: ItUserAuthContext) -> ApiRe
         sb_id: sb.map(|sb| sb.id),
         biz_wf_id: user_auth.biz_wf_id.clone(),
         vault_id: user_auth.user.id.clone(),
+        scopes: user_auth.scopes.clone(),
     };
     Ok(result)
 }

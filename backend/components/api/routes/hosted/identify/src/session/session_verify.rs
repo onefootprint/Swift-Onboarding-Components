@@ -1,6 +1,5 @@
 use crate::session::requirements::get_requirements;
 use crate::State;
-use api_core::auth::session::user::AssociatedAuthEventKind;
 use api_core::auth::session::user::UserSessionBuilder;
 use api_core::auth::user::allowed_user_scopes;
 use api_core::auth::user::IdentifyAuthContext;
@@ -44,11 +43,8 @@ pub async fn post(
     // Create an auth token with the new scopes and context
     let uv_id = identify.user_session.user.id.clone();
     let bo_id = identify.user_session.bo_id.clone();
-    let is_explicit_auth =
-        (identify.auth_events.iter()).any(|(_, k)| k == &AssociatedAuthEventKind::Explicit);
-    let ae_kinds = identify.auth_events.iter().map(|(ae, _)| ae.kind).collect_vec();
     let scope = identify.scope;
-    let scopes = allowed_user_scopes(ae_kinds, scope.into(), is_explicit_auth);
+    let scopes = allowed_user_scopes(&identify.auth_events, scope.into());
     let session = UserSessionBuilder::from_existing(&identify.user_session, scope.into())?
         .add_scopes(scopes)
         .finish()?;

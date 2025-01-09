@@ -1,9 +1,19 @@
 import pytest
-from tests.identify_client import IdentifyClient
+from tests.identify_client import IdentifyClient, biometric_challenge_response
 from tests.bifrost_client import BifrostClient
 from tests.constants import FIXTURE_EMAIL, FIXTURE_PHONE_NUMBER
 from tests.headers import FpAuth, SandboxId
 from tests.utils import _gen_random_sandbox_id, create_ob_config, get, patch, post
+
+
+@pytest.fixture(scope="session")
+def multi_auth_obc(sandbox_tenant, must_collect_data):
+    return create_ob_config(
+        sandbox_tenant,
+        "Multi Auth",
+        must_collect_data,
+        required_auth_methods=["phone", "email"],
+    )
 
 
 def test_identify_signup(sandbox_tenant):

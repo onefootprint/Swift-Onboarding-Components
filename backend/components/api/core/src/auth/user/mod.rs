@@ -1,3 +1,5 @@
+use db::models::auth_event::AuthEvent;
+use itertools::Itertools;
 use newtypes::AuthEventKind;
 use newtypes::RequestedTokenScope;
 pub use newtypes::UserAuthScope;
@@ -15,6 +17,7 @@ pub use user_biz_wf::*;
 mod contact_info_verify;
 pub use contact_info_verify::*;
 mod identify;
+use super::session::user::AssociatedAuthEventKind;
 pub use identify::*;
 
 /// Computes the list of scopes to be granted to an auth token for a user.
@@ -25,6 +28,15 @@ pub use identify::*;
 /// The result is the intersection of the scopes requested and the scopes allowed by the auth
 /// methods
 pub fn allowed_user_scopes(
+    auth_events: &[(AuthEvent, AssociatedAuthEventKind)],
+    scope: RequestedTokenScope,
+) -> Vec<UserAuthScope> {
+    let is_explicit_auth = (auth_events.iter()).any(|(_, k)| k == &AssociatedAuthEventKind::Explicit);
+    let ae_kinds = auth_events.iter().map(|(ae, _)| ae.kind).collect_vec();
+    internal_allowed_user_scopes(ae_kinds, scope, is_explicit_auth)
+}
+
+fn internal_allowed_user_scopes(
     auth_events: Vec<AuthEventKind>,
     scope: RequestedTokenScope,
     is_explicit_auth: bool,
@@ -118,6 +130,6 @@ mod test {
         scope: RequestedTokenScope,
         is_explicit_auth: bool,
     ) -> Vec<UserAuthScope> {
-        super::allowed_user_scopes(kinds, scope, is_explicit_auth)
+        super::internal_allowed_user_scopes(kinds, scope, is_explicit_auth)
     }
 }

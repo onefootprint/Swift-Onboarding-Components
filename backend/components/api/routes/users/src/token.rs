@@ -2,6 +2,7 @@ use crate::auth::tenant::CheckTenantGuard;
 use crate::types::ApiResponse;
 use crate::State;
 use api_core::auth::session::user::AssociatedAuthEvent;
+use api_core::auth::session::user::AssociatedAuthEventKind;
 use api_core::auth::tenant::TenantApiKeyAuth;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::user::allowed_user_scopes;
@@ -180,16 +181,16 @@ pub async fn post(
                 third_party_auth_event.into_iter().collect()
             };
             tracing::info!(num_events=%implicit_auth_events.len(), "Creating token with implied auth events");
-            let kinds = implicit_auth_events.iter().map(|e| e.kind).collect();
+            let auth_events = implicit_auth_events.into_iter().map(|e| (e, AssociatedAuthEventKind::Implicit)).collect_vec();
+            let scopes = allowed_user_scopes(&auth_events, RequestedTokenScope::Onboarding);
             // All auth events associated with the token made here are implicit
-            let auth_events = implicit_auth_events
+            let auth_events = auth_events
                 .into_iter()
-                .map(|e| AssociatedAuthEvent::implicit(e.id))
+                .map(|(e, _)| AssociatedAuthEvent::implicit(e.id))
                 .collect_vec();
 
             // Request Onboarding scopes, but if the user hasn't authed to the tenant recently, we
             // will be granted no scopes and the user will be required to re-auth
-            let scopes = allowed_user_scopes(kinds, RequestedTokenScope::Onboarding, false);
 
             let ttl_min = ttl_min.unwrap_or(60);
             const MAX_TTL: u32 = 60 * 24;

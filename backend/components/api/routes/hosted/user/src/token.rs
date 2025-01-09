@@ -1,5 +1,4 @@
 use crate::auth::user::UserAuthContext;
-use api_core::auth::session::user::AssociatedAuthEventKind;
 use api_core::auth::session::user::UserSessionBuilder;
 use api_core::auth::user::allowed_user_scopes;
 use api_core::auth::user::load_auth_events;
@@ -46,15 +45,8 @@ pub async fn post(
     let session_key = state.session_sealing_key.clone();
     let (token, expires_at) = state
         .db_query(move |conn| {
-            let aes = load_auth_events(conn, &user_auth.auth_events)?
-                .iter()
-                .map(|(ae, _)| ae.kind)
-                .collect();
-            let is_explicit = user_auth
-                .auth_events
-                .iter()
-                .any(|ae| ae.kind == AssociatedAuthEventKind::Explicit);
-            let new_scopes = allowed_user_scopes(aes, requested_scope, is_explicit);
+            let aes = load_auth_events(conn, &user_auth.auth_events)?;
+            let new_scopes = allowed_user_scopes(&aes, requested_scope);
             if new_scopes.iter().any(|s| !user_auth.scopes.contains(s)) {
                 // The only use case of this today is to request a token with _fewer_ scopes.
                 // It could be dangerous to allow a user to request a token with _more_ scopes,
