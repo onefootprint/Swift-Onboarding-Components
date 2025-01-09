@@ -18,7 +18,12 @@ if [[ $(command -v brew) == "" ]]; then
     source ~/.zprofile
 fi
 
+# Install NVM (Node Version Manager)
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+
 # Useful packages
+nvm install 20
+
 brew update
 brew install openssl
 brew install postgresql@14
@@ -26,11 +31,8 @@ brew install awscli
 brew install jq
 brew install wget
 brew install watchman
-brew install node@18
 brew install biome
 
-# Add NPM to path
-echo 'export PATH="/opt/homebrew/opt/node@18/bin:$PATH"' >> ~/.zshrc
 source ~/.zshrc
 
 # For iOS / React Native
