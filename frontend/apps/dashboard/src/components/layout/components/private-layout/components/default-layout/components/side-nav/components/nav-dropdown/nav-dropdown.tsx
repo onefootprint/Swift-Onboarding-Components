@@ -7,7 +7,6 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { GetAuthRolesOrg } from '@onefootprint/types';
-import useHasShown2024Wrapped from 'src/hooks/use-has-shown-2024-wrapped';
 import type { UserSession } from 'src/hooks/use-session';
 import styled, { css } from 'styled-components';
 import type { PostDetails } from '../../side-nav.types';
@@ -16,7 +15,6 @@ import PgpUploadTool from './components/pgp-upload-tool';
 import RiskSignalsGlossary from './components/risk-signals-glossary';
 import TenantsList from './components/tenants-list';
 import UserName from './components/user-name/user-name';
-import WrappedDialog from './components/wrapped-dialog';
 
 export type NavDropdownProps = {
   tenants: GetAuthRolesOrg[];
@@ -33,8 +31,6 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user, posts }: Nav
   const [isPgpHelperOpen, setIsPgpHelperOpen] = useState(false);
   const [isWhatsNewOpen, setIsWhatsNewOpen] = useState(false);
   const router = useRouter();
-  const { hasShown2024Wrapped, markAsShown2024Wrapped } = useHasShown2024Wrapped();
-  const [isWrappedOpen, setIsWrappedOpen] = useState(!hasShown2024Wrapped || router.query.show_wrapped === 'true');
 
   const handleLogout = () => {
     router.push('/logout');
@@ -72,17 +68,6 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user, posts }: Nav
   const handleWhatsNewClose = () => {
     setIsDropdownOpen(false);
     setIsWhatsNewOpen(false);
-  };
-
-  const handle2024WrappedOpen = () => {
-    setIsDropdownOpen(false);
-    setIsWrappedOpen(true);
-  };
-
-  const handle2024WrappedClose = () => {
-    markAsShown2024Wrapped();
-    setIsDropdownOpen(false);
-    setIsWrappedOpen(false);
   };
 
   return (
@@ -129,11 +114,6 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user, posts }: Nav
                   {t('whats-new.title')}
                 </button>
               </Dropdown.Item>
-              <Dropdown.Item>
-                <button type="button" onClick={handle2024WrappedOpen}>
-                  {t('2024-wrapped.title')}
-                </button>
-              </Dropdown.Item>
             </Dropdown.Group>
             <Dropdown.Divider />
             <Dropdown.Group>
@@ -147,7 +127,6 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user, posts }: Nav
       <RiskSignalsGlossary open={isGlossaryOpen} onClose={handleGlossaryClose} />
       <PgpUploadTool open={isPgpHelperOpen} onClose={handlePgpHelperClose} />
       <WhatsNewDialog open={isWhatsNewOpen} onClose={handleWhatsNewClose} posts={posts} />
-      <WrappedDialog isOpen={isWrappedOpen} onClose={handle2024WrappedClose} />
     </>
   );
 };

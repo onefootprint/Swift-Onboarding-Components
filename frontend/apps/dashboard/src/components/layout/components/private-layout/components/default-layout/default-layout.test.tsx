@@ -8,11 +8,9 @@ import {
   asAssumedUser,
 } from 'src/config/tests';
 
-import { useStore as useHasShown2024WrappedStore } from 'src/hooks/use-has-shown-2024-wrapped';
 import DefaultLayout from './default-layout';
 import {
   withEntities,
-  withFootprintWrapped,
   withGhostPosts,
   withMembersAdmin,
   withMembersRead,
@@ -43,11 +41,7 @@ describe('<DefaultLayout />', () => {
     withRiskSignals();
     withMembersRead();
     withGhostPosts();
-    withFootprintWrapped();
     withPrivateAccessRequests();
-    useHasShown2024WrappedStore.setState({
-      hasShown2024Wrapped: true,
-    });
   });
 
   describe('when its restricted to use only the sandbox mode', () => {

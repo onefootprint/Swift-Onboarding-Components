@@ -97,13 +97,6 @@ export const withGhostPosts = () =>
     response: { posts: [] },
   });
 
-export const withFootprintWrapped = () =>
-  mockRequest({
-    method: 'get',
-    path: '/org/footprint_wrapped',
-    response: {},
-  });
-
 export const withPrivateAccessRequests = () =>
   mockRequest({
     method: 'get',
