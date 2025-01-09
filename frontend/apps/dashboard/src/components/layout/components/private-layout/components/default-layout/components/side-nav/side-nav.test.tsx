@@ -13,6 +13,7 @@ import {
   withOrgAssumeRole,
   withOrgAssumeRoleError,
   withOrgAuthRolesError,
+  withPrivateAccessRequests,
   withRiskSignals,
   withSevenOrgAuthRoles,
   withTwoOrgAuthRoles,
@@ -31,6 +32,7 @@ describe('<SideNav />', () => {
     asAdminUserInLive();
     withRiskSignals();
     withGhostPosts();
+    withPrivateAccessRequests();
     withFootprintWrapped();
     useHasShown2024WrappedStore.setState({
       hasShown2024Wrapped: true,

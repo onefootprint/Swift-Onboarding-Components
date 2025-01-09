@@ -73,6 +73,7 @@ const AssumeBanner = () => {
           <button type="button" onClick={handleChangeEdit}>
             {getEditButtonText()}
           </button>
+          <span>·</span>
           <button type="button" onClick={handleLogout}>
             {t('log-out')}
           </button>

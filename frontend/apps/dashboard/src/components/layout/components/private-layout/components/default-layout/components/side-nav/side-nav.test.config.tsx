@@ -246,3 +246,10 @@ export const withFootprintWrapped = () =>
     path: '/org/footprint_wrapped',
     response: {},
   });
+
+export const withPrivateAccessRequests = () =>
+  mockRequest({
+    method: 'get',
+    path: '/private/access_requests',
+    response: { data: [] },
+  });

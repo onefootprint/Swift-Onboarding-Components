@@ -4,6 +4,7 @@ import type { TenantScope } from '@onefootprint/request-types/dashboard';
 import { Button, Form, MultiSelect, useToast } from '@onefootprint/ui';
 import { useMutation } from '@tanstack/react-query';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
+import useInvalidateQueries from 'src/hooks/use-invalidate-queries';
 import useSession from 'src/hooks/use-session';
 import useTenantScopeOptions from './hooks/use-tenant-scope-options';
 
@@ -26,6 +27,7 @@ const GrantEditRightsForm = ({ onClose }: GrantEditRightsFormProps) => {
   const mutation = useMutation(postPrivateAccessRequestsMutation({ throwOnError: true }));
   const tenantId = session?.org?.id ?? '';
   const toast = useToast();
+  const invalidateQueries = useInvalidateQueries();
 
   const onSubmit = (data: GrantEditRightsFormData) => {
     mutation.mutate(
@@ -43,6 +45,7 @@ const GrantEditRightsForm = ({ onClose }: GrantEditRightsFormProps) => {
             title: 'Edit grant requested',
             description: 'A Risk Ops manager will review your request shortly.',
           });
+          invalidateQueries();
           onClose();
         },
         onError: (e: Error) => {

@@ -31,7 +31,7 @@ const Row = ({ accessRequest }: { accessRequest: AccessRequest }) => {
         )}
       </td>
       <td key="duration" className="text-body-3 text-primary">{`${duration} (Until ${expiresAt})`}</td>
-      <td key="actions">
+      <td key="actions" className="flex items-center justify-end">
         <Actions id={accessRequest.id} />
       </td>
     </>

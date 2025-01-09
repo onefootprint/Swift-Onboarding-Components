@@ -11,6 +11,7 @@ import {
   IcoStore16,
   IcoUsers16,
   IcoWebhook16,
+  IcoWriting16,
 } from '@onefootprint/icons';
 import { useTranslation } from 'react-i18next';
 
@@ -20,10 +21,16 @@ type Route = {
   items: { href: string; Icon: Icon; text: string; badgeCount?: number }[];
 };
 
-const useRoutes = (): Route[] => {
+type useRoutesProps = {
+  riskOpsRequests?: number;
+  isRiskOpsTeamMember?: boolean;
+};
+
+const useRoutes = ({ riskOpsRequests = undefined, isRiskOpsTeamMember = false }: useRoutesProps): Route[] => {
   const { t } = useTranslation('common', {
     keyPrefix: 'components.private-layout.nav',
   });
+
   const routes = [
     {
       title: '',
@@ -102,6 +109,16 @@ const useRoutes = (): Route[] => {
           Icon: IcoConstruct16,
           text: t('toolbox'),
         },
+        ...(isRiskOpsTeamMember
+          ? [
+              {
+                href: '/internal/risk-ops',
+                Icon: IcoWriting16,
+                text: t('edit-grant-requests'),
+                badgeCount: riskOpsRequests,
+              },
+            ]
+          : []),
       ],
     },
   ];

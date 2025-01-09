@@ -11,6 +11,8 @@ import styled, { css } from 'styled-components';
 
 import CompanyName from './components/company-name';
 const NavDropdown = lazy(() => import('./components/nav-dropdown'));
+import { getPrivateAccessRequestsOptions } from '@onefootprint/axios/dashboard';
+import { useQuery } from '@tanstack/react-query';
 import NavLink from './components/nav-link';
 import SettingsDropdown from './components/settings-dropdown';
 import WhatsNewBanner from './components/whats-new-banner';
@@ -22,11 +24,11 @@ import moveTenantToFront from './utils/move-tenant-to-front';
 
 const WHATS_NEW_BANNER_KEY = 'whatsNewBannerInteracted';
 const LAST_SEEN_POST_KEY = 'lastSeenPostDate';
+const RISK_OPS_TEAM_MEMBERS = ['elliott@onefootprint.com', 'alex@onefootprint.com', 'dave@onefootprint.com'];
 
 const Nav = () => {
   const router = useRouter();
   const { data: posts = [] } = useChangelogArticles();
-
   const [recentPosts, setRecentPosts] = useState<PostDetails[]>([]);
   const [showBanner, setShowBanner] = useState(false);
   const [openWhatsNewDialog, setOpenWhatsNewDialog] = useState(false);
@@ -38,10 +40,15 @@ const Nav = () => {
   } = useSession();
   const assumeRoleMutation = useAssumeAuthRole();
   const showErrorToast = useRequestErrorToast();
-  const routes = useRoutes();
   const tenantsQuery = useAuthRoles(dangerouslyCastedData.auth);
   const currTenantId = dangerouslyCastedData.org.id;
   const tenants = moveTenantToFront(tenantsQuery.data ?? [], currTenantId);
+  const { data: accessRequests } = useQuery(getPrivateAccessRequestsOptions());
+  const outstandingRiskOpsRequests = Array.isArray(accessRequests)
+    ? accessRequests.filter(accessRequest => accessRequest.respondedAt === null).length
+    : 0;
+  const isRiskOpsTeamMember = RISK_OPS_TEAM_MEMBERS.includes(user?.email ?? '');
+  const routes = useRoutes({ riskOpsRequests: outstandingRiskOpsRequests, isRiskOpsTeamMember });
 
   useEffect(() => {
     if (posts.length > 0) {

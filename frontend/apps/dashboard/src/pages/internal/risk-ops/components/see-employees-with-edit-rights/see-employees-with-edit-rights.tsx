@@ -4,7 +4,7 @@ import { Table } from '@onefootprint/ui';
 import { useQuery } from '@tanstack/react-query';
 import Row from './components/row';
 
-const useSeeEmployeesWithEditRightsForm = () => {
+const SeeEmployeesWithEditRights = () => {
   const { data, isPending } = useQuery(getPrivateAccessRequestsOptions());
 
   const columns = [
@@ -34,8 +34,8 @@ const useSeeEmployeesWithEditRightsForm = () => {
     },
   ];
 
-  const component = (
-    <div className="flex flex-col gap-5 px-52">
+  return (
+    <>
       <div className="flex flex-col gap-1">
         <h2 className="text-heading-2 text-primary">Employees with edit rights</h2>
         <p className="text-body-2 text-secondary">View a list of employees and their assigned edit rights.</p>
@@ -48,13 +48,8 @@ const useSeeEmployeesWithEditRightsForm = () => {
         items={data}
         renderTr={({ item: accessRequest }) => <Row accessRequest={accessRequest} />}
       />
-    </div>
+    </>
   );
-
-  return {
-    component,
-    isPending,
-  };
 };
 
-export default useSeeEmployeesWithEditRightsForm;
+export default SeeEmployeesWithEditRights;
