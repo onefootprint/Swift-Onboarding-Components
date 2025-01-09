@@ -25,6 +25,7 @@ use newtypes::VaultKind;
 use newtypes::WatchlistCheckId;
 use newtypes::WatchlistCheckStatus;
 use newtypes::WatchlistCheckStatusKind;
+use newtypes::WorkflowId;
 use newtypes::WorkflowKind;
 use std::collections::HashMap;
 
@@ -46,6 +47,8 @@ pub struct WatchlistCheck {
     pub completed_at: Option<DateTime<Utc>>,
     pub status_details: WatchlistCheckStatus,
     pub deactivated_at: Option<DateTime<Utc>>,
+    // added 2025-01-07
+    pub workflow_id: Option<WorkflowId>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -68,6 +71,7 @@ struct UpdateWatchlistCheck {
     pub reason_codes: Option<Vec<FootprintReasonCode>>,
     pub completed_at: Option<DateTime<Utc>>,
     pub status_details: WatchlistCheckStatus,
+    pub workflow_id: Option<WorkflowId>,
 }
 
 impl WatchlistCheck {
@@ -149,6 +153,7 @@ impl WatchlistCheck {
         reason_codes: Option<Vec<FootprintReasonCode>>,
         completed_at: Option<DateTime<Utc>>,
         logic_git_hash: Option<String>,
+        workflow_id: Option<WorkflowId>,
     ) -> FpResult<Self> {
         if let Some(completed_at) = completed_at {
             Self::deactivate_old(conn, &wc.scoped_vault_id, completed_at)?;
@@ -159,6 +164,7 @@ impl WatchlistCheck {
             reason_codes,
             completed_at,
             status_details: status,
+            workflow_id,
         };
         let result = diesel::update(watchlist_check::table)
             .filter(watchlist_check::id.eq(&wc.id))

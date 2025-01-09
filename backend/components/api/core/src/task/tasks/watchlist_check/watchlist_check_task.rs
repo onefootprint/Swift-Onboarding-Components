@@ -27,6 +27,7 @@ use db::models::tenant::Tenant;
 use db::models::user_timeline::UserTimeline;
 use db::models::verification_request::VReqIdentifier;
 use db::models::watchlist_check::WatchlistCheck;
+use db::models::workflow::Workflow;
 use db::TxnPgConn;
 use idv::requirements::HasIdentityDataRequirements;
 use newtypes::vendor_api_struct::IdologyPa;
@@ -127,6 +128,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
         let di_id = wc.decision_intent_id.ok_or(ServerErr(
             "Expected watchlist_check.decision_intent_id to be non-null",
         ))?;
+        let obc_id = playbook_obc.as_ref().map(|(_, obc)| obc.id.clone());
 
         let watchlist_result = match (
             &playbook_obc,
@@ -196,6 +198,39 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
                     return Ok(()); //ie if we had somehow concurrently already run this txn
                 }
 
+                let wf_id = if let Some(obc_id) = obc_id {
+                    let wf = Workflow::create_completed_adhoc_vendor_call(conn, &sv.id, &obc_id)?;
+                    let wf_id = wf.id.clone();
+                    // Notably, we always create a RiskSignalGroup here
+                    let rsg_scope = RiskSignalGroupScope::WorkflowId {
+                        id: &wf_id,
+                        sv_id: &sv.id,
+                    };
+
+                    RiskSignal::bulk_save_for_scope(
+                        conn,
+                        rsg_scope,
+                        watchlist_result.reason_codes().unwrap_or(vec![]),
+                        RiskSignalGroupKind::Aml,
+                        false,
+                    )?;
+                    Some(wf_id)
+                } else {
+                    tracing::warn!(%sv.id, wc_id=%wc.id, "wl_check_task creating rsg for sv scope");
+                    let rsg_scope = RiskSignalGroupScope::ScopedVaultId {
+                        id: &sv.id,
+                        op: RiskSignalGroupCreateOp::Create,
+                    };
+                    RiskSignal::bulk_save_for_scope(
+                        conn,
+                        rsg_scope,
+                        watchlist_result.reason_codes().unwrap_or(vec![]),
+                        RiskSignalGroupKind::Aml,
+                        false,
+                    )?;
+                    None
+                };
+
                 let wc = WatchlistCheck::update(
                     wc,
                     conn,
@@ -205,19 +240,9 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
                         .map(|rs| rs.iter().map(|(r, _, _)| r.clone()).collect()),
                     Some(Utc::now()),
                     Some(crate::GIT_HASH.to_string()),
+                    wf_id,
                 )?;
-                // Notably, we always create a RiskSignalGroup here
-                let rsg_scope = RiskSignalGroupScope::ScopedVaultId {
-                    id: &sv.id,
-                    op: RiskSignalGroupCreateOp::Create,
-                };
-                RiskSignal::bulk_save_for_scope(
-                    conn,
-                    rsg_scope,
-                    watchlist_result.reason_codes().unwrap_or(vec![]),
-                    RiskSignalGroupKind::Aml,
-                    false,
-                )?;
+
 
                 let sv = ScopedVault::lock(conn, &sv.id)?;
                 let sv_txn = DataLifetime::new_sv_txn(conn, &sv)?;

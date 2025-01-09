@@ -1,0 +1,1 @@
+ALTER TABLE watchlist_check DROP COLUMN workflow_id;

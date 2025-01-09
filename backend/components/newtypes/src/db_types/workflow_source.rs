@@ -30,6 +30,8 @@ pub enum WorkflowSource {
     Tenant,
     /// Just for events that aren't backfilled
     Unknown,
+    /// Footprint initiated workflow (like Scheduled watchlist checks)
+    Footprint,
 }
 
 crate::util::impl_enum_string_diesel!(WorkflowSource);

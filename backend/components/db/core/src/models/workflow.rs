@@ -414,6 +414,52 @@ impl Workflow {
         Self::insert(conn, new_workflow)
     }
 
+    /// Create an adhoc workflow and complete it immediately
+    /// Used just for bookkeeping
+    #[tracing::instrument("Workflow::create_completed_adhoc_vendor_call", skip_all)]
+    pub fn create_completed_adhoc_vendor_call(
+        conn: &mut TxnPgConn,
+        scoped_vault_id: &ScopedVaultId,
+        ob_configuration_id: &ObConfigurationId,
+    ) -> FpResult<Self> {
+        let new_workflow = NewWorkflow {
+            created_at: Utc::now(),
+            scoped_vault_id: scoped_vault_id.clone(),
+            kind: WorkflowKind::AdhocVendorCall,
+            state: WorkflowState::AdhocVendorCall(AdhocVendorCallState::Complete),
+            config: AdhocVendorCallConfig::default().into(),
+            fixture_result: None,
+            status: OnboardingStatus::None,
+            ob_configuration_id: ob_configuration_id.clone(),
+            insight_event_id: None,
+            authorized_at: None,
+            source: WorkflowSource::Footprint,
+            is_one_click: false,
+            is_neuro_enabled: false,
+        };
+        let wf = Self::insert(conn, new_workflow)?;
+
+        #[derive(AsChangeset)]
+        #[diesel(table_name = workflow)]
+        struct AdhocWorkflowStateUpdate {
+            state: WorkflowState,
+            completed_at: Option<DateTime<Utc>>,
+            status: OnboardingStatus,
+        }
+
+        let update = AdhocWorkflowStateUpdate {
+            state: WorkflowState::AdhocVendorCall(AdhocVendorCallState::Complete),
+            completed_at: Some(Utc::now()),
+            status: OnboardingStatus::None,
+        };
+        let wf = diesel::update(workflow::table)
+            .filter(workflow::id.eq(&wf.id))
+            .set(update)
+            .get_result(conn.conn())?;
+
+        Ok(wf)
+    }
+
     #[tracing::instrument("Workflow::get", skip_all)]
     pub fn get<'a, T: Into<WorkflowIdentifier<'a>>>(conn: &mut PgConn, id: T) -> FpResult<Self> {
         let result = match id.into() {

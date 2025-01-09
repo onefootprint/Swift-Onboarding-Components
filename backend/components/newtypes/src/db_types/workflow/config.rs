@@ -91,7 +91,7 @@ impl From<KybConfig> for WorkflowConfig {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 
 pub struct AdhocVendorCallConfig {
     pub verification_checks: Vec<VerificationCheck>,

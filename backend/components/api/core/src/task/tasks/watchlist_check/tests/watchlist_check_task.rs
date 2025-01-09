@@ -5,11 +5,13 @@ use crate::State;
 use api_errors::FpError;
 use chrono::Duration;
 use chrono::Utc;
+use db::models::workflow::Workflow;
 use db::test_helpers::assert_have_same_elements;
 use db::tests::MockFFClient;
 use db_schema::schema::verification_result;
 use diesel::prelude::*;
 use macros::test_state_case;
+use newtypes::AdhocVendorCallState;
 use newtypes::AmlMatchKind;
 use newtypes::FootprintReasonCode;
 use newtypes::IdentityDataKind as IDK;
@@ -20,6 +22,7 @@ use newtypes::WatchlistCheckError;
 use newtypes::WatchlistCheckNotNeededReason;
 use newtypes::WatchlistCheckStatus;
 use newtypes::WatchlistCheckStatusKind;
+use newtypes::WorkflowState;
 
 #[test_state_case(
     true,
@@ -237,6 +240,20 @@ async fn active_users(
             .unwrap();
         assert!(vreq_vres.1.is_some());
         assert!(!vreq_vres.1.as_ref().unwrap().is_error);
+    }
+
+    if matches!(vault_kind, VaultKind::Portable(_)) {
+        let wf = state
+            .db_query(move |conn| Workflow::get(conn, &wc.workflow_id.unwrap()))
+            .await
+            .unwrap();
+        assert_eq!(wf.status, OnboardingStatus::None);
+        assert_eq!(
+            wf.state,
+            WorkflowState::AdhocVendorCall(AdhocVendorCallState::Complete)
+        );
+    } else {
+        assert!(wc.workflow_id.is_none());
     }
 }
 

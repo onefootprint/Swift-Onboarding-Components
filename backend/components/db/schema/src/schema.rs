@@ -1756,6 +1756,7 @@ diesel::table! {
         completed_at -> Nullable<Timestamptz>,
         status_details -> Jsonb,
         deactivated_at -> Nullable<Timestamptz>,
+        workflow_id -> Nullable<Text>,
     }
 }
 
@@ -2074,6 +2075,7 @@ diesel::joinable!(verification_result -> verification_request (request_id));
 diesel::joinable!(watchlist_check -> decision_intent (decision_intent_id));
 diesel::joinable!(watchlist_check -> scoped_vault (scoped_vault_id));
 diesel::joinable!(watchlist_check -> task (task_id));
+diesel::joinable!(watchlist_check -> workflow (workflow_id));
 diesel::joinable!(waterfall_execution -> decision_intent (decision_intent_id));
 diesel::joinable!(waterfall_step -> verification_result (verification_result_id));
 diesel::joinable!(waterfall_step -> waterfall_execution (execution_id));
