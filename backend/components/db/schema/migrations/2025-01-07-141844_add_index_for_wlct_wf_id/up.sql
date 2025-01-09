@@ -1,0 +1,1 @@
+CREATE INDEX CONCURRENTLY IF NOT EXISTS watchlist_check_workflow_id ON watchlist_check (workflow_id);

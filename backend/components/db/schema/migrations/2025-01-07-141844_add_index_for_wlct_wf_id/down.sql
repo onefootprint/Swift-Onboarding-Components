@@ -1,0 +1,1 @@
+DROP INDEX CONCURRENTLY IF EXISTS watchlist_check_workflow_id;
