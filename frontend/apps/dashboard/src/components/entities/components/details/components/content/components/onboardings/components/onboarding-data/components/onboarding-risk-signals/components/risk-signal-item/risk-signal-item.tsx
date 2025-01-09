@@ -33,7 +33,7 @@ const RiskSignalItem = ({ riskSignal }: RiskSignalItemProps) => {
 
   return (
     <button className={riskSignalItemItem()} onClick={handleRowClick} type="button">
-      <span className="text-snippet-1 text-secondary">{reasonCode}</span>
+      <span className="text-snippet-2 text-secondary">{reasonCode}</span>
       <Divider variant="secondary" marginBottom={2} />
       <span className={`text-caption-1 text-${getSeverityColor()}`}>{riskSignalSeverityT(severity)}</span>
     </button>
@@ -41,7 +41,7 @@ const RiskSignalItem = ({ riskSignal }: RiskSignalItemProps) => {
 };
 
 const riskSignalItemItem = cva([
-  'relative flex items-end gap-2 py-1',
+  'relative flex items-end gap-2 py-1 z-10',
   'hover:after:content-[""]',
   'hover:after:absolute hover:after:top-0 hover:after:left-[-12px]',
   'hover:after:w-[calc(100%+24px)] hover:after:h-full',
