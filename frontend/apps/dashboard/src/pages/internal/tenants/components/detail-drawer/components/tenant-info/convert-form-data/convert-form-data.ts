@@ -1,5 +1,9 @@
 import type { TenantDetail } from '@onefootprint/types';
-import type { TenantPreviewApi, TenantSupportedAuthMethod } from '@onefootprint/types/src/api/get-tenants';
+import type {
+  TenantBusinessInfo,
+  TenantPreviewApi,
+  TenantSupportedAuthMethod,
+} from '@onefootprint/types/src/api/get-tenants';
 import type { SelectOption } from '@onefootprint/ui';
 import type { PrivatePatchTenantRequest } from 'src/pages/internal/tenants/components/detail-drawer/hooks/use-update-tenant';
 
@@ -25,6 +29,7 @@ export type UpdateTenantFormData = {
   phone: string;
   addressLine1: string;
   city: string;
+  state: string;
   zip: string;
 };
 
@@ -50,4 +55,34 @@ export const convertFormData = (tenant: TenantDetail, formData: UpdateTenantForm
     formData.allowedPreviewApis.map(({ value }) => value),
     tenant.allowedPreviewApis,
   ),
+  // update all the data together
+  businessInfo: businessInfo(formData, tenant.businessInfo),
 });
+
+// currently businessInfo must all be updated together
+function businessInfo(
+  formData: UpdateTenantFormData,
+  _businessInfo: TenantBusinessInfo | undefined,
+): TenantBusinessInfo | undefined {
+  // don't allow any empty fields
+  const fields = [
+    formData.companyName,
+    formData.phone,
+    formData.addressLine1,
+    formData.city,
+    formData.state,
+    formData.zip,
+  ];
+  if (fields.filter(v => v === '').length > 0) {
+    return undefined;
+  }
+
+  return {
+    companyName: formData.companyName,
+    phone: formData.phone,
+    addressLine1: formData.addressLine1,
+    city: formData.city,
+    state: formData.state,
+    zip: formData.zip,
+  };
+}

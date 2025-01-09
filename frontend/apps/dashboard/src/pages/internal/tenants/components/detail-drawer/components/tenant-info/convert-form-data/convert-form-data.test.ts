@@ -27,6 +27,12 @@ describe('convertFormData', () => {
         notIsProdKycPlaybookRestricted: true,
         notIsProdKybPlaybookRestricted: true,
         notIsProdAuthPlaybookRestricted: true,
+        companyName: '',
+        phone: '',
+        addressLine1: '',
+        city: '',
+        state: '',
+        zip: '',
       },
       tenant: {
         name: 'Name',
@@ -40,6 +46,7 @@ describe('convertFormData', () => {
         isProdKycPlaybookRestricted: false,
         isProdKybPlaybookRestricted: false,
         isProdAuthPlaybookRestricted: false,
+        businessInfo: undefined,
       },
       x: {
         name: undefined,
@@ -53,6 +60,7 @@ describe('convertFormData', () => {
         isProdKycPlaybookRestricted: undefined,
         isProdKybPlaybookRestricted: undefined,
         isProdAuthPlaybookRestricted: undefined,
+        businessInfo: undefined,
       },
     },
     {
@@ -82,6 +90,12 @@ describe('convertFormData', () => {
         notIsProdKycPlaybookRestricted: true,
         notIsProdKybPlaybookRestricted: true,
         notIsProdAuthPlaybookRestricted: true,
+        companyName: '',
+        phone: '',
+        addressLine1: '',
+        city: '',
+        state: '',
+        zip: '',
       },
       tenant: {
         name: 'Name',
@@ -95,6 +109,7 @@ describe('convertFormData', () => {
         isProdKycPlaybookRestricted: true,
         isProdKybPlaybookRestricted: true,
         isProdAuthPlaybookRestricted: true,
+        businessInfo: undefined,
       },
       x: {
         name: 'Name2',
@@ -108,6 +123,7 @@ describe('convertFormData', () => {
         isProdKycPlaybookRestricted: false,
         isProdKybPlaybookRestricted: false,
         isProdAuthPlaybookRestricted: false,
+        businessInfo: undefined,
       },
     },
     // Can clear some fields
@@ -125,6 +141,12 @@ describe('convertFormData', () => {
         notIsProdKycPlaybookRestricted: true,
         notIsProdKybPlaybookRestricted: true,
         notIsProdAuthPlaybookRestricted: true,
+        companyName: '',
+        phone: '',
+        addressLine1: '',
+        city: '',
+        state: '',
+        zip: '',
       },
       tenant: {
         supportedAuthMethods: ['google_oauth'],
@@ -139,6 +161,7 @@ describe('convertFormData', () => {
         isProdKycPlaybookRestricted: false,
         isProdKybPlaybookRestricted: false,
         isProdAuthPlaybookRestricted: false,
+        businessInfo: undefined,
       },
       x: {
         superTenantId: null,
@@ -152,6 +175,7 @@ describe('convertFormData', () => {
         isProdKycPlaybookRestricted: undefined,
         isProdKybPlaybookRestricted: undefined,
         isProdAuthPlaybookRestricted: undefined,
+        businessInfo: undefined,
       },
     },
   ])('.', ({ data, tenant, x }) => {

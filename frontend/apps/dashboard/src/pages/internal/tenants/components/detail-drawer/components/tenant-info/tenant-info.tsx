@@ -40,7 +40,7 @@ const AUTH_METHOD_OPTIONS: SelectOption<TenantSupportedAuthMethod>[] = Object.va
 
 const getDefaultValues = (tenant: TenantDetail): UpdateTenantFormData => ({
   name: tenant.name,
-  superTenantId: tenant.superTenantId ?? null,
+  superTenantId: tenant.superTenantId,
   isDemoTenant: tenant.isDemoTenant,
   domains: tenant.domains.join(','),
   allowDomainAccess: tenant.allowDomainAccess,
@@ -54,6 +54,7 @@ const getDefaultValues = (tenant: TenantDetail): UpdateTenantFormData => ({
   phone: tenant.businessInfo?.phone || '',
   addressLine1: tenant.businessInfo?.addressLine1 || '',
   city: tenant.businessInfo?.city || '',
+  state: tenant.businessInfo?.state || '',
   zip: tenant.businessInfo?.zip || '',
 });
 
@@ -113,6 +114,11 @@ const TenantInfo = ({ tenant }: TenantInfoProps) => {
       title: 'City',
       content: tenant.businessInfo?.city || '-',
       editModeContent: <TextInput placeholder="San Francisco" {...register('city')} />,
+    },
+    {
+      title: 'State',
+      content: tenant.businessInfo?.state || '-',
+      editModeContent: <TextInput placeholder="CA" {...register('state')} />,
     },
     {
       title: 'ZIP',
