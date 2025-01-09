@@ -72,7 +72,6 @@ const Actions = ({ id }: ActionsProps) => {
             <Dropdown.Group>
               <Dropdown.Item onSelect={handleExtend}>Extend edit rights</Dropdown.Item>
             </Dropdown.Group>
-            <Dropdown.Divider />
             <Dropdown.Group>
               <Dropdown.Item onSelect={handleRevoke}>Revoke edit rights</Dropdown.Item>
             </Dropdown.Group>

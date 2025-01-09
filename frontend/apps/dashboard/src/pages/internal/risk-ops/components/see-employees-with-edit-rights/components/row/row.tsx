@@ -20,6 +20,9 @@ const Row = ({ accessRequest }: { accessRequest: AccessRequest }) => {
       <td key="requester" className="text-body-3 text-primary">
         {accessRequest.requester}
       </td>
+      <td key="tenant" className="text-body-3 text-primary">
+        {accessRequest.tenantName}
+      </td>
       <td key="scopes" className="text-body-3 text-primary">
         {firstThree.join(', ')}{' '}
         {remaining > 0 ? (

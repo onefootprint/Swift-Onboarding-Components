@@ -92,6 +92,11 @@ const GrantEditRightsForm = ({ onClose }: GrantEditRightsFormProps) => {
             <Form.Input size="compact" type="number" {...register('duration')} placeholder="1" />
             <Form.Hint>Specify the number of days the employee will have edit rights for.</Form.Hint>
           </Form.Field>
+          <Form.Field>
+            <Form.Label>Reason</Form.Label>
+            <Form.TextArea {...register('reason')} placeholder="Enter a reason why you are requesting edit rights" />
+            <Form.Hint>Provide a reason for the edit rights request.</Form.Hint>
+          </Form.Field>
           <div className="flex justify-end gap-3">
             <Button variant="secondary" onClick={onClose}>
               Cancel
