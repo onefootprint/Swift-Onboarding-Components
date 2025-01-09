@@ -26,11 +26,6 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
           on: {
             receivedCountryAndType: [
               {
-                target: 'mobileFrontPhotoFallback',
-                cond: ctx => isMobileKind(ctx.device.type) && !ctx.isConsentMissing && !!ctx.forceUpload,
-                actions: ['assignCountryAndType', 'assignId', 'assignSide'],
-              },
-              {
                 target: 'mobileRequestCameraAccess',
                 cond: ctx =>
                   isMobileKind(ctx.device.type) && !ctx.isConsentMissing && isPrompt(ctx.cameraPermissionState),
@@ -146,15 +141,12 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
             navigatedToPrev: {
               target: 'countryAndType',
             },
-
             cameraErrored: {
               target: 'countryAndType',
             },
             cameraStuck: {
               target: 'mobileFrontPhotoFallback',
-              actions: 'assignForcedUpload',
             },
-
             receivedImage: {
               target: 'mobileProcessing',
               actions: 'assignImage',
@@ -221,6 +213,9 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
             navigatedToPrev: {
               target: 'countryAndType',
             },
+            cameraStuck: {
+              target: 'mobileBackPhotoFallback',
+            },
             receivedImage: {
               target: 'mobileProcessing',
               actions: 'assignImage',
@@ -275,6 +270,9 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
             navigatedToPrev: {
               target: 'countryAndType',
             },
+            cameraStuck: {
+              target: 'mobileSelfieFallback',
+            },
             receivedImage: {
               target: 'mobileProcessing',
               actions: 'assignImage',
@@ -294,18 +292,6 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
           },
         },
         desktopSelfieImage: {
-          on: {
-            receivedImage: {
-              target: 'desktopProcessing',
-              actions: 'assignImage',
-            },
-            cameraStuck: {
-              target: 'desktopSelfieFallback',
-              actions: 'assignForcedUpload',
-            },
-          },
-        },
-        desktopSelfieFallback: {
           on: {
             receivedImage: {
               target: 'desktopProcessing',
@@ -415,6 +401,7 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
             imageFile: event.payload.imageFile,
             captureKind: event.payload.captureKind,
             extraCompressed: event.payload.extraCompressed,
+            forcedUpload: event.payload.forcedUpload,
           };
           logInfo(
             `IdDocMachine (func assignImage): size of the image file assigned to machine context is ${context.image?.imageFile?.size}, file type ${context.image?.imageFile?.type}`,
@@ -439,10 +426,6 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
         clearImageAndErrors: assign(context => {
           context.errors = [];
           context.image = undefined;
-          return context;
-        }),
-        assignForcedUpload: assign(context => {
-          context.forceUpload = true;
           return context;
         }),
         assignCameraPermissionState: assign((context, event) => {

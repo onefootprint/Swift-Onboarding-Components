@@ -20,6 +20,9 @@ const SelfiePhoto = () => {
       type: 'navigatedToPrev',
     });
   };
+  const handleCameraStuck = () => {
+    send({ type: 'cameraStuck' });
+  };
 
   return (
     <PhotoCapture
@@ -34,6 +37,7 @@ const SelfiePhoto = () => {
       title={{ camera: t('title'), preview: t('title') }}
       onComplete={onComplete}
       onBack={handleClickBack}
+      onCameraStuck={handleCameraStuck}
     />
   );
 };

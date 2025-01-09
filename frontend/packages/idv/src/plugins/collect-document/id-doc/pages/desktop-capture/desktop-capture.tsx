@@ -4,7 +4,6 @@ import type { ComponentProps } from 'react';
 
 import { NavigationHeader } from '@/idv/components';
 import DesktopPhotoPrompt from '../../../components/desktop-photo-prompt';
-import { isSelfie } from '../../../utils/capture';
 import useDocName from '../../hooks/use-doc-name';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 
@@ -20,10 +19,9 @@ const DesktopCapture = ({ imageType, isRetry = false, onBack, onComplete }: Desk
   const { errors, hasBadConnectivity, idDoc, requirement } = state.context;
   const docType = idDoc.type;
   const countryCode = idDoc.country;
-  const isSelfieCapture = isSelfie(imageType);
   const { getDocName, getSideName } = useDocName({ docType, imageType });
 
-  if (!isSelfieCapture && (!docType || !countryCode)) return null;
+  if (!docType || !countryCode) return null;
 
   const handleUploadError = (errs: IdDocImageUploadError[]) => {
     send({
@@ -34,20 +32,16 @@ const DesktopCapture = ({ imageType, isRetry = false, onBack, onComplete }: Desk
 
   return (
     <>
-      <NavigationHeader
-        leftButton={isSelfieCapture ? { variant: 'close', confirmClose: true } : { variant: 'back', onBack }}
-      />
+      <NavigationHeader leftButton={{ variant: 'back', onBack }} />
       <DesktopPhotoPrompt
         country={countryCode}
         docName={getDocName()}
         errors={errors}
         hasBadConnectivity={hasBadConnectivity}
         isRetry={isRetry}
-        isSelfie={isSelfieCapture}
         onUploadError={handleUploadError}
         onUploadSuccess={onComplete}
         requirement={requirement}
-        showCameraFallbackText={isSelfieCapture}
         sideName={getSideName()}
       />
     </>

@@ -43,6 +43,7 @@ const DocumentPrompt = () => {
     imageFile: File | Blob;
     extraCompressed: boolean;
     captureKind: CaptureKind;
+    forcedUpload: boolean;
   }) => {
     send({
       type: 'receivedDocument',

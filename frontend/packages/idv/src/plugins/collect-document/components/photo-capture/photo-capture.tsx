@@ -54,7 +54,7 @@ const PhotoCapture = ({
   deviceKind,
   sideName,
   docName,
-  orgId,
+  orgId: _orgId,
   requirement,
   hasBadConnectivity,
   onCameraStuck,
@@ -80,8 +80,13 @@ const PhotoCapture = ({
     footer: { set: updateFooter },
   } = useLayoutOptions();
   const { FallbackToDocUploadOnCameraError } = useFlags();
-  const orgIds = new Set<string>(FallbackToDocUploadOnCameraError);
-  const shouldFallbackToUpload = orgIds.has(orgId);
+  const _orgIds = new Set<string>(FallbackToDocUploadOnCameraError);
+
+  // with flag it should be orgIds.has(orgId)
+  // But we are trying to use the native device camera as fallback
+  // So we are setting it to true for all tenants
+  // if it works as expected, we can remove the flag
+  const shouldFallbackToUpload = true;
 
   useLayoutEffect(() => {
     if (isMobile(deviceKind)) {
@@ -132,7 +137,7 @@ const PhotoCapture = ({
     logInfo(
       `Photocapture: size of the processed file to be sent in machine event type 'receivedImage' is ${bytesToMegabytes(file.size)} MB, file type ${file.type}`,
     );
-    onComplete({ captureKind, extraCompressed, imageFile: file });
+    onComplete({ captureKind, extraCompressed, imageFile: file, forcedUpload: false });
   };
 
   const handleError = (err?: unknown) => {

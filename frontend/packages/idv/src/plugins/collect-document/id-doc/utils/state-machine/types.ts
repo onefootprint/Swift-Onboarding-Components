@@ -29,7 +29,6 @@ export type MachineContext = {
   errors?: IdDocImageErrorType[];
   sandboxOutcome?: IdDocOutcome;
   hasBadConnectivity?: boolean;
-  forceUpload?: boolean;
 };
 
 export type ProcessingSucceededEvent = {

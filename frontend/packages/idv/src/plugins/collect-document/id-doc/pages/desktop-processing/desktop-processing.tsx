@@ -48,7 +48,6 @@ const DeskTopProcessing = () => {
     authToken,
     currSide,
     id,
-    forceUpload,
   } = state.context;
   const isSelfie = currSide === IdDocImageTypes.selfie;
   const { getDocName, getSideName } = useDocName({
@@ -167,7 +166,7 @@ const DeskTopProcessing = () => {
       }, SLOW_CONNECTION_MESSAGE_TIMEOUT);
     }
 
-    const { imageFile, extraCompressed, captureKind } = image;
+    const { imageFile, extraCompressed, captureKind, forcedUpload } = image;
     logInfo(
       `Uploading image with size ${bytesToMegabytes(imageFile.size)} MB and type ${imageFile.type} in POST request`,
     );
@@ -178,7 +177,7 @@ const DeskTopProcessing = () => {
         extraCompress: extraCompressed,
         side: currSide,
         id,
-        forceUpload,
+        forceUpload: forcedUpload,
         meta: {
           manual: captureKind === 'manual',
           isUpload: captureKind === 'upload',

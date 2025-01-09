@@ -13,6 +13,7 @@ export const initialContextDL: MachineContext = {
     }),
     captureKind: 'manual',
     extraCompressed: false,
+    forcedUpload: false,
   },
 };
 

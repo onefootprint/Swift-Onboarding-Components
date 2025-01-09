@@ -1495,22 +1495,22 @@
           }
         },
         "mobile-front-photo-fallback-upload": {
-          "title": "Tiempo excedido",
+          "title": "Subir foto",
           "subtitle": {
-            "bankStatement": "No podemos acceder a tu cámara en este momento. Sube manualmente una foto del frente de tu estado de cuenta.",
-            "custom": "No podemos acceder a tu cámara en este momento. Sube manualmente una foto del frente de {{custom}}.",
-            "utilityBill": "No podemos acceder a tu cámara en este momento. Sube manualmente una foto del frente de tu recibo de luz o agua.",
-            "lease": "No podemos acceder a tu cámara en este momento. Sube manualmente una foto del frente de tu alquiler.",
-            "driversLicense": "No podemos acceder a tu cámara en este momento. Sube manualmente una foto del frente de tu licencia de conducir.",
-            "idCard": "No podemos acceder a tu cámara en este momento. Sube manualmente una foto del frente de tu tarjeta de identidad.",
-            "passport": "No podemos acceder a tu cámara en este momento. Sube manualmente una foto del frente de tu pasaporte.",
-            "visa": "No podemos acceder a tu cámara en este momento. Sube manualmente una foto del frente de tu visa.",
-            "workPermit": "No podemos acceder a tu cámara en este momento. Sube manualmente una foto del frente de tu tarjeta EAD.",
-            "residenceDocument": "No podemos acceder a tu cámara en este momento. Sube manualmente una foto del frente de tu tarjeta verde.",
-            "voterIdentification": "No podemos acceder a tu cámara en este momento. Sube manualmente una foto del frente de tu identificación de votante.",
-            "ssnCard": "No podemos acceder a tu cámara en este momento. Sube manualmente una foto del frente de tu tarjeta de SSN.",
-            "proofOfAddress": "No podemos acceder a tu cámara en este momento. Sube manualmente una foto del frente de tu comprobante de domicilio.",
-            "passportCard": "No podemos acceder a tu cámara en este momento. Sube manualmente una foto del frente de tu tarjeta de pasaporte."
+            "bankStatement": "Puedes tomar una nueva foto del anverso de tu estado de cuenta bancario o subir una foto desde tu dispositivo.",
+            "custom": "Puedes tomar una nueva foto del anverso de tu {{custom}} o subir una foto desde tu dispositivo.",
+            "utilityBill": "Puedes tomar una nueva foto del anverso de tu factura de servicios o subir una foto desde tu dispositivo.",
+            "lease": "Puedes tomar una nueva foto del anverso de tu contrato de arrendamiento o subir una foto desde tu dispositivo.",
+            "driversLicense": "Puedes tomar una nueva foto del anverso de tu licencia de conducir o subir una foto desde tu dispositivo.",
+            "idCard": "Puedes tomar una nueva foto del anverso de tu documento de identidad o subir una foto desde tu dispositivo.",
+            "passport": "Puedes tomar una nueva foto del anverso de tu pasaporte o subir una foto desde tu dispositivo.",
+            "visa": "Puedes tomar una nueva foto del anverso de tu visa o subir una foto desde tu dispositivo.",
+            "workPermit": "Puedes tomar una nueva foto del anverso de tu tarjeta EAD o subir una foto desde tu dispositivo.",
+            "residenceDocument": "Puedes tomar una nueva foto del anverso de tu tarjeta de residente o subir una foto desde tu dispositivo.",
+            "voterIdentification": "Puedes tomar una nueva foto del anverso de tu identificación de votante o subir una foto desde tu dispositivo.",
+            "ssnCard": "Puedes tomar una nueva foto del anverso de tu tarjeta del SSN o subir una foto desde tu dispositivo.",
+            "proofOfAddress": "Puedes tomar una nueva foto del anverso de tu comprobante de domicilio o subir una foto desde tu dispositivo.",
+            "passportCard": "Puedes tomar una nueva foto del anverso de tu tarjeta de pasaporte o subir una foto desde tu dispositivo."
           }
         },
         "back-photo-capture": {
@@ -1519,22 +1519,22 @@
           }
         },
         "mobile-back-photo-fallback-upload": {
-          "title": "Tiempo excedido",
+          "title": "Subir foto",
           "subtitle": {
-            "bankStatement": "No podemos acceder a tu cámara en este momento. Sube manualmente una foto del frente de tu estado de cuenta.",
-            "custom": "No podemos acceder a tu cámara en este momento. Sube manualmente una foto del frente de {{custom}}.",
-            "utilityBill": "No podemos acceder a tu cámara en este momento. Sube manualmente una foto del frente de tu recibo de luz o agua.",
-            "lease": "No podemos acceder a tu cámara en este momento. Sube manualmente una foto del frente de tu alquiler.",
-            "driversLicense": "No podemos acceder a tu cámara en este momento. Sube manualmente una imagen del lado posterior de tu licencia de conducir.",
-            "idCard": "No podemos acceder a tu cámara en este momento. Sube manualmente  una imagen del lado posteriorde tu tarjeta de identidad.",
-            "passport": "No podemos acceder a tu cámara en este momento. Sube manualmente  una imagen del lado posteriorde tu pasaporte.",
-            "visa": "No podemos acceder a tu cámara en este momento. Sube manualmente  una imagen del lado posteriorde tu visa.",
-            "workPermit": "No podemos acceder a tu cámara en este momento. Sube manualmente  una imagen del lado posteriorde tu tarjeta EAD.",
-            "residenceDocument": "No podemos acceder a tu cámara en este momento. Sube manualmente  una imagen del lado posteriorde tu tarjeta verde.",
-            "voterIdentification": "No podemos acceder a tu cámara en este momento. Sube manualmente  una imagen del lado posteriorde tu identificación de votante.",
-            "ssnCard": "No podemos acceder a tu cámara en este momento. Sube manualmente  una imagen del lado posteriorde tu tarjeta de SSN.",
-            "proofOfAddress": "No podemos acceder a tu cámara en este momento. Sube manualmente  una imagen del lado posteriorde tu comprobante de domicilio.",
-            "passportCard": "No podemos acceder a tu cámara en este momento. Sube manualmente  una imagen del lado posteriorde tu tarjeta de pasaporte."
+            "bankStatement": "Puedes tomar una nueva foto del reverso de tu estado de cuenta bancario o subir una foto desde tu dispositivo.",
+            "custom": "Puedes tomar una nueva foto del reverso de tu {{custom}} o subir una foto desde tu dispositivo.",
+            "utilityBill": "Puedes tomar una nueva foto del reverso de tu factura de servicios o subir una foto desde tu dispositivo.",
+            "lease": "Puedes tomar una nueva foto del reverso de tu contrato de arrendamiento o subir una foto desde tu dispositivo.",
+            "driversLicense": "Puedes tomar una nueva foto del reverso de tu licencia de conducir o subir una foto desde tu dispositivo.",
+            "idCard": "Puedes tomar una nueva foto del reverso de tu documento de identidad o subir una foto desde tu dispositivo.",
+            "passport": "Puedes tomar una nueva foto del reverso de tu pasaporte o subir una foto desde tu dispositivo.",
+            "visa": "Puedes tomar una nueva foto del reverso de tu visa o subir una foto desde tu dispositivo.",
+            "workPermit": "Puedes tomar una nueva foto del reverso de tu tarjeta EAD o subir una foto desde tu dispositivo.",
+            "residenceDocument": "Puedes tomar una nueva foto del reverso de tu tarjeta de residente o subir una foto desde tu dispositivo.",
+            "voterIdentification": "Puedes tomar una nueva foto del reverso de tu identificación de votante o subir una foto desde tu dispositivo.",
+            "ssnCard": "Puedes tomar una nueva foto del reverso de tu tarjeta del SSN o subir una foto desde tu dispositivo.",
+            "proofOfAddress": "Puedes tomar una nueva foto del reverso de tu comprobante de domicilio o subir una foto desde tu dispositivo.",
+            "passportCard": "Puedes tomar una nueva foto del reverso de tu tarjeta de pasaporte o subir una foto desde tu dispositivo."
           }
         },
         "selfie-photo-prompt": {
@@ -1569,8 +1569,8 @@
           }
         },
         "mobile-selfie-fallback-upload": {
-          "title": "Tiempo excedido",
-          "subtitle": "No podemos acceder a tu cámara en este momento. Sube manualmente tu foto de selfie."
+          "title": "Tomar una selfie",
+          "subtitle": "Toma una selfie para validar tu identidad. Asegúrate de que tu rostro esté claramente visible y centrado en la foto."
         },
         "selfie-retry-prompt": {
           "cta": "Tomar foto"

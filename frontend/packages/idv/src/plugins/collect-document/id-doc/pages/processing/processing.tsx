@@ -41,7 +41,6 @@ const Processing = () => {
     image,
     authToken,
     currSide,
-    forceUpload,
     id,
   } = state.context;
 
@@ -157,7 +156,7 @@ const Processing = () => {
       }, SLOW_CONNECTION_MESSAGE_TIMEOUT);
     }
 
-    const { imageFile, extraCompressed, captureKind } = image;
+    const { imageFile, extraCompressed, captureKind, forcedUpload } = image;
     logInfo(
       `Uploading image with size ${bytesToMegabytes(imageFile.size)} MB and type ${imageFile.type} in POST request`,
     );
@@ -168,7 +167,7 @@ const Processing = () => {
         image: imageFile,
         extraCompress: extraCompressed,
         side: currSide,
-        forceUpload,
+        forceUpload: forcedUpload,
         id,
         meta: {
           manual: captureKind === 'manual',

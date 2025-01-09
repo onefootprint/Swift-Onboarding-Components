@@ -82,6 +82,7 @@ const DesktopPhotoPrompt = ({
       imageFile: processResult.file,
       captureKind: 'upload',
       extraCompressed: processResult.extraCompressed,
+      forcedUpload: !!showCameraFallbackText, // it's a forced upload if the user fell back to the upload prompt
     });
     onProcessingDone();
   };
@@ -126,9 +127,14 @@ const DesktopPhotoPrompt = ({
         onUploadError={handleUploadError}
         allowPdf={allowPdf}
       >
-        {showCameraFallbackText && (
+        {showCameraFallbackText && !isLoading && (
           <>
-            <HeaderTitle title={t('camera-fallback-text.title')} icon={IcoClock40} />
+            <HeaderTitle
+              title={t('camera-fallback-text.title')}
+              display="flex"
+              flexDirection="column"
+              icon={IcoClock40}
+            />
             <Text variant="body-2" color="quaternary">
               {t('camera-fallback-text.subtitle')}
             </Text>

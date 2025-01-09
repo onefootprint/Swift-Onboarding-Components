@@ -29,6 +29,7 @@ describe('Non Id Doc Machine Tests', () => {
           imageFile: testFile,
           extraCompressed: false,
           captureKind: 'manual',
+          forcedUpload: false,
         },
       });
       expect(state.value).toEqual('mobileProcessing');
@@ -56,6 +57,7 @@ describe('Non Id Doc Machine Tests', () => {
           imageFile: testFile,
           extraCompressed: false,
           captureKind: 'manual',
+          forcedUpload: false,
         },
       });
       expect(state.value).toEqual('mobileProcessing');
@@ -84,6 +86,7 @@ describe('Non Id Doc Machine Tests', () => {
           imageFile: testFile,
           extraCompressed: false,
           captureKind: 'manual',
+          forcedUpload: false,
         },
       });
       expect(state.value).toEqual('desktopProcessing');
@@ -114,6 +117,7 @@ describe('Non Id Doc Machine Tests', () => {
           imageFile: testFile,
           extraCompressed: false,
           captureKind: 'manual',
+          forcedUpload: false,
         },
       });
       expect(state.value).toEqual('mobileProcessing');
@@ -131,6 +135,7 @@ describe('Non Id Doc Machine Tests', () => {
           imageFile: testFile,
           extraCompressed: false,
           captureKind: 'manual',
+          forcedUpload: false,
         },
       });
       expect(state.value).toEqual('mobileProcessing');
@@ -159,6 +164,7 @@ describe('Non Id Doc Machine Tests', () => {
           imageFile: testFile,
           extraCompressed: false,
           captureKind: 'manual',
+          forcedUpload: false,
         },
       });
       expect(state.value).toEqual('desktopProcessing');
@@ -176,6 +182,7 @@ describe('Non Id Doc Machine Tests', () => {
           imageFile: testFile,
           extraCompressed: false,
           captureKind: 'manual',
+          forcedUpload: false,
         },
       });
       expect(state.value).toEqual('desktopProcessing');
@@ -204,6 +211,7 @@ describe('Non Id Doc Machine Tests', () => {
           imageFile: testFile,
           extraCompressed: false,
           captureKind: 'manual',
+          forcedUpload: false,
         },
       });
       expect(state.value).toEqual('desktopProcessing');
@@ -229,6 +237,7 @@ describe('Non Id Doc Machine Tests', () => {
           imageFile: testFile,
           extraCompressed: false,
           captureKind: 'manual',
+          forcedUpload: false,
         },
       });
       expect(state.value).toEqual('desktopProcessing');
@@ -268,6 +277,7 @@ describe('Non Id Doc Machine Tests', () => {
             imageFile: testFile,
             extraCompressed: false,
             captureKind: 'manual',
+            forcedUpload: false,
           },
         },
         {
@@ -288,6 +298,7 @@ describe('Non Id Doc Machine Tests', () => {
             imageFile: testFile,
             extraCompressed: false,
             captureKind: 'manual',
+            forcedUpload: false,
           },
         },
         {
@@ -316,6 +327,7 @@ describe('Non Id Doc Machine Tests', () => {
             imageFile: testFile,
             extraCompressed: false,
             captureKind: 'manual',
+            forcedUpload: false,
           },
         },
         {
@@ -336,6 +348,7 @@ describe('Non Id Doc Machine Tests', () => {
             imageFile: testFile,
             extraCompressed: false,
             captureKind: 'manual',
+            forcedUpload: false,
           },
         },
         {
@@ -366,6 +379,7 @@ describe('Non Id Doc Machine Tests', () => {
           imageFile: testFile,
           extraCompressed: false,
           captureKind: 'manual',
+          forcedUpload: false,
         },
       });
       expect(state.value).toEqual('mobileProcessing');
@@ -394,6 +408,7 @@ describe('Non Id Doc Machine Tests', () => {
           imageFile: testFile,
           extraCompressed: false,
           captureKind: 'manual',
+          forcedUpload: false,
         },
       });
       expect(state.value).toEqual('desktopProcessing');
@@ -417,7 +432,7 @@ describe('Non Id Doc Machine Tests', () => {
 
       state = machine.send({
         type: 'receivedDocument',
-        payload: { imageFile: testFile, extraCompressed: false, captureKind: 'manual' },
+        payload: { imageFile: testFile, extraCompressed: false, captureKind: 'manual', forcedUpload: false },
       });
       expect(state.value).toEqual('desktopProcessing');
     });

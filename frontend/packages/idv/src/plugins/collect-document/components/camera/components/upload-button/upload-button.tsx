@@ -80,6 +80,7 @@ const UploadButton = ({
       captureKind: 'upload',
       extraCompressed: processResult.extraCompressed,
       imageFile: processResult.file,
+      forcedUpload: false,
     });
     onProcessingDone();
   };

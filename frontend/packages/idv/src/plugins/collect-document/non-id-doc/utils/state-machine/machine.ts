@@ -177,6 +177,7 @@ const createNonIdDocMachine = (args: MachineContext) =>
             imageFile: event.payload.imageFile,
             captureKind: event.payload.captureKind,
             extraCompressed: event.payload.extraCompressed,
+            forcedUpload: event.payload.forcedUpload,
           };
           Logger.info(
             `NonIDocMachine (func assignImage): size of the image file assigned to machine context is ${context.document?.imageFile?.size}, file type ${context.document?.imageFile?.type}`,

@@ -19,8 +19,8 @@ const DesktopHeader = ({ docName, sideName, country, isSelfie }: DesktopHeaderPr
   // TODO: these probably need to be translated
   const countryName = getCountryFromCode(country)?.label;
   let title: string = `${docName}`;
-  if (!docName) title = `${sideName}`;
-  if (docName && sideName) title = `${docName} · ${sideName}`;
+  if (!docName || isSelfie) title = `${sideName}`;
+  else if (docName && sideName) title = `${docName} · ${sideName}`;
 
   let subtitle;
   if (!isSelfie && countryName) {

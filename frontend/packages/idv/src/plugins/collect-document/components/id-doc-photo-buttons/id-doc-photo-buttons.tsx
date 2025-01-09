@@ -16,6 +16,9 @@ type IdDocPhotoButtonsProp = {
   allowPdf?: boolean;
   hasBadConnectivity?: boolean;
   onTakePhoto?: () => void;
+  fallbackUpload?: boolean;
+  isNativeCameraCapture?: boolean;
+  nativeCameraFacingMode?: 'environment' | 'user';
 };
 
 const IdDocPhotoButtons = ({
@@ -26,11 +29,15 @@ const IdDocPhotoButtons = ({
   allowPdf,
   hasBadConnectivity,
   onTakePhoto,
+  fallbackUpload,
+  isNativeCameraCapture,
+  nativeCameraFacingMode,
 }: IdDocPhotoButtonsProp) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'document-flow.components.photo-upload-buttons',
   });
   const uploadPhotoRef = useRef<HTMLInputElement | undefined>();
+  const capturePhotoRef = useRef<HTMLInputElement | undefined>();
   const { processImageFile, acceptedFileFormats } = useProcessImage({
     allowPdf,
   });
@@ -68,13 +75,23 @@ const IdDocPhotoButtons = ({
       `IdDocPhotoButtons: size of the processed file to be sent in machine event type 'receivedImage' is ${file.size}, file type ${file.type}`,
     );
 
-    onComplete({ imageFile: file, extraCompressed, captureKind: 'upload' });
+    onComplete({
+      imageFile: file,
+      extraCompressed,
+      captureKind: captureMethod === 'upload' ? 'upload' : 'manual',
+      forcedUpload: !!fallbackUpload && captureMethod === 'upload',
+    });
     onProcessingDone();
   };
 
   const handleUpload = () => {
     setCaptureMethod('upload');
     uploadPhotoRef.current?.click();
+  };
+
+  const handleNativeCameraCapture = () => {
+    setCaptureMethod('take');
+    capturePhotoRef.current?.click();
   };
 
   return (
@@ -89,14 +106,16 @@ const IdDocPhotoButtons = ({
           size="large"
           data-dd-action-name="doc:upload-photo"
         >
-          {t('upload-file.title')}
+          {allowPdf ? t('upload-file.title') : t('upload-photo.title')}
         </Button>
       )}
       {showCaptureButton && (
         <Button
           fullWidth
-          onClick={onTakePhoto}
+          onClick={isNativeCameraCapture ? handleNativeCameraCapture : onTakePhoto}
           variant={uploadFirst ? 'secondary' : 'primary'}
+          loading={isLoading && captureMethod === 'take'}
+          disabled={isLoading}
           size="large"
           data-dd-action-name="doc:take-photo"
         >
@@ -113,7 +132,7 @@ const IdDocPhotoButtons = ({
           size="large"
           data-dd-action-name="doc:upload-photo"
         >
-          {t('upload-photo.title')}
+          {allowPdf ? t('upload-file.title') : t('upload-photo.title')}
         </Button>
       )}
       <HiddenInput
@@ -122,6 +141,14 @@ const IdDocPhotoButtons = ({
         accept={acceptedFileFormats}
         onChange={handleImage}
         aria-label="file-input"
+      />
+      <HiddenInput
+        ref={capturePhotoRef as React.RefObject<HTMLInputElement>}
+        type="file"
+        accept="image/*"
+        onChange={handleImage}
+        aria-label="photo-input"
+        capture={nativeCameraFacingMode}
       />
     </ButtonsContainer>
   );

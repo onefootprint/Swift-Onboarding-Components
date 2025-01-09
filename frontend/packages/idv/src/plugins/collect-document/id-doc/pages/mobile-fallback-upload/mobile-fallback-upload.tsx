@@ -1,4 +1,4 @@
-import { IcoClock40 } from '@onefootprint/icons';
+import { IcoCamera40 } from '@onefootprint/icons';
 import { useTranslation } from 'react-i18next';
 
 import { HeaderTitle, NavigationHeader } from '@/idv/components';
@@ -16,7 +16,6 @@ type SubtitlePaths = `mobile-${Sides}-photo-fallback-upload.subtitle.${KeysOfIdD
 
 type MobileFallbackUploadProps = {
   imageType: `${IdDocImageTypes}`;
-  onTakePhotoClick?: () => void;
 };
 
 const getTitle = (imageType: `${IdDocImageTypes}`) => {
@@ -32,7 +31,7 @@ const getSubtitle = (docType: `${SupportedIdDocTypes}`, imageType: `${IdDocImage
     : `mobile-back-photo-fallback-upload.subtitle.${lastKey}`;
 };
 
-const MobileFallbackUpload = ({ imageType, onTakePhotoClick }: MobileFallbackUploadProps) => {
+const MobileFallbackUpload = ({ imageType }: MobileFallbackUploadProps) => {
   const { t } = useTranslation('idv', { keyPrefix: 'document-flow.id-doc.pages' });
   const [state, send] = useIdDocMachine();
   const { hasBadConnectivity, idDoc, requirement } = state.context;
@@ -58,17 +57,19 @@ const MobileFallbackUpload = ({ imageType, onTakePhotoClick }: MobileFallbackUpl
       <HeaderTitle
         title={t(getTitle(imageType))}
         subtitle={subtitle}
-        icon={IcoClock40}
+        icon={IcoCamera40}
         display="flex"
         flexDirection="column"
       />
       <IdDocPhotoButtons
         onComplete={payload => send({ type: 'receivedImage', payload })}
         allowPdf={allowPdf}
-        hideCaptureButton
+        hideUploadButton={isSelfie(imageType)}
+        nativeCameraFacingMode={isSelfie(imageType) ? 'user' : 'environment'}
+        isNativeCameraCapture
         uploadFirst
         hasBadConnectivity={hasBadConnectivity}
-        onTakePhoto={onTakePhotoClick}
+        fallbackUpload
       />
     </FlexColumnMotionContainer>
   );

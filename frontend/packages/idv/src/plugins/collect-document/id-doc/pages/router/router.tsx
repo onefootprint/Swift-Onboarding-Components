@@ -59,7 +59,7 @@ const Router = ({ onDone }: RouterProps) => {
   }
 
   if (state.matches('mobileFrontPhotoFallback')) {
-    return <MobileFallbackUpload imageType="front" onTakePhotoClick={() => send({ type: 'startImageCapture' })} />;
+    return <MobileFallbackUpload imageType="front" />;
   }
 
   if (state.matches('mobileFrontImageRetry')) {
@@ -134,10 +134,6 @@ const Router = ({ onDone }: RouterProps) => {
 
   if (state.matches('desktopSelfieImage')) {
     return <DesktopSelfie />;
-  }
-
-  if (state.matches('desktopSelfieFallback')) {
-    return <DesktopCapture imageType="selfie" onComplete={payload => send({ type: 'receivedImage', payload })} />;
   }
 
   if (state.matches('desktopSelfieImageRetry')) {

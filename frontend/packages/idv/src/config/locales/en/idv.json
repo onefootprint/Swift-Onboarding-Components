@@ -1494,22 +1494,22 @@
           }
         },
         "mobile-front-photo-fallback-upload": {
-          "title": "Time exceeded",
+          "title": "Upload photo",
           "subtitle": {
-            "bankStatement": "We're unable to access your camera at this time. Please manually upload the front side of your bank statement",
-            "custom": "We're unable to access your camera at this time. Please manually upload the front side of your {{custom}}",
-            "utilityBill": "We're unable to access your camera at this time. Please manually upload the front side of your utility bill",
-            "lease": "We're unable to access your camera at this time. Please manually upload the front side of your lease",
-            "driversLicense": "We're unable to access your camera at this time. Please manually upload the front side of your driver's license",
-            "idCard": "We're unable to access your camera at this time. Please manually upload the front side of your ID card",
-            "passport": "We're unable to access your camera at this time. Please manually upload the front side of your passport",
-            "visa": "We're unable to access your camera at this time. Please manually upload the front side of your visa",
-            "workPermit": "We're unable to access your camera at this time. Please manually upload the front side of your EAD card",
-            "residenceDocument": "We're unable to access your camera at this time. Please manually upload the front side of your green card",
-            "voterIdentification": "We're unable to access your camera at this time. Please manually upload the front side of your voter identification",
-            "ssnCard": "We're unable to access your camera at this time. Please manually upload the front side of your SSN Card",
-            "proofOfAddress": "We're unable to access your camera at this time. Please manually upload the front side of your proof of address",
-            "passportCard": "We're unable to access your camera at this time. Please manually upload the front side of your passport card"
+            "bankStatement": "You may either take a new photo of the front side of your bank statement or upload a photo from your device.",
+            "custom": "You may either take a new photo of the front side of your {{custom}} or upload a photo from your device.",
+            "utilityBill": "You may either take a new photo of the front side of your utility bill or upload a photo from your device.",
+            "lease": "You may either take a new photo of the front side of your lease or upload a photo from your device.",
+            "driversLicense": "You may either take a new photo of the front side of your driver's license or upload a photo from your device.",
+            "idCard": "You may either take a new photo of the front side of your ID card or upload a photo from your device.",
+            "passport": "You may either take a new photo of the front side of your passport or upload a photo from your device.",
+            "visa": "You may either take a new photo of the front side of your visa or upload a photo from your device.",
+            "workPermit": "You may either take a new photo of the front side of your EAD card or upload a photo from your device.",
+            "residenceDocument": "You may either take a new photo of the front side of your green card or upload a photo from your device.",
+            "voterIdentification": "You may either take a new photo of the front side of your voter identification or upload a photo from your device.",
+            "ssnCard": "You may either take a new photo of the front side of your SSN Card or upload a photo from your device.",
+            "proofOfAddress": "You may either take a new photo of the front side of your proof of address or upload a photo from your device.",
+            "passportCard": "You may either take a new photo of the front side of your passport card or upload a photo from your device."
           }
         },
         "back-photo-capture": {
@@ -1518,22 +1518,22 @@
           }
         },
         "mobile-back-photo-fallback-upload": {
-          "title": "Time exceeded",
+          "title": "Upload photo",
           "subtitle": {
-            "bankStatement": "We're unable to access your camera at this time. Please manually upload the front side of your bank statement",
-            "custom": "We're unable to access your camera at this time. Please manually upload the front side of your {{custom}}",
-            "utilityBill": "We're unable to access your camera at this time. Please manually upload the front side of your utility bill",
-            "lease": "We're unable to access your camera at this time. Please manually upload the front side of your lease",
-            "driversLicense": "We're unable to access your camera at this time. Please manually upload the back side of your driver's license",
-            "idCard": "We're unable to access your camera at this time. Please manually upload the back side of your ID card",
-            "passport": "We're unable to access your camera at this time. Please manually upload the back side of your passport",
-            "visa": "We're unable to access your camera at this time. Please manually upload the back side of your visa",
-            "workPermit": "We're unable to access your camera at this time. Please manually upload the back side of your EAD card",
-            "residenceDocument": "We're unable to access your camera at this time. Please manually upload the back side of your green card",
-            "voterIdentification": "We're unable to access your camera at this time. Please manually upload the back side of your voter identification",
-            "ssnCard": "We're unable to access your camera at this time. Please manually upload the back side of your SSN Card",
-            "proofOfAddress": "We're unable to access your camera at this time. Please manually upload the back side of your proof of address",
-            "passportCard": "We're unable to access your camera at this time. Please manually upload the back side of your passport card"
+            "bankStatement": "You may either take a new photo of the back side of your bank statement or upload a photo from your device.",
+            "custom": "You may either take a new photo of the back side of your {{custom}} or upload a photo from your device.",
+            "utilityBill": "You may either take a new photo of the back side of your utility bill or upload a photo from your device.",
+            "lease": "You may either take a new photo of the back side of your lease or upload a photo from your device.",
+            "driversLicense": "You may either take a new photo of the back side of your driver's license or upload a photo from your device.",
+            "idCard": "You may either take a new photo of the back side of your ID card or upload a photo from your device.",
+            "passport": "You may either take a new photo of the back side of your passport or upload a photo from your device.",
+            "visa": "You may either take a new photo of the back side of your visa or upload a photo from your device.",
+            "workPermit": "You may either take a new photo of the back side of your EAD card or upload a photo from your device.",
+            "residenceDocument": "You may either take a new photo of the back side of your green card or upload a photo from your device.",
+            "voterIdentification": "You may either take a new photo of the back side of your voter identification or upload a photo from your device.",
+            "ssnCard": "You may either take a new photo of the back side of your SSN Card or upload a photo from your device.",
+            "proofOfAddress": "You may either take a new photo of the back side of your proof of address or upload a photo from your device.",
+            "passportCard": "You may either take a new photo of the back side of your passport card or upload a photo from your device."
           }
         },
         "selfie-photo-prompt": {
@@ -1568,8 +1568,8 @@
           }
         },
         "mobile-selfie-fallback-upload": {
-          "title": "Time exceeded",
-          "subtitle": "We're unable to access your camera at this time. Please manually upload your selfie photo."
+          "title": "Take a selfie",
+          "subtitle": "Take a selfie to validate your identity. Make sure your face is clearly visible and centered in the photo."
         },
         "selfie-retry-prompt": {
           "cta": "Take photo"

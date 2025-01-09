@@ -17,6 +17,9 @@ const DesktopSelfie = () => {
   const permissionState = useCameraPermission();
 
   const onComplete = (payload: ReceivedImagePayload) => send({ type: 'receivedImage', payload });
+  const handleCameraStuck = () => {
+    send({ type: 'cameraStuck' });
+  };
 
   return permissionState === 'allowed' ? (
     <PhotoCapture
@@ -34,6 +37,7 @@ const DesktopSelfie = () => {
       }}
       subtitle={{ camera: t('header.subtitle.camera') }}
       onComplete={onComplete}
+      onCameraStuck={handleCameraStuck}
     />
   ) : (
     <DesktopCameraPermission permissionState={permissionState} />

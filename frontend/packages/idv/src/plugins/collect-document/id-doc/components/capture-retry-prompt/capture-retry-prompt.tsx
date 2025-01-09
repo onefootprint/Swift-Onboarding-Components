@@ -18,7 +18,7 @@ type CaptureRetryPromptProps = {
 
 const CaptureRetryPrompt = ({ imageType, onComplete }: CaptureRetryPromptProps) => {
   const [state, send] = useIdDocMachine();
-  const { errors, forceUpload, hasBadConnectivity, idDoc, requirement } = state.context;
+  const { errors, hasBadConnectivity, idDoc, requirement } = state.context;
   const docType = idDoc.type;
   const docCountry = idDoc.country;
   const { getDocName, getSideName } = useDocName({ docType, imageType });
@@ -29,10 +29,8 @@ const CaptureRetryPrompt = ({ imageType, onComplete }: CaptureRetryPromptProps) 
   const sideName = getSideName();
   const countryName = getCountryFromCode(docCountry)?.label || docCountry;
 
-  const hideUploadButton = isSelfie(imageType) ? !forceUpload : false;
-  const hideCaptureButton = !!forceUpload;
-  const hideUpload =
-    hideUploadButton || (requirement.uploadSettings === DocumentUploadSettings.captureOnlyOnMobile && !forceUpload);
+  const hideUploadButton = isSelfie(imageType);
+  const hideUpload = hideUploadButton || requirement.uploadSettings === DocumentUploadSettings.captureOnlyOnMobile;
   const allowPdf = requirement.uploadSettings === DocumentUploadSettings.preferUpload;
 
   return (
@@ -47,9 +45,7 @@ const CaptureRetryPrompt = ({ imageType, onComplete }: CaptureRetryPromptProps) 
         <ErrorComponent docName={docName} sideName={sideName} errors={errors || []} countryName={countryName} />
         <IdDocPhotoButtons
           onComplete={onComplete}
-          hideCaptureButton={hideCaptureButton}
           hideUploadButton={hideUpload}
-          uploadFirst={!!forceUpload}
           onTakePhoto={() => send({ type: 'startImageCapture' })}
           hasBadConnectivity={hasBadConnectivity}
           allowPdf={allowPdf}

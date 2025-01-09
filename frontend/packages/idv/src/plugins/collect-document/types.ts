@@ -41,4 +41,5 @@ export type ReceivedImagePayload = {
   captureKind: CaptureKind;
   extraCompressed: boolean;
   imageFile: File | Blob;
+  forcedUpload: boolean;
 };
