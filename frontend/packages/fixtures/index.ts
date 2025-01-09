@@ -1,5 +1,7 @@
 import type {
   ActionKind,
+  AdverseMediaListKind,
+  AmlMatchKind,
   ApiKeyStatus,
   ApiOnboardingRequirement,
   AuthMethod,
@@ -125,6 +127,7 @@ import type {
   OnboardingSessionResponse,
   OnboardingStatus,
   OnboardingStatusResponse,
+  PhoneLookupAttributes,
   PostBusinessOnboardingRequest,
   PostOnboardingRequest,
   ProcessRequest,
@@ -155,17 +158,34 @@ import type {
   UserDataIdentifier,
   UserDecryptRequest,
   VaultData,
+  VerificationCheck,
+  VerificationCheckAml,
+  VerificationCheckBusinessAml,
+  VerificationCheckCurpValidation,
+  VerificationCheckIdentityDocument,
+  VerificationCheckKyb,
+  VerificationCheckKyc,
+  VerificationCheckNeuroId,
+  VerificationCheckPhone,
+  VerificationCheckSentilink,
+  VerificationCheckStytchDevice,
   VerifyResultV1SdkArgs,
   VerifyV1Options,
   VerifyV1SdkArgs,
+  WfrAdhocVendorCallConfig,
+  WfrDocumentConfig,
+  WfrOnboardConfig,
   WorkflowFixtureResult,
   WorkflowRequestConfig,
+  WorkflowRequestConfigAdhocVendorCall,
   WorkflowRequestConfigDocument,
   WorkflowRequestConfigOnboard,
 } from '@onefootprint/request-types';
 import deepmerge from 'deepmerge';
 
 export const getActionKind = (props: ActionKind): ActionKind => props ?? 'replace';
+export const getAdverseMediaListKind = (props: AdverseMediaListKind): AdverseMediaListKind => props ?? 'fraud';
+export const getAmlMatchKind = (props: AmlMatchKind): AmlMatchKind => props ?? 'fuzzy_high';
 export const getApiKeyStatus = (props: ApiKeyStatus): ApiKeyStatus => props ?? 'disabled';
 
 export const getApiOnboardingRequirement = (
@@ -3892,6 +3912,8 @@ export const getOnboardingStatusResponse = (
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+export const getPhoneLookupAttributes = (props: PhoneLookupAttributes): PhoneLookupAttributes =>
+  props ?? 'line_type_intelligence';
 
 export const getPostBusinessOnboardingRequest = (
   props: Partial<PostBusinessOnboardingRequest>,
@@ -4386,6 +4408,162 @@ export const getUserDecryptRequest = (
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
 
+export const getVerificationCheck = (
+  props: Partial<VerificationCheck>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): VerificationCheck =>
+  deepmerge<VerificationCheck>(
+    {
+      data: {
+        einOnly: false,
+      },
+      kind: 'kyb',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getVerificationCheckAml = (
+  props: Partial<VerificationCheckAml>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): VerificationCheckAml =>
+  deepmerge<VerificationCheckAml>(
+    {
+      data: {
+        adverseMedia: true,
+        adverseMediaLists: ['general_serious', 'terrorism', 'violent_crime'],
+        continuousMonitoring: false,
+        matchKind: 'exact_name_and_dob_year',
+        ofac: false,
+        pep: false,
+      },
+      kind: 'aml',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getVerificationCheckBusinessAml = (
+  props: Partial<VerificationCheckBusinessAml>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): VerificationCheckBusinessAml =>
+  deepmerge<VerificationCheckBusinessAml>(
+    {
+      data: {},
+      kind: 'business_aml',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getVerificationCheckCurpValidation = (
+  props: Partial<VerificationCheckCurpValidation>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): VerificationCheckCurpValidation =>
+  deepmerge<VerificationCheckCurpValidation>(
+    {
+      data: {},
+      kind: 'curp_validation',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getVerificationCheckIdentityDocument = (
+  props: Partial<VerificationCheckIdentityDocument>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): VerificationCheckIdentityDocument =>
+  deepmerge<VerificationCheckIdentityDocument>(
+    {
+      data: {},
+      kind: 'identity_document',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getVerificationCheckKyb = (
+  props: Partial<VerificationCheckKyb>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): VerificationCheckKyb =>
+  deepmerge<VerificationCheckKyb>(
+    {
+      data: {
+        einOnly: true,
+      },
+      kind: 'kyb',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getVerificationCheckKyc = (
+  props: Partial<VerificationCheckKyc>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): VerificationCheckKyc =>
+  deepmerge<VerificationCheckKyc>(
+    {
+      data: {},
+      kind: 'kyc',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getVerificationCheckNeuroId = (
+  props: Partial<VerificationCheckNeuroId>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): VerificationCheckNeuroId =>
+  deepmerge<VerificationCheckNeuroId>(
+    {
+      data: {},
+      kind: 'neuro_id',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getVerificationCheckPhone = (
+  props: Partial<VerificationCheckPhone>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): VerificationCheckPhone =>
+  deepmerge<VerificationCheckPhone>(
+    {
+      data: {
+        attributes: ['line_type_intelligence', 'line_type_intelligence', 'line_type_intelligence'],
+      },
+      kind: 'phone',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getVerificationCheckSentilink = (
+  props: Partial<VerificationCheckSentilink>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): VerificationCheckSentilink =>
+  deepmerge<VerificationCheckSentilink>(
+    {
+      data: {},
+      kind: 'sentilink',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getVerificationCheckStytchDevice = (
+  props: Partial<VerificationCheckStytchDevice>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): VerificationCheckStytchDevice =>
+  deepmerge<VerificationCheckStytchDevice>(
+    {
+      data: {},
+      kind: 'stytch_device',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
 export const getVerifyResultV1SdkArgs = (
   props: Partial<VerifyResultV1SdkArgs>,
   options: { overwriteArray: boolean } = { overwriteArray: true },
@@ -4438,6 +4616,126 @@ export const getVerifyV1SdkArgs = (
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+
+export const getWfrAdhocVendorCallConfig = (
+  props: Partial<WfrAdhocVendorCallConfig>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): WfrAdhocVendorCallConfig =>
+  deepmerge<WfrAdhocVendorCallConfig>(
+    {
+      verificationChecks: [
+        {
+          data: {
+            einOnly: true,
+          },
+          kind: 'kyb',
+        },
+        {
+          data: {
+            einOnly: true,
+          },
+          kind: 'kyb',
+        },
+        {
+          data: {
+            einOnly: false,
+          },
+          kind: 'kyb',
+        },
+      ],
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getWfrDocumentConfig = (
+  props: Partial<WfrDocumentConfig>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): WfrDocumentConfig =>
+  deepmerge<WfrDocumentConfig>(
+    {
+      businessConfigs: [
+        {
+          data: {
+            collectSelfie: true,
+            documentTypesAndCountries: {
+              countrySpecific: {},
+              global: ['voter_identification', 'passport_card', 'passport_card'],
+            },
+          },
+          kind: 'identity',
+        },
+        {
+          data: {
+            collectSelfie: true,
+            documentTypesAndCountries: {
+              countrySpecific: {},
+              global: ['passport_card', 'residence_document', 'voter_identification'],
+            },
+          },
+          kind: 'identity',
+        },
+        {
+          data: {
+            collectSelfie: true,
+            documentTypesAndCountries: {
+              countrySpecific: {},
+              global: ['passport_card', 'visa', 'visa'],
+            },
+          },
+          kind: 'identity',
+        },
+      ],
+      configs: [
+        {
+          data: {
+            collectSelfie: false,
+            documentTypesAndCountries: {
+              countrySpecific: {},
+              global: ['voter_identification', 'passport_card', 'drivers_license'],
+            },
+          },
+          kind: 'identity',
+        },
+        {
+          data: {
+            collectSelfie: true,
+            documentTypesAndCountries: {
+              countrySpecific: {},
+              global: ['permit', 'drivers_license', 'passport'],
+            },
+          },
+          kind: 'identity',
+        },
+        {
+          data: {
+            collectSelfie: false,
+            documentTypesAndCountries: {
+              countrySpecific: {},
+              global: ['passport_card', 'passport', 'id_card'],
+            },
+          },
+          kind: 'identity',
+        },
+      ],
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getWfrOnboardConfig = (
+  props: Partial<WfrOnboardConfig>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): WfrOnboardConfig =>
+  deepmerge<WfrOnboardConfig>(
+    {
+      playbookId: 'fdcaeeec-2b5d-4a9b-ab0a-fd1fc034fe5b',
+      recollectAttributes: ['us_legal_status', 'business_website', 'us_tax_id'],
+      reuseExistingBoKyc: false,
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
 export const getWorkflowFixtureResult = (props: WorkflowFixtureResult): WorkflowFixtureResult => props ?? 'pass';
 
 export const getWorkflowRequestConfig = (
@@ -4452,6 +4750,40 @@ export const getWorkflowRequestConfig = (
         reuseExistingBoKyc: false,
       },
       kind: 'onboard',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getWorkflowRequestConfigAdhocVendorCall = (
+  props: Partial<WorkflowRequestConfigAdhocVendorCall>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): WorkflowRequestConfigAdhocVendorCall =>
+  deepmerge<WorkflowRequestConfigAdhocVendorCall>(
+    {
+      data: {
+        verificationChecks: [
+          {
+            data: {
+              einOnly: true,
+            },
+            kind: 'kyb',
+          },
+          {
+            data: {
+              einOnly: false,
+            },
+            kind: 'kyb',
+          },
+          {
+            data: {
+              einOnly: true,
+            },
+            kind: 'kyb',
+          },
+        ],
+      },
+      kind: 'adhoc_vendor_call',
     },
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },

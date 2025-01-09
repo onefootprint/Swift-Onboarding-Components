@@ -13357,7 +13357,28 @@
                     },
                     {
                         "$ref": "#/components/schemas/EntityActionManualDecision"
+                    },
+                    {
+                        "$ref": "#/components/schemas/EntityActionAdhocVendorCall"
                     }
+                ]
+            },
+            "EntityActionAdhocVendorCall": {
+                "type": "object",
+                "properties": {
+                    "config": {
+                        "$ref": "#/components/schemas/WfrAdhocVendorCallConfig"
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "adhoc_vendor_call"
+                        ]
+                    }
+                },
+                "required": [
+                    "config",
+                    "kind"
                 ]
             },
             "EntityActionClearReview": {
@@ -22288,6 +22309,63 @@
                     "url"
                 ]
             },
+            "WfrAdhocVendorCallConfig": {
+                "type": "object",
+                "properties": {
+                    "verification_checks": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/VerificationCheck"
+                        }
+                    }
+                },
+                "required": [
+                    "verification_checks"
+                ]
+            },
+            "WfrDocumentConfig": {
+                "type": "object",
+                "properties": {
+                    "business_configs": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DocumentRequestConfig"
+                        }
+                    },
+                    "configs": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DocumentRequestConfig"
+                        }
+                    }
+                },
+                "required": [
+                    "business_configs",
+                    "configs"
+                ]
+            },
+            "WfrOnboardConfig": {
+                "type": "object",
+                "properties": {
+                    "playbook_id": {
+                        "type": "string"
+                    },
+                    "recollect_attributes": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CollectedDataOption"
+                        }
+                    },
+                    "reuse_existing_bo_kyc": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "playbook_id",
+                    "recollect_attributes",
+                    "reuse_existing_bo_kyc"
+                ]
+            },
             "WorkflowKind": {
                 "description": "Auto-generated discriminant enum variants",
                 "type": "string",
@@ -22295,6 +22373,7 @@
                     "kyc",
                     "alpaca_kyc",
                     "document",
+                    "adhoc_vendor_call",
                     "kyb"
                 ]
             },
@@ -22305,32 +22384,51 @@
                     },
                     {
                         "$ref": "#/components/schemas/WorkflowRequestConfigDocument"
+                    },
+                    {
+                        "$ref": "#/components/schemas/WorkflowRequestConfigAdhocVendorCall"
                     }
+                ]
+            },
+            "WorkflowRequestConfigAdhocVendorCall": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/WfrAdhocVendorCallConfig"
+                            },
+                            {
+                                "description": "Adhoc vendor call",
+                                "type": "object"
+                            }
+                        ]
+                    },
+                    "kind": {
+                        "description": "Adhoc vendor call",
+                        "type": "string",
+                        "enum": [
+                            "adhoc_vendor_call"
+                        ]
+                    }
+                },
+                "required": [
+                    "data",
+                    "kind"
                 ]
             },
             "WorkflowRequestConfigDocument": {
                 "type": "object",
                 "properties": {
                     "data": {
-                        "description": "Upload a new document and re-run the decision engine",
-                        "type": "object",
-                        "properties": {
-                            "business_configs": {
-                                "type": "array",
-                                "items": {
-                                    "$ref": "#/components/schemas/DocumentRequestConfig"
-                                }
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/WfrDocumentConfig"
                             },
-                            "configs": {
-                                "type": "array",
-                                "items": {
-                                    "$ref": "#/components/schemas/DocumentRequestConfig"
-                                }
+                            {
+                                "description": "Upload a new document and re-run the decision engine",
+                                "type": "object"
                             }
-                        },
-                        "required": [
-                            "business_configs",
-                            "configs"
                         ]
                     },
                     "kind": {
@@ -22350,27 +22448,14 @@
                 "type": "object",
                 "properties": {
                     "data": {
-                        "description": "Allow onboarding onto the specific playbook.\n This allows editing data, re-verifies data, and then re-triggers decision engine",
-                        "type": "object",
-                        "properties": {
-                            "playbook_id": {
-                                "type": "string"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/WfrOnboardConfig"
                             },
-                            "recollect_attributes": {
-                                "type": "array",
-                                "items": {
-                                    "$ref": "#/components/schemas/CollectedDataOption"
-                                }
-                            },
-                            "reuse_existing_bo_kyc": {
-                                "description": "When true, reuses existing BOs' KYC results on the same playbook.\n When false, requires the existing BOs to re-complete KYC.\n Can only be true for KYB playbooks",
-                                "type": "boolean"
+                            {
+                                "description": "Allow onboarding onto the specific playbook.\n This allows editing data, re-verifies data, and then re-triggers decision engine",
+                                "type": "object"
                             }
-                        },
-                        "required": [
-                            "playbook_id",
-                            "recollect_attributes",
-                            "reuse_existing_bo_kyc"
                         ]
                     },
                     "kind": {
@@ -22417,7 +22502,8 @@
                 "type": "string",
                 "enum": [
                     "playbook",
-                    "document"
+                    "document",
+                    "adhoc"
                 ]
             },
             "WorkflowTriggered": {

@@ -301,6 +301,7 @@ import type {
   EnhancedAml,
   Entity,
   EntityAction,
+  EntityActionAdhocVendorCall,
   EntityActionClearReview,
   EntityActionManualDecision,
   EntityActionResponse,
@@ -561,8 +562,12 @@ import type {
   WatchlistEntry,
   WatchlistHit,
   WebhookPortalResponse,
+  WfrAdhocVendorCallConfig,
+  WfrDocumentConfig,
+  WfrOnboardConfig,
   WorkflowKind,
   WorkflowRequestConfig,
+  WorkflowRequestConfigAdhocVendorCall,
   WorkflowRequestConfigDocument,
   WorkflowRequestConfigOnboard,
   WorkflowSource,
@@ -572,6 +577,8 @@ import type {
 } from '@onefootprint/request-types/dashboard';
 
 export const hosted_ActionKind: ActionKind = 'replace';
+export const hosted_AdverseMediaListKind: AdverseMediaListKind = 'fraud';
+export const hosted_AmlMatchKind: AmlMatchKind = 'fuzzy_high';
 export const hosted_ApiKeyStatus: ApiKeyStatus = 'disabled';
 export const hosted_ApiOnboardingRequirement: ApiOnboardingRequirement = {
   isMet: false,
@@ -3385,6 +3392,7 @@ export const hosted_OnboardingStatusResponse: OnboardingStatusResponse = {
   ],
   canUpdateUserData: true,
 };
+export const hosted_PhoneLookupAttributes: PhoneLookupAttributes = 'line_type_intelligence';
 export const hosted_PostBusinessOnboardingRequest: PostBusinessOnboardingRequest = {
   inheritBusinessId: 'f6863402-d987-4c0d-bb28-6f65d008a1ef',
   kybFixtureResult: 'manual_review',
@@ -3653,6 +3661,63 @@ export const hosted_UserDecryptRequest: UserDecryptRequest = {
   transforms: ['prefix(<n>)', 'to_lowercase', 'prefix(<n>)'],
   versionAt: '1911-08-13T18:10:09.0Z',
 };
+export const hosted_VerificationCheck: VerificationCheck = {
+  data: {
+    einOnly: false,
+  },
+  kind: 'kyb',
+};
+export const hosted_VerificationCheckAml: VerificationCheckAml = {
+  data: {
+    adverseMedia: true,
+    adverseMediaLists: ['general_serious', 'terrorism', 'violent_crime'],
+    continuousMonitoring: false,
+    matchKind: 'exact_name_and_dob_year',
+    ofac: false,
+    pep: false,
+  },
+  kind: 'aml',
+};
+export const hosted_VerificationCheckBusinessAml: VerificationCheckBusinessAml = {
+  data: {},
+  kind: 'business_aml',
+};
+export const hosted_VerificationCheckCurpValidation: VerificationCheckCurpValidation = {
+  data: {},
+  kind: 'curp_validation',
+};
+export const hosted_VerificationCheckIdentityDocument: VerificationCheckIdentityDocument = {
+  data: {},
+  kind: 'identity_document',
+};
+export const hosted_VerificationCheckKyb: VerificationCheckKyb = {
+  data: {
+    einOnly: true,
+  },
+  kind: 'kyb',
+};
+export const hosted_VerificationCheckKyc: VerificationCheckKyc = {
+  data: {},
+  kind: 'kyc',
+};
+export const hosted_VerificationCheckNeuroId: VerificationCheckNeuroId = {
+  data: {},
+  kind: 'neuro_id',
+};
+export const hosted_VerificationCheckPhone: VerificationCheckPhone = {
+  data: {
+    attributes: ['line_type_intelligence', 'line_type_intelligence', 'line_type_intelligence'],
+  },
+  kind: 'phone',
+};
+export const hosted_VerificationCheckSentilink: VerificationCheckSentilink = {
+  data: {},
+  kind: 'sentilink',
+};
+export const hosted_VerificationCheckStytchDevice: VerificationCheckStytchDevice = {
+  data: {},
+  kind: 'stytch_device',
+};
 export const hosted_VerifyResultV1SdkArgs: VerifyResultV1SdkArgs = {
   authToken: '79b3047d-ce81-4bb3-b509-e39bc26fa006',
   deviceResponse: 'dolor mollit et laborum',
@@ -3679,6 +3744,99 @@ export const hosted_VerifyV1SdkArgs: VerifyV1SdkArgs = {
   shouldRelayToComponents: false,
   userData: {},
 };
+export const hosted_WfrAdhocVendorCallConfig: WfrAdhocVendorCallConfig = {
+  verificationChecks: [
+    {
+      data: {
+        einOnly: true,
+      },
+      kind: 'kyb',
+    },
+    {
+      data: {
+        einOnly: true,
+      },
+      kind: 'kyb',
+    },
+    {
+      data: {
+        einOnly: false,
+      },
+      kind: 'kyb',
+    },
+  ],
+};
+export const hosted_WfrDocumentConfig: WfrDocumentConfig = {
+  businessConfigs: [
+    {
+      data: {
+        collectSelfie: true,
+        documentTypesAndCountries: {
+          countrySpecific: {},
+          global: ['voter_identification', 'passport_card', 'passport_card'],
+        },
+      },
+      kind: 'identity',
+    },
+    {
+      data: {
+        collectSelfie: true,
+        documentTypesAndCountries: {
+          countrySpecific: {},
+          global: ['passport_card', 'residence_document', 'voter_identification'],
+        },
+      },
+      kind: 'identity',
+    },
+    {
+      data: {
+        collectSelfie: true,
+        documentTypesAndCountries: {
+          countrySpecific: {},
+          global: ['passport_card', 'visa', 'visa'],
+        },
+      },
+      kind: 'identity',
+    },
+  ],
+  configs: [
+    {
+      data: {
+        collectSelfie: false,
+        documentTypesAndCountries: {
+          countrySpecific: {},
+          global: ['voter_identification', 'passport_card', 'drivers_license'],
+        },
+      },
+      kind: 'identity',
+    },
+    {
+      data: {
+        collectSelfie: true,
+        documentTypesAndCountries: {
+          countrySpecific: {},
+          global: ['permit', 'drivers_license', 'passport'],
+        },
+      },
+      kind: 'identity',
+    },
+    {
+      data: {
+        collectSelfie: false,
+        documentTypesAndCountries: {
+          countrySpecific: {},
+          global: ['passport_card', 'passport', 'id_card'],
+        },
+      },
+      kind: 'identity',
+    },
+  ],
+};
+export const hosted_WfrOnboardConfig: WfrOnboardConfig = {
+  playbookId: 'fdcaeeec-2b5d-4a9b-ab0a-fd1fc034fe5b',
+  recollectAttributes: ['us_legal_status', 'business_website', 'us_tax_id'],
+  reuseExistingBoKyc: false,
+};
 export const hosted_WorkflowFixtureResult: WorkflowFixtureResult = 'pass';
 export const hosted_WorkflowRequestConfig: WorkflowRequestConfig = {
   data: {
@@ -3687,6 +3845,31 @@ export const hosted_WorkflowRequestConfig: WorkflowRequestConfig = {
     reuseExistingBoKyc: false,
   },
   kind: 'onboard',
+};
+export const hosted_WorkflowRequestConfigAdhocVendorCall: WorkflowRequestConfigAdhocVendorCall = {
+  data: {
+    verificationChecks: [
+      {
+        data: {
+          einOnly: true,
+        },
+        kind: 'kyb',
+      },
+      {
+        data: {
+          einOnly: false,
+        },
+        kind: 'kyb',
+      },
+      {
+        data: {
+          einOnly: true,
+        },
+        kind: 'kyb',
+      },
+    ],
+  },
+  kind: 'adhoc_vendor_call',
 };
 export const hosted_WorkflowRequestConfigDocument: WorkflowRequestConfigDocument = {
   data: {
@@ -7018,6 +7201,31 @@ export const dashboard_EntityAction: EntityAction = {
     },
     kind: 'onboard',
   },
+};
+export const dashboard_EntityActionAdhocVendorCall: EntityActionAdhocVendorCall = {
+  config: {
+    verificationChecks: [
+      {
+        data: {
+          einOnly: true,
+        },
+        kind: 'kyb',
+      },
+      {
+        data: {
+          einOnly: true,
+        },
+        kind: 'kyb',
+      },
+      {
+        data: {
+          einOnly: true,
+        },
+        kind: 'kyb',
+      },
+    ],
+  },
+  kind: 'adhoc_vendor_call',
 };
 export const dashboard_EntityActionClearReview: EntityActionClearReview = {
   kind: 'clear_review',
@@ -11636,6 +11844,99 @@ export const dashboard_WebhookPortalResponse: WebhookPortalResponse = {
   token: '4be15425-befa-4709-ada0-d8733cfe03fd',
   url: 'https://silver-dredger.name/',
 };
+export const dashboard_WfrAdhocVendorCallConfig: WfrAdhocVendorCallConfig = {
+  verificationChecks: [
+    {
+      data: {
+        einOnly: false,
+      },
+      kind: 'kyb',
+    },
+    {
+      data: {
+        einOnly: false,
+      },
+      kind: 'kyb',
+    },
+    {
+      data: {
+        einOnly: false,
+      },
+      kind: 'kyb',
+    },
+  ],
+};
+export const dashboard_WfrDocumentConfig: WfrDocumentConfig = {
+  businessConfigs: [
+    {
+      data: {
+        collectSelfie: true,
+        documentTypesAndCountries: {
+          countrySpecific: {},
+          global: ['visa', 'voter_identification', 'passport_card'],
+        },
+      },
+      kind: 'identity',
+    },
+    {
+      data: {
+        collectSelfie: true,
+        documentTypesAndCountries: {
+          countrySpecific: {},
+          global: ['visa', 'passport', 'drivers_license'],
+        },
+      },
+      kind: 'identity',
+    },
+    {
+      data: {
+        collectSelfie: true,
+        documentTypesAndCountries: {
+          countrySpecific: {},
+          global: ['residence_document', 'residence_document', 'permit'],
+        },
+      },
+      kind: 'identity',
+    },
+  ],
+  configs: [
+    {
+      data: {
+        collectSelfie: false,
+        documentTypesAndCountries: {
+          countrySpecific: {},
+          global: ['drivers_license', 'visa', 'permit'],
+        },
+      },
+      kind: 'identity',
+    },
+    {
+      data: {
+        collectSelfie: false,
+        documentTypesAndCountries: {
+          countrySpecific: {},
+          global: ['permit', 'drivers_license', 'passport'],
+        },
+      },
+      kind: 'identity',
+    },
+    {
+      data: {
+        collectSelfie: true,
+        documentTypesAndCountries: {
+          countrySpecific: {},
+          global: ['voter_identification', 'residence_document', 'drivers_license'],
+        },
+      },
+      kind: 'identity',
+    },
+  ],
+};
+export const dashboard_WfrOnboardConfig: WfrOnboardConfig = {
+  playbookId: '7764cd44-e092-4c19-a7d4-6e243d72bd6d',
+  recollectAttributes: ['phone_number', 'business_kyced_beneficial_owners', 'bank'],
+  reuseExistingBoKyc: false,
+};
 export const dashboard_WorkflowKind: WorkflowKind = 'kyb';
 export const dashboard_WorkflowRequestConfig: WorkflowRequestConfig = {
   data: {
@@ -11644,6 +11945,31 @@ export const dashboard_WorkflowRequestConfig: WorkflowRequestConfig = {
     reuseExistingBoKyc: true,
   },
   kind: 'onboard',
+};
+export const dashboard_WorkflowRequestConfigAdhocVendorCall: WorkflowRequestConfigAdhocVendorCall = {
+  data: {
+    verificationChecks: [
+      {
+        data: {
+          einOnly: false,
+        },
+        kind: 'kyb',
+      },
+      {
+        data: {
+          einOnly: false,
+        },
+        kind: 'kyb',
+      },
+      {
+        data: {
+          einOnly: false,
+        },
+        kind: 'kyb',
+      },
+    ],
+  },
+  kind: 'adhoc_vendor_call',
 };
 export const dashboard_WorkflowRequestConfigDocument: WorkflowRequestConfigDocument = {
   data: {

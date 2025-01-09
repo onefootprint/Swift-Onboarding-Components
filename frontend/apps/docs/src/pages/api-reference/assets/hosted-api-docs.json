@@ -2768,6 +2768,30 @@
                     "add_primary"
                 ]
             },
+            "AdverseMediaListKind": {
+                "type": "string",
+                "enum": [
+                    "financial_crime",
+                    "violent_crime",
+                    "sexual_crime",
+                    "cyber_crime",
+                    "terrorism",
+                    "fraud",
+                    "narcotics",
+                    "general_serious",
+                    "general_minor"
+                ]
+            },
+            "AmlMatchKind": {
+                "type": "string",
+                "enum": [
+                    "exact_name_and_dob_year",
+                    "exact_name",
+                    "fuzzy_high",
+                    "fuzzy_medium",
+                    "fuzzy_low"
+                ]
+            },
             "ApiKeyStatus": {
                 "type": "string",
                 "enum": [
@@ -7556,6 +7580,12 @@
                     "can_update_user_data"
                 ]
             },
+            "PhoneLookupAttributes": {
+                "type": "string",
+                "enum": [
+                    "line_type_intelligence"
+                ]
+            },
             "PostBusinessOnboardingRequest": {
                 "type": "object",
                 "properties": {
@@ -8484,6 +8514,269 @@
                     "reason"
                 ]
             },
+            "VerificationCheck": {
+                "anyOf": [
+                    {
+                        "$ref": "#/components/schemas/VerificationCheckKyb"
+                    },
+                    {
+                        "$ref": "#/components/schemas/VerificationCheckBusinessAml"
+                    },
+                    {
+                        "$ref": "#/components/schemas/VerificationCheckKyc"
+                    },
+                    {
+                        "$ref": "#/components/schemas/VerificationCheckAml"
+                    },
+                    {
+                        "$ref": "#/components/schemas/VerificationCheckCurpValidation"
+                    },
+                    {
+                        "$ref": "#/components/schemas/VerificationCheckIdentityDocument"
+                    },
+                    {
+                        "$ref": "#/components/schemas/VerificationCheckStytchDevice"
+                    },
+                    {
+                        "$ref": "#/components/schemas/VerificationCheckNeuroId"
+                    },
+                    {
+                        "$ref": "#/components/schemas/VerificationCheckPhone"
+                    },
+                    {
+                        "$ref": "#/components/schemas/VerificationCheckSentilink"
+                    }
+                ]
+            },
+            "VerificationCheckAml": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "object",
+                        "properties": {
+                            "adverse_media": {
+                                "type": "boolean"
+                            },
+                            "adverse_media_lists": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/AdverseMediaListKind"
+                                }
+                            },
+                            "continuous_monitoring": {
+                                "type": "boolean"
+                            },
+                            "match_kind": {
+                                "$ref": "#/components/schemas/AmlMatchKind"
+                            },
+                            "ofac": {
+                                "type": "boolean"
+                            },
+                            "pep": {
+                                "type": "boolean"
+                            }
+                        },
+                        "required": [
+                            "adverse_media",
+                            "continuous_monitoring",
+                            "match_kind",
+                            "ofac",
+                            "pep"
+                        ]
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "aml"
+                        ]
+                    }
+                },
+                "required": [
+                    "data",
+                    "kind"
+                ]
+            },
+            "VerificationCheckBusinessAml": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "object"
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "business_aml"
+                        ]
+                    }
+                },
+                "required": [
+                    "data",
+                    "kind"
+                ]
+            },
+            "VerificationCheckCurpValidation": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "object"
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "curp_validation"
+                        ]
+                    }
+                },
+                "required": [
+                    "data",
+                    "kind"
+                ]
+            },
+            "VerificationCheckIdentityDocument": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "object"
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "identity_document"
+                        ]
+                    }
+                },
+                "required": [
+                    "data",
+                    "kind"
+                ]
+            },
+            "VerificationCheckKyb": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "object",
+                        "properties": {
+                            "ein_only": {
+                                "type": "boolean"
+                            }
+                        },
+                        "required": [
+                            "ein_only"
+                        ]
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "kyb"
+                        ]
+                    }
+                },
+                "required": [
+                    "data",
+                    "kind"
+                ]
+            },
+            "VerificationCheckKyc": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "object"
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "kyc"
+                        ]
+                    }
+                },
+                "required": [
+                    "data",
+                    "kind"
+                ]
+            },
+            "VerificationCheckNeuroId": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "object"
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "neuro_id"
+                        ]
+                    }
+                },
+                "required": [
+                    "data",
+                    "kind"
+                ]
+            },
+            "VerificationCheckPhone": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "object",
+                        "properties": {
+                            "attributes": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/PhoneLookupAttributes"
+                                }
+                            }
+                        },
+                        "required": [
+                            "attributes"
+                        ]
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "phone"
+                        ]
+                    }
+                },
+                "required": [
+                    "data",
+                    "kind"
+                ]
+            },
+            "VerificationCheckSentilink": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "object"
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "sentilink"
+                        ]
+                    }
+                },
+                "required": [
+                    "data",
+                    "kind"
+                ]
+            },
+            "VerificationCheckStytchDevice": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "object"
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "stytch_device"
+                        ]
+                    }
+                },
+                "required": [
+                    "data",
+                    "kind"
+                ]
+            },
             "VerifyResultV1SdkArgs": {
                 "type": "object",
                 "properties": {
@@ -8546,6 +8839,63 @@
                     }
                 }
             },
+            "WfrAdhocVendorCallConfig": {
+                "type": "object",
+                "properties": {
+                    "verification_checks": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/VerificationCheck"
+                        }
+                    }
+                },
+                "required": [
+                    "verification_checks"
+                ]
+            },
+            "WfrDocumentConfig": {
+                "type": "object",
+                "properties": {
+                    "business_configs": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DocumentRequestConfig"
+                        }
+                    },
+                    "configs": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DocumentRequestConfig"
+                        }
+                    }
+                },
+                "required": [
+                    "business_configs",
+                    "configs"
+                ]
+            },
+            "WfrOnboardConfig": {
+                "type": "object",
+                "properties": {
+                    "playbook_id": {
+                        "type": "string"
+                    },
+                    "recollect_attributes": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CollectedDataOption"
+                        }
+                    },
+                    "reuse_existing_bo_kyc": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "playbook_id",
+                    "recollect_attributes",
+                    "reuse_existing_bo_kyc"
+                ]
+            },
             "WorkflowFixtureResult": {
                 "type": "string",
                 "enum": [
@@ -8563,32 +8913,51 @@
                     },
                     {
                         "$ref": "#/components/schemas/WorkflowRequestConfigDocument"
+                    },
+                    {
+                        "$ref": "#/components/schemas/WorkflowRequestConfigAdhocVendorCall"
                     }
+                ]
+            },
+            "WorkflowRequestConfigAdhocVendorCall": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/WfrAdhocVendorCallConfig"
+                            },
+                            {
+                                "description": "Adhoc vendor call",
+                                "type": "object"
+                            }
+                        ]
+                    },
+                    "kind": {
+                        "description": "Adhoc vendor call",
+                        "type": "string",
+                        "enum": [
+                            "adhoc_vendor_call"
+                        ]
+                    }
+                },
+                "required": [
+                    "data",
+                    "kind"
                 ]
             },
             "WorkflowRequestConfigDocument": {
                 "type": "object",
                 "properties": {
                     "data": {
-                        "description": "Upload a new document and re-run the decision engine",
-                        "type": "object",
-                        "properties": {
-                            "business_configs": {
-                                "type": "array",
-                                "items": {
-                                    "$ref": "#/components/schemas/DocumentRequestConfig"
-                                }
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/WfrDocumentConfig"
                             },
-                            "configs": {
-                                "type": "array",
-                                "items": {
-                                    "$ref": "#/components/schemas/DocumentRequestConfig"
-                                }
+                            {
+                                "description": "Upload a new document and re-run the decision engine",
+                                "type": "object"
                             }
-                        },
-                        "required": [
-                            "business_configs",
-                            "configs"
                         ]
                     },
                     "kind": {
@@ -8608,27 +8977,14 @@
                 "type": "object",
                 "properties": {
                     "data": {
-                        "description": "Allow onboarding onto the specific playbook.\n This allows editing data, re-verifies data, and then re-triggers decision engine",
-                        "type": "object",
-                        "properties": {
-                            "playbook_id": {
-                                "type": "string"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/WfrOnboardConfig"
                             },
-                            "recollect_attributes": {
-                                "type": "array",
-                                "items": {
-                                    "$ref": "#/components/schemas/CollectedDataOption"
-                                }
-                            },
-                            "reuse_existing_bo_kyc": {
-                                "description": "When true, reuses existing BOs' KYC results on the same playbook.\n When false, requires the existing BOs to re-complete KYC.\n Can only be true for KYB playbooks",
-                                "type": "boolean"
+                            {
+                                "description": "Allow onboarding onto the specific playbook.\n This allows editing data, re-verifies data, and then re-triggers decision engine",
+                                "type": "object"
                             }
-                        },
-                        "required": [
-                            "playbook_id",
-                            "recollect_attributes",
-                            "reuse_existing_bo_kyc"
                         ]
                     },
                     "kind": {

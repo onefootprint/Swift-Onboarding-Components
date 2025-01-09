@@ -1628,17 +1628,26 @@ export type Entity = {
    */
   workflows: Array<EntityWorkflow>;
 };
-export type EntityAction = EntityActionTrigger | EntityActionClearReview | EntityActionManualDecision;
+export type EntityAction =
+  | EntityActionTrigger
+  | EntityActionClearReview
+  | EntityActionManualDecision
+  | EntityActionAdhocVendorCall;
+export type EntityActionAdhocVendorCall = {
+  config: WfrAdhocVendorCallConfig;
+  kind: 'adhoc_vendor_call';
+};
+export type kind52 = 'adhoc_vendor_call';
 export type EntityActionClearReview = {
   kind: 'clear_review';
 };
-export type kind52 = 'clear_review';
+export type kind53 = 'clear_review';
 export type EntityActionManualDecision = {
   annotation: CreateAnnotationRequest;
   kind: 'manual_decision';
   status: TerminalDecisionStatus;
 };
-export type kind53 = 'manual_decision';
+export type kind54 = 'manual_decision';
 export type EntityActionResponse = EntityActionResponseTrigger;
 export type EntityActionResponseTrigger = {
   /**
@@ -1658,7 +1667,7 @@ export type EntityActionResponseTrigger = {
    */
   token: string;
 };
-export type kind54 = 'trigger';
+export type kind55 = 'trigger';
 export type EntityActionTrigger = {
   fpBid?: string;
   kind: 'trigger';
@@ -1754,10 +1763,15 @@ export type FilterFunction =
   | "encrypt('<algorithm>','<public_key>')";
 export type FootprintReasonCode =
   | 'watchlist_hit_ofac'
+  | 'watchlist_clear_ofac'
   | 'watchlist_hit_non_sdn'
+  | 'watchlist_clear_non_sdn'
   | 'watchlist_hit_warning'
+  | 'watchlist_clear_warning'
   | 'watchlist_hit_pep'
+  | 'watchlist_clear_pep'
   | 'adverse_media_hit'
+  | 'adverse_media_clear'
   | 'id_not_located'
   | 'id_flagged'
   | 'credit_more_than3_inquiries_in_last30_days'
@@ -3227,16 +3241,16 @@ export type InvokeVaultProxyPermission =
 export type InvokeVaultProxyPermissionAny = {
   kind: 'any';
 };
-export type kind55 = 'any';
+export type kind56 = 'any';
 export type InvokeVaultProxyPermissionId = {
   id: string;
   kind: 'id';
 };
-export type kind56 = 'id';
+export type kind57 = 'id';
 export type InvokeVaultProxyPermissionJustInTime = {
   kind: 'just_in_time';
 };
-export type kind57 = 'just_in_time';
+export type kind58 = 'just_in_time';
 export type IsIn = 'is_in' | 'is_not_in';
 /**
  * list of valid iso3166-alpha-2 country codes, from https://datahub.io/core/country-codes#data
@@ -4826,14 +4840,14 @@ export type RuleActionConfigFail = {
   };
   kind: 'fail';
 };
-export type kind58 = 'fail';
+export type kind59 = 'fail';
 export type RuleActionConfigManualReview = {
   config: {
     [key: string]: unknown;
   };
   kind: 'manual_review';
 };
-export type kind59 = 'manual_review';
+export type kind60 = 'manual_review';
 export type RuleActionConfigPassWithManualReview = {
   /**
    * ORDERING MATTERS!!!
@@ -4849,12 +4863,12 @@ export type RuleActionConfigPassWithManualReview = {
 /**
  * ORDERING MATTERS!!!
  */
-export type kind60 = 'pass_with_manual_review';
+export type kind61 = 'pass_with_manual_review';
 export type RuleActionConfigStepUp = {
   config: Array<DocumentRequestConfig>;
   kind: 'step_up';
 };
-export type kind61 = 'step_up';
+export type kind62 = 'step_up';
 export type RuleActionMigration = RuleAction | RuleActionConfig;
 export type RuleEvalResult = {
   backtestActionTriggered?: RuleAction;
@@ -5073,44 +5087,44 @@ export type TenantScope =
 export type TenantScopeAdmin = {
   kind: 'admin';
 };
-export type kind62 = 'admin';
+export type kind63 = 'admin';
 /**
  * Add, edit, and decrypt secret API keys and their roles
  */
 export type TenantScopeApiKeys = {
   kind: 'api_keys';
 };
-export type kind63 = 'api_keys';
+export type kind64 = 'api_keys';
 /**
  * Create an auth token that can be used to launch Footprint.js for a given user
  */
 export type TenantScopeAuthToken = {
   kind: 'auth_token';
 };
-export type kind64 = 'auth_token';
+export type kind65 = 'auth_token';
 /**
  * Forward identity data to a CIP integration
  */
 export type TenantScopeCipIntegration = {
   kind: 'cip_integration';
 };
-export type kind65 = 'cip_integration';
+export type kind66 = 'cip_integration';
 export type TenantScopeCompliancePartnerAdmin = {
   kind: 'compliance_partner_admin';
 };
-export type kind66 = 'compliance_partner_admin';
+export type kind67 = 'compliance_partner_admin';
 export type TenantScopeCompliancePartnerManageReviews = {
   kind: 'compliance_partner_manage_reviews';
 };
-export type kind67 = 'compliance_partner_manage_reviews';
+export type kind68 = 'compliance_partner_manage_reviews';
 export type TenantScopeCompliancePartnerManageTemplates = {
   kind: 'compliance_partner_manage_templates';
 };
-export type kind68 = 'compliance_partner_manage_templates';
+export type kind69 = 'compliance_partner_manage_templates';
 export type TenantScopeCompliancePartnerRead = {
   kind: 'compliance_partner_read';
 };
-export type kind69 = 'compliance_partner_read';
+export type kind70 = 'compliance_partner_read';
 /**
  * Allows decrypting data attributes belonging to the listed CollectedDataOption
  */
@@ -5118,42 +5132,42 @@ export type TenantScopeDecrypt = {
   data: CollectedDataOption;
   kind: 'decrypt';
 };
-export type kind70 = 'decrypt';
+export type kind71 = 'decrypt';
 /**
  * Allows decrypting all data
  */
 export type TenantScopeDecryptAll = {
   kind: 'decrypt_all';
 };
-export type kind71 = 'decrypt_all';
+export type kind72 = 'decrypt_all';
 /**
  * Allows decrypting all data except PCI card data
  */
 export type TenantScopeDecryptAllExceptPciData = {
   kind: 'decrypt_all_except_pci_data';
 };
-export type kind72 = 'decrypt_all_except_pci_data';
+export type kind73 = 'decrypt_all_except_pci_data';
 /**
  * Allows decrypting all custom attributes. TODO more fine-grained decryption controls
  */
 export type TenantScopeDecryptCustom = {
   kind: 'decrypt_custom';
 };
-export type kind73 = 'decrypt_custom';
+export type kind74 = 'decrypt_custom';
 /**
  * Allows decrypting all document data
  */
 export type TenantScopeDecryptDocument = {
   kind: 'decrypt_document';
 };
-export type kind74 = 'decrypt_document';
+export type kind75 = 'decrypt_document';
 /**
  * Allows decrypting all document data and selfies
  */
 export type TenantScopeDecryptDocumentAndSelfie = {
   kind: 'decrypt_document_and_selfie';
 };
-export type kind75 = 'decrypt_document_and_selfie';
+export type kind76 = 'decrypt_document_and_selfie';
 /**
  * Invoke the specified vault proxies
  */
@@ -5161,35 +5175,35 @@ export type TenantScopeInvokeVaultProxy = {
   data: InvokeVaultProxyPermission;
   kind: 'invoke_vault_proxy';
 };
-export type kind76 = 'invoke_vault_proxy';
+export type kind77 = 'invoke_vault_proxy';
 /**
  * Create labels and tags
  */
 export type TenantScopeLabelAndTag = {
   kind: 'label_and_tag';
 };
-export type kind77 = 'label_and_tag';
+export type kind78 = 'label_and_tag';
 /**
  * Allows tenants to submit compliance documents and edit document assignment.
  */
 export type TenantScopeManageComplianceDocSubmission = {
   kind: 'manage_compliance_doc_submission';
 };
-export type kind78 = 'manage_compliance_doc_submission';
+export type kind79 = 'manage_compliance_doc_submission';
 /**
  * Create and update vault proxy configurations
  */
 export type TenantScopeManageVaultProxy = {
   kind: 'manage_vault_proxy';
 };
-export type kind79 = 'manage_vault_proxy';
+export type kind80 = 'manage_vault_proxy';
 /**
  * Configure webhook endpoints
  */
 export type TenantScopeManageWebhooks = {
   kind: 'manage_webhooks';
 };
-export type kind80 = 'manage_webhooks';
+export type kind81 = 'manage_webhooks';
 /**
  * Perform review actions on users, like making a new decision, adding an annotation, or
  * re-triggering KYC
@@ -5204,21 +5218,21 @@ export type TenantScopeManualReview = {
 export type TenantScopeOnboarding = {
   kind: 'onboarding';
 };
-export type kind81 = 'onboarding';
+export type kind82 = 'onboarding';
 /**
  * Create and update onboarding configurations
  */
 export type TenantScopeOnboardingConfiguration = {
   kind: 'onboarding_configuration';
 };
-export type kind82 = 'onboarding_configuration';
+export type kind83 = 'onboarding_configuration';
 /**
  * Update org settings, roles, and users
  */
 export type TenantScopeOrgSettings = {
   kind: 'org_settings';
 };
-export type kind83 = 'org_settings';
+export type kind84 = 'org_settings';
 /**
  * Every token that exists must have minimum this Read scope. This allows basic access to most
  * GET endpoints
@@ -5226,35 +5240,35 @@ export type kind83 = 'org_settings';
 export type TenantScopeRead = {
   kind: 'read';
 };
-export type kind84 = 'read';
+export type kind85 = 'read';
 /**
  * Run KYB checks on a vaulted business
  */
 export type TenantScopeTriggerKyb = {
   kind: 'trigger_kyb';
 };
-export type kind85 = 'trigger_kyb';
+export type kind86 = 'trigger_kyb';
 /**
  * Run KYC checks on a vaulted user
  */
 export type TenantScopeTriggerKyc = {
   kind: 'trigger_kyc';
 };
-export type kind86 = 'trigger_kyc';
+export type kind87 = 'trigger_kyc';
 /**
  * Create new vaults and update existing vaults' information
  */
 export type TenantScopeWriteEntities = {
   kind: 'write_entities';
 };
-export type kind87 = 'write_entities';
+export type kind88 = 'write_entities';
 /**
  * Edit lists and entries
  */
 export type TenantScopeWriteLists = {
   kind: 'write_lists';
 };
-export type kind88 = 'write_lists';
+export type kind89 = 'write_lists';
 export type TerminalDecisionStatus = 'fail' | 'pass';
 /**
  * Describes the outcome of an onboarding decision that took place on the user.
@@ -6330,12 +6344,12 @@ export type UserTimelineEventAnnotation = {
   data: Annotation;
   kind: 'annotation';
 };
-export type kind89 = 'annotation';
+export type kind90 = 'annotation';
 export type UserTimelineEventAuthMethodUpdated = {
   data: AuthMethodUpdated;
   kind: 'auth_method_updated';
 };
-export type kind90 = 'auth_method_updated';
+export type kind91 = 'auth_method_updated';
 export type UserTimelineEventBusinessOwnerCompletedKyc = {
   data: {
     decision: TimelineOnboardingDecision;
@@ -6343,32 +6357,32 @@ export type UserTimelineEventBusinessOwnerCompletedKyc = {
   };
   kind: 'business_owner_completed_kyc';
 };
-export type kind91 = 'business_owner_completed_kyc';
+export type kind92 = 'business_owner_completed_kyc';
 export type UserTimelineEventDataCollected = {
   data: DataCollectedInfo;
   kind: 'data_collected';
 };
-export type kind92 = 'data_collected';
+export type kind93 = 'data_collected';
 export type UserTimelineEventDocumentUploaded = {
   data: DocumentUploadedTimelineEvent;
   kind: 'document_uploaded';
 };
-export type kind93 = 'document_uploaded';
+export type kind94 = 'document_uploaded';
 export type UserTimelineEventExternalIntegrationCalled = {
   data: ExternalIntegrationCalled;
   kind: 'external_integration_called';
 };
-export type kind94 = 'external_integration_called';
+export type kind95 = 'external_integration_called';
 export type UserTimelineEventLabelAdded = {
   data: LabelAdded;
   kind: 'label_added';
 };
-export type kind95 = 'label_added';
+export type kind96 = 'label_added';
 export type UserTimelineEventLiveness = {
   data: LivenessEvent;
   kind: 'liveness';
 };
-export type kind96 = 'liveness';
+export type kind97 = 'liveness';
 export type UserTimelineEventOnboardingDecision = {
   data: {
     annotation?: Annotation;
@@ -6377,12 +6391,12 @@ export type UserTimelineEventOnboardingDecision = {
   };
   kind: 'onboarding_decision';
 };
-export type kind97 = 'onboarding_decision';
+export type kind98 = 'onboarding_decision';
 export type UserTimelineEventOnboardingTimeline = {
   data: OnboardingTimelineInfo;
   kind: 'onboarding_timeline';
 };
-export type kind98 = 'onboarding_timeline';
+export type kind99 = 'onboarding_timeline';
 export type UserTimelineEventStepUp = {
   data: Array<DocumentRequest>;
   kind: 'step_up';
@@ -6391,22 +6405,22 @@ export type UserTimelineEventVaultCreated = {
   data: VaultCreated;
   kind: 'vault_created';
 };
-export type kind99 = 'vault_created';
+export type kind100 = 'vault_created';
 export type UserTimelineEventWatchlistCheck = {
   data: WatchlistCheck;
   kind: 'watchlist_check';
 };
-export type kind100 = 'watchlist_check';
+export type kind101 = 'watchlist_check';
 export type UserTimelineEventWorkflowStarted = {
   data: WorkflowStarted;
   kind: 'workflow_started';
 };
-export type kind101 = 'workflow_started';
+export type kind102 = 'workflow_started';
 export type UserTimelineEventWorkflowTriggered = {
   data: WorkflowTriggered;
   kind: 'workflow_triggered';
 };
-export type kind102 = 'workflow_triggered';
+export type kind103 = 'workflow_triggered';
 export type VaultCreated = {
   actor: Actor;
 };
@@ -6484,70 +6498,70 @@ export type VerificationCheckAml = {
   };
   kind: 'aml';
 };
-export type kind103 = 'aml';
+export type kind104 = 'aml';
 export type VerificationCheckBusinessAml = {
   data: {
     [key: string]: unknown;
   };
   kind: 'business_aml';
 };
-export type kind104 = 'business_aml';
+export type kind105 = 'business_aml';
 export type VerificationCheckCurpValidation = {
   data: {
     [key: string]: unknown;
   };
   kind: 'curp_validation';
 };
-export type kind105 = 'curp_validation';
+export type kind106 = 'curp_validation';
 export type VerificationCheckIdentityDocument = {
   data: {
     [key: string]: unknown;
   };
   kind: 'identity_document';
 };
-export type kind106 = 'identity_document';
+export type kind107 = 'identity_document';
 export type VerificationCheckKyb = {
   data: {
     einOnly: boolean;
   };
   kind: 'kyb';
 };
-export type kind107 = 'kyb';
+export type kind108 = 'kyb';
 export type VerificationCheckKyc = {
   data: {
     [key: string]: unknown;
   };
   kind: 'kyc';
 };
-export type kind108 = 'kyc';
+export type kind109 = 'kyc';
 export type VerificationCheckNeuroId = {
   data: {
     [key: string]: unknown;
   };
   kind: 'neuro_id';
 };
-export type kind109 = 'neuro_id';
+export type kind110 = 'neuro_id';
 export type VerificationCheckPhone = {
   data: {
     attributes: Array<PhoneLookupAttributes>;
   };
   kind: 'phone';
 };
-export type kind110 = 'phone';
+export type kind111 = 'phone';
 export type VerificationCheckSentilink = {
   data: {
     [key: string]: unknown;
   };
   kind: 'sentilink';
 };
-export type kind111 = 'sentilink';
+export type kind112 = 'sentilink';
 export type VerificationCheckStytchDevice = {
   data: {
     [key: string]: unknown;
   };
   kind: 'stytch_device';
 };
-export type kind112 = 'stytch_device';
+export type kind113 = 'stytch_device';
 export type WatchlistCheck = {
   id: string;
   reasonCodes?: Array<FootprintReasonCode>;
@@ -6580,19 +6594,41 @@ export type WebhookPortalResponse = {
   token: string;
   url: string;
 };
+export type WfrAdhocVendorCallConfig = {
+  verificationChecks: Array<VerificationCheck>;
+};
+export type WfrDocumentConfig = {
+  businessConfigs: Array<DocumentRequestConfig>;
+  configs: Array<DocumentRequestConfig>;
+};
+export type WfrOnboardConfig = {
+  playbookId: string;
+  recollectAttributes: Array<CollectedDataOption>;
+  reuseExistingBoKyc: boolean;
+};
 /**
  * Auto-generated discriminant enum variants
  */
-export type WorkflowKind = 'kyc' | 'alpaca_kyc' | 'document' | 'kyb';
-export type WorkflowRequestConfig = WorkflowRequestConfigOnboard | WorkflowRequestConfigDocument;
+export type WorkflowKind = 'kyc' | 'alpaca_kyc' | 'document' | 'adhoc_vendor_call' | 'kyb';
+export type WorkflowRequestConfig =
+  | WorkflowRequestConfigOnboard
+  | WorkflowRequestConfigDocument
+  | WorkflowRequestConfigAdhocVendorCall;
+export type WorkflowRequestConfigAdhocVendorCall = {
+  /**
+   * Adhoc vendor call
+   */
+  data: WfrAdhocVendorCallConfig;
+  /**
+   * Adhoc vendor call
+   */
+  kind: 'adhoc_vendor_call';
+};
 export type WorkflowRequestConfigDocument = {
   /**
    * Upload a new document and re-run the decision engine
    */
-  data: {
-    businessConfigs: Array<DocumentRequestConfig>;
-    configs: Array<DocumentRequestConfig>;
-  };
+  data: WfrDocumentConfig;
   /**
    * Upload a new document and re-run the decision engine
    */
@@ -6601,22 +6637,13 @@ export type WorkflowRequestConfigDocument = {
 /**
  * Upload a new document and re-run the decision engine
  */
-export type kind113 = 'document';
+export type kind114 = 'document';
 export type WorkflowRequestConfigOnboard = {
   /**
    * Allow onboarding onto the specific playbook.
    * This allows editing data, re-verifies data, and then re-triggers decision engine
    */
-  data: {
-    playbookId: string;
-    recollectAttributes: Array<CollectedDataOption>;
-    /**
-     * When true, reuses existing BOs' KYC results on the same playbook.
-     * When false, requires the existing BOs to re-complete KYC.
-     * Can only be true for KYB playbooks
-     */
-    reuseExistingBoKyc: boolean;
-  };
+  data: WfrOnboardConfig;
   /**
    * Allow onboarding onto the specific playbook.
    * This allows editing data, re-verifies data, and then re-triggers decision engine
@@ -6627,14 +6654,14 @@ export type WorkflowRequestConfigOnboard = {
  * Allow onboarding onto the specific playbook.
  * This allows editing data, re-verifies data, and then re-triggers decision engine
  */
-export type kind114 = 'onboard';
+export type kind115 = 'onboard';
 export type WorkflowSource = 'hosted' | 'tenant' | 'unknown';
 export type WorkflowStarted = {
   kind: WorkflowStartedEventKind;
   playbook: TimelinePlaybook;
   workflowSource: WorkflowSource;
 };
-export type WorkflowStartedEventKind = 'playbook' | 'document';
+export type WorkflowStartedEventKind = 'playbook' | 'document' | 'adhoc';
 export type WorkflowTriggered = {
   actor: Actor;
   config: WorkflowRequestConfig;

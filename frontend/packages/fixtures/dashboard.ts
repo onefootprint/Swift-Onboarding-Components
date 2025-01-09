@@ -170,6 +170,7 @@ import type {
   EnhancedAml,
   Entity,
   EntityAction,
+  EntityActionAdhocVendorCall,
   EntityActionClearReview,
   EntityActionManualDecision,
   EntityActionResponse,
@@ -430,8 +431,12 @@ import type {
   WatchlistEntry,
   WatchlistHit,
   WebhookPortalResponse,
+  WfrAdhocVendorCallConfig,
+  WfrDocumentConfig,
+  WfrOnboardConfig,
   WorkflowKind,
   WorkflowRequestConfig,
+  WorkflowRequestConfigAdhocVendorCall,
   WorkflowRequestConfigDocument,
   WorkflowRequestConfigOnboard,
   WorkflowSource,
@@ -4931,6 +4936,40 @@ export const getEntityAction = (
         },
         kind: 'onboard',
       },
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getEntityActionAdhocVendorCall = (
+  props: Partial<EntityActionAdhocVendorCall>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): EntityActionAdhocVendorCall =>
+  deepmerge<EntityActionAdhocVendorCall>(
+    {
+      config: {
+        verificationChecks: [
+          {
+            data: {
+              einOnly: true,
+            },
+            kind: 'kyb',
+          },
+          {
+            data: {
+              einOnly: true,
+            },
+            kind: 'kyb',
+          },
+          {
+            data: {
+              einOnly: true,
+            },
+            kind: 'kyb',
+          },
+        ],
+      },
+      kind: 'adhoc_vendor_call',
     },
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
@@ -11503,6 +11542,126 @@ export const getWebhookPortalResponse = (
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
   );
+
+export const getWfrAdhocVendorCallConfig = (
+  props: Partial<WfrAdhocVendorCallConfig>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): WfrAdhocVendorCallConfig =>
+  deepmerge<WfrAdhocVendorCallConfig>(
+    {
+      verificationChecks: [
+        {
+          data: {
+            einOnly: false,
+          },
+          kind: 'kyb',
+        },
+        {
+          data: {
+            einOnly: false,
+          },
+          kind: 'kyb',
+        },
+        {
+          data: {
+            einOnly: false,
+          },
+          kind: 'kyb',
+        },
+      ],
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getWfrDocumentConfig = (
+  props: Partial<WfrDocumentConfig>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): WfrDocumentConfig =>
+  deepmerge<WfrDocumentConfig>(
+    {
+      businessConfigs: [
+        {
+          data: {
+            collectSelfie: true,
+            documentTypesAndCountries: {
+              countrySpecific: {},
+              global: ['visa', 'voter_identification', 'passport_card'],
+            },
+          },
+          kind: 'identity',
+        },
+        {
+          data: {
+            collectSelfie: true,
+            documentTypesAndCountries: {
+              countrySpecific: {},
+              global: ['visa', 'passport', 'drivers_license'],
+            },
+          },
+          kind: 'identity',
+        },
+        {
+          data: {
+            collectSelfie: true,
+            documentTypesAndCountries: {
+              countrySpecific: {},
+              global: ['residence_document', 'residence_document', 'permit'],
+            },
+          },
+          kind: 'identity',
+        },
+      ],
+      configs: [
+        {
+          data: {
+            collectSelfie: false,
+            documentTypesAndCountries: {
+              countrySpecific: {},
+              global: ['drivers_license', 'visa', 'permit'],
+            },
+          },
+          kind: 'identity',
+        },
+        {
+          data: {
+            collectSelfie: false,
+            documentTypesAndCountries: {
+              countrySpecific: {},
+              global: ['permit', 'drivers_license', 'passport'],
+            },
+          },
+          kind: 'identity',
+        },
+        {
+          data: {
+            collectSelfie: true,
+            documentTypesAndCountries: {
+              countrySpecific: {},
+              global: ['voter_identification', 'residence_document', 'drivers_license'],
+            },
+          },
+          kind: 'identity',
+        },
+      ],
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getWfrOnboardConfig = (
+  props: Partial<WfrOnboardConfig>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): WfrOnboardConfig =>
+  deepmerge<WfrOnboardConfig>(
+    {
+      playbookId: '7764cd44-e092-4c19-a7d4-6e243d72bd6d',
+      recollectAttributes: ['phone_number', 'business_kyced_beneficial_owners', 'bank'],
+      reuseExistingBoKyc: false,
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
 export const getWorkflowKind = (props: WorkflowKind): WorkflowKind => props ?? 'kyb';
 
 export const getWorkflowRequestConfig = (
@@ -11517,6 +11676,40 @@ export const getWorkflowRequestConfig = (
         reuseExistingBoKyc: true,
       },
       kind: 'onboard',
+    },
+    props,
+    { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
+  );
+
+export const getWorkflowRequestConfigAdhocVendorCall = (
+  props: Partial<WorkflowRequestConfigAdhocVendorCall>,
+  options: { overwriteArray: boolean } = { overwriteArray: true },
+): WorkflowRequestConfigAdhocVendorCall =>
+  deepmerge<WorkflowRequestConfigAdhocVendorCall>(
+    {
+      data: {
+        verificationChecks: [
+          {
+            data: {
+              einOnly: false,
+            },
+            kind: 'kyb',
+          },
+          {
+            data: {
+              einOnly: false,
+            },
+            kind: 'kyb',
+          },
+          {
+            data: {
+              einOnly: false,
+            },
+            kind: 'kyb',
+          },
+        ],
+      },
+      kind: 'adhoc_vendor_call',
     },
     props,
     { ...(options?.overwriteArray ? { arrayMerge: (_: unknown[], sourceArray: unknown[]) => sourceArray } : {}) },
