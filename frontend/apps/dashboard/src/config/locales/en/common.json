@@ -680,8 +680,9 @@
       "assume-banner": {
         "title": "You're logged into {{orgName}} in view-only mode",
         "edit-mode-title": "You're in edit mode for {{orgName}}",
-        "enable-edit": "Enable edit mode",
+        "request-edit-mode": "Request edit mode",
         "disable-edit": "Exit edit mode",
+        "enable-edit": "Enable edit mode",
         "edit-mode-info": "Proceed with caution. You are performing write actions on behalf of {{orgName}}. Note, you may not have all write permissions for this tenant.",
         "log-out": "Log out"
       }

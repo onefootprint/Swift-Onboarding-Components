@@ -1,5 +1,5 @@
 import type { Icon } from '@onefootprint/icons';
-import { IcoDatabase24, IcoFileText24, IcoStore24, IcoUser24, IcoWriting24 } from '@onefootprint/icons';
+import { IcoDatabase24, IcoStore24, IcoUser24 } from '@onefootprint/icons';
 import { Dialog, type DialogSize, useToast } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -12,8 +12,6 @@ import useSession from 'src/hooks/use-session';
 import Button from './components/button';
 import useCleanUpUserForm from './hooks/clean-up-user-form';
 import useCreateSandboxTenantForm from './hooks/create-sandbox-tenant-form';
-import useSeeEmployeesWithEditRightsForm from './hooks/employees-with-edit-rights-form';
-import useGrantEditRightsForm from './hooks/grant-edit-rights-form';
 
 export type ToolFormProps = {
   formId: string;
@@ -78,19 +76,6 @@ const Tenants = () => {
       subtitle: `Before a sales demo, pre-create a tenant for the target customer's company`,
       icon: IcoStore24,
       useDialogComponent: useCreateSandboxTenantForm,
-    },
-    {
-      title: 'Grant edit rights',
-      subtitle: 'Grant Footprint employees specific edit rights when impersonating a tenant',
-      icon: IcoWriting24,
-      useDialogComponent: useGrantEditRightsForm,
-    },
-    {
-      title: 'See employees with edit rights',
-      subtitle: 'View a list of employees and their assigned edit rights',
-      icon: IcoFileText24,
-      useDialogComponent: useSeeEmployeesWithEditRightsForm,
-      size: 'full-screen',
     },
   ];
 

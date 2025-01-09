@@ -1,4 +1,4 @@
-import { customRender, screen } from '@onefootprint/test-utils';
+import { customRender, mockRequest, screen, userEvent } from '@onefootprint/test-utils';
 import mockRouter from 'next-router-mock';
 import { asAssumedUser, asUser } from 'src/config/tests';
 
@@ -11,6 +11,13 @@ describe('<AssumeBanner />', () => {
 
   beforeEach(() => {
     mockRouter.setCurrentUrl('/users');
+    mockRequest({
+      path: '/private/access_requests',
+      method: 'get',
+      response: {
+        data: [],
+      },
+    });
   });
 
   describe('when assuming a tenant', () => {
@@ -22,6 +29,17 @@ describe('<AssumeBanner />', () => {
       renderAssumeBanner();
       const banner = screen.getByRole('alert');
       expect(banner).toBeInTheDocument();
+    });
+
+    it('should open dialog when requesting edit mode', async () => {
+      renderAssumeBanner();
+
+      const requestEditButton = screen.getByRole('button', { name: 'Request edit mode' });
+      expect(requestEditButton).toBeInTheDocument();
+      await userEvent.click(requestEditButton);
+
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(screen.getByText('Request edit grant')).toBeInTheDocument();
     });
   });
 

@@ -17,6 +17,7 @@ import {
   withMembersAdmin,
   withMembersRead,
   withOrgAuthRoles,
+  withPrivateAccessRequests,
   withRiskSignals,
 } from './default-layout.test.config';
 
@@ -43,6 +44,7 @@ describe('<DefaultLayout />', () => {
     withMembersRead();
     withGhostPosts();
     withFootprintWrapped();
+    withPrivateAccessRequests();
     useHasShown2024WrappedStore.setState({
       hasShown2024Wrapped: true,
     });
@@ -199,7 +201,7 @@ describe('<DefaultLayout />', () => {
 
         expect(screen.getByText("You're logged into Acme in view-only mode")).toBeInTheDocument();
         await waitFor(() => {
-          expect(screen.getByText('Enable edit mode')).toBeEnabled();
+          expect(screen.getByText('Request edit mode')).toBeEnabled();
         });
       });
     });
