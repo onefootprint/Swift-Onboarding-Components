@@ -55,7 +55,14 @@ public class Footprint: NSObject {
             })
         } catch {
             self.hasActiveSession = false
-            self.logger?.logError(error: FootprintHostedError(kind: .exceptionError, message: "Could not initialize auth session."))
+            if let hostedError = error as? FootprintHostedError {
+                self.logger?.logError(error: hostedError)
+                configuration.onError?(hostedError)  // Use hostedError here instead of force casting error
+            } else {
+                let genericError = FootprintHostedError(kind: .exceptionError, message: "Could not initialize auth session.")
+                self.logger?.logError(error: genericError)
+                configuration.onError?(genericError)
+            }
         }
     }
     

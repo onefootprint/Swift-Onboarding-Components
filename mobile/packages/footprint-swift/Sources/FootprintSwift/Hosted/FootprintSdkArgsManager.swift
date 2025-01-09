@@ -56,6 +56,9 @@ public class FootprintSdkArgsManager {
             }
         }
         
-        return try await token.value!
+        guard let tokenValue = try await token.value else {
+            throw FootprintHostedError(kind: .httpRequestError, message: "Failed to obtain sdk args token")
+        }
+        return tokenValue
     }
 }
