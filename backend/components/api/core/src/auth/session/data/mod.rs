@@ -24,6 +24,7 @@ impl AuthSessionData {
 
 /// Represents various types of session data our server maybe storing
 /// in its encrypted session store
+#[allow(clippy::large_enum_variant)]
 #[derive(Serialize, Deserialize, Debug, Clone, derive_more::From)]
 pub enum AuthSessionData {
     /// authed as a user at a tenant for admin dashboard

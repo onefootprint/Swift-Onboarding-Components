@@ -12,7 +12,7 @@ use newtypes::AuthEventId;
 use newtypes::AuthMethodKind;
 use newtypes::BoId;
 use newtypes::ContactInfoId;
-use newtypes::DataIdentifier;
+use newtypes::DataLifetimeId;
 use newtypes::DataLifetimeSource;
 use newtypes::IdentifyScope;
 use newtypes::InsightEventId;
@@ -58,9 +58,9 @@ pub struct UserSession {
     /// The auth events that give this token its permissions
     #[serde(default)]
     pub auth_events: Vec<AssociatedAuthEvent>,
-    /// The list of DataIdentifiers whose knowledge has been proven during this session
+    /// The list of DataLifetimes whose knowledge has been proven during this session.
     #[serde(default)]
-    pub kba: Vec<DataIdentifier>,
+    pub kba_dls: Vec<DataLifetimeId>,
     #[serde(default)]
     pub metadata: OnboardingSessionTrustedMetadata,
     /// For an identify session token, the requested scope
@@ -203,7 +203,7 @@ impl UserSessionBuilder {
             wf_id: None,
             biz_wf_id: None,
             wfr_id: None,
-            kba: vec![],
+            kba_dls: vec![],
             metadata: OnboardingSessionTrustedMetadata::default(),
             identify_scope: None,
         };
@@ -262,8 +262,8 @@ impl UserSessionBuilder {
         self
     }
 
-    pub fn add_kba(mut self, kba: Vec<DataIdentifier>) -> Self {
-        self.kba = chain!(self.kba.clone(), kba).unique().collect();
+    pub fn add_kba(mut self, kba_dls: Vec<DataLifetimeId>) -> Self {
+        self.kba_dls = chain!(self.kba_dls.clone(), kba_dls).unique().collect();
         self
     }
 

@@ -5,9 +5,9 @@ use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
 use api_core::types::ApiResponse;
 use api_core::utils::vault_wrapper::VaultWrapper;
-use api_core::utils::vault_wrapper::VwArgs;
 use api_core::FpResult;
 use api_errors::BadRequestInto;
+use api_errors::ServerErr;
 use api_wire_types::KbaResponse;
 use itertools::Itertools;
 use newtypes::put_data_request::ModernRawUserDataRequest;
@@ -15,12 +15,10 @@ use newtypes::put_data_request::PatchDataRequest;
 use newtypes::DataIdentifier;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::ValidateArgs;
+use paperclip::actix;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
 use paperclip::actix::web::Json;
-use paperclip::actix::{
-    self,
-};
 
 #[api_v2_operation(
     tags(Identify, Hosted),
@@ -47,11 +45,7 @@ pub async fn post(
 
     let id = user_auth.user_identifier();
     let vw = state
-        .db_query(move |conn| {
-            let args = VwArgs::from(&id);
-            let vw = VaultWrapper::<Any>::build(conn, args)?;
-            Ok(vw)
-        })
+        .db_query(move |conn| VaultWrapper::<Any>::build(conn, (&id).into()))
         .await?;
     let dis = data.keys().cloned().collect_vec();
     let decrypted = vw.decrypt_unchecked(&state.enclave_client, &dis).await?;
@@ -63,7 +57,8 @@ pub async fn post(
             if !crypto::safe_compare(actual.leak().as_bytes(), kba_response.leak().as_bytes()) {
                 return BadRequestInto!("Incorrect KBA response for {}", di);
             }
-            Ok(di.clone())
+            let dl = vw.get_lifetime(di).ok_or(ServerErr("Lifetime not found"))?;
+            Ok(dl.id.clone())
         })
         .collect::<FpResult<Vec<_>>>()?;
 

@@ -39,7 +39,7 @@ pub async fn post(
         sandbox_id: None,
         playbook: ob_context.map(|obc| obc.playbook().clone()),
         root_span,
-        kba_dis: &[],
+        kba_dls: vec![],
     };
     let user_found = crate::get_identify_challenge_context(&state, args)
         .await?

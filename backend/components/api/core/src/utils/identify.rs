@@ -6,6 +6,7 @@ use crate::State;
 use api_errors::FpResult;
 use api_errors::ServerErr;
 use db::models::contact_info::ContactInfo;
+use db::models::data_lifetime::DataLifetime;
 use db::models::passkey::Passkey;
 use itertools::Itertools;
 use newtypes::email::Email;
@@ -89,10 +90,10 @@ impl AuthMethod {
 pub async fn get_user_auth_methods(
     state: &State,
     identifier: impl Into<UserIdentifier>,
-    kba_dis: &[DI],
+    kba_dls: Vec<DataLifetimeId>,
 ) -> FpResult<UserAuthMethodsContext> {
     let identifier = identifier.into();
-    let (uvw, cis, passkeys) = state
+    let (uvw, cis, passkeys, kba_dls) = state
         .db_query(move |conn| {
             let uvw = VaultWrapper::build(conn, VwArgs::from(&identifier))?;
             let passkeys = match identifier {
@@ -104,7 +105,8 @@ pub async fn get_user_auth_methods(
                 .filter_map(|cik| uvw.get_lifetime(&cik.di()).map(|dl| (cik, dl.id.clone())))
                 .map(|(cik, dl_id)| ContactInfo::get(conn, &dl_id).map(|ci| (cik, ci, dl_id)))
                 .collect::<Result<Vec<_>, _>>()?;
-            Ok((uvw, cis, passkeys))
+            let kba_dls = DataLifetime::bulk_get(conn, &kba_dls)?;
+            Ok((uvw, cis, passkeys, kba_dls))
         })
         .await?;
 
@@ -147,10 +149,10 @@ pub async fn get_user_auth_methods(
 
     // Allow initiating challenges to unverified methods that are either permitted by
     // KBA or because the vault is "not yet" portable
-
-    let mut allowed_unverified_methods = kba_dis
-        .iter()
-        .flat_map(allowed_unverified_methods_for_kba)
+    let mut allowed_unverified_methods = kba_dls
+        .into_iter()
+        .filter(|dl| dl.vault_id == uvw.vault.id)
+        .flat_map(|dl| allowed_unverified_methods_for_kba(&dl.kind))
         .collect_vec();
     let is_vault_unverified = is_all_ci_unverified && uvw.vault.is_created_via_api;
     if is_vault_unverified {

@@ -42,7 +42,7 @@ pub async fn post(
     // Look up existing user vault by identifier
     let args = GetIdentifyChallengeArgs {
         identifier: IdentifyLookupId::User(user_auth.user_vault_id.clone(), user_auth.su_id.clone()),
-        kba_dis: &user_auth.kba,
+        kba_dls: user_auth.kba_dls.clone(),
         sandbox_id: None,
         playbook: user_auth.playbook.clone(),
         root_span: root_span.clone(),

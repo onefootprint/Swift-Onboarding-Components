@@ -65,7 +65,7 @@ pub(super) async fn get_requirements(
     // a user and can short-circuit to a login challenge instead.
     let args = GetIdentifyChallengeArgs {
         identifier: IdentifyLookupId::Pii(identifiers),
-        kba_dis: &[],
+        kba_dls: identify.user_session.kba_dls.clone(),
         sandbox_id: placeholder_vw.vault.sandbox_id.clone(),
         playbook: Some(identify.playbook.clone()),
         root_span,

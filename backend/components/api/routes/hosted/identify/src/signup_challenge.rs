@@ -80,7 +80,7 @@ pub async fn post(
     .collect_vec();
     let args = GetIdentifyChallengeArgs {
         identifier: IdentifyLookupId::Pii(identifiers),
-        kba_dis: &[],
+        kba_dls: vec![],
         sandbox_id: sandbox_id.clone(),
         playbook: Some(ob_context.playbook().clone()),
         root_span: root_span.clone(),
@@ -142,7 +142,7 @@ pub async fn post(
         user_session: Some(session),
         insight_headers,
     };
-    let ctx = get_user_auth_methods(&state, sv.id.clone(), &[]).await?;
+    let ctx = get_user_auth_methods(&state, sv.id.clone(), vec![]).await?;
     let response = initiate_challenge(&state, ctx, args).await?;
 
     // Since these errors return an HTTP 200, log something special on the root span if there's an error

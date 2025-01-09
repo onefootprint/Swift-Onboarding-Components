@@ -20,7 +20,6 @@ use db::models::tenant::Tenant;
 use db::models::vault::LocatedVault;
 use newtypes::output::Csv;
 use newtypes::AuthEventId;
-use newtypes::DataIdentifier as DI;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeId;
 use newtypes::PiiString;
@@ -129,12 +128,12 @@ pub enum IdentifyLookupId {
     Pii(Vec<IdentifyId>),
 }
 
-pub struct GetIdentifyChallengeArgs<'a> {
+pub struct GetIdentifyChallengeArgs {
     pub identifier: IdentifyLookupId,
     pub playbook: Option<Playbook>,
     pub sandbox_id: Option<SandboxId>,
     pub root_span: RootSpan,
-    pub kba_dis: &'a [DI],
+    pub kba_dls: Vec<DataLifetimeId>,
 }
 
 pub struct IdentifyChallengeContext {
@@ -151,16 +150,16 @@ pub struct IdentifyChallengeContext {
 }
 
 #[tracing::instrument(skip_all)]
-async fn get_identify_challenge_context<'a>(
+async fn get_identify_challenge_context(
     state: &State,
-    args: GetIdentifyChallengeArgs<'a>,
+    args: GetIdentifyChallengeArgs,
 ) -> FpResult<Option<IdentifyChallengeContext>> {
     let GetIdentifyChallengeArgs {
         identifier,
         playbook,
         sandbox_id,
         root_span,
-        kba_dis,
+        kba_dls,
     } = args;
 
     let t_id = playbook.as_ref().map(|playbook| &playbook.tenant_id);
@@ -216,7 +215,7 @@ async fn get_identify_challenge_context<'a>(
         // new tenant
         UserIdentifier::Vault(existing_user_id)
     };
-    let ctx = get_user_auth_methods(state, identifier, kba_dis).await?;
+    let ctx = get_user_auth_methods(state, identifier, kba_dls).await?;
     let can_initiate_signup_challenge = tenant.is_some() && sv.is_none();
     let ctx = IdentifyChallengeContext {
         ctx,

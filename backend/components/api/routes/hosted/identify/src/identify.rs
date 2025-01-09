@@ -88,12 +88,13 @@ pub async fn post(
         _ => return Err(ErrorWithCode::OnlyOneIdentifier.into()),
     };
 
+    let kba_dls = (user_auth.as_ref().map(|ua| ua.data.kba_dls.clone())).unwrap_or_default();
     let args = GetIdentifyChallengeArgs {
         identifier,
         playbook,
         sandbox_id: sandbox_id.0,
         root_span,
-        kba_dis: user_auth.as_ref().map(|ua| ua.data.kba.as_ref()).unwrap_or(&[]),
+        kba_dls,
     };
     let Some(ctx) = crate::get_identify_challenge_context(&state, args).await? else {
         // The user vault doesn't exist. Just return that the user wasn't found

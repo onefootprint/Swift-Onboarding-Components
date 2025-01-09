@@ -461,4 +461,11 @@ impl DataLifetime {
         let seqno = seqno.unwrap_or_default();
         Ok(seqno)
     }
+
+    pub fn bulk_get(conn: &mut PgConn, ids: &[DataLifetimeId]) -> FpResult<Vec<Self>> {
+        let results = data_lifetime::table
+            .filter(data_lifetime::id.eq_any(ids))
+            .get_results(conn)?;
+        Ok(results)
+    }
 }
