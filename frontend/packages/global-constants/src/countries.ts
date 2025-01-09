@@ -833,6 +833,7 @@ export const BANNED_PHONE_COUNTRIES: CountryCode[] = [
   'OM', // Oman
   'LK', // Sri Lanka
   'IR', // Iran
+  'SA', // Saudi Arabia
 
   // Africa
   'DZ', // Algeria
