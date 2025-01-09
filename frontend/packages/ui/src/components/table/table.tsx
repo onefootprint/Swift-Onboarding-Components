@@ -244,7 +244,7 @@ const Tr = styled.tr`
   `}
 `;
 
-const InfoButton = styled.button`
+const InfoButton = styled.div`
   margin: 0;
   padding: 0;
   background: none;

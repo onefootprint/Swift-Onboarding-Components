@@ -3,7 +3,7 @@
 import * as TooltipPrimitive from '@radix-ui/react-tooltip';
 import { motion } from 'framer-motion';
 import type React from 'react';
-import { useState } from 'react';
+import { forwardRef, useState } from 'react';
 
 export type TooltipProps = TooltipPrimitive.TooltipProps & {
   children: React.ReactElement;
@@ -44,11 +44,12 @@ const getAnimationProps = (side: TooltipPrimitive.TooltipContentProps['side']) =
   return animations[side || 'top'];
 };
 
-const TooltipContent = ({ children, side }: TooltipContentProps) => {
+const TooltipContent = forwardRef<HTMLDivElement, TooltipContentProps>(({ children, side }, ref) => {
   const animation = getAnimationProps(side);
 
   return (
     <motion.div
+      ref={ref}
       className="min-w-fit w-fit max-w-[300px] px-2 py-1 text-caption-3 text-quinary text-left rounded-sm bg-tertiary shadow-md will-change-opacity"
       initial={animation.initial}
       animate={animation.animate}
@@ -57,64 +58,72 @@ const TooltipContent = ({ children, side }: TooltipContentProps) => {
       {children}
     </motion.div>
   );
-};
+});
 
-const Tooltip = ({
-  children,
-  text,
-  disabled,
-  position = 'top',
-  alignment = 'center',
-  collisionBoundary,
-  sideOffset = 4,
-  ariaLabel,
-  asChild,
-}: TooltipProps) => {
-  const [isOpen, setIsOpen] = useState(false);
+const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(
+  (
+    {
+      children,
+      text,
+      disabled,
+      position = 'top',
+      alignment = 'center',
+      collisionBoundary,
+      sideOffset = 4,
+      ariaLabel,
+      asChild,
+    },
+    ref,
+  ) => {
+    const [isOpen, setIsOpen] = useState(false);
 
-  if (disabled || !text) {
-    return children;
-  }
+    if (disabled || !text) {
+      return children;
+    }
 
-  const handleHover = () => {
-    setIsOpen(true);
-  };
+    const handleHover = () => {
+      setIsOpen(true);
+    };
 
-  const handleLeave = () => {
-    setIsOpen(false);
-  };
+    const handleLeave = () => {
+      setIsOpen(false);
+    };
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-    event.stopPropagation();
-    setIsOpen(!isOpen);
-  };
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.preventDefault();
+      event.stopPropagation();
+      setIsOpen(!isOpen);
+    };
 
-  return (
-    <TooltipPrimitive.Provider delayDuration={0}>
-      <TooltipPrimitive.Root open={isOpen} onOpenChange={setIsOpen}>
-        <TooltipPrimitive.Trigger
-          aria-label={ariaLabel}
-          onClick={handleClick}
-          onMouseEnter={handleHover}
-          onMouseLeave={handleLeave}
-          asChild={asChild}
-        >
-          {children}
-        </TooltipPrimitive.Trigger>
+    return (
+      <TooltipPrimitive.Provider delayDuration={0}>
+        <TooltipPrimitive.Root open={isOpen} onOpenChange={setIsOpen}>
+          <TooltipPrimitive.Trigger
+            aria-label={ariaLabel}
+            onClick={handleClick}
+            onMouseEnter={handleHover}
+            onMouseLeave={handleLeave}
+            asChild={asChild}
+          >
+            {children}
+          </TooltipPrimitive.Trigger>
 
-        <TooltipPrimitive.Content
-          side={position}
-          align={alignment}
-          sideOffset={sideOffset}
-          collisionBoundary={collisionBoundary}
-          asChild
-        >
-          <TooltipContent side={position}>{text}</TooltipContent>
-        </TooltipPrimitive.Content>
-      </TooltipPrimitive.Root>
-    </TooltipPrimitive.Provider>
-  );
-};
+          <TooltipPrimitive.Content
+            ref={ref}
+            side={position}
+            align={alignment}
+            sideOffset={sideOffset}
+            collisionBoundary={collisionBoundary}
+            asChild
+          >
+            <TooltipContent side={position}>{text}</TooltipContent>
+          </TooltipPrimitive.Content>
+        </TooltipPrimitive.Root>
+      </TooltipPrimitive.Provider>
+    );
+  },
+);
+
+Tooltip.displayName = 'Tooltip';
 
 export default Tooltip;
