@@ -34,7 +34,7 @@ describe('<AssumeBanner />', () => {
     it('should open dialog when requesting edit mode', async () => {
       renderAssumeBanner();
 
-      const requestEditButton = screen.getByRole('button', { name: 'Request edit mode' });
+      const requestEditButton = await screen.findByRole('button', { name: 'Request edit mode' });
       expect(requestEditButton).toBeInTheDocument();
       await userEvent.click(requestEditButton);
 

@@ -70,7 +70,7 @@ const Actions = ({ id }: ActionsProps) => {
         <Dropdown.Portal>
           <Dropdown.Content align="end" style={{ zIndex: 999999 }}>
             <Dropdown.Group>
-              <Dropdown.Item onSelect={handleExtend}>Extend edit rights</Dropdown.Item>
+              <Dropdown.Item onSelect={handleExtend}>Grant edit rights</Dropdown.Item>
             </Dropdown.Group>
             <Dropdown.Group>
               <Dropdown.Item onSelect={handleRevoke}>Revoke edit rights</Dropdown.Item>

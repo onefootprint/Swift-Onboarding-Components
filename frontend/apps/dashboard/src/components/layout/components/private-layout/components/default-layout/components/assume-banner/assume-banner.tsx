@@ -15,7 +15,7 @@ const AssumeBanner = () => {
   const { t } = useTranslation('common', { keyPrefix: 'components.private-layout.assume-banner' });
   const [showEditRightsForm, setShowEditRightsForm] = useState(false);
   const { data, isAssumedSessionEditMode, setAssumedSessionEditMode } = useSession();
-  const { data: accessRequests } = useQuery(getPrivateAccessRequestsOptions());
+  const { data: accessRequests, isPending: isAccessRequestsPending } = useQuery(getPrivateAccessRequestsOptions());
   const router = useRouter();
   const canEnableEditMode =
     Array.isArray(accessRequests) &&
@@ -70,10 +70,14 @@ const AssumeBanner = () => {
             </Tooltip>
           )}
           <span>·</span>
-          <button type="button" onClick={handleChangeEdit}>
-            {getEditButtonText()}
-          </button>
-          <span>·</span>
+          {!isAccessRequestsPending && (
+            <>
+              <button type="button" onClick={handleChangeEdit}>
+                {getEditButtonText()}
+              </button>
+              <span>·</span>
+            </>
+          )}
           <button type="button" onClick={handleLogout}>
             {t('log-out')}
           </button>

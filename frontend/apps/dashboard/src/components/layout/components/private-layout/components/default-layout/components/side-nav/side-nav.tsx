@@ -24,14 +24,7 @@ import moveTenantToFront from './utils/move-tenant-to-front';
 
 const WHATS_NEW_BANNER_KEY = 'whatsNewBannerInteracted';
 const LAST_SEEN_POST_KEY = 'lastSeenPostDate';
-const RISK_OPS_TEAM_MEMBERS = [
-  'elliott@onefootprint.com',
-  'alex@onefootprint.com',
-  'dave@onefootprint.com',
-  'eli@onefootprint.com',
-  'lucas@onefootprint.com',
-  'pedro@onefootprint.com',
-];
+const RISK_OPS_TEAM_MEMBERS = ['elliott@onefootprint.com', 'alex@onefootprint.com', 'dave@onefootprint.com'];
 
 const Nav = () => {
   const router = useRouter();
