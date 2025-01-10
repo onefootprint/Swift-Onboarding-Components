@@ -124,6 +124,9 @@ impl IncodeOcrField {
         let address = r.address_fields();
         let state = match address.and_then(|a| a.normalized_state()) {
             Some(Ok(s)) => Some(s),
+            // incode sets the state to "ALL" for passports
+            // See `ivs_ygvNVh5ccePOqgDUmT3LTN`
+            Some(Err(_)) if r.type_of_id == Some(newtypes::incode::IncodeDocumentType::Passport) => None,
             _ => {
                 tracing::warn!("incode changed address formats");
                 None
