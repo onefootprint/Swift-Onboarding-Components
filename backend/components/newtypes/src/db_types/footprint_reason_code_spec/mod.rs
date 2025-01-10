@@ -84,14 +84,10 @@ mod tests {
             .cloned()
             .collect_vec();
 
-        let enum_codes = FootprintReasonCode::iter()
-            .filter(|frc| !frc.to_be_deprecated())
-            .filter(|frc| !frc.in_preview())
-            .filter(|frc| !matches!(frc, FootprintReasonCode::Other(_)))
-            .collect_vec();
+        let active_frcs = FootprintReasonCode::iter_active().collect_vec();
 
         // Find codes in enum but not in YAML. We can't have anything in YAML not in enum bc deser will fail
-        let missing_in_yaml: Vec<&FootprintReasonCode> = enum_codes
+        let missing_in_yaml: Vec<&FootprintReasonCode> = active_frcs
             .iter()
             .filter(|code| !yaml_codes.contains(*code))
             .collect();
@@ -114,6 +110,18 @@ mod tests {
             return Err(format!(
                 "RiskSignalGroupKinds missing from YAML: {:?}\n",
                 missing_rsgs
+            ));
+        }
+
+        let inactive_frcs_in_yaml = FootprintReasonCode::iter()
+            .filter(|frc| !active_frcs.contains(frc))
+            .filter(|frc| yaml_codes.contains(frc))
+            .collect_vec();
+
+        if !inactive_frcs_in_yaml.is_empty() {
+            return Err(format!(
+                "Inactive Reason codes found in YAML: {:?}\n",
+                inactive_frcs_in_yaml
             ));
         }
 

@@ -93,6 +93,7 @@ pub struct PublicRiskSignalSubCategory {
 
 impl From<HashMap<RiskSignalGroupKind, RiskSignalSpec>> for PublicRiskSignalSpecDescription {
     fn from(specs: HashMap<RiskSignalGroupKind, RiskSignalSpec>) -> Self {
+        let active_rs = FootprintReasonCode::iter_active().collect_vec();
         let public_specs = specs
             .into_iter()
             .map(|(k, v)| {
@@ -107,9 +108,7 @@ impl From<HashMap<RiskSignalGroupKind, RiskSignalSpec>> for PublicRiskSignalSpec
                                 let reason_codes = subcategory
                                     .reason_codes
                                     .into_iter()
-                                    .filter(|code| !code.to_be_deprecated())
-                                    .filter(|code| !code.in_preview())
-                                    .filter(|code| !matches!(code, FootprintReasonCode::Other(_)))
+                                    .filter(|code| active_rs.contains(code))
                                     .map(|code| PublicRiskSignalDescription {
                                         reason_code: code.clone(),
                                         note: code.note(),

@@ -10,7 +10,6 @@ use newtypes::footprint_reason_code_spec::load_reason_code_specs;
 use newtypes::FootprintReasonCode;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
-use strum::IntoEnumIterator;
 
 #[api_v2_operation(description = "List all Footprint Risk Signals", tags(Org, Preview))]
 #[get("/org/risk_signals")]
@@ -19,10 +18,7 @@ pub fn get(
 ) -> ApiListResponse<api_wire_types::PublicRiskSignalDescription> {
     let _auth = auth.check_guard(TenantGuard::Read)?;
 
-    let response = FootprintReasonCode::iter()
-        .filter(|frc| !frc.to_be_deprecated())
-        .filter(|frc| !frc.in_preview())
-        .filter(|frc| !matches!(frc, FootprintReasonCode::Other(_)))
+    let response = FootprintReasonCode::iter_active()
         .map(|frc| PublicRiskSignalDescription {
             reason_code: frc.clone(),
             note: frc.note(),

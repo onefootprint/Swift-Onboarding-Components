@@ -1685,6 +1685,13 @@ impl FootprintReasonCode {
     pub fn in_preview(&self) -> bool {
         false
     }
+
+    pub fn iter_active() -> impl Iterator<Item = Self> {
+        Self::iter()
+            .filter(|frc| !frc.to_be_deprecated())
+            .filter(|frc| !frc.in_preview())
+            .filter(|frc| !matches!(frc, FootprintReasonCode::Other(_)))
+    }
 }
 
 impl FootprintReasonCode {
