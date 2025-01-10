@@ -267,3 +267,10 @@ def test_user_risk_signals(sandbox_tenant, must_collect_data):
     )
     # now we get the risk signal in the latest onboarding
     assert any([rs["reason_code"] == "user_is_labeled_fraud" for rs in risk_signals])
+
+def test_risk_signals_spec(sandbox_tenant):
+    body = get(f"/org/risk_signals_spec", None, *sandbox_tenant.db_auths)
+    assert body["kyc"]
+    assert body["doc"]
+    assert body["behavior"]
+    

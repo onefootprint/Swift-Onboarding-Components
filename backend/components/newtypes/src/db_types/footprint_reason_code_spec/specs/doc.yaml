@@ -1,14 +1,155 @@
 categories:
+- name: barcode
+  sub_categories:
   - name: overall
-    sub_categories:
-      - name: document
-        reason_codes:
-          - document_verified
-          - document_not_verified
-      - name: selfie
-        reason_codes:
-          - document_selfie_matches
-          - document_selfie_does_not_match
-      - name: liveness
-        reason_codes:
-          - document_selfie_not_live_image
+    reason_codes:
+    - document_barcode_content_matches
+  - name: all
+    reason_codes:
+    - document_barcode_content_does_not_match
+    - document_barcode_could_be_read
+    - document_barcode_could_not_be_detected
+    - document_barcode_could_not_be_read
+    - document_barcode_detected
+  - name: pdf417
+    reason_codes:
+    - document_pdf417_data_is_not_valid
+    - document_pdf417_data_is_valid
+- name: capture
+  sub_categories:
+  - name: liveness
+    reason_codes:
+    - document_not_live_capture
+- name: document
+  sub_categories:
+  - name: overall
+    reason_codes:
+    - document_could_not_classify
+    - document_not_verified
+    - document_verified
+  - name: cross checks
+    reason_codes:
+    - document_dob_check_digit_does_not_match
+    - document_dob_check_digit_matches
+    - document_dob_crosscheck_does_not_match
+    - document_dob_crosscheck_matches
+    - document_expiration_check_digit_does_not_match
+    - document_expiration_check_digit_matches
+    - document_expiration_date_crosscheck_does_not_match
+    - document_expiration_date_crosscheck_matches
+    - document_field_crosscheck_failed
+    - document_full_name_crosscheck_does_not_match
+    - document_full_name_crosscheck_matches
+    - document_number_check_digit_does_not_match
+    - document_number_check_digit_matches
+    - document_number_crosscheck_does_not_match
+    - document_number_crosscheck_matches
+    - document_sex_crosscheck_does_not_match
+    - document_sex_crosscheck_matches
+  - name: expiration
+    reason_codes:
+    - document_expired
+    - document_not_expired
+  - name: fake document
+    reason_codes:
+    - document_not_fake_image
+  - name: fraud
+    reason_codes:
+    - document_photo_is_not_paper_capture
+    - document_photo_is_not_screen_capture
+    - document_photo_is_paper_capture
+    - document_photo_is_screen_capture
+    - document_possible_digital_fraud
+    - document_possible_fake_image
+    - document_possible_image_alteration
+    - document_possible_image_alteration_back
+    - document_possible_image_alteration_front
+    - document_possible_image_tampering
+  - name: image alteration
+    reason_codes:
+    - document_no_image_alteration_back
+    - document_no_image_alteration_front
+    - document_no_image_tampering
+  - name: misc
+    reason_codes:
+    - document_alignment_failed
+    - document_collected_via_desktop
+    - document_country_code_mismatch
+    - document_from_restricted_country
+    - document_invalid_issuance_or_expiration_date
+    - document_invalid_template_layout
+    - document_live_capture_failed
+    - document_mrz_line_format_check
+    - document_ocr_not_successful
+    - document_ocr_successful
+    - document_visible_photo_features_not_verified
+    - document_visible_photo_features_verified
+  - name: type
+    reason_codes:
+    - document_is_permit_or_provisional_license
+- name: input cross checks
+  sub_categories:
+  - name: overall
+    reason_codes:
+    - document_ocr_address_matches
+    - document_ocr_dob_matches
+    - document_ocr_name_could_not_match
+    - document_ocr_name_does_not_match
+    - document_ocr_name_matches
+  - name: address
+    reason_codes:
+    - document_ocr_address_could_not_match
+    - document_ocr_address_does_not_match
+  - name: components
+    reason_codes:
+    - document_ocr_first_name_does_not_match
+    - document_ocr_first_name_matches
+    - document_ocr_last_name_does_not_match
+    - document_ocr_last_name_matches
+  - name: dob
+    reason_codes:
+    - document_ocr_dob_could_not_match
+    - document_ocr_dob_does_not_match
+- name: misc
+  sub_categories:
+  - name: misc
+    reason_codes:
+    - document_restricted_template_type
+    - document_type_mismatch
+    - document_type_not_allowed
+    - document_unknown_country_code
+    - document_upload_failed
+- name: qr code
+  sub_categories:
+  - name: misc
+    reason_codes:
+    - document_qr_code_check
+- name: selfie
+  sub_categories:
+  - name: overall
+    reason_codes:
+    - document_selfie_does_not_match
+    - document_selfie_matches
+  - name: liveness
+    reason_codes:
+    - document_selfie_not_live_image
+  - name: misc
+    reason_codes:
+    - document_selfie_bad_quality
+    - document_selfie_glasses
+    - document_selfie_mask
+    - document_selfie_not_used_with_different_information
+    - document_selfie_used_with_different_information
+    - document_selfie_was_skipped
+- name: CURP
+  sub_categories:
+  - name: all
+    reason_codes:
+    - curp_could_not_validate
+    - curp_input_curp_invalid
+    - curp_malformed
+    - curp_multiple_results_for_data
+    - curp_not_found
+    - curp_not_valid
+    - curp_service_not_available
+    - curp_valid

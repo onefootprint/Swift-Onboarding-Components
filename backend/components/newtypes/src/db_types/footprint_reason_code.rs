@@ -1654,6 +1654,8 @@ impl FootprintReasonCode {
                 | Self::SyntheticIdentityHighRisk
                 | Self::SyntheticIdentityMediumRisk
                 | Self::SyntheticIdentityLowRisk
+                | Self::IpAlertHighRiskProxy
+                | Self::IpAlertDataCenter
         )
     }
 

@@ -1,0 +1,106 @@
+categories:
+- name: address
+  sub_categories:
+  - name: cmra
+    reason_codes:
+    - business_address_commercial_mail_receiving_agency
+  - name: deliverability
+    reason_codes:
+    - business_address_deliverable
+    - business_address_not_deliverable
+  - name: matching
+    reason_codes:
+    - business_address_close_match
+    - business_address_does_not_match
+    - business_address_incomplete_match
+    - business_address_match
+    - business_address_similar_match
+  - name: type
+    reason_codes:
+    - business_address_commercial
+    - business_address_residential
+- name: beneficial owner
+  sub_categories:
+  - name: all
+    reason_codes:
+    - beneficial_owner_failed_kyc
+    - beneficial_owner_possible_missing_bo
+    - beneficial_owners_do_not_match
+    - beneficial_owners_match
+    - beneficial_owners_partial_match
+- name: business address sos
+  sub_categories:
+  - name: status
+    reason_codes:
+    - sos_business_address_active_filing_found
+    - sos_business_address_filing_not_found
+    - sos_business_address_filing_status_not_available
+    - sos_business_address_inactive_filing_found
+- name: dba
+  sub_categories:
+  - name: matching
+    reason_codes:
+    - business_dba_alternate_match
+    - business_dba_does_not_match
+    - business_dba_match
+    - business_dba_similar_match
+- name: name
+  sub_categories:
+  - name: matching
+    reason_codes:
+    - business_name_alternate_match
+    - business_name_does_not_match
+    - business_name_match
+    - business_name_similar_match
+  - name: watchlist
+    reason_codes:
+    - business_name_no_watchlist_hits
+    - business_name_watchlist_hit
+- name: phone
+  sub_categories:
+  - name: matching
+    reason_codes:
+    - business_phone_number_does_not_match
+    - business_phone_number_match
+- name: sos
+  sub_categories:
+  - name: status
+    reason_codes:
+    - sos_active_filing_found
+    - sos_filing_no_active_found
+    - sos_filing_no_status
+    - sos_filing_not_found
+    - sos_filing_partially_active
+- name: state of formation sos
+  sub_categories:
+  - name: standing
+    reason_codes:
+    - sos_domestic_filing_status_dissolved
+    - sos_domestic_filing_status_good_standing
+    - sos_domestic_filing_status_not_in_good_standing
+    - sos_domestic_filing_status_not_provided_by_state
+    - sos_domestic_filing_status_pending_active
+    - sos_domestic_filing_status_pending_inactive
+  - name: status
+    reason_codes:
+    - sos_domestic_active_filing_found
+    - sos_domestic_filing_no_status
+    - sos_domestic_filing_not_found
+    - sos_domestic_filing_partially_active
+- name: tin
+  sub_categories:
+  - name: matching
+    reason_codes:
+    - tin_does_not_match
+    - tin_invalid
+    - tin_match
+    - tin_not_found
+- name: website
+  sub_categories:
+  - name: all
+    reason_codes:
+    - business_website_offline
+    - business_website_online
+    - business_website_parking_page
+    - business_website_unverified
+    - business_website_verified

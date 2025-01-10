@@ -1,0 +1,14 @@
+categories:
+- name: overall
+  sub_categories:
+  - name: medium
+    reason_codes:
+    - medium_connection_to_labeled_active
+    - medium_connection_to_labeled_fraud
+    - medium_connection_to_labeled_offboard_other
+    - multiple_records_found
+  - name: strong
+    reason_codes:
+    - strong_connection_to_labeled_active
+    - strong_connection_to_labeled_fraud
+    - strong_connection_to_labeled_offboard_other

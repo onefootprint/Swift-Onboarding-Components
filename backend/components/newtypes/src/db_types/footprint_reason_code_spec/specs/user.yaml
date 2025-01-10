@@ -1,0 +1,6 @@
+categories:
+- name: overall
+  sub_categories:
+  - name: misc
+    reason_codes:
+    - user_is_labeled_fraud

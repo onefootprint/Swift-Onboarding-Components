@@ -1,0 +1,23 @@
+categories:
+- name: android
+  sub_categories:
+  - name: all
+    reason_codes:
+    - attested_device_android
+    - attested_device_android_failed_evaluation
+    - attested_device_android_risky
+    - attested_device_android_strong_integrity
+    - attested_device_android_unlicensed
+- name: apple
+  sub_categories:
+  - name: all
+    reason_codes:
+    - attested_device_apple
+- name: fraud
+  sub_categories:
+  - name: all
+    reason_codes:
+    - attested_device_fraud_duplicate_risk_high
+    - attested_device_fraud_duplicate_risk_low
+    - attested_device_fraud_duplicate_risk_medium
+    - attested_device_no_fraud_duplicate_risk

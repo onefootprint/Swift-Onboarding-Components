@@ -1,0 +1,6 @@
+categories:
+- name: phone
+  sub_categories:
+  - name: type
+    reason_codes:
+    - phone_number_is_voip

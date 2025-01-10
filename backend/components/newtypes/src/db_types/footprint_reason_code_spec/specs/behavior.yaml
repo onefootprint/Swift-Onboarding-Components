@@ -1,0 +1,39 @@
+categories:
+- name: behavior
+  sub_categories:
+  - name: overall
+    reason_codes:
+    - behavior_high_risk
+    - behavior_low_risk
+  - name: all
+    reason_codes:
+    - behavior_automatic_activity
+    - behavior_fraud_ring_risk
+    - browser_automation
+    - browser_incognito
+    - browser_tampering
+- name: device
+  sub_categories:
+  - name: overall
+    reason_codes:
+    - device_high_risk
+    - device_low_risk
+    - device_medium_risk
+  - name: all
+    reason_codes:
+    - device_bot_risk
+    - device_factory_reset
+    - device_gps_spoofing
+    - device_multiple_users
+    - device_reputation
+    - device_suspicious
+    - device_velocity
+- name: ip address
+  sub_categories:
+  - name: misc
+    reason_codes:
+    - ip_data_center
+    - ip_proxy
+    - ip_state_matches
+    - ip_tor_exit_node
+    - ip_vpn

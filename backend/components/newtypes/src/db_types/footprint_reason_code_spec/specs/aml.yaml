@@ -1,0 +1,27 @@
+categories:
+- name: adverse media
+  sub_categories:
+  - name: all
+    reason_codes:
+    - adverse_media_clear
+    - adverse_media_hit
+- name: non-sdn
+  sub_categories:
+  - name: all
+    reason_codes:
+    - watchlist_clear_non_sdn
+    - watchlist_hit_non_sdn
+- name: ofac
+  sub_categories:
+  - name: all
+    reason_codes:
+    - watchlist_clear_ofac
+    - watchlist_clear_warning
+    - watchlist_hit_ofac
+    - watchlist_hit_warning
+- name: pep
+  sub_categories:
+  - name: all
+    reason_codes:
+    - watchlist_clear_pep
+    - watchlist_hit_pep

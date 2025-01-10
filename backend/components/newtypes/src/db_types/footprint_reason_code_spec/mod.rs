@@ -10,9 +10,27 @@ use std::collections::HashMap;
 // Include all the YAML files
 const KYC: &str = include_str!("./specs/kyc.yaml");
 const DOC: &str = include_str!("./specs/doc.yaml");
+const AML: &str = include_str!("./specs/aml.yaml");
+const BUSINESS: &str = include_str!("./specs/business.yaml");
+const BEHAVIORAL: &str = include_str!("./specs/behavior.yaml");
+const NATIVE_DEVICE: &str = include_str!("./specs/native_device.yaml");
+const PHONE: &str = include_str!("./specs/phone.yaml");
+const SYNTHETIC: &str = include_str!("./specs/synthetic.yaml");
+const USER: &str = include_str!("./specs/user.yaml");
+const DUPLICATES: &str = include_str!("./specs/duplicates.yaml");
 // Register all the specs
-const SPECS: [(&str, RiskSignalGroupKind); 2] =
-    [(KYC, RiskSignalGroupKind::Kyc), (DOC, RiskSignalGroupKind::Doc)];
+const SPECS: [(&str, RiskSignalGroupKind); 10] = [
+    (KYC, RiskSignalGroupKind::Kyc),
+    (DOC, RiskSignalGroupKind::Doc),
+    (AML, RiskSignalGroupKind::Aml),
+    (BUSINESS, RiskSignalGroupKind::Kyb),
+    (BEHAVIORAL, RiskSignalGroupKind::Behavior),
+    (NATIVE_DEVICE, RiskSignalGroupKind::NativeDevice),
+    (PHONE, RiskSignalGroupKind::Phone),
+    (SYNTHETIC, RiskSignalGroupKind::Synthetic),
+    (USER, RiskSignalGroupKind::User),
+    (DUPLICATES, RiskSignalGroupKind::Duplicates),
+];
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -66,7 +84,11 @@ mod tests {
             .cloned()
             .collect_vec();
 
-        let enum_codes = FootprintReasonCode::iter().collect_vec();
+        let enum_codes = FootprintReasonCode::iter()
+            .filter(|frc| !frc.to_be_deprecated())
+            .filter(|frc| !frc.in_preview())
+            .filter(|frc| !matches!(frc, FootprintReasonCode::Other(_)))
+            .collect_vec();
 
         // Find codes in enum but not in YAML. We can't have anything in YAML not in enum bc deser will fail
         let missing_in_yaml: Vec<&FootprintReasonCode> = enum_codes
@@ -82,7 +104,9 @@ mod tests {
         // Validate RSGs are accounted for. This is unlikely to happen since we have already validated all
         // the FRCs but just in case
         //
-        let rsgs = RiskSignalGroupKind::iter().collect_vec();
+        let rsgs = RiskSignalGroupKind::iter()
+            .filter(|c| !matches!(c, RiskSignalGroupKind::WebDevice))
+            .collect_vec();
         let missing_rsgs: Vec<&RiskSignalGroupKind> =
             rsgs.iter().filter(|rsg| !specs.contains_key(*rsg)).collect();
 
@@ -101,6 +125,6 @@ mod tests {
     #[test]
     fn test_load_and_validate_reason_codes() {
         // TODO: finish all the mapping
-        // validate_reason_codes().unwrap();
+        validate_reason_codes().unwrap();
     }
 }

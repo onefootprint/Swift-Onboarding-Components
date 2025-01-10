@@ -1,27 +1,227 @@
 categories:
-  - name: name
-    sub_categories:
-      - name: matching
-        reason_codes:
-          - name_does_not_match
-          - name_matches
-          - name_partially_matches
-      - name: First
-        reason_codes:
-          - name_first_matches
-          - name_first_does_not_match
-          - name_first_partially_matches
-  - name: address
-    sub_categories:
-      - name: matching
-        reason_codes:
-          - address_matches
-          - address_does_not_match
-          - address_partially_matches
-  - name: dob
-    sub_categories:
-      - name: matching
-        reason_codes:
-          - dob_matches
-          - dob_does_not_match
-          - dob_partial_match
+- name: overall
+  sub_categories:
+  - name: flagged
+    reason_codes:
+    - id_flagged
+  - name: located
+    reason_codes:
+    - id_not_located
+  - name: thin file
+    reason_codes:
+    - thin_file
+- name: address
+  sub_categories:
+  - name: current
+    reason_codes:
+    - address_newer_record_found
+  - name: misc
+    reason_codes:
+    - address_input_is_correctional_facility
+    - address_input_is_non_residential
+    - address_input_is_not_deliverable
+    - address_input_is_not_standard_campground
+    - address_input_is_not_standard_college
+    - address_input_is_not_standard_general_delivery
+    - address_input_is_not_standard_hospital
+    - address_input_is_not_standard_hotel
+    - address_input_is_not_standard_mail_drop
+    - address_input_is_not_standard_prison
+    - address_input_is_not_standard_university
+    - address_input_is_not_standard_uspo
+    - address_input_not_on_file
+    - address_located_is_non_residential
+    - address_located_is_not_standard_campground
+    - address_located_is_not_standard_college
+    - address_located_is_not_standard_general_delivery
+    - address_located_is_not_standard_hospital
+    - address_located_is_not_standard_hotel
+    - address_located_is_not_standard_mail_drop
+    - address_located_is_not_standard_prison
+    - address_located_is_not_standard_university
+    - address_located_is_not_standard_uspo
+  - name: risk
+    reason_codes:
+    - address_alert_longevity
+    - address_alert_single_address_in_file
+    - address_alert_stability
+    - address_alert_velocity
+    - address_input_is_po_box
+    - address_located_is_high_risk_address
+    - address_located_is_po_box
+    - address_risk_alert
+- name: address matching
+  sub_categories:
+  - name: overall
+    reason_codes:
+    - address_does_not_match
+    - address_matches
+    - address_partially_matches
+  - name: city
+    reason_codes:
+    - address_city_does_not_match
+    - address_city_matches
+  - name: state
+    reason_codes:
+    - address_state_does_not_match
+    - address_state_matches
+  - name: street
+    reason_codes:
+    - address_street_name_does_not_match
+    - address_street_name_matches
+    - address_street_name_partially_matches
+    - address_street_number_does_not_match
+    - address_street_number_matches
+  - name: zip
+    reason_codes:
+    - address_zip_code_does_not_match
+    - address_zip_code_matches
+- name: dob
+  sub_categories:
+  - name: misc
+    reason_codes:
+    - dob_located_age_above_maximum
+    - dob_located_age_below_minimum
+    - dob_located_coppa_alert
+- name: dob matching
+  sub_categories:
+  - name: overall
+    reason_codes:
+    - dob_could_not_match
+    - dob_does_not_match
+    - dob_input_age_less_than18
+    - dob_matches
+    - dob_not_on_file
+    - dob_partial_match
+  - name: components
+    reason_codes:
+    - dob_day_does_not_match
+    - dob_mob_does_not_match
+    - dob_mob_matches
+    - dob_mob_not_available
+    - dob_yob_does_not_match
+    - dob_yob_does_not_match_within1_year
+    - dob_yob_matches
+    - dob_yob_not_available
+- name: drivers license
+  sub_categories:
+  - name: misc
+    reason_codes:
+    - drivers_license_number_different_number_found
+    - drivers_license_number_is_valid
+    - drivers_license_number_not_on_record
+    - drivers_license_number_not_valid
+- name: email
+  sub_categories:
+  - name: fraud
+    reason_codes:
+    - email_high_risk_country
+    - email_high_risk_disposable
+    - email_high_risk_domain
+    - email_high_risk_fraud
+    - email_high_risk_tumbled
+  - name: misc
+    reason_codes:
+    - email_address_invalid
+    - email_address_or_domain_does_not_exist
+    - email_domain_corporate
+    - email_domain_private
+    - email_domain_recently_created
+    - email_found_on_file
+    - email_not_found_on_file
+    - email_recently_verified
+- name: identity
+  sub_categories:
+  - name: misc
+    reason_codes:
+    - credit_established_before_s_s_n_date
+    - credit_more_than3_inquiries_in_last30_days
+- name: investor profile
+  sub_categories:
+  - name: all
+    reason_codes:
+    - affiliated_with_broker_or_finra
+- name: misc
+  sub_categories:
+  - name: all
+    reason_codes:
+    - bureau_deleted_record
+- name: name matching
+  sub_categories:
+  - name: overall
+    reason_codes:
+    - name_does_not_match
+    - name_matches
+    - name_partially_matches
+  - name: components
+    reason_codes:
+    - name_first_does_not_match
+    - name_first_matches
+    - name_first_partially_matches
+    - name_last_does_not_match
+    - name_last_matches
+    - name_last_partially_matches
+- name: phone
+  sub_categories:
+  - name: matching
+    reason_codes:
+    - phone_located_does_not_match
+    - phone_located_matches
+    - phone_number_matches
+  - name: misc
+    reason_codes:
+    - input_phone_number_does_not_match_input_state
+    - input_phone_number_does_not_match_located_state_history
+    - input_phone_number_matches_input_state
+    - input_phone_number_matches_located_state_history
+    - phone_input_likely_belongs_to_another
+    - phone_located_address_does_not_match
+    - phone_located_address_matches
+    - phone_located_address_partially_matches
+    - phone_located_name_does_not_match
+    - phone_located_name_matches
+    - phone_located_name_partially_matches
+    - phone_located_partially_matches
+    - phone_not_provided
+  - name: misc
+    reason_codes:
+    - phone_number_input_invalid
+  - name: type
+    reason_codes:
+    - phone_number_located_is_voip
+- name: ssn
+  sub_categories:
+  - name: overall
+    reason_codes:
+    - ssn_input_is_itin
+    - ssn_located_is_itin
+    - ssn_not_available
+    - ssn_not_on_file
+    - us_tax_id_is_itin
+  - name: matching
+    reason_codes:
+    - ssn_does_not_match
+    - ssn_does_not_match_within1_digit
+    - ssn_partially_matches
+    - ssn_matches
+  - name: misc
+    reason_codes:
+    - itin_is_expired
+  - name: risk
+    reason_codes:
+    - ssn_input_is_invalid
+    - ssn_input_tied_to_multiple_names
+    - ssn_issue_date_cannot_be_verified
+    - ssn_issued_prior_to_dob
+    - ssn_likely_belongs_to_another
+    - ssn_located_is_invalid
+    - ssn_located_issue_date_cannot_be_verified
+    - ssn_not_provided
+    - ssn_potentially_belongs_to_another
+    - subject_deceased
+- name: visa
+  sub_categories:
+  - name: misc
+    reason_codes:
+    - visa_expired_or_expiring_soon
+    - visa_is_other
