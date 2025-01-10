@@ -13,6 +13,7 @@ import CompanyName from './components/company-name';
 const NavDropdown = lazy(() => import('./components/nav-dropdown'));
 import { getPrivateAccessRequestsOptions } from '@onefootprint/axios/dashboard';
 import { useQuery } from '@tanstack/react-query';
+import { RISK_OPS_TEAM_MEMBERS } from 'src/config/constants';
 import NavLink from './components/nav-link';
 import SettingsDropdown from './components/settings-dropdown';
 import WhatsNewBanner from './components/whats-new-banner';
@@ -24,7 +25,6 @@ import moveTenantToFront from './utils/move-tenant-to-front';
 
 const WHATS_NEW_BANNER_KEY = 'whatsNewBannerInteracted';
 const LAST_SEEN_POST_KEY = 'lastSeenPostDate';
-const RISK_OPS_TEAM_MEMBERS = ['elliott@onefootprint.com', 'alex@onefootprint.com', 'dave@onefootprint.com'];
 
 const Nav = () => {
   const router = useRouter();

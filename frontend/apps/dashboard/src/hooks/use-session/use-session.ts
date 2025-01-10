@@ -4,6 +4,7 @@ import { useToast } from '@onefootprint/ui';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+import { isUndefined } from 'lodash';
 import {
   DASHBOARD_ALLOW_ASSUMED_WRITES,
   DASHBOARD_AUTHORIZATION_HEADER,
@@ -98,6 +99,8 @@ const useSession = () => {
     await fetchNewPermissionsOrLogout({
       newAuthToken: session.auth,
       newIsLive: session.newIsLive ?? isLive,
+      // On login/logout/tenant switch this should always be reset
+      newIsAssumedSessionEditMode: false,
     });
   };
 
@@ -106,11 +109,15 @@ const useSession = () => {
     newIsLive,
     newIsAssumedSessionEditMode,
   }: FetchNewPermissionsParams) => {
+    const isAssumedSessionEditModeToSet = isUndefined(newIsAssumedSessionEditMode)
+      ? isAssumedSessionEditMode
+      : newIsAssumedSessionEditMode;
+
     // Fetch the new permissions from the backend
     const user = await getOrgMemberRequest({
       auth: newAuthToken,
       isLive: newIsLive,
-      isAssumedSessionEditMode: !!newIsAssumedSessionEditMode,
+      isAssumedSessionEditMode: !!isAssumedSessionEditModeToSet,
     });
 
     if (user.tenant.isSandboxRestricted && newIsLive) {
@@ -123,7 +130,7 @@ const useSession = () => {
       await fetchNewPermissions({
         newAuthToken,
         newIsLive: false,
-        newIsAssumedSessionEditMode,
+        newIsAssumedSessionEditMode: isAssumedSessionEditModeToSet,
       });
       return;
     }
@@ -132,7 +139,7 @@ const useSession = () => {
       user: {
         ...user,
         isAssumedSession: !!user.isAssumedSession,
-        isAssumedSessionEditMode: !!newIsAssumedSessionEditMode,
+        isAssumedSessionEditMode: isAssumedSessionEditModeToSet,
       },
       org: {
         ...user.tenant,

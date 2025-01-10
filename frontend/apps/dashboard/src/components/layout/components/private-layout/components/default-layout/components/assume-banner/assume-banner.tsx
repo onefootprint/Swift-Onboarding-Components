@@ -1,15 +1,14 @@
 import { getPrivateAccessRequestsOptions } from '@onefootprint/axios/dashboard';
 import { IcoInfo16 } from '@onefootprint/icons';
-import type { AccessRequest } from '@onefootprint/request-types/dashboard';
 import { Banner, Dialog, Stack, Tooltip } from '@onefootprint/ui';
 import { useQuery } from '@tanstack/react-query';
-import { isAfter, parseISO } from 'date-fns';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useSession from 'src/hooks/use-session';
 import styled, { css } from 'styled-components';
 import GrantEditRightsForm from './components/grant-edit-rights-form';
+import useCanEnableEditMode from './utils/use-can-enable-edit-mode';
 
 const AssumeBanner = () => {
   const { t } = useTranslation('common', { keyPrefix: 'components.private-layout.assume-banner' });
@@ -17,14 +16,14 @@ const AssumeBanner = () => {
   const { data, isAssumedSessionEditMode, setAssumedSessionEditMode } = useSession();
   const { data: accessRequests, isPending: isAccessRequestsPending } = useQuery(getPrivateAccessRequestsOptions());
   const router = useRouter();
-  const canEnableEditMode =
-    Array.isArray(accessRequests) &&
-    accessRequests.some(
-      (accessRequest: AccessRequest) =>
-        accessRequest.requester === data.user?.email &&
-        accessRequest.approved &&
-        isAfter(parseISO(accessRequest.expiresAt), new Date()),
-    );
+  const {
+    data: { user, org },
+  } = useSession();
+  const { canEnableEditMode } = useCanEnableEditMode({
+    accessRequests,
+    userEmail: user?.email,
+    orgId: org?.id,
+  });
 
   const handleChangeEdit = () => {
     if (isAssumedSessionEditMode) {

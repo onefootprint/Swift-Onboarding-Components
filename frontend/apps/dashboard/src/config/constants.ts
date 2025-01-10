@@ -16,3 +16,4 @@ export const DASHBOARD_AUTHORIZATION_HEADER = 'x-fp-dashboard-authorization';
 export const DASHBOARD_IS_LIVE_HEADER = 'x-is-live';
 export const DASHBOARD_ALLOW_ASSUMED_WRITES = 'x-allow-assumed-writes';
 export const MAIN_PAGE_ID = 'page-main';
+export const RISK_OPS_TEAM_MEMBERS = ['elliott@onefootprint.com', 'alex@onefootprint.com', 'dave@onefootprint.com'];
