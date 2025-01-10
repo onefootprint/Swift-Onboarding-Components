@@ -769,7 +769,7 @@ pub async fn prepare_onboarding_configuration_request(
 
     // VERIFICATION CHECK MIGRATION: construct verification checks
     let curp_validation_enabled = curp_validation_enabled.unwrap_or(false);
-    let verification_checks = VerificationChecks::new(
+    let verification_checks = VerificationChecks::build(
         &tenant.id,
         verification_checks,
         skip_kyc,

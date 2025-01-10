@@ -14,7 +14,6 @@ use db::models::task::Task;
 use db::models::task::TaskPollArgs;
 use db::models::workflow::OnboardingWorkflowArgs;
 use db::models::workflow::Workflow;
-use db::models::workflow_request::WorkflowRequest;
 use db::OffsetPagination;
 use db::TxnPgConn;
 use newtypes::ApiKeyStatus;
@@ -29,7 +28,6 @@ use newtypes::TaskKind;
 use newtypes::TenantId;
 use newtypes::WfrAdhocVendorCallConfig;
 use newtypes::WorkflowRequestConfig;
-use newtypes::WorkflowRequestId;
 use newtypes::WorkflowSource;
 
 
@@ -79,7 +77,7 @@ pub(super) fn apply_adhoc_vendor_call(
     conn: &mut TxnPgConn,
     config: WfrAdhocVendorCallConfig,
     sv: &Locked<ScopedVault>,
-    actor: DbActor,
+    _actor: DbActor, // TODO: use in TL event
 ) -> FpResult<EntityActionPostCommit> {
     let query = ObConfigurationQuery {
         tenant_id: sv.tenant_id.clone(),
@@ -94,23 +92,9 @@ pub(super) fn apply_adhoc_vendor_call(
     let (obcs, _) = ObConfiguration::list(conn, &query, OffsetPagination::page(1))?;
     let (_, obc, _, _) = obcs.into_iter().next().ok_or(UserError::NoPlaybooksExist)?;
 
-    // We use the WFR to just get the correct workflow creation behavior out of
-    // `get_or_create_onboarding` but don't actually create a WFR in the DB since those are reserved
-    // for the requests that are for customers to fulfill
-    let in_memory_wfr = WorkflowRequest {
-        id: WorkflowRequestId::test_data("wfr_1234".into()),
-        _created_at: Utc::now(),
-        _updated_at: Utc::now(),
-        timestamp: Utc::now(),
-        deactivated_at: None,
-        ob_configuration_id: obc.id.clone(),
-        created_by: actor,
-        config: WorkflowRequestConfig::AdhocVendorCall(config),
-        note: None,
-    };
-
     // TODO: TL event
 
+    let config = WorkflowRequestConfig::AdhocVendorCall(config);
     let args = OnboardingWorkflowArgs {
         scoped_vault_id: sv.id.clone(),
         ob_configuration_id: obc.id.clone(),
@@ -119,7 +103,7 @@ pub(super) fn apply_adhoc_vendor_call(
         source: WorkflowSource::Tenant,
         fixture_result: None,
         is_one_click: false,
-        wfr: Some(&in_memory_wfr),
+        wfr_config: Some(&config),
         is_neuro_enabled: false,
     };
     let (wf, _) = Workflow::get_or_create_onboarding(conn, args, true)?;

@@ -163,7 +163,7 @@ impl Task {
     }
 
     #[tracing::instrument("Task::poll_single", skip_all)]
-    pub fn poll_single(conn: &mut TxnPgConn, id: TaskId) -> FpResult<Vec<(Task, TaskExecution)>> {
+    pub fn poll_single(conn: &mut TxnPgConn, id: &TaskId) -> FpResult<Vec<(Task, TaskExecution)>> {
         let now = Utc::now();
         // TODO: cannot for the life of me get this to compile in diesel
         let task = sql_query(
@@ -184,9 +184,10 @@ impl Task {
         .bind::<Text, _>(TaskStatus::Pending)
         .bind::<Timestamptz, _>(now)
         .bind::<Text, _>(id.to_string())
-        .get_result::<Task>(conn.conn())?;
+        .get_result::<Task>(conn.conn())
+        .optional()?;
 
-        Self::create_task_executions(conn, vec![task], now)
+        Self::create_task_executions(conn, task.into_iter().collect(), now)
     }
 
     fn create_task_executions(
@@ -281,6 +282,7 @@ mod tests {
     use crate::test_helpers::assert_have_same_elements;
     use crate::test_helpers::have_same_elements;
     use crate::tests::test_db_pool::TestDbPool;
+    use itertools::Itertools;
     use macros::test_db_pool;
     use newtypes::LogMessageTaskArgs;
     use newtypes::LogNumTenantApiKeysArgs;
@@ -321,6 +323,40 @@ mod tests {
     }
 
     #[test_db_pool]
+    async fn create_and_poll_single(db_pool: TestDbPool) {
+        db_pool
+            .db_transaction(|conn| -> FpResult<()> {
+                let task1 = Task::create(conn, Utc::now(), task_data())?;
+                let _task2 = Task::create(conn, Utc::now(), task_data())?;
+                let task3 = Task::create(conn, Utc::now(), task_data())?;
+                let _task4 = Task::create(conn, Utc::now(), task_data())?;
+
+                let tasks = vec![
+                    Task::poll_single(conn, &task1.id)?,
+                    Task::poll_single(conn, &task3.id)?,
+                ]
+                .into_iter()
+                .flatten()
+                .collect_vec();
+
+                assert!(have_same_elements(
+                    vec![
+                        (&task1.id, TaskStatus::Running, 1, &task1.id, 1),
+                        (&task3.id, TaskStatus::Running, 1, &task3.id, 1),
+                    ],
+                    tasks
+                        .iter()
+                        .map(|(t, te)| (&t.id, t.status, t.num_attempts, &te.task_id, te.attempt_num))
+                        .collect(),
+                ));
+                Ok(())
+            })
+            .await
+            .unwrap();
+    }
+
+
+    #[test_db_pool]
     async fn only_pending_tasks_are_retrieved(db_pool: TestDbPool) {
         db_pool
             .db_transaction(|conn| -> FpResult<()> {
@@ -332,7 +368,37 @@ mod tests {
                 Task::_update_for_test(conn, &task3.id, TaskStatus::Failed);
                 let task4 = Task::create(conn, Utc::now(), task_data())?;
 
-                let tasks = Task::poll(conn, 4, None).unwrap();
+                let tasks = Task::poll(conn, 4, None)?;
+
+                assert_eq!(1, tasks.len());
+                assert_eq!(tasks[0].0.id, task4.id);
+                Ok(())
+            })
+            .await
+            .unwrap();
+    }
+
+    #[test_db_pool]
+    async fn only_pending_tasks_are_retrieved_single(db_pool: TestDbPool) {
+        db_pool
+            .db_transaction(|conn| -> FpResult<()> {
+                let task1 = Task::create(conn, Utc::now(), task_data())?;
+                Task::_update_for_test(conn, &task1.id, TaskStatus::Running);
+                let task2 = Task::create(conn, Utc::now(), task_data())?;
+                Task::_update_for_test(conn, &task2.id, TaskStatus::Completed);
+                let task3 = Task::create(conn, Utc::now(), task_data())?;
+                Task::_update_for_test(conn, &task3.id, TaskStatus::Failed);
+                let task4 = Task::create(conn, Utc::now(), task_data())?;
+
+                let tasks = vec![
+                    Task::poll_single(conn, &task4.id)?,
+                    Task::poll_single(conn, &task3.id)?,
+                    Task::poll_single(conn, &task2.id)?,
+                    Task::poll_single(conn, &task1.id)?,
+                ]
+                .into_iter()
+                .flatten()
+                .collect_vec();
 
                 assert_eq!(1, tasks.len());
                 assert_eq!(tasks[0].0.id, task4.id);
@@ -412,7 +478,14 @@ mod tests {
             .db_transaction(move |conn| {
                 // tasks now past their max lease duration and should be polled again, num_attempts
                 // incremented, and new task_execution's written
-                let repolled_tasks = Task::poll(conn, 2, None)?;
+                let repolled_tasks = vec![
+                    Task::poll(conn, 1, None)?,
+                    Task::poll_single(conn, &tasks[1].0.id)?, // task 2 is scheduled_for after task1
+                ]
+                .into_iter()
+                .flatten()
+                .collect_vec();
+
                 assert!(have_same_elements(
                     vec![
                         (&tasks[0].0.id, TaskStatus::Running, 2, &tasks[0].0.id, 2),

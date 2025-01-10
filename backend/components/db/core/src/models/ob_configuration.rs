@@ -852,7 +852,7 @@ impl NewObConfiguration {
 #[derive(Default, Clone)]
 pub struct VerificationChecks(Vec<VerificationCheck>);
 impl VerificationChecks {
-    pub fn new(
+    pub fn build(
         tenant_id: &TenantId,
         checks_from_request: Option<Vec<VerificationCheck>>,
         skip_kyc: Option<bool>,
@@ -928,7 +928,7 @@ impl VerificationChecks {
         };
 
         let identity_doc_migrated = if collects_identity_document {
-            let doc_migrated = VerificationChecks::new_for_test(checks.clone())
+            let doc_migrated = VerificationChecks::new(checks.clone())
                 .get(VerificationCheckKind::IdentityDocument)
                 .is_some();
 
@@ -942,7 +942,7 @@ impl VerificationChecks {
         };
 
         let curp_migrated = if curp_validation_enabled {
-            let curp_migrated = VerificationChecks::new_for_test(checks.clone())
+            let curp_migrated = VerificationChecks::new(checks.clone())
                 .get(VerificationCheckKind::CurpValidation)
                 .is_some();
 
@@ -960,7 +960,7 @@ impl VerificationChecks {
         checks
     }
 
-    pub fn new_for_test(checks: Vec<VerificationCheck>) -> Self {
+    pub fn new(checks: Vec<VerificationCheck>) -> Self {
         Self(checks)
     }
 

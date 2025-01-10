@@ -148,7 +148,7 @@ pub fn get_or_create_user_workflow(
         source,
         fixture_result,
         is_one_click: is_first_wf && has_prefill_data,
-        wfr,
+        wfr_config: wfr.as_ref().map(|wfr| &wfr.config),
         is_neuro_enabled,
     };
     let (wf, is_new_wf) = Workflow::get_or_create_onboarding(conn, ob_create_args, force_create)?;
@@ -345,7 +345,7 @@ pub fn get_or_create_business_wf<'a>(
         source,
         fixture_result,
         is_one_click: false,
-        wfr,
+        wfr_config: wfr.as_ref().map(|wfr| &wfr.config),
         is_neuro_enabled: false, // not now
     };
     let (biz_wf, is_new_wf) = Workflow::get_or_create_onboarding(conn, ob_create_args, force_create)?;

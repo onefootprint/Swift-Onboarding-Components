@@ -115,7 +115,7 @@ pub fn create_with_opts(
     let documents_to_collect = vec![];
     let curp_validation_enabled = false;
     let collects_identity_doc = must_collect_data.iter().any(|d| CDOK::from(d) == CDOK::Document);
-    let verification_checks = VerificationChecks::new(
+    let verification_checks = VerificationChecks::build(
         tenant_id,
         verification_checks,
         Some(skip_kyc),

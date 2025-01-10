@@ -160,7 +160,7 @@ pub struct OnboardingWorkflowArgs<'a> {
     pub fixture_result: Option<WorkflowFixtureResult>,
     pub is_one_click: bool,
     /// If starting from a WorkflowRequest, the config
-    pub wfr: Option<&'a WorkflowRequest>,
+    pub wfr_config: Option<&'a WorkflowRequestConfig>,
     pub is_neuro_enabled: bool,
 }
 
@@ -253,7 +253,7 @@ impl Workflow {
             source,
             fixture_result,
             is_one_click,
-            wfr,
+            wfr_config,
             is_neuro_enabled,
         } = args;
 
@@ -299,7 +299,7 @@ impl Workflow {
             }
         }
 
-        let config: WorkflowConfig = match wfr.map(|wfr| wfr.config.clone()) {
+        let config: WorkflowConfig = match wfr_config.cloned() {
             Some(WorkflowRequestConfig::Document(cfg)) => DocumentConfig {
                 configs: cfg.configs,
                 business_configs: cfg.business_configs,

@@ -49,7 +49,7 @@ pub async fn poll_and_execute_tasks(state: &State, args: TaskPollArgs) -> FpResu
             args @ TaskPollArgs::Limit { .. } | args @ TaskPollArgs::Kind { .. } => {
                 Task::poll(conn, args.limit(), args.kind())
             }
-            TaskPollArgs::Single { id } => Task::poll_single(conn, id),
+            TaskPollArgs::Single { ref id } => Task::poll_single(conn, id),
         })
         .await?;
 

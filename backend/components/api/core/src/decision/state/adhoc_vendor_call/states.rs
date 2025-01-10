@@ -44,8 +44,7 @@ impl AdhocVendorCallVendorCalls {
     }
 
     fn verification_checks(&self) -> VerificationChecks {
-        // TODO: fix this
-        VerificationChecks::new_for_test(self.config.verification_checks.clone())
+        VerificationChecks::new(self.config.verification_checks.clone())
     }
 }
 

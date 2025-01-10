@@ -110,7 +110,7 @@ pub async fn create_user_and_onboarding(
                     source: WorkflowSource::Hosted,
                     fixture_result: kyc_fixture_result,
                     is_one_click: false,
-                    wfr: None,
+                    wfr_config: None,
                     is_neuro_enabled: false,
                 };
                 let (biz_wf, _) = Workflow::get_or_create_onboarding(conn, ob_create_args, false)?;

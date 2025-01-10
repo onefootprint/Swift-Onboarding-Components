@@ -55,7 +55,7 @@ fn test(must_collect_data: Vec<CDO>, optional_data: Vec<CDO>, can_access_data: V
         document_types_and_countries: None,
         documents_to_collect: vec![],
         business_documents_to_collect: vec![],
-        verification_checks: VerificationChecks::new_for_test(vec![VerificationCheck::Kyc {}]),
+        verification_checks: VerificationChecks::new(vec![VerificationCheck::Kyc {}]),
         required_auth_methods: None,
         prompt_for_passkey: true,
     };
@@ -89,7 +89,7 @@ fn test_is_no_phone_flow(
         document_types_and_countries: None,
         documents_to_collect: vec![],
         business_documents_to_collect: vec![],
-        verification_checks: VerificationChecks::new_for_test(vec![VerificationCheck::Kyc {}]),
+        verification_checks: VerificationChecks::new(vec![VerificationCheck::Kyc {}]),
         required_auth_methods: None,
         prompt_for_passkey: true,
     };
@@ -153,7 +153,7 @@ fn test_documents(documents_to_collect: Vec<DocumentRequestConfig>) -> bool {
         document_types_and_countries: None,
         documents_to_collect,
         business_documents_to_collect: vec![],
-        verification_checks: VerificationChecks::new_for_test(vec![VerificationCheck::Kyc {}]),
+        verification_checks: VerificationChecks::new(vec![VerificationCheck::Kyc {}]),
         required_auth_methods: None,
         prompt_for_passkey: true,
     };
@@ -184,7 +184,7 @@ fn test_validate_for_cip(kind: CipKind, must_collect_data: Vec<CDO>) -> bool {
         document_types_and_countries: None,
         documents_to_collect: vec![],
         business_documents_to_collect: vec![],
-        verification_checks: VerificationChecks::new_for_test(vec![
+        verification_checks: VerificationChecks::new(vec![
             VerificationCheck::Kyc {},
             VerificationCheck::Aml {
                 ofac: true,

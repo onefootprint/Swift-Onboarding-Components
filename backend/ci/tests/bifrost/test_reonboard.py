@@ -3,7 +3,9 @@ from tests.headers import FpAuth, PlaybookKey
 from tests.types import ObConfiguration
 from tests.utils import get, patch, post, put
 from tests.bifrost_client import BifrostClient
-from tests.utils import create_ob_config
+from tests.utils import create_ob_config, try_until_success, create_tenant, _gen_random_sandbox_id
+from tests.constants import ID_DATA, FIXTURE_PHONE_NUMBER, FIXTURE_EMAIL
+from tests.headers import SandboxId
 
 
 def num_onboarding_decisions(fp_id, tenant):
@@ -24,6 +26,58 @@ def test_reonboard(sandbox_tenant, sandbox_user):
     # no new KYC checks should be run, we should still only 1 OBD
     assert num_onboarding_decisions(sandbox_user.fp_id, sandbox_tenant) == 1
 
+
+def test_reonboard_behavior_with_adhoc_vendor_call(sandbox_tenant): 
+    """ This test ensures that running an adhoc vendor call on a user will not
+        make a bifrost initiated workflow on that same playbook no-op
+    """
+    sandbox_id = _gen_random_sandbox_id()
+    sandbox_id_h = SandboxId(sandbox_id)
+    data = ID_DATA
+    data.update({"id.phone_number": FIXTURE_PHONE_NUMBER, "id.email": FIXTURE_EMAIL})
+    body = post("users", data, sandbox_tenant.s_sk, sandbox_id_h)
+    fp_id = body["id"]
+
+    # run an adhoc action on them
+    action = dict(verification_checks=[dict(kind="sentilink", data=dict())])
+    adhoc_vendor_call_action = dict(kind="adhoc_vendor_call", config=action)
+    data = dict(actions=[adhoc_vendor_call_action])
+    post(f"entities/{fp_id}/actions", data, *sandbox_tenant.db_auths)
+
+    def check_adhoc_vendor_call_results():
+        assert num_onboarding_decisions(fp_id, sandbox_tenant) == 1
+        # Get the OBC
+        body = get(f"entities/{fp_id}/onboardings", None, *sandbox_tenant.db_auths)
+        assert len(body["data"]) == 1
+        return body["data"][0]["playbook_key"]
+    pb_from_adhoc_vendor_call = try_until_success(check_adhoc_vendor_call_results, 60, retry_interval_s=0.1)
+
+    # Register auth methods for the user
+    auth_playbook = create_ob_config(
+        sandbox_tenant,
+        "Auth playbook",
+        ["phone_number", "email"],
+        required_auth_methods=["phone"],
+        kind="auth",
+    )
+    IdentifyClient(auth_playbook, sandbox_id).login(kind="sms", scope="auth")
+
+    # Find the playbook used by the adhoc vendor call
+    body = get("org/playbooks?page_size=100", None, *sandbox_tenant.db_auths)
+    configs = body["data"]
+    resp = next(i for i in configs if i["key"] == pb_from_adhoc_vendor_call)
+    ob = ObConfiguration.from_response(resp, sandbox_tenant)
+    
+    # Now run bifrost, and we should not no-op and get a new decision
+    bifrost = BifrostClient.login_user(sandbox_tenant.default_ob_config, sandbox_id)
+    bifrost.run()
+    assert len(bifrost.handled_requirements) > 0
+    assert num_onboarding_decisions(fp_id, sandbox_tenant) == 2
+    body = get(f"entities/{fp_id}/onboardings", None, *sandbox_tenant.db_auths)
+    assert len(body["data"]) == 2
+    assert body["data"][0]["status"] == "pass"
+    assert body["data"][1]["status"] == "none"
+    
 
 def test_abort_then_reonboard(sandbox_tenant, must_collect_data):
     obc1 = create_ob_config(sandbox_tenant, "Abort OBC 1", must_collect_data)
