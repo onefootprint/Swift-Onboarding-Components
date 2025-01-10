@@ -753,11 +753,11 @@ impl ObConfiguration {
         // completed WF by completed_at where enhanced_aml = Yes. If none of the WF's have enhanced AML,
         // then we just take the first OBC.
         let (wfs, _) = Workflow::list(conn, sv_id, OffsetPagination::page(20))?;
-        let playbook_obc = if let Some((_, playbook, obc)) = wfs
+        let playbook_obc = if let Some((_, playbook, obc, _)) = wfs
             .iter()
-            .filter(|(wf, _, _)| wf.completed_at.is_some())
-            .sorted_by_key(|(wf, _, _)| wf.completed_at)
-            .find(|(_, _, obc)| {
+            .filter(|(wf, _, _, _)| wf.completed_at.is_some())
+            .sorted_by_key(|(wf, _, _, _)| wf.completed_at)
+            .find(|(_, _, obc, _)| {
                 matches!(
                     &obc.verification_checks().enhanced_aml(),
                     EnhancedAmlOption::Yes { .. }
@@ -766,7 +766,7 @@ impl ObConfiguration {
             Some((playbook.clone(), obc.clone()))
         } else {
             wfs.first()
-                .map(|(_, playbook, obc)| (playbook.clone(), obc.clone()))
+                .map(|(_, playbook, obc, _)| (playbook.clone(), obc.clone()))
         };
         Ok(playbook_obc)
     }

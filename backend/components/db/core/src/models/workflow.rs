@@ -26,6 +26,7 @@ use chrono::Utc;
 use db_schema::schema::identity_document;
 use db_schema::schema::ob_configuration;
 use db_schema::schema::playbook;
+use db_schema::schema::watchlist_check;
 use db_schema::schema::workflow;
 use diesel::dsl::not;
 use diesel::prelude::*;
@@ -53,6 +54,7 @@ use newtypes::PreviewApi;
 use newtypes::ScopedVaultId;
 use newtypes::TenantScope;
 use newtypes::VaultKind;
+use newtypes::WatchlistCheckId;
 use newtypes::WebhookEvent;
 use newtypes::WorkflowConfig;
 use newtypes::WorkflowFixtureResult;
@@ -476,19 +478,22 @@ impl Workflow {
         Ok(result)
     }
 
+    #[allow(clippy::type_complexity)]
     #[tracing::instrument("Workflow::list", skip_all)]
     pub fn list(
         conn: &mut PgConn,
         sv_id: &ScopedVaultId,
         pagination: OffsetPagination,
-    ) -> FpResult<OffsetPaginatedResult<(Self, Playbook, ObConfiguration)>> {
+    ) -> FpResult<OffsetPaginatedResult<(Self, Playbook, ObConfiguration, Option<WatchlistCheckId>)>> {
         let mut query = workflow::table
             .filter(workflow::scoped_vault_id.eq(sv_id))
             .inner_join(ob_configuration::table.inner_join(playbook::table))
+            .left_join(watchlist_check::table.on(workflow::id.nullable().eq(watchlist_check::workflow_id)))
             .select((
                 workflow::all_columns,
                 playbook::all_columns,
                 ob_configuration::all_columns,
+                watchlist_check::id.nullable(),
             ))
             .order_by(workflow::created_at.desc())
             .limit(pagination.limit())

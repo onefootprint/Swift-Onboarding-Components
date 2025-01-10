@@ -53,10 +53,10 @@ pub async fn get(
 
     let results = wfs
         .into_iter()
-        .filter(|(wf, _, _)| wf.kind.has_tenant_facing_decision())
+        .filter(|(wf, _, _, _)| wf.kind.has_tenant_facing_decision())
         // Start by only showing workflows with a terminal decision
-        .filter(|(wf, _, _)| wf.status.is_terminal())
-        .map(|(wf, playbook, _)| (wf, playbook))
+        .filter(|(wf, _, _, _)| wf.status.is_terminal())
+        .map(|(wf, playbook, _, _)| (wf, playbook))
         .map(api_wire_types::PublicOnboarding::from_db)
         .collect();
     let response = OffsetPaginatedResponse::ok_no_count(results, next_page);

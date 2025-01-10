@@ -65,6 +65,7 @@ def test_onboardings(sandbox_tenant, must_collect_data):
     assert body["data"][2]["status"] == "fail"
     assert body["data"][2]["playbook_key"] == sandbox_tenant.default_ob_config.key.value
     assert body["data"][2]["seqno"] is not None
+    assert body["data"][2]["kind"] == "kyc"
     # assert len(body["data"][2]["rule_set_results"]) == 1
 
 

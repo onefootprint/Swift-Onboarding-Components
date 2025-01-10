@@ -1,10 +1,12 @@
 use crate::utils::db2api::DbToApi;
+use api_wire_types::PublicWorkflowKind;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::playbook::Playbook;
 use db::models::rule_set_result::RuleSetResult;
 use db::models::workflow::Workflow;
 use itertools::Itertools;
 use newtypes::DataLifetimeSeqno;
+use newtypes::WatchlistCheckId;
 
 impl
     DbToApi<(
@@ -13,15 +15,17 @@ impl
         ObConfiguration,
         Vec<RuleSetResult>,
         Option<DataLifetimeSeqno>,
+        Option<WatchlistCheckId>,
     )> for api_wire_types::EntityOnboarding
 {
     fn from_db(
-        (wf, playbook, obc, rsrs, seqno): (
+        (wf, playbook, obc, rsrs, seqno, watchlist_check_id): (
             Workflow,
             Playbook,
             ObConfiguration,
             Vec<RuleSetResult>,
             Option<DataLifetimeSeqno>,
+            Option<WatchlistCheckId>,
         ),
     ) -> Self {
         let Workflow {
@@ -29,8 +33,10 @@ impl
             status,
             id,
             kind,
+            config,
             ..
         } = wf;
+        let public_kind = PublicWorkflowKind::from((kind, watchlist_check_id));
         let Playbook { key, .. } = playbook;
         let ObConfiguration { name, .. } = obc;
         let rule_set_results = rsrs
@@ -45,8 +51,9 @@ impl
             id,
             playbook_name: name,
             playbook_key: key,
-            kind,
+            kind: public_kind,
             status,
+            config,
             rule_set_results,
             seqno,
             timestamp: created_at,

@@ -40,8 +40,8 @@ pub async fn get(
             let (biz_wfs, _) = Workflow::list(conn, &sb.id, OffsetPagination::page(100))?;
             let biz_wf = biz_wfs
                 .into_iter()
-                .find(|(wf, _, _)| wf.kind == WorkflowKind::Kyb);
-            let user_decisions = if let Some((biz_wf, _, _)) = biz_wf {
+                .find(|(wf, _, _, _)| wf.kind == WorkflowKind::Kyb);
+            let user_decisions = if let Some((biz_wf, _, _, _)) = biz_wf {
                 BusinessWorkflowLink::get_latest_user_decisions(conn, &biz_wf.id, false)?
             } else {
                 Default::default()

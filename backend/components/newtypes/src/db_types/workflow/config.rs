@@ -5,11 +5,12 @@ use crate::VerificationCheck;
 use diesel::AsExpression;
 use diesel::FromSqlRow;
 use diesel_as_jsonb::AsJsonb;
+use paperclip::actix::Apiv2Schema;
 use serde::Deserialize;
 use serde::Serialize;
 
 // TODO: probs consolidate this into WorkflowState somehow
-#[derive(Debug, Clone, Serialize, Deserialize, AsJsonb)]
+#[derive(Debug, Clone, Serialize, Deserialize, AsJsonb, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "kind", content = "data")]
 pub enum WorkflowConfig {
@@ -42,7 +43,7 @@ impl WorkflowConfig {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, Apiv2Schema)]
 pub struct KycConfig {
     #[serde(default)]
     pub recollect_attributes: Vec<CollectedDataOption>,
@@ -54,7 +55,7 @@ impl From<KycConfig> for WorkflowConfig {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema)]
 
 pub struct AlpacaKycConfig {}
 
@@ -64,7 +65,7 @@ impl From<AlpacaKycConfig> for WorkflowConfig {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema)]
 pub struct DocumentConfig {
     pub configs: Vec<DocumentRequestConfig>,
     #[serde(default)]
@@ -77,7 +78,7 @@ impl From<DocumentConfig> for WorkflowConfig {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, Apiv2Schema)]
 pub struct KybConfig {
     #[serde(default)]
     pub recollect_attributes: Vec<CollectedDataOption>,
@@ -91,7 +92,7 @@ impl From<KybConfig> for WorkflowConfig {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, Apiv2Schema)]
 
 pub struct AdhocVendorCallConfig {
     pub verification_checks: Vec<VerificationCheck>,

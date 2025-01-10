@@ -9279,6 +9279,20 @@
                     "kind"
                 ]
             },
+            "AdhocVendorCallConfig": {
+                "type": "object",
+                "properties": {
+                    "verification_checks": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/VerificationCheck"
+                        }
+                    }
+                },
+                "required": [
+                    "verification_checks"
+                ]
+            },
             "AdverseMediaListKind": {
                 "type": "string",
                 "enum": [
@@ -9292,6 +9306,9 @@
                     "general_serious",
                     "general_minor"
                 ]
+            },
+            "AlpacaKycConfig": {
+                "type": "object"
             },
             "AmlDetail": {
                 "type": "object",
@@ -12877,6 +12894,27 @@
                     "global"
                 ]
             },
+            "DocumentConfig": {
+                "type": "object",
+                "properties": {
+                    "business_configs": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DocumentRequestConfig"
+                        }
+                    },
+                    "configs": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DocumentRequestConfig"
+                        }
+                    }
+                },
+                "required": [
+                    "business_configs",
+                    "configs"
+                ]
+            },
             "DocumentImageError": {
                 "type": "string",
                 "enum": [
@@ -13565,11 +13603,14 @@
             "EntityOnboarding": {
                 "type": "object",
                 "properties": {
+                    "config": {
+                        "$ref": "#/components/schemas/WorkflowConfig"
+                    },
                     "id": {
                         "type": "string"
                     },
                     "kind": {
-                        "$ref": "#/components/schemas/WorkflowKind"
+                        "$ref": "#/components/schemas/PublicWorkflowKind"
                     },
                     "playbook_key": {
                         "example": "pb_live_fZvYlX3JpanlQ3MAwE45g0",
@@ -13597,6 +13638,7 @@
                     }
                 },
                 "required": [
+                    "config",
                     "id",
                     "kind",
                     "playbook_key",
@@ -15615,6 +15657,38 @@
                     "ZM",
                     "ZW",
                     "AX"
+                ]
+            },
+            "KybConfig": {
+                "type": "object",
+                "properties": {
+                    "recollect_attributes": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CollectedDataOption"
+                        }
+                    },
+                    "reuse_existing_bo_kyc": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "recollect_attributes",
+                    "reuse_existing_bo_kyc"
+                ]
+            },
+            "KycConfig": {
+                "type": "object",
+                "properties": {
+                    "recollect_attributes": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CollectedDataOption"
+                        }
+                    }
+                },
+                "required": [
+                    "recollect_attributes"
                 ]
             },
             "LabelAdded": {
@@ -18327,6 +18401,17 @@
                 "required": [
                     "target",
                     "token"
+                ]
+            },
+            "PublicWorkflowKind": {
+                "type": "string",
+                "enum": [
+                    "kyc",
+                    "alpaca_kyc",
+                    "kyb",
+                    "document",
+                    "adhoc_vendor_call",
+                    "continuous_monitoring_watchlist_check"
                 ]
             },
             "RawUserDataRequest": {
@@ -22399,6 +22484,115 @@
                     "playbook_id",
                     "recollect_attributes",
                     "reuse_existing_bo_kyc"
+                ]
+            },
+            "WorkflowConfig": {
+                "anyOf": [
+                    {
+                        "$ref": "#/components/schemas/WorkflowConfigKyc"
+                    },
+                    {
+                        "$ref": "#/components/schemas/WorkflowConfigAlpacaKyc"
+                    },
+                    {
+                        "$ref": "#/components/schemas/WorkflowConfigDocument"
+                    },
+                    {
+                        "$ref": "#/components/schemas/WorkflowConfigKyb"
+                    },
+                    {
+                        "$ref": "#/components/schemas/WorkflowConfigAdhocVendorCall"
+                    }
+                ]
+            },
+            "WorkflowConfigAdhocVendorCall": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/AdhocVendorCallConfig"
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "adhoc_vendor_call"
+                        ]
+                    }
+                },
+                "required": [
+                    "data",
+                    "kind"
+                ]
+            },
+            "WorkflowConfigAlpacaKyc": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/AlpacaKycConfig"
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "alpaca_kyc"
+                        ]
+                    }
+                },
+                "required": [
+                    "data",
+                    "kind"
+                ]
+            },
+            "WorkflowConfigDocument": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/DocumentConfig"
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "document"
+                        ]
+                    }
+                },
+                "required": [
+                    "data",
+                    "kind"
+                ]
+            },
+            "WorkflowConfigKyb": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/KybConfig"
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "kyb"
+                        ]
+                    }
+                },
+                "required": [
+                    "data",
+                    "kind"
+                ]
+            },
+            "WorkflowConfigKyc": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/KycConfig"
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "kyc"
+                        ]
+                    }
+                },
+                "required": [
+                    "data",
+                    "kind"
                 ]
             },
             "WorkflowKind": {
