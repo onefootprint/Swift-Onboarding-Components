@@ -57,6 +57,7 @@ pub enum DbUserTimelineEvent {
     WatchlistCheck(WatchlistCheckInfo),
     VaultCreated(VaultCreatedInfo),
     WorkflowTriggered(WorkflowTriggeredInfo),
+    AdhocWorkflowTriggered(AdhocWorkflowTriggeredInfo),
     WorkflowStarted(WorkflowStartedInfo),
     AuthMethodUpdated(AuthMethodUpdatedInfo),
     LabelAdded(LabelAddedInfo),
@@ -127,6 +128,12 @@ pub struct WorkflowTriggeredInfo {
     pub workflow_request_id: Option<WorkflowRequestId>,
 
     pub ob_config_id: ObConfigurationId,
+    pub actor: DbActor,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AdhocWorkflowTriggeredInfo {
+    pub workflow_id: WorkflowId,
     pub actor: DbActor,
 }
 

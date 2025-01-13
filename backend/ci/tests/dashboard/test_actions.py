@@ -177,6 +177,9 @@ def test_adhoc_vendor_call(sandbox_tenant):
         assert len(body["data"]) == 1
         assert body["data"][0]["timestamp"] == bifrost_ob_timestamp
 
+        timeline = get(f"entities/{user.fp_id}/timeline", None, *sandbox_tenant.db_auths)
+        trigger_events = [i for i in timeline["data"] if i["event"]["kind"] == "adhoc_workflow_triggered"]
+        assert len(trigger_events) == 1
     try_until_success(check_adhoc_vendor_call_results, 60, retry_interval_s=0.1)
 
 def test_adhoc_vendor_call_does_not_break_in_progress_workflows(sandbox_tenant):

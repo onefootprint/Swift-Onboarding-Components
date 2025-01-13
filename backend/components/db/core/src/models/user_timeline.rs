@@ -24,12 +24,14 @@ use crate::DbError;
 use crate::PgConn;
 use crate::TxnPgConn;
 use api_errors::FpResult;
+use api_errors::ServerErr;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::user_timeline;
 use diesel::prelude::*;
 use diesel::Insertable;
 use diesel::Queryable;
+use newtypes::AdhocVendorCallConfig;
 use newtypes::AuthMethodUpdatedInfo;
 use newtypes::CollectedDataOption;
 use newtypes::DataIdentifier;
@@ -42,6 +44,7 @@ use newtypes::OnboardingTimelineInfo;
 use newtypes::ScopedVaultId;
 use newtypes::UserTimelineId;
 use newtypes::VaultId;
+use newtypes::WorkflowConfig;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable)]
@@ -87,6 +90,8 @@ pub struct SaturatedWorkflowTriggeredEvent(
     pub Option<(WorkflowRequest, ScopedVault)>,
 );
 
+pub struct SaturatedAdhocWorkflowTriggeredEvent(pub AdhocVendorCallConfig, pub SaturatedActor);
+
 #[allow(clippy::large_enum_variant)]
 /// Mirrors structure of DbUserTimelineEvent but includes resources hydrated from the DB rather than
 /// identifiers
@@ -99,6 +104,7 @@ pub enum SaturatedTimelineEvent {
     WatchlistCheck(WatchlistCheck),
     VaultCreated(SaturatedActor),
     WorkflowTriggered(SaturatedWorkflowTriggeredEvent),
+    AdhocWorkflowTriggered(SaturatedAdhocWorkflowTriggeredEvent),
     WorkflowStarted((Workflow, ObConfiguration)),
     AuthMethodUpdated((AuthMethodUpdatedInfo, AuthEvent, InsightEvent)),
     LabelAdded(ScopedVaultLabel),
@@ -192,6 +198,7 @@ impl UserTimeline {
         let db_actors = results.iter().flat_map(|ut| match ut.event {
             DbUserTimelineEvent::VaultCreated(ref e) => Some(e.actor.clone()),
             DbUserTimelineEvent::WorkflowTriggered(ref e) => Some(e.actor.clone()),
+            DbUserTimelineEvent::AdhocWorkflowTriggered(ref e) => Some(e.actor.clone()),
             DbUserTimelineEvent::DataCollected(ref e) => e.actor.clone(),
             _ => None,
         });
@@ -201,6 +208,7 @@ impl UserTimeline {
         });
         let workflow_ids = results.iter().flat_map(|ut| match ut.event {
             DbUserTimelineEvent::WorkflowTriggered(ref e) => e.workflow_id.clone(),
+            DbUserTimelineEvent::AdhocWorkflowTriggered(ref e) => Some(e.workflow_id.clone()),
             DbUserTimelineEvent::WorkflowStarted(ref e) => Some(e.workflow_id.clone()),
             _ => None,
         });
@@ -325,6 +333,22 @@ impl UserTimeline {
                         let event =
                             SaturatedWorkflowTriggeredEvent(workflow, e.ob_config_id.clone(), actor, wfr);
                         SaturatedTimelineEvent::WorkflowTriggered(event)
+                    }
+
+                    DbUserTimelineEvent::AdhocWorkflowTriggered(ref e) => {
+                        let workflow = workflows
+                            .get(&e.workflow_id)
+                            .ok_or(DbError::RelatedObjectNotFound)?
+                            .clone();
+                        let actor = actors
+                            .get(&e.actor)
+                            .ok_or(DbError::RelatedObjectNotFound)?
+                            .clone();
+                        let WorkflowConfig::AdhocVendorCall(config) = workflow.config else {
+                            return Err(ServerErr("Wrong config for adhoc workflow triggered event"));
+                        };
+                        let event = SaturatedAdhocWorkflowTriggeredEvent(config, actor);
+                        SaturatedTimelineEvent::AdhocWorkflowTriggered(event)
                     }
                     DbUserTimelineEvent::WorkflowStarted(ref e) => {
                         let workflow = workflows

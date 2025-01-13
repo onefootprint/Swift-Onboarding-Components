@@ -14,6 +14,7 @@ use crate::Utc;
 use crate::VaultCreated;
 use crate::WatchlistCheck;
 use newtypes::ActionKind;
+use newtypes::AdhocVendorCallConfig;
 use newtypes::AuthMethodKind;
 use newtypes::CollectedDataOption;
 use newtypes::DataIdentifier;
@@ -50,6 +51,7 @@ pub enum UserTimelineEvent {
     WatchlistCheck(WatchlistCheck),
     VaultCreated(VaultCreated),
     WorkflowTriggered(WorkflowTriggered),
+    AdhocWorkflowTriggered(AdhocWorkflowTriggered),
     WorkflowStarted(WorkflowStarted),
     AuthMethodUpdated(AuthMethodUpdated),
     LabelAdded(LabelAdded),
@@ -80,6 +82,12 @@ pub struct WorkflowTriggered {
     pub note: Option<String>,
     /// Only not populated for legacy events
     pub fp_id: Option<FpId>,
+}
+
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+pub struct AdhocWorkflowTriggered {
+    pub config: AdhocVendorCallConfig,
+    pub actor: Actor,
 }
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]

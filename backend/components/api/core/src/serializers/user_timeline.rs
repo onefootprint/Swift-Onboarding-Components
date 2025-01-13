@@ -2,6 +2,7 @@ use crate::utils::db2api::DbToApi;
 use api_wire_types::DocumentRequest;
 use api_wire_types::WorkflowStartedEventKind;
 use db::models::scoped_vault_label::ScopedVaultLabel;
+use db::models::user_timeline::SaturatedAdhocWorkflowTriggeredEvent;
 use db::models::user_timeline::SaturatedDataCollectedEvent;
 use db::models::user_timeline::SaturatedTimelineEvent;
 use db::models::user_timeline::SaturatedWorkflowTriggeredEvent;
@@ -115,6 +116,13 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                     actor: api_wire_types::Actor::from_db(actor),
                     note,
                     fp_id,
+                })
+            }
+            SaturatedTimelineEvent::AdhocWorkflowTriggered(event) => {
+                let SaturatedAdhocWorkflowTriggeredEvent(config, actor) = event;
+                Self::AdhocWorkflowTriggered(api_wire_types::AdhocWorkflowTriggered {
+                    config,
+                    actor: api_wire_types::Actor::from_db(actor),
                 })
             }
             SaturatedTimelineEvent::WorkflowStarted((wf, pb)) => {

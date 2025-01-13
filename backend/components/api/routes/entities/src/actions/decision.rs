@@ -11,15 +11,18 @@ use api_core::FpResult;
 use api_errors::FpDbOptionalExtension;
 use chrono::Utc;
 use db::models::audit_event::AuditEvent;
+use db::models::data_lifetime::DataLifetime;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::ob_configuration::ObConfigurationQuery;
 use db::models::scoped_vault::ScopedVault;
 use db::models::task::Task;
 use db::models::task::TaskPollArgs;
+use db::models::user_timeline::UserTimeline;
 use db::models::workflow::OnboardingWorkflowArgs;
 use db::models::workflow::Workflow;
 use db::OffsetPagination;
 use db::TxnPgConn;
+use newtypes::AdhocWorkflowTriggeredInfo;
 use newtypes::ApiKeyStatus;
 use newtypes::AuditEventDetail;
 use newtypes::DbActor;
@@ -83,7 +86,7 @@ pub(super) fn apply_adhoc_vendor_call(
     sv: &Locked<ScopedVault>,
     tvc: &TenantVendorControl,
     is_live: bool,
-    _actor: DbActor, // TODO: use in TL event
+    actor: DbActor,
 ) -> FpResult<EntityActionPostCommit> {
     let vw: TenantVw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
     validate_adhoc_vendor_call(config.clone(), sv, tvc, is_live, &vw)?;
@@ -101,8 +104,6 @@ pub(super) fn apply_adhoc_vendor_call(
     let (obcs, _) = ObConfiguration::list(conn, &query, OffsetPagination::page(1))?;
     let (_, obc, _, _) = obcs.into_iter().next().ok_or(UserError::NoPlaybooksExist)?;
 
-    // TODO: TL event
-
     let config = WorkflowRequestConfig::AdhocVendorCall(config);
     let args = OnboardingWorkflowArgs {
         scoped_vault_id: sv.id.clone(),
@@ -116,6 +117,15 @@ pub(super) fn apply_adhoc_vendor_call(
         is_neuro_enabled: false,
     };
     let (wf, _) = Workflow::get_or_create_onboarding(conn, args, true)?;
+
+    let sv_txn = DataLifetime::new_sv_txn(conn, sv)?;
+    let event = AdhocWorkflowTriggeredInfo {
+        workflow_id: wf.id.clone(),
+        actor,
+    };
+    UserTimeline::create(conn, &sv_txn, event.clone())?;
+
+
     let task_data = RunIncodeStuckWorkflowArgs { workflow_id: wf.id };
     let task = Task::create(conn, Utc::now(), task_data)?;
 
