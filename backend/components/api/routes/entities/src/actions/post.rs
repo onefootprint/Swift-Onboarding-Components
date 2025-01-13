@@ -7,6 +7,7 @@ use crate::auth::tenant::TenantSessionAuth;
 use crate::State;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
+use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use api_core::types::ApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::headers::InsightHeaders;
@@ -46,6 +47,14 @@ pub async fn post(
         return BadRequestInto("Must provide at least one action");
     }
 
+    let tvc = TenantVendorControl::new(
+        tenant_id.clone(),
+        &state.db_pool,
+        &state.config,
+        &state.enclave_client,
+    )
+    .await?;
+
     let outcomes = state
         .db_transaction(move |conn| {
             let sv = ScopedVault::lock(conn, (&fp_id, &tenant_id, is_live))?;
@@ -67,7 +76,7 @@ pub async fn post(
                             tenant_id.clone(),
                         )?,
                         EntityAction::AdhocVendorCall(req) => {
-                            apply_adhoc_vendor_call(conn, req.config, &sv, actor.clone())?
+                            apply_adhoc_vendor_call(conn, req.config, &sv, &tvc, is_live, actor.clone())?
                         }
                     };
                     Ok(action)

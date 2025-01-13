@@ -1,3 +1,4 @@
+use super::kyc::waterfall_vendor_api::WaterfallVendorAPI;
 use crate::config::Config;
 use crate::enclave_client::DecryptReq;
 use crate::enclave_client::EnclaveClient;
@@ -23,6 +24,7 @@ use newtypes::PiiString;
 use newtypes::TenantId;
 use newtypes::Vendor;
 use newtypes::VendorAPI;
+use strum::IntoEnumIterator;
 
 #[derive(Clone, Debug, Default)]
 /// A struct for adapting db::models::TenantVendorControl for use in the api crate
@@ -108,6 +110,15 @@ impl TenantVendorControl {
 
     pub fn neuro_api_key(&self) -> CredentialType<NeuroIdApiKeys> {
         self.neuro_id_api_key.clone()
+    }
+
+    // Strictly speaking this is not correct since conceivably not _all_ kyc vendors need to be a part
+    // of the waterfall but for the forseeable future this works
+    pub fn enabled_kyc_vendors(&self) -> Vec<VendorAPI> {
+        WaterfallVendorAPI::iter()
+            .map(|v| v.into())
+            .filter(|v| self.enabled_vendor_apis.contains(v))
+            .collect()
     }
 }
 

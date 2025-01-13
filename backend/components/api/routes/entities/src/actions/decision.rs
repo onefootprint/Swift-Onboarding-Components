@@ -1,8 +1,12 @@
+use super::validation::validate_adhoc_vendor_call;
 use crate::actions::EntityActionPostCommit;
 use api_core::decision::review::save_review_decision;
+use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use api_core::errors::onboarding::OnboardingError;
 use api_core::errors::user::UserError;
 use api_core::utils::headers::InsightHeaders;
+use api_core::utils::vault_wrapper::TenantVw;
+use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::FpResult;
 use api_errors::FpDbOptionalExtension;
 use chrono::Utc;
@@ -77,8 +81,13 @@ pub(super) fn apply_adhoc_vendor_call(
     conn: &mut TxnPgConn,
     config: WfrAdhocVendorCallConfig,
     sv: &Locked<ScopedVault>,
+    tvc: &TenantVendorControl,
+    is_live: bool,
     _actor: DbActor, // TODO: use in TL event
 ) -> FpResult<EntityActionPostCommit> {
+    let vw: TenantVw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
+    validate_adhoc_vendor_call(config.clone(), sv, tvc, is_live, &vw)?;
+
     let query = ObConfigurationQuery {
         tenant_id: sv.tenant_id.clone(),
         is_live: sv.is_live,

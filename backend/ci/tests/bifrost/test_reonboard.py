@@ -34,7 +34,7 @@ def test_reonboard_behavior_with_adhoc_vendor_call(sandbox_tenant):
     sandbox_id = _gen_random_sandbox_id()
     sandbox_id_h = SandboxId(sandbox_id)
     data = ID_DATA
-    data.update({"id.phone_number": FIXTURE_PHONE_NUMBER, "id.email": FIXTURE_EMAIL})
+    data.update({"id.phone_number": FIXTURE_PHONE_NUMBER, "id.email": FIXTURE_EMAIL, "id.ssn9": "123456789"})
     body = post("users", data, sandbox_tenant.s_sk, sandbox_id_h)
     fp_id = body["id"]
 

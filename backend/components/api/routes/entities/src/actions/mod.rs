@@ -8,6 +8,7 @@ use triggers::TriggerRequestOutcome;
 mod decision;
 pub mod post;
 mod triggers;
+mod validation;
 
 
 #[derive(derive_more::From)]

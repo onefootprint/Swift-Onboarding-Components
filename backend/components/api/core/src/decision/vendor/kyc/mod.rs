@@ -3,4 +3,4 @@ mod make_request;
 mod tests;
 pub mod waterfall;
 mod waterfall_rules;
-mod waterfall_vendor_api;
+pub mod waterfall_vendor_api;

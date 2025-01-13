@@ -1,3 +1,4 @@
+use super::validation::validate_triggers;
 use crate::State;
 use api_core::config::LinkKind;
 use api_core::errors::tenant::TenantError;
@@ -27,11 +28,9 @@ use db::models::workflow::Workflow;
 use db::models::workflow_request::NewWorkflowRequestArgs;
 use db::models::workflow_request::WorkflowRequest;
 use db::OffsetPagination;
-use db::PgConn;
 use db::TxnPgConn;
 use newtypes::ApiKeyStatus;
 use newtypes::DbActor;
-use newtypes::DocumentRequestConfig;
 use newtypes::Locked;
 use newtypes::ObConfigurationKind;
 use newtypes::SessionAuthToken;
@@ -41,53 +40,6 @@ use newtypes::VaultKind;
 use newtypes::WorkflowRequestConfig;
 use newtypes::WorkflowTriggeredInfo;
 
-fn validate(
-    conn: &mut PgConn,
-    trigger: &WorkflowRequestConfig,
-    su: &ScopedVault,
-    sb: Option<&ScopedVault>,
-) -> FpResult<()> {
-    let has_sb = sb.is_some();
-    match trigger {
-        WorkflowRequestConfig::Onboard(cfg) => {
-            let (_, obc) = ObConfiguration::get(conn, (&cfg.playbook_id, &su.tenant_id, su.is_live))?;
-            if cfg
-                .recollect_attributes
-                .iter()
-                .any(|cdo| !obc.must_collect_data.contains(cdo))
-            {
-                return BadRequestInto("recollect_attributes must be a subset of the playbook's data");
-            }
-            let is_kyb = obc.kind == ObConfigurationKind::Kyb;
-            if cfg.reuse_existing_bo_kyc && !is_kyb {
-                return BadRequestInto("reuse_existing_bo_kyc can only be used with KYB playbooks");
-            }
-            if has_sb && !is_kyb {
-                return BadRequestInto("Must provide a KYB playbook when providing fp_bid");
-            }
-            // Temporary until we implement this
-            if has_sb && !cfg.reuse_existing_bo_kyc {
-                return BadRequestInto("Must provide reuse_existing_bo_kyc for KYB flows");
-            }
-        }
-        WorkflowRequestConfig::Document(cfg) => {
-            DocumentRequestConfig::validate(&cfg.configs)?;
-            DocumentRequestConfig::validate(&cfg.business_configs)?;
-            if cfg.business_configs.iter().any(|c| !c.is_custom()) {
-                return BadRequestInto("business_configs can only contain custom document requests");
-            }
-            let has_business_configs = !cfg.business_configs.is_empty();
-            if has_sb != has_business_configs {
-                return BadRequestInto("fp_bid and business_configs must both be provided together");
-            }
-        }
-        WorkflowRequestConfig::AdhocVendorCall(_) => {
-            // MOVE this
-            todo!()
-        }
-    }
-    Ok(())
-}
 
 pub(super) struct TriggerRequestOutcome {
     token: SessionAuthToken,
@@ -124,7 +76,7 @@ pub(super) fn apply_trigger_request(
         })
         .transpose()?;
 
-    validate(conn, &trigger, sv, sb.as_deref())?;
+    validate_triggers(conn, &trigger, sv, sb.as_deref())?;
 
     let vault = Vault::get(conn, &sv.id)?;
     if vault.kind != VaultKind::Person {
