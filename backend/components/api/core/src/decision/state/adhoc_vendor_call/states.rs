@@ -20,9 +20,11 @@ use db::models::risk_signal_group::RiskSignalGroupScope;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow::Workflow as DbWorkflow;
 use feature_flag::FeatureFlagClient;
+use idv::incode::watchlist::response::WatchlistResultResponse;
 use idv::sentilink::application_risk::response::ValidatedApplicationRiskResponse;
 use newtypes::AdhocVendorCallConfig;
 use newtypes::DataLifetimeSeqno;
+use newtypes::EnhancedAmlOption;
 use newtypes::Locked;
 use newtypes::RiskSignalGroupKind;
 use newtypes::ScopedVaultId;
@@ -70,6 +72,7 @@ impl AdhocVendorCallVendorCalls {
 
 type UserInputRiskSignals = Vec<NewRiskSignalInfo>;
 type KycResult = VendorResult;
+type AmlResult = (VerificationResultId, WatchlistResultResponse);
 /////////////////////
 /// MakeVendorCalls
 /// ////////////////
@@ -81,6 +84,7 @@ impl OnAction<MakeVendorCalls, AdhocVendorCallState> for AdhocVendorCallVendorCa
         Option<(LookupV2Response, VerificationResultId)>,
         UserInputRiskSignals,
         Option<KycResult>,
+        Option<AmlResult>,
     )>;
 
     async fn execute_async_idempotent_actions(
@@ -134,12 +138,20 @@ impl OnAction<MakeVendorCalls, AdhocVendorCallState> for AdhocVendorCallVendorCa
             (None, vec![])
         };
 
+        let aml_vendor_result = match verification_checks.enhanced_aml() {
+            EnhancedAmlOption::No => None,
+            EnhancedAmlOption::Yes { .. } => {
+                Some(common::run_aml_call(state, &self.wf_id, &self.t_id).await?)
+            }
+        };
+
         Ok(Box::new((
             state.ff_client.clone(),
             sentilink_result,
             twilio_result,
             user_input_risk_signals,
             kyc_vendor_result,
+            aml_vendor_result,
         )))
     }
 
@@ -149,8 +161,14 @@ impl OnAction<MakeVendorCalls, AdhocVendorCallState> for AdhocVendorCallVendorCa
         async_res: Self::AsyncRes,
         conn: &mut db::TxnPgConn,
     ) -> FpResult<AdhocVendorCallState> {
-        let (ff_client, sentilink_result, twilio_result, user_input_risk_signals, kyc_vendor_result) =
-            *async_res;
+        let (
+            ff_client,
+            sentilink_result,
+            twilio_result,
+            user_input_risk_signals,
+            kyc_vendor_result,
+            aml_vendor_result,
+        ) = *async_res;
         let (vw, _, obc) = common::get_vw_and_obc(conn, &self.sv_id, self.seqno, &self.wf_id)?;
         // For all reason codes, we scope them to the onboarding/wf
         let risk_signal_group_scope = RiskSignalGroupScope::WorkflowId {
@@ -217,6 +235,39 @@ impl OnAction<MakeVendorCalls, AdhocVendorCallState> for AdhocVendorCallVendorCa
                 false,
             )?;
         }
+        // Save AML risk signals from Aml call or Kyc call (or save nothing if neither called)
+        if let Some((watchlist_vres_id, watchlist_result_response)) = aml_vendor_result {
+            let aml_risk_signals = if let Some(fixture_result) = fixture_result {
+                let reason_codes = decision::sandbox::get_fixture_aml_reason_codes(&fixture_result, &obc);
+
+                reason_codes
+                    .into_iter()
+                    .map(|r| (r.0, r.1, watchlist_vres_id.clone()))
+                    .collect()
+            } else {
+                common::get_aml_risk_signals_from_aml_call(
+                    &obc,
+                    &watchlist_vres_id,
+                    &watchlist_result_response,
+                )
+            };
+            RiskSignal::bulk_save_for_scope(
+                conn,
+                risk_signal_group_scope.clone(),
+                aml_risk_signals,
+                RiskSignalGroupKind::Aml,
+                false,
+            )?;
+        } else if let Some(kyc_vendor_result) = kyc_vendor_result {
+            let aml_risk_signals = common::get_aml_risk_signals_from_kyc_call(&vw, kyc_vendor_result)?;
+            RiskSignal::bulk_save_for_scope(
+                conn,
+                risk_signal_group_scope.clone(),
+                aml_risk_signals,
+                RiskSignalGroupKind::Aml,
+                false,
+            )?;
+        };
 
         risk::save_final_decision(conn, &wf.id, RulesOutcome::RulesNotExecuted, None, vec![])?;
         Ok(AdhocVendorCallState::Complete(AdhocVendorCallComplete))
