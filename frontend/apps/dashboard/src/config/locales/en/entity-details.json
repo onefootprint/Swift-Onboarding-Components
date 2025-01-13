@@ -1360,7 +1360,8 @@
           "title": "Filing details",
           "date": "Filed date",
           "file-number": "File number",
-          "source": "SOS website"
+          "source": "SOS website",
+          "source-aria-label": "Copy source url"
         }
       }
     },

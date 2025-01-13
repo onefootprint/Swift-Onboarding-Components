@@ -1,5 +1,5 @@
-import { IcoArrowTopRight16 } from '@onefootprint/icons';
-import { Dialog, LinkButton } from '@onefootprint/ui';
+import { IcoCopy16 } from '@onefootprint/icons';
+import { CopyButton, Dialog } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 import { statusVariant } from '../../../../constants';
 import type { FormattedRegistration } from '../../../../onboarding-business-insight.types';
@@ -72,9 +72,16 @@ const RegistrationDetails = ({
               <LineItem
                 label={t('dialog.filing-details.source')}
                 customValue={
-                  <LinkButton href={source} iconComponent={IcoArrowTopRight16}>
-                    {source}
-                  </LinkButton>
+                  <div className="flex items-center gap-1 justify-end max-w-[60%]">
+                    <p className="text-body-3 truncate">{source}</p>
+                    <CopyButton
+                      ariaLabel={t('dialog.filing-details.source-aria-label')}
+                      contentToCopy={source}
+                      tooltip={{ position: 'left' }}
+                    >
+                      <IcoCopy16 />
+                    </CopyButton>
+                  </div>
                 }
               />
             ) : (
