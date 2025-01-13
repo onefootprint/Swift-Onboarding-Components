@@ -1,9 +1,9 @@
 import { Box, Container, createFontStyles, media } from '@onefootprint/ui';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
-import { useRouter } from 'next/router';
-import { useState } from 'react';
+// import { useRouter } from 'next/router';
+// import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import MessageBanner from 'src/components/layout/message-banner';
+// import MessageBanner from 'src/components/layout/message-banner';
 import MarketingLink from 'src/components/marketing-link';
 import styled, { css } from 'styled-components';
 import type { NavEntry } from '../../types';
@@ -12,8 +12,7 @@ import DesktopNavLink from './components/desktop-nav-link';
 import DesktopNavMenu from './components/desktop-nav-menu';
 import LogoCopyAssets from './components/logo-copy-assets';
 
-const ARTICLE_URL =
-  'https://www.businesswire.com/news/home/20241030764010/en/Money2020-USA-Unveils-Seven-Incredible-Fintech-Startups-And-Industry-Disruptors?utm_source=footprint';
+// const ARTICLE_URL = '';
 
 type DesktopNavProps = {
   entries: NavEntry[];
@@ -21,24 +20,22 @@ type DesktopNavProps = {
 
 const DesktopNav = ({ entries }: DesktopNavProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'components.navbar' });
-  const router = useRouter();
-  const isArticlePage = router.pathname.includes(ARTICLE_URL);
-  const [isBannerVisible, setIsBannerVisible] = useState<boolean>(!isArticlePage);
-
-  const handleCloseBanner = () => {
-    setIsBannerVisible(false);
-  };
+  // const router = useRouter();
+  // const isArticlePage = router.pathname.includes(ARTICLE_URL);
+  // const [isBannerVisible, setIsBannerVisible] = useState<boolean>(!isArticlePage);
 
   return (
     <NavigationMenu.Root asChild>
       <NavContainer>
-        <MessageBanner
+        {/* <MessageBanner
           showBanner={isBannerVisible}
-          onClose={handleCloseBanner}
+          onClose={() => {
+            setIsBannerVisible(false);
+          }}
           articleUrl={ARTICLE_URL}
           text={t('message-banner.text')}
           cta={t('message-banner.cta')}
-        />
+        /> */}
         <StyledContainer>
           <LogoCopyAssets />
           <MainNav>
