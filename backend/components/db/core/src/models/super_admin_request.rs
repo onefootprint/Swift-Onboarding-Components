@@ -127,7 +127,8 @@ impl SuperAdminRequest {
             .inner_join(tenant_user::table.on(tenant_user::id.eq(super_admin_request::tenant_user_id)))
             .inner_join(tenant::table.on(tenant::id.eq(super_admin_request::tenant_id)))
             .left_join(
-                tenant_user_alias.on(tenant_user::id
+                tenant_user_alias.on(tenant_user_alias
+                    .field(tenant_user::id)
                     .nullable()
                     .eq(super_admin_request::responder_tenant_user_id)),
             )
@@ -135,7 +136,7 @@ impl SuperAdminRequest {
                 super_admin_request::all_columns,
                 tenant::name,
                 tenant_user::email,
-                tenant_user::email.nullable(),
+                tenant_user_alias.field(tenant_user::email).nullable(),
             ))
             .into_boxed();
 
