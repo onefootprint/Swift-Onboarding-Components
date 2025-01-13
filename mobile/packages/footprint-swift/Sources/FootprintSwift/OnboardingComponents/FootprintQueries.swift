@@ -9,33 +9,53 @@ internal class FootprintQueries {
         self.configKey = configKey
     }
     
-    func getQueryErrorMessage(errorResponse: ErrorResponse) -> String{
-        var message = ""
+    func getQueryErrorMessage(errorResponse: ErrorResponse) -> String {
+        var message = "An unknown error occurred." // Default fallback message
+        
+        // Check for the specific error type
         switch errorResponse {
         case let .error(statusCode, data, response, underlyingError):
+            guard let data = data else {
+                return "No error data available."
+            }
+            
+            // Attempt to parse the JSON object safely
             do {
-                if let jsonObject = try JSONSerialization.jsonObject(with: data!, options: []) as? [String: Any] {
-                    message = jsonObject["message"] as? String ?? ""
+                if let jsonObject = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                    message = jsonObject["message"] as? String ?? "No error message provided in response."
+                } else {
+                    message = "Error response data is not in the expected format."
                 }
-            }catch{
-                // Do nothing for now
+            } catch {
+                message = "Failed to parse error response: \(error.localizedDescription)"
             }
         }
+        
         return message
     }
     
-    func getVaultErrorContext(errorResponse: ErrorResponse) -> [String: String]?{
+    func getVaultErrorContext(errorResponse: ErrorResponse) -> [String: String]? {
         var errContext: [String: String]? = nil
+        
         switch errorResponse {
         case let .error(statusCode, data, response, underlyingError):
+            // Ensure data is not nil before attempting to parse
+            guard let data = data else {
+                return nil
+            }
+            
             do {
-                if let jsonObject = try JSONSerialization.jsonObject(with: data!, options: []) as? [String: Any], let context = jsonObject["context"] as? [String: String]{
+                // Safely attempt to parse the JSON object
+                if let jsonObject = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
+                   let context = jsonObject["context"] as? [String: String] {
                     errContext = context
                 }
-            }catch{
-                // Do nothing for now
+            } catch {
+                // Handle JSON parsing error (optional: add logging or debugging output here)
+                print("Failed to parse error context: \(error.localizedDescription)")
             }
         }
+        
         return errContext
     }
     
