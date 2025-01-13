@@ -33,6 +33,7 @@ use newtypes::VendorAPI;
 use newtypes::VerificationCheck;
 use newtypes::VerificationCheckKind;
 use newtypes::VerificationResultId;
+use newtypes::WorkflowFixtureResult;
 use newtypes::WorkflowId;
 use std::sync::Arc;
 use twilio::response::lookup::LookupV2Response;
@@ -73,6 +74,11 @@ impl AdhocVendorCallVendorCalls {
 type UserInputRiskSignals = Vec<NewRiskSignalInfo>;
 type KycResult = VendorResult;
 type AmlResult = (VerificationResultId, WatchlistResultResponse);
+
+pub enum AdhocWfKybResult {
+    NotRequired,
+    Required(Option<WorkflowFixtureResult>),
+}
 /////////////////////
 /// MakeVendorCalls
 /// ////////////////
@@ -85,6 +91,7 @@ impl OnAction<MakeVendorCalls, AdhocVendorCallState> for AdhocVendorCallVendorCa
         UserInputRiskSignals,
         Option<KycResult>,
         Option<AmlResult>,
+        AdhocWfKybResult,
     )>;
 
     async fn execute_async_idempotent_actions(
@@ -145,6 +152,38 @@ impl OnAction<MakeVendorCalls, AdhocVendorCallState> for AdhocVendorCallVendorCa
             }
         };
 
+        //
+        // KYB
+        //
+        let wfid2 = self.wf_id.clone();
+        let kyb_result = if verification_checks.is_enabled(VerificationCheckKind::Kyb) {
+            let (wf, v) = state
+                .db_query(move |conn| DbWorkflow::get_with_vault(conn, &wfid2))
+                .await?;
+            let fixture_result =
+                decision::utils::get_fixture_result(state.ff_client.clone(), &v, &wf, &self.t_id)?;
+            if fixture_result.is_none() {
+                // TODO: later will refactor so we instead construct the BusinessData from the vault here,
+                // then make the CreateBusiness request to middesk and then in the on_commit
+                // txn save the vreq + vres + MiddeskRequest with the business_id from the
+                // response all at once.
+
+                // TODO: make this get_or_create
+                let middesk_state =
+                    decision::vendor::middesk::init_middesk_request(&state.db_pool, self.wf_id.clone())
+                        .await?;
+
+                // TODO: match on MiddeskStates and only call this if AwaitingBusinessUpdateWebhook
+                let _middesk_state = middesk_state.make_create_business_call(state, &self.t_id).await?;
+                AdhocWfKybResult::Required(None)
+            } else {
+                AdhocWfKybResult::Required(fixture_result)
+            }
+        } else {
+            AdhocWfKybResult::NotRequired
+        };
+
+
         Ok(Box::new((
             state.ff_client.clone(),
             sentilink_result,
@@ -152,6 +191,7 @@ impl OnAction<MakeVendorCalls, AdhocVendorCallState> for AdhocVendorCallVendorCa
             user_input_risk_signals,
             kyc_vendor_result,
             aml_vendor_result,
+            kyb_result,
         )))
     }
 
@@ -168,6 +208,7 @@ impl OnAction<MakeVendorCalls, AdhocVendorCallState> for AdhocVendorCallVendorCa
             user_input_risk_signals,
             kyc_vendor_result,
             aml_vendor_result,
+            kyb_result,
         ) = *async_res;
         let (vw, _, obc) = common::get_vw_and_obc(conn, &self.sv_id, self.seqno, &self.wf_id)?;
         // For all reason codes, we scope them to the onboarding/wf
@@ -268,6 +309,14 @@ impl OnAction<MakeVendorCalls, AdhocVendorCallState> for AdhocVendorCallVendorCa
                 false,
             )?;
         };
+
+        if let AdhocWfKybResult::Required(Some(fixture_result)) = kyb_result {
+            decision::utils::write_kyb_fixture_vendor_result_and_risk_signals(
+                conn,
+                &self.wf_id,
+                fixture_result,
+            )?;
+        }
 
         risk::save_final_decision(conn, &wf.id, RulesOutcome::RulesNotExecuted, None, vec![])?;
         Ok(AdhocVendorCallState::Complete(AdhocVendorCallComplete))
