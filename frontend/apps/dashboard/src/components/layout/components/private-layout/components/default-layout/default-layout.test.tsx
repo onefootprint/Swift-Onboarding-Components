@@ -17,6 +17,7 @@ import {
   withOrgAuthRoles,
   withPrivateAccessRequests,
   withRiskSignals,
+  withRiskSignalsSpec,
 } from './default-layout.test.config';
 
 jest.mock('next/router', () => jest.requireActual('next-router-mock'));
@@ -42,6 +43,7 @@ describe('<DefaultLayout />', () => {
     withMembersRead();
     withGhostPosts();
     withPrivateAccessRequests();
+    withRiskSignalsSpec();
   });
 
   describe('when its restricted to use only the sandbox mode', () => {

@@ -13,6 +13,7 @@ import {
   withOrgAuthRolesError,
   withPrivateAccessRequests,
   withRiskSignals,
+  withRiskSignalsSpec,
   withSevenOrgAuthRoles,
   withTwoOrgAuthRoles,
 } from './side-nav.test.config';
@@ -36,6 +37,10 @@ describe('<SideNav />', () => {
   const renderSideNav = () => customRender(<SideNav />);
 
   describe('NavDropdown', () => {
+    beforeEach(() => {
+      withRiskSignalsSpec();
+    });
+
     describe('when the request to fetch the tenants fails', () => {
       it('should not show tenant list', async () => {
         withOrgAuthRolesError();

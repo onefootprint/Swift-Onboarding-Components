@@ -510,7 +510,8 @@
       "title": "Risk Signals Glossary",
       "description": "Learn more about the risk signals that we use to evaluate your users.",
       "search": "Search risk signals",
-      "no-results": "No results found"
+      "no-results": "No results found",
+      "search-placeholder": "Search risk signals"
     },
     "pgp-helper-tool": {
       "title": "PGP upload tool",

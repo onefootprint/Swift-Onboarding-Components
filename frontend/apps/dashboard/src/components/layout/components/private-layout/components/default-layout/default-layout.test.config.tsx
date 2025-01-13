@@ -103,3 +103,10 @@ export const withPrivateAccessRequests = () =>
     path: '/private/access_requests',
     response: { data: [] },
   });
+
+export const withRiskSignalsSpec = () =>
+  mockRequest({
+    method: 'get',
+    path: '/org/risk_signals_spec',
+    response: {},
+  });
