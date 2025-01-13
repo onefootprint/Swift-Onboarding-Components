@@ -138,7 +138,9 @@ import type {
   ActorFootprint,
   ActorOrganization,
   ActorUser,
+  AdhocVendorCallConfig,
   AdverseMediaListKind,
+  AlpacaKycConfig,
   AmlDetail,
   AmlHit,
   AmlHitMedia,
@@ -278,6 +280,7 @@ import type {
   DocsTokenResponse,
   Document,
   DocumentAndCountryConfiguration,
+  DocumentConfig,
   DocumentImageError,
   DocumentKind,
   DocumentRequest,
@@ -351,6 +354,8 @@ import type {
   InvokeVaultProxyPermissionJustInTime,
   IsIn,
   Iso3166TwoDigitCountryCode,
+  KybConfig,
+  KycConfig,
   LabelAdded,
   LabelKind,
   LineItem,
@@ -415,6 +420,7 @@ import type {
   ProxyConfigDetailed,
   ProxyIngressContentType,
   ProxyIngressRule,
+  PublicWorkflowKind,
   RawUserDataRequest,
   RestoreOnboardingConfigurationRequest,
   ReuploadComplianceDocRequest,
@@ -565,6 +571,12 @@ import type {
   WfrAdhocVendorCallConfig,
   WfrDocumentConfig,
   WfrOnboardConfig,
+  WorkflowConfig,
+  WorkflowConfigAdhocVendorCall,
+  WorkflowConfigAlpacaKyc,
+  WorkflowConfigDocument,
+  WorkflowConfigKyb,
+  WorkflowConfigKyc,
   WorkflowKind,
   WorkflowRequestConfig,
   WorkflowRequestConfigAdhocVendorCall,
@@ -3998,7 +4010,30 @@ export const dashboard_ActorUser: ActorUser = {
   id: '50c4e2c1-87c1-4ed0-bc9b-bba4aa982c59',
   kind: 'user',
 };
+export const dashboard_AdhocVendorCallConfig: AdhocVendorCallConfig = {
+  verificationChecks: [
+    {
+      data: {
+        einOnly: false,
+      },
+      kind: 'kyb',
+    },
+    {
+      data: {
+        einOnly: false,
+      },
+      kind: 'kyb',
+    },
+    {
+      data: {
+        einOnly: false,
+      },
+      kind: 'kyb',
+    },
+  ],
+};
 export const dashboard_AdverseMediaListKind: AdverseMediaListKind = 'cyber_crime';
+export const dashboard_AlpacaKycConfig: AlpacaKycConfig = {};
 export const dashboard_AmlDetail: AmlDetail = {
   hits: [
     {
@@ -6846,6 +6881,72 @@ export const dashboard_DocumentAndCountryConfiguration: DocumentAndCountryConfig
   countrySpecific: {},
   global: ['visa', 'voter_identification', 'passport_card'],
 };
+export const dashboard_DocumentConfig: DocumentConfig = {
+  businessConfigs: [
+    {
+      data: {
+        collectSelfie: false,
+        documentTypesAndCountries: {
+          countrySpecific: {},
+          global: ['voter_identification', 'passport', 'id_card'],
+        },
+      },
+      kind: 'identity',
+    },
+    {
+      data: {
+        collectSelfie: false,
+        documentTypesAndCountries: {
+          countrySpecific: {},
+          global: ['drivers_license', 'passport_card', 'id_card'],
+        },
+      },
+      kind: 'identity',
+    },
+    {
+      data: {
+        collectSelfie: false,
+        documentTypesAndCountries: {
+          countrySpecific: {},
+          global: ['voter_identification', 'voter_identification', 'id_card'],
+        },
+      },
+      kind: 'identity',
+    },
+  ],
+  configs: [
+    {
+      data: {
+        collectSelfie: false,
+        documentTypesAndCountries: {
+          countrySpecific: {},
+          global: ['id_card', 'visa', 'id_card'],
+        },
+      },
+      kind: 'identity',
+    },
+    {
+      data: {
+        collectSelfie: false,
+        documentTypesAndCountries: {
+          countrySpecific: {},
+          global: ['residence_document', 'passport_card', 'permit'],
+        },
+      },
+      kind: 'identity',
+    },
+    {
+      data: {
+        collectSelfie: true,
+        documentTypesAndCountries: {
+          countrySpecific: {},
+          global: ['residence_document', 'visa', 'visa'],
+        },
+      },
+      kind: 'identity',
+    },
+  ],
+};
 export const dashboard_DocumentImageError: DocumentImageError = 'barcode_not_detected';
 export const dashboard_DocumentKind: DocumentKind = 'drivers_license';
 export const dashboard_DocumentRequest: DocumentRequest = {
@@ -7315,6 +7416,12 @@ export const dashboard_EntityAttribute: EntityAttribute = {
   value: 'tempor consequat',
 };
 export const dashboard_EntityOnboarding: EntityOnboarding = {
+  config: {
+    data: {
+      recollectAttributes: ['business_kyced_beneficial_owners', 'dob', 'dob'],
+    },
+    kind: 'kyc',
+  },
   id: 'cfa455b0-a178-4dab-a96e-b505c29965d0',
   kind: 'document',
   playbookKey: '2c6b1579-a878-4723-a5b6-968b0d666bac',
@@ -8301,6 +8408,13 @@ export const dashboard_InvokeVaultProxyPermissionJustInTime: InvokeVaultProxyPer
 };
 export const dashboard_IsIn: IsIn = 'is_not_in';
 export const dashboard_Iso3166TwoDigitCountryCode: Iso3166TwoDigitCountryCode = 'GN';
+export const dashboard_KybConfig: KybConfig = {
+  recollectAttributes: ['dob', 'investor_profile', 'us_tax_id'],
+  reuseExistingBoKyc: false,
+};
+export const dashboard_KycConfig: KycConfig = {
+  recollectAttributes: ['phone_number', 'business_phone_number', 'email'],
+};
 export const dashboard_LabelAdded: LabelAdded = {
   kind: 'active',
 };
@@ -9409,77 +9523,95 @@ export const dashboard_OffsetPaginatedDashboardSecretApiKey: OffsetPaginatedDash
 export const dashboard_OffsetPaginatedEntityOnboarding: OffsetPaginatedEntityOnboarding = {
   data: [
     {
-      id: '88d31449-2ad8-4277-ac39-e2b6f29819ca',
-      kind: 'kyb',
-      playbookKey: '6626610f-8533-4a11-adf8-9c8c5369d4d7',
-      playbookName: 'Example Playbook',
+      config: {
+        data: {
+          recollectAttributes: ['business_kyced_beneficial_owners', 'business_corporation_type', 'phone_number'],
+        },
+        kind: 'kyc',
+      },
+      id: '4b46463b-fcbb-4e57-8737-c58103b24ccb',
+      kind: 'continuous_monitoring_watchlist_check',
+      playbookKey: '4b07696a-020c-4b94-9810-ca0ade90e3f5',
+      playbookName: 'Mike Reilly III',
       ruleSetResults: [
         {
-          id: 'cf3ca0f3-449f-4f72-96ba-4147d4c3883e',
-          timestamp: '1949-07-23T10:38:04.0Z',
+          id: '2597be05-35af-4101-b828-b2c191c1b716',
+          timestamp: '1911-05-16T18:02:57.0Z',
         },
         {
-          id: 'cf3ca0f3-449f-4f72-96ba-4147d4c3883e',
-          timestamp: '1891-07-18T02:12:29.0Z',
+          id: '2597be05-35af-4101-b828-b2c191c1b716',
+          timestamp: '1954-07-26T13:22:57.0Z',
         },
         {
-          id: 'cf3ca0f3-449f-4f72-96ba-4147d4c3883e',
-          timestamp: '1900-07-15T09:23:13.0Z',
+          id: '2597be05-35af-4101-b828-b2c191c1b716',
+          timestamp: '1924-10-15T06:27:29.0Z',
         },
       ],
-      seqno: 43797063,
+      seqno: -24685365,
       status: 'fail',
-      timestamp: '1962-06-13T06:33:18.0Z',
+      timestamp: '1962-06-28T10:25:01.0Z',
     },
     {
-      id: '88d31449-2ad8-4277-ac39-e2b6f29819ca',
-      kind: 'kyc',
-      playbookKey: '6626610f-8533-4a11-adf8-9c8c5369d4d7',
-      playbookName: 'Example Playbook',
+      config: {
+        data: {
+          recollectAttributes: ['business_address', 'ssn9', 'business_name'],
+        },
+        kind: 'kyc',
+      },
+      id: '4b46463b-fcbb-4e57-8737-c58103b24ccb',
+      kind: 'continuous_monitoring_watchlist_check',
+      playbookKey: '4b07696a-020c-4b94-9810-ca0ade90e3f5',
+      playbookName: 'Mike Reilly III',
       ruleSetResults: [
         {
-          id: 'cf3ca0f3-449f-4f72-96ba-4147d4c3883e',
-          timestamp: '1947-11-12T20:01:50.0Z',
+          id: '2597be05-35af-4101-b828-b2c191c1b716',
+          timestamp: '1914-08-03T07:13:51.0Z',
         },
         {
-          id: 'cf3ca0f3-449f-4f72-96ba-4147d4c3883e',
-          timestamp: '1948-06-12T15:48:42.0Z',
+          id: '2597be05-35af-4101-b828-b2c191c1b716',
+          timestamp: '1917-05-02T04:23:08.0Z',
         },
         {
-          id: 'cf3ca0f3-449f-4f72-96ba-4147d4c3883e',
-          timestamp: '1920-09-16T14:26:17.0Z',
+          id: '2597be05-35af-4101-b828-b2c191c1b716',
+          timestamp: '1948-03-27T21:38:23.0Z',
         },
       ],
-      seqno: -4726749,
-      status: 'pending',
-      timestamp: '1899-04-27T06:52:49.0Z',
+      seqno: -47872346,
+      status: 'fail',
+      timestamp: '1918-03-04T01:20:59.0Z',
     },
     {
-      id: '88d31449-2ad8-4277-ac39-e2b6f29819ca',
+      config: {
+        data: {
+          recollectAttributes: ['us_legal_status', 'name', 'card'],
+        },
+        kind: 'kyc',
+      },
+      id: '4b46463b-fcbb-4e57-8737-c58103b24ccb',
       kind: 'document',
-      playbookKey: '6626610f-8533-4a11-adf8-9c8c5369d4d7',
-      playbookName: 'Example Playbook',
+      playbookKey: '4b07696a-020c-4b94-9810-ca0ade90e3f5',
+      playbookName: 'Mike Reilly III',
       ruleSetResults: [
         {
-          id: 'cf3ca0f3-449f-4f72-96ba-4147d4c3883e',
-          timestamp: '1927-02-18T12:29:56.0Z',
+          id: '2597be05-35af-4101-b828-b2c191c1b716',
+          timestamp: '1920-08-20T22:11:15.0Z',
         },
         {
-          id: 'cf3ca0f3-449f-4f72-96ba-4147d4c3883e',
-          timestamp: '1903-04-03T12:51:39.0Z',
+          id: '2597be05-35af-4101-b828-b2c191c1b716',
+          timestamp: '1968-01-14T12:45:40.0Z',
         },
         {
-          id: 'cf3ca0f3-449f-4f72-96ba-4147d4c3883e',
-          timestamp: '1918-10-27T01:51:42.0Z',
+          id: '2597be05-35af-4101-b828-b2c191c1b716',
+          timestamp: '1892-02-21T22:25:32.0Z',
         },
       ],
-      seqno: -17580459,
-      status: 'pass',
-      timestamp: '1919-12-27T09:46:49.0Z',
+      seqno: 27670219,
+      status: 'pending',
+      timestamp: '1918-09-07T13:04:33.0Z',
     },
   ],
   meta: {
-    nextPage: 26570948,
+    nextPage: 57557456,
   },
 };
 export const dashboard_OffsetPaginatedList: OffsetPaginatedList = {
@@ -10612,6 +10744,7 @@ export const dashboard_ProxyIngressRule: ProxyIngressRule = {
   target: 'ea',
   token: 'document.drivers_license.front.image',
 };
+export const dashboard_PublicWorkflowKind: PublicWorkflowKind = 'continuous_monitoring_watchlist_check';
 export const dashboard_RawUserDataRequest: RawUserDataRequest = {
   key: 'bank.*.ach_account_id',
   value: {},
@@ -11936,6 +12069,123 @@ export const dashboard_WfrOnboardConfig: WfrOnboardConfig = {
   playbookId: '7764cd44-e092-4c19-a7d4-6e243d72bd6d',
   recollectAttributes: ['phone_number', 'business_kyced_beneficial_owners', 'bank'],
   reuseExistingBoKyc: false,
+};
+export const dashboard_WorkflowConfig: WorkflowConfig = {
+  data: {
+    recollectAttributes: ['business_address', 'phone_number', 'bank'],
+  },
+  kind: 'kyc',
+};
+export const dashboard_WorkflowConfigAdhocVendorCall: WorkflowConfigAdhocVendorCall = {
+  data: {
+    verificationChecks: [
+      {
+        data: {
+          einOnly: true,
+        },
+        kind: 'kyb',
+      },
+      {
+        data: {
+          einOnly: true,
+        },
+        kind: 'kyb',
+      },
+      {
+        data: {
+          einOnly: true,
+        },
+        kind: 'kyb',
+      },
+    ],
+  },
+  kind: 'adhoc_vendor_call',
+};
+export const dashboard_WorkflowConfigAlpacaKyc: WorkflowConfigAlpacaKyc = {
+  data: {},
+  kind: 'alpaca_kyc',
+};
+export const dashboard_WorkflowConfigDocument: WorkflowConfigDocument = {
+  data: {
+    businessConfigs: [
+      {
+        data: {
+          collectSelfie: false,
+          documentTypesAndCountries: {
+            countrySpecific: {},
+            global: ['visa', 'permit', 'voter_identification'],
+          },
+        },
+        kind: 'identity',
+      },
+      {
+        data: {
+          collectSelfie: true,
+          documentTypesAndCountries: {
+            countrySpecific: {},
+            global: ['drivers_license', 'permit', 'passport_card'],
+          },
+        },
+        kind: 'identity',
+      },
+      {
+        data: {
+          collectSelfie: false,
+          documentTypesAndCountries: {
+            countrySpecific: {},
+            global: ['passport', 'passport_card', 'drivers_license'],
+          },
+        },
+        kind: 'identity',
+      },
+    ],
+    configs: [
+      {
+        data: {
+          collectSelfie: true,
+          documentTypesAndCountries: {
+            countrySpecific: {},
+            global: ['visa', 'id_card', 'passport_card'],
+          },
+        },
+        kind: 'identity',
+      },
+      {
+        data: {
+          collectSelfie: false,
+          documentTypesAndCountries: {
+            countrySpecific: {},
+            global: ['visa', 'passport', 'passport_card'],
+          },
+        },
+        kind: 'identity',
+      },
+      {
+        data: {
+          collectSelfie: true,
+          documentTypesAndCountries: {
+            countrySpecific: {},
+            global: ['passport', 'visa', 'passport'],
+          },
+        },
+        kind: 'identity',
+      },
+    ],
+  },
+  kind: 'document',
+};
+export const dashboard_WorkflowConfigKyb: WorkflowConfigKyb = {
+  data: {
+    recollectAttributes: ['email', 'phone_number', 'dob'],
+    reuseExistingBoKyc: false,
+  },
+  kind: 'kyb',
+};
+export const dashboard_WorkflowConfigKyc: WorkflowConfigKyc = {
+  data: {
+    recollectAttributes: ['dob', 'business_corporation_type', 'business_kyced_beneficial_owners'],
+  },
+  kind: 'kyc',
 };
 export const dashboard_WorkflowKind: WorkflowKind = 'kyb';
 export const dashboard_WorkflowRequestConfig: WorkflowRequestConfig = {

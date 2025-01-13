@@ -15,28 +15,37 @@
 
 package org.openapitools.client.models
 
-import org.openapitools.client.models.DocumentRequestConfig
+import org.openapitools.client.models.VerificationCheckAmlData
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * Upload a new document and re-run the decision engine
+ * 
  *
- * @param businessConfigs 
- * @param configs 
+ * @param `data` 
+ * @param kind 
  */
 @Serializable
 
-data class WorkflowRequestConfigDocumentData (
+data class VerificationCheckAml (
 
-    @SerialName(value = "business_configs") @Required val businessConfigs: kotlin.collections.List<DocumentRequestConfig>,
+    @SerialName(value = "data") @Required val `data`: VerificationCheckAmlData,
 
-    @SerialName(value = "configs") @Required val configs: kotlin.collections.List<DocumentRequestConfig>
+    @SerialName(value = "kind") @Required val kind: VerificationCheckAml.Kind
 
 ) {
 
+    /**
+     * 
+     *
+     * Values: aml
+     */
+    @Serializable
+    enum class Kind(val value: kotlin.String) {
+        @SerialName(value = "aml") aml("aml");
+    }
 
 }
 

@@ -15,7 +15,6 @@
 
 package org.openapitools.client.models
 
-import org.openapitools.client.models.WfrDocumentConfig
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
@@ -25,27 +24,26 @@ import kotlinx.serialization.encoding.*
  * 
  *
  * @param `data` 
- * @param kind Upload a new document and re-run the decision engine
+ * @param kind 
  */
 @Serializable
 
-data class WorkflowRequestConfigDocument (
+data class VerificationCheckIdentityDocument (
 
-    @SerialName(value = "data") @Required val `data`: WfrDocumentConfig,
+    @SerialName(value = "data") @Required val `data`: kotlin.String,
 
-    /* Upload a new document and re-run the decision engine */
-    @SerialName(value = "kind") @Required val kind: WorkflowRequestConfigDocument.Kind
+    @SerialName(value = "kind") @Required val kind: VerificationCheckIdentityDocument.Kind
 
 ) {
 
     /**
-     * Upload a new document and re-run the decision engine
+     * 
      *
-     * Values: document
+     * Values: identity_document
      */
     @Serializable
     enum class Kind(val value: kotlin.String) {
-        @SerialName(value = "document") document("document");
+        @SerialName(value = "identity_document") identity_document("identity_document");
     }
 
 }

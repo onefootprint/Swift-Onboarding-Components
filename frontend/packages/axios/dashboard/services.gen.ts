@@ -187,6 +187,9 @@ import type {
   GetOrgProxyConfigsError,
   GetOrgProxyConfigsResponse,
   GetOrgResponse,
+  GetOrgRiskSignalsSpecData,
+  GetOrgRiskSignalsSpecError,
+  GetOrgRiskSignalsSpecResponse,
   GetOrgRolesData,
   GetOrgRolesError,
   GetOrgRolesResponse,
@@ -2263,6 +2266,18 @@ export const postOrgProxyConfigsByProxyConfigIdDeactivate = <ThrowOnError extend
   >({
     ...options,
     url: '/org/proxy_configs/{proxyConfigId}/deactivate',
+  });
+};
+
+/**
+ * List all Footprint Risk Signals
+ */
+export const getOrgRiskSignalsSpec = <ThrowOnError extends boolean = false>(
+  options?: Options<GetOrgRiskSignalsSpecData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<GetOrgRiskSignalsSpecResponse, GetOrgRiskSignalsSpecError, ThrowOnError>({
+    ...options,
+    url: '/org/risk_signals_spec',
   });
 };
 

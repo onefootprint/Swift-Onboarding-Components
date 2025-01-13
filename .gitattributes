@@ -6,4 +6,4 @@ frontend/packages/fixtures/config/persisted-values.ts linguist-generated
 frontend/packages/axios/index.ts linguist-generated
 frontend/packages/fetch/index.ts linguist-generated
 **/*.gen.ts linguist-generated
-mobile/NativeOnboardingComponents/shared/src/commonMain/kotlin/com/onefootprint/native_onboarding_components/client/models/*.kt linguist-generated
+mobile/packages/NativeOnboardingComponents/shared/src/commonMain/kotlin/com/onefootprint/native_onboarding_components/client/models/*.kt linguist-generated

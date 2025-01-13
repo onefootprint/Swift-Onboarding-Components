@@ -64,6 +64,9 @@ export type ActorUser = {
   kind: 'user';
 };
 export type kind5 = 'user';
+export type AdhocVendorCallConfig = {
+  verificationChecks: Array<VerificationCheck>;
+};
 export type AdverseMediaListKind =
   | 'financial_crime'
   | 'violent_crime'
@@ -74,6 +77,9 @@ export type AdverseMediaListKind =
   | 'narcotics'
   | 'general_serious'
   | 'general_minor';
+export type AlpacaKycConfig = {
+  [key: string]: unknown;
+};
 export type AmlDetail = {
   hits: Array<AmlHit>;
   shareUrl?: string;
@@ -1431,6 +1437,10 @@ export type DocumentAndCountryConfiguration = {
   countrySpecific: CountrySpecificDocumentMapping;
   global: Array<IdDocKind>;
 };
+export type DocumentConfig = {
+  businessConfigs: Array<DocumentRequestConfig>;
+  configs: Array<DocumentRequestConfig>;
+};
 export type DocumentImageError =
   | 'image_too_small'
   | 'document_missing_four_corners'
@@ -1697,8 +1707,9 @@ export type EntityAttribute = {
   value?: string;
 };
 export type EntityOnboarding = {
+  config: WorkflowConfig;
   id: string;
-  kind: WorkflowKind;
+  kind: PublicWorkflowKind;
   playbookKey: string;
   playbookName: string;
   ruleSetResults: Array<EntityOnboardingRuleSetResult>;
@@ -3507,6 +3518,13 @@ export type Iso3166TwoDigitCountryCode =
   | 'ZM'
   | 'ZW'
   | 'AX';
+export type KybConfig = {
+  recollectAttributes: Array<CollectedDataOption>;
+  reuseExistingBoKyc: boolean;
+};
+export type KycConfig = {
+  recollectAttributes: Array<CollectedDataOption>;
+};
 export type LabelAdded = {
   kind: LabelKind;
 };
@@ -4454,6 +4472,13 @@ export type ProxyIngressRule = {
    */
   token: DataIdentifier;
 };
+export type PublicWorkflowKind =
+  | 'kyc'
+  | 'alpaca_kyc'
+  | 'kyb'
+  | 'document'
+  | 'adhoc_vendor_call'
+  | 'continuous_monitoring_watchlist_check';
 export type RawUserDataRequest<T extends string = string> = {
   key:
     | 'id.first_name'
@@ -6606,6 +6631,34 @@ export type WfrOnboardConfig = {
   recollectAttributes: Array<CollectedDataOption>;
   reuseExistingBoKyc: boolean;
 };
+export type WorkflowConfig =
+  | WorkflowConfigKyc
+  | WorkflowConfigAlpacaKyc
+  | WorkflowConfigDocument
+  | WorkflowConfigKyb
+  | WorkflowConfigAdhocVendorCall;
+export type WorkflowConfigAdhocVendorCall = {
+  data: AdhocVendorCallConfig;
+  kind: 'adhoc_vendor_call';
+};
+export type WorkflowConfigAlpacaKyc = {
+  data: AlpacaKycConfig;
+  kind: 'alpaca_kyc';
+};
+export type kind114 = 'alpaca_kyc';
+export type WorkflowConfigDocument = {
+  data: DocumentConfig;
+  kind: 'document';
+};
+export type kind115 = 'document';
+export type WorkflowConfigKyb = {
+  data: KybConfig;
+  kind: 'kyb';
+};
+export type WorkflowConfigKyc = {
+  data: KycConfig;
+  kind: 'kyc';
+};
 /**
  * Auto-generated discriminant enum variants
  */
@@ -6634,10 +6687,6 @@ export type WorkflowRequestConfigDocument = {
    */
   kind: 'document';
 };
-/**
- * Upload a new document and re-run the decision engine
- */
-export type kind114 = 'document';
 export type WorkflowRequestConfigOnboard = {
   /**
    * Allow onboarding onto the specific playbook.
@@ -6654,8 +6703,8 @@ export type WorkflowRequestConfigOnboard = {
  * Allow onboarding onto the specific playbook.
  * This allows editing data, re-verifies data, and then re-triggers decision engine
  */
-export type kind115 = 'onboard';
-export type WorkflowSource = 'hosted' | 'tenant' | 'unknown';
+export type kind116 = 'onboard';
+export type WorkflowSource = 'hosted' | 'tenant' | 'unknown' | 'footprint';
 export type WorkflowStarted = {
   kind: WorkflowStartedEventKind;
   playbook: TimelinePlaybook;
@@ -9610,6 +9659,22 @@ export type PostOrgProxyConfigsByProxyConfigIdDeactivateData = {
 };
 export type PostOrgProxyConfigsByProxyConfigIdDeactivateResponse = Empty;
 export type PostOrgProxyConfigsByProxyConfigIdDeactivateError = unknown;
+export type GetOrgRiskSignalsSpecData = {
+  headers?: {
+    /**
+     * Secret API key. You can create and view your API keys in the dashboard. This key should never be sent to your client and should be treated as a secret on your server.
+     */
+    'X-Footprint-Secret-Key'?: string;
+    /**
+     * Short-lived token for an authenticated dashboard user.
+     */
+    'X-Fp-Dashboard-Authorization'?: string;
+  };
+};
+export type GetOrgRiskSignalsSpecResponse = {
+  [key: string]: unknown;
+};
+export type GetOrgRiskSignalsSpecError = unknown;
 export type GetOrgRolesData = {
   headers?: {
     /**
@@ -11447,6 +11512,19 @@ export type $OpenApiTs = {
          * OK
          */
         '200': Empty;
+      };
+    };
+  };
+  '/org/risk_signals_spec': {
+    get: {
+      req: GetOrgRiskSignalsSpecData;
+      res: {
+        /**
+         * OK
+         */
+        '200': {
+          [key: string]: unknown;
+        };
       };
     };
   };

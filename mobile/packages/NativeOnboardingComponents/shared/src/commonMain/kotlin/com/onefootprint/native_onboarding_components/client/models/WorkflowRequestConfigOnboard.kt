@@ -15,7 +15,7 @@
 
 package org.openapitools.client.models
 
-import org.openapitools.client.models.WorkflowRequestConfigOnboardData
+import org.openapitools.client.models.WfrOnboardConfig
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
@@ -31,7 +31,7 @@ import kotlinx.serialization.encoding.*
 
 data class WorkflowRequestConfigOnboard (
 
-    @SerialName(value = "data") @Required val `data`: WorkflowRequestConfigOnboardData,
+    @SerialName(value = "data") @Required val `data`: WfrOnboardConfig,
 
     /* Allow onboarding onto the specific playbook.  This allows editing data, re-verifies data, and then re-triggers decision engine */
     @SerialName(value = "kind") @Required val kind: WorkflowRequestConfigOnboard.Kind

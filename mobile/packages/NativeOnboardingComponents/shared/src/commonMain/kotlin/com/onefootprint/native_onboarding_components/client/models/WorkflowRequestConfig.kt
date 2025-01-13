@@ -15,8 +15,9 @@
 
 package org.openapitools.client.models
 
+import org.openapitools.client.models.WfrAdhocVendorCallConfig
+import org.openapitools.client.models.WorkflowRequestConfigAdhocVendorCall
 import org.openapitools.client.models.WorkflowRequestConfigDocument
-import org.openapitools.client.models.WorkflowRequestConfigDocumentData
 import org.openapitools.client.models.WorkflowRequestConfigOnboard
 
 import kotlinx.serialization.*
@@ -27,27 +28,27 @@ import kotlinx.serialization.encoding.*
  * 
  *
  * @param `data` 
- * @param kind Upload a new document and re-run the decision engine
+ * @param kind Adhoc vendor call
  */
 @Serializable
 
 data class WorkflowRequestConfig (
 
-    @SerialName(value = "data") @Required val `data`: WorkflowRequestConfigDocumentData,
+    @SerialName(value = "data") @Required val `data`: WfrAdhocVendorCallConfig,
 
-    /* Upload a new document and re-run the decision engine */
+    /* Adhoc vendor call */
     @SerialName(value = "kind") @Required val kind: WorkflowRequestConfig.Kind
 
 ) {
 
     /**
-     * Upload a new document and re-run the decision engine
+     * Adhoc vendor call
      *
-     * Values: document
+     * Values: adhoc_vendor_call
      */
     @Serializable
     enum class Kind(val value: kotlin.String) {
-        @SerialName(value = "document") document("document");
+        @SerialName(value = "adhoc_vendor_call") adhoc_vendor_call("adhoc_vendor_call");
     }
 
 }

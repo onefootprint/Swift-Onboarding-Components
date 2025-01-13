@@ -84,6 +84,7 @@ import type {
   GetOrgPlaybooksData,
   GetOrgProxyConfigsByProxyConfigIdData,
   GetOrgProxyConfigsData,
+  GetOrgRiskSignalsSpecData,
   GetOrgRolesData,
   GetOrgTagsData,
   GetOrgVaultDrAwsPreEnrollmentData,
@@ -445,6 +446,7 @@ import {
   getOrgPlaybooksByPlaybookIdVersions,
   getOrgProxyConfigs,
   getOrgProxyConfigsByProxyConfigId,
+  getOrgRiskSignalsSpec,
   getOrgRoles,
   getOrgTags,
   getOrgVaultDrAwsPreEnrollment,
@@ -3833,6 +3835,25 @@ export const postOrgProxyConfigsByProxyConfigIdDeactivateMutation = (
     },
   };
   return mutationOptions;
+};
+
+export const getOrgRiskSignalsSpecQueryKey = (options?: Options<GetOrgRiskSignalsSpecData>) => [
+  createQueryKey('getOrgRiskSignalsSpec', options),
+];
+
+export const getOrgRiskSignalsSpecOptions = (options?: Options<GetOrgRiskSignalsSpecData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getOrgRiskSignalsSpec({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getOrgRiskSignalsSpecQueryKey(options),
+  });
 };
 
 export const getOrgRolesQueryKey = (options?: Options<GetOrgRolesData>) => [createQueryKey('getOrgRoles', options)];

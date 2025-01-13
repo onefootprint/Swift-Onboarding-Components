@@ -22,21 +22,20 @@ import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * Allow onboarding onto the specific playbook.  This allows editing data, re-verifies data, and then re-triggers decision engine
+ * 
  *
  * @param playbookId 
  * @param recollectAttributes 
- * @param reuseExistingBoKyc When true, reuses existing BOs' KYC results on the same playbook.  When false, requires the existing BOs to re-complete KYC.  Can only be true for KYB playbooks
+ * @param reuseExistingBoKyc 
  */
 @Serializable
 
-data class WorkflowRequestConfigOnboardData (
+data class WfrOnboardConfig (
 
     @SerialName(value = "playbook_id") @Required val playbookId: kotlin.String,
 
     @SerialName(value = "recollect_attributes") @Required val recollectAttributes: kotlin.collections.List<CollectedDataOption>,
 
-    /* When true, reuses existing BOs' KYC results on the same playbook.  When false, requires the existing BOs to re-complete KYC.  Can only be true for KYB playbooks */
     @SerialName(value = "reuse_existing_bo_kyc") @Required val reuseExistingBoKyc: kotlin.Boolean
 
 ) {

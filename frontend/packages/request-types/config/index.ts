@@ -73,7 +73,7 @@ const createKotlinTypes = async () => {
     );
 
     const targetDir = path.resolve(
-      '../../../mobile/NativeOnboardingComponents/shared/src/commonMain/kotlin/com/onefootprint/native_onboarding_components',
+      '../../../mobile/packages/NativeOnboardingComponents/shared/src/commonMain/kotlin/com/onefootprint/native_onboarding_components',
     );
 
     // Remove everything from target directory
