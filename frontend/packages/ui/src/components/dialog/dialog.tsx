@@ -1,17 +1,13 @@
 import type { Icon } from '@onefootprint/icons';
 import * as RadixDialog from '@radix-ui/react-dialog';
-import { AnimatePresence } from 'framer-motion';
+import { cx } from 'class-variance-authority';
 import type React from 'react';
-import { forwardRef } from 'react';
-import ScrollArea from '../scroll-area';
-
-import Box from '../box';
+import { forwardRef, useEffect, useRef, useState } from 'react';
 import Overlay from '../overlay';
 import Container from './container';
 import type { DialogButton, DialogLinkButton, DialogSize } from './dialog.types';
 import Footer from './footer';
 import DialogHeader from './header';
-
 export type DialogProps = {
   children?: React.ReactNode;
   open: boolean;
@@ -54,56 +50,77 @@ const Dialog = forwardRef<HTMLDivElement, DialogProps>(
     ref,
   ) => {
     const hasFooter = primaryButton || secondaryButton || linkButton;
+    const contentRef = useRef<HTMLDivElement>(null);
+    const [hasScroll, setHasScroll] = useState(false);
+
+    useEffect(() => {
+      const checkScroll = () => {
+        if (contentRef.current) {
+          const { scrollHeight, clientHeight, scrollTop } = contentRef.current;
+          const hasMoreContent = scrollHeight > clientHeight;
+          const isAtBottom = Math.ceil(scrollTop + clientHeight) >= scrollHeight;
+          setHasScroll(hasMoreContent && !isAtBottom);
+        }
+      };
+
+      const contentElement = contentRef.current;
+      if (contentElement) {
+        checkScroll();
+
+        contentElement.addEventListener('scroll', checkScroll);
+        window.addEventListener('resize', checkScroll);
+
+        const observer = new ResizeObserver(checkScroll);
+        observer.observe(contentElement);
+
+        return () => {
+          contentElement.removeEventListener('scroll', checkScroll);
+          window.removeEventListener('resize', checkScroll);
+          observer.disconnect();
+        };
+      }
+    }, [children, open]);
 
     return (
-      <AnimatePresence>
-        <RadixDialog.Root open={open} onOpenChange={onClose} modal={true}>
-          <RadixDialog.Portal forceMount>
-            {open && (
-              <RadixDialog.Overlay asChild>
-                <Overlay isVisible={open} isConfirmation={isConfirmation} />
-              </RadixDialog.Overlay>
-            )}
-            {open && (
-              <Container
-                aria-label={title}
-                aria-describedby={undefined}
-                data-has-footer={hasFooter}
-                isConfirmation={isConfirmation}
-                onClose={onClose}
-                onEscapeKeyDown={onEscapeKeyDown}
-                preventEscapeKeyDown={preventEscapeKeyDown}
-                ref={ref}
+      <RadixDialog.Root open={open} onOpenChange={onClose} modal={true}>
+        <RadixDialog.Portal>
+          <RadixDialog.Overlay asChild>
+            <Overlay isVisible={open} isConfirmation={isConfirmation} />
+          </RadixDialog.Overlay>
+          <Container
+            aria-label={title}
+            aria-describedby={undefined}
+            isConfirmation={isConfirmation}
+            onClose={onClose}
+            onEscapeKeyDown={onEscapeKeyDown}
+            preventEscapeKeyDown={preventEscapeKeyDown}
+            ref={ref}
+            size={size}
+            open={open}
+          >
+            <DialogHeader title={title} onClose={onClose} icon={headerIcon} />
+            <div
+              ref={contentRef}
+              className={cx('flex-1 overflow-auto min-h-0', {
+                'p-0': noPadding,
+                'p-6': !noPadding,
+                'overflow-hidden': noScroll,
+              })}
+            >
+              {children}
+            </div>
+            {hasFooter && (
+              <Footer
+                primaryButton={primaryButton}
+                secondaryButton={secondaryButton}
+                linkButton={linkButton}
                 size={size}
-              >
-                <DialogHeader title={title} onClose={onClose} icon={headerIcon} />
-                <Box overflow="auto" flex="1">
-                  {noScroll ? (
-                    children
-                  ) : (
-                    <ScrollArea
-                      height="100%"
-                      padding={noPadding ? 0 : 7}
-                      hideTopLine
-                      hideBottomLine={size === 'full-screen' || !hasFooter}
-                    >
-                      {children}
-                    </ScrollArea>
-                  )}
-                </Box>
-                {hasFooter && (
-                  <Footer
-                    primaryButton={primaryButton}
-                    secondaryButton={secondaryButton}
-                    linkButton={linkButton}
-                    size={size}
-                  />
-                )}
-              </Container>
+                hasScroll={hasScroll}
+              />
             )}
-          </RadixDialog.Portal>
-        </RadixDialog.Root>
-      </AnimatePresence>
+          </Container>
+        </RadixDialog.Portal>
+      </RadixDialog.Root>
     );
   },
 );

@@ -103,17 +103,18 @@ const CustomOption = styled.div`
       ${createFontStyles('body-3')};
       align-items: center;
       color: ${dropdown.colorPrimary};
+      border-radius: ${theme.borderRadius.sm};
+      overflow: hidden;
       cursor: pointer;
       display: flex;
-      height: 36px;
-      padding: 0 ${theme.spacing[5]};
+      padding: ${theme.spacing[3]};
+      margin-left: ${theme.spacing[3]};
       user-select: none;
       width: 100%;
       gap: ${theme.spacing[4]};
 
       input[type='checkbox'] {
-        position: relative;
-        top: calc(-1 * ${theme.spacing[1]});
+        margin: auto 0;
       }
 
       &:hover {

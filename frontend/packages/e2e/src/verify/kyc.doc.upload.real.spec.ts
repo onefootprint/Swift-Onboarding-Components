@@ -54,7 +54,7 @@ test('E2E.KYC.DriverDocOnly.Real #real', async ({ page, browser, isMobile }) => 
 
   await expect(frame.getByRole('option', { name: 'Simulated outcome', selected: true })).toBeAttached();
 
-  await frame.locator('#docVerificationOutcome').selectOption('Real outcome');
+  await frame.locator('select[name="docVerificationOutcome"]').selectOption('real');
   await page.waitForLoadState();
 
   await clickOnContinue(frame);

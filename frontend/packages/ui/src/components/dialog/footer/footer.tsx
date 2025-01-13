@@ -1,16 +1,28 @@
-import styled, { css } from 'styled-components';
-import media from '../../../utils/media';
+import { cx } from 'class-variance-authority';
 import Button from '../../button';
 import LinkButton from '../../link-button';
-import Stack from '../../stack';
-import type { DialogFooter, DialogSize } from '../dialog.types';
+import type { DialogFooter } from '../dialog.types';
 
-const Footer = ({ linkButton, primaryButton, secondaryButton, size }: DialogFooter) => {
-  const isSingleButton = primaryButton && !secondaryButton && !linkButton;
+const Footer = ({ linkButton, primaryButton, secondaryButton, size, hasScroll }: DialogFooter) => {
+  const hasBorder = size === 'full-screen' || hasScroll;
+  const isFullScreen = size === 'full-screen';
+  const isSingleButton = !secondaryButton && !linkButton && primaryButton;
 
   return (
-    <Container $size={size}>
-      <ButtonsContainer $size={size} $isSingleButton={isSingleButton ?? false}>
+    <footer
+      className={cx(
+        'flex flex-col flex-0 md:flex-row-reverse items-center justify-between w-full py-3 md:py-4 md:px-6 px-3 bg-background-primary relative before:transition-all before:duration-200 before:opacity-0',
+        {
+          'before:content-[""] before:h-[1px] before:absolute before:inset-0 before:border-t before:border-tertiary before:border-solid before:opacity-100':
+            hasBorder,
+        },
+      )}
+    >
+      <div
+        className={cx('flex flex-col-reverse gap-2 md:flex-row md:justify-end w-full', {
+          'md:justify-between': isFullScreen && !isSingleButton,
+        })}
+      >
         {secondaryButton && (
           <Button
             id={secondaryButton.id}
@@ -39,42 +51,16 @@ const Footer = ({ linkButton, primaryButton, secondaryButton, size }: DialogFoot
             {primaryButton.label}
           </Button>
         )}
-      </ButtonsContainer>
+      </div>
       {linkButton && (
-        <LinkButton onClick={linkButton.onClick} type={linkButton.type} form={linkButton.form}>
-          {linkButton.label}
-        </LinkButton>
+        <div className="flex p-3 md:p-0">
+          <LinkButton onClick={linkButton.onClick} type={linkButton.type} form={linkButton.form}>
+            {linkButton.label}
+          </LinkButton>
+        </div>
       )}
-    </Container>
+    </footer>
   );
 };
-
-const Container = styled.footer<{ $size: DialogSize }>`
-  ${({ theme, $size }) => css`
-    display: flex;
-    width: 100%;
-    flex-direction: row-reverse;
-    align-items: center;
-    justify-content: space-between;
-    padding: ${theme.spacing[5]} ${theme.spacing[7]};
-    flex: 0 0 auto;
-    background-color: ${theme.backgroundColor.primary};
-    z-index: 1;
-    border-top: ${theme.borderWidth[1]} solid ${$size === 'full-screen' ? theme.borderColor.tertiary : 'transparent'};
-  `}
-`;
-
-const ButtonsContainer = styled(Stack)<{ $size: DialogSize; $isSingleButton: boolean }>`
-  ${({ theme, $size, $isSingleButton }) => css`
-    flex-direction: column-reverse;
-    width: 100%;
-    gap: ${theme.spacing[3]};
-
-    ${media.greaterThan('sm')`
-      flex-direction: row;
-      justify-content: ${$size === 'full-screen' && !$isSingleButton ? 'space-between' : 'flex-end'};
-    `}
-  `}
-`;
 
 export default Footer;

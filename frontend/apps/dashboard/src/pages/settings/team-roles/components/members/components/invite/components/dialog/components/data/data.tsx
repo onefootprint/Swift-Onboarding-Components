@@ -4,7 +4,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import useSession from 'src/hooks/use-session';
-import styled, { css } from 'styled-components';
 
 import type { Invitation } from '../../dialog.types';
 import AddButton from './components/add-button';
@@ -61,17 +60,24 @@ const Data = ({ roles, defaultRole, onSubmit }: DataProps) => {
   };
 
   return (
-    <section>
+    <section className="w-full">
       <FormProvider {...methods}>
-        <Form id="members-invite-form" onSubmit={handleSubmit(handleAfterSubmit)} className="flex flex-col gap-4">
+        <form id="members-invite-form" onSubmit={handleSubmit(handleAfterSubmit)} className="flex flex-col gap-4">
           <AnimatePresence>
             {fields.map((field, index) => (
-              <motion.div key={field.id} variants={fromTopToTop} initial="initial" animate="animate" exit="exit">
+              <motion.div
+                key={field.id}
+                variants={fromTopToTop}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                className="w-full"
+              >
                 <InviteFields index={index} roles={roles} />
               </motion.div>
             ))}
           </AnimatePresence>
-        </Form>
+        </form>
         <AddButton onClick={handleAddMore} />
         {user?.isFirmEmployee && (
           <Box marginTop={5}>
@@ -83,13 +89,5 @@ const Data = ({ roles, defaultRole, onSubmit }: DataProps) => {
     </section>
   );
 };
-
-const Form = styled.form`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[5]};
-  `}
-`;
 
 export default Data;

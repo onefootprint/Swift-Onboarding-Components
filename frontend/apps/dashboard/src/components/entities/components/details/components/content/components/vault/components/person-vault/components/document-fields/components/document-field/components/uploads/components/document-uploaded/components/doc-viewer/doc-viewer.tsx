@@ -1,5 +1,5 @@
 import { IcoClose16 } from '@onefootprint/icons';
-import { Box, IconButton, LinkButton, Overlay, Stack, Text } from '@onefootprint/ui';
+import { Box, IconButton, LinkButton, Stack, Text } from '@onefootprint/ui';
 import * as Dialog from '@radix-ui/react-dialog';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -45,7 +45,7 @@ const DocViewer = ({ children, documentName, mimeType, src }: DocViewerProps) =>
         </Dialog.Trigger>
       </Stack>
       <Dialog.Portal>
-        <Overlay />
+        <Dialog.Overlay className="overlay-default" />
         <Dialog.Content
           onEscapeKeyDown={handleEscapeKeyDown}
           onPointerDownOutside={handleClose}

@@ -85,7 +85,7 @@ const Drawer = ({
           </DrawerSurface>
         </RadixDialog.Content>
         <RadixDialog.Overlay asChild>
-          <Overlay isVisible={open} />
+          <Overlay isVisible={open} isConfirmation={false} />
         </RadixDialog.Overlay>
       </RadixDialog.Portal>
     </RadixDialog.Root>

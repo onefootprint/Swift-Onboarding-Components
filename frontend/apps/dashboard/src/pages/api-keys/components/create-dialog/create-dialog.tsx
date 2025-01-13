@@ -1,4 +1,4 @@
-import { Dialog, Form, Grid, useToast } from '@onefootprint/ui';
+import { Dialog, Form, useToast } from '@onefootprint/ui';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -79,9 +79,14 @@ const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
       onClose={handleClose}
       open={open}
     >
-      <form id="create-secret-key-form" onSubmit={handleSubmit(handleBeforeSubmit)} aria-label={t('form.aria')}>
-        <Grid.Container columns={['2fr', '1fr']} gap={5}>
-          <Grid.Item className="flex-1 min-w-0">
+      <form
+        id="create-secret-key-form"
+        onSubmit={handleSubmit(handleBeforeSubmit)}
+        aria-label={t('form.aria')}
+        className="w-full"
+      >
+        <div className="grid grid-cols-[2fr_1fr] gap-5">
+          <div className="flex-1 min-w-0">
             <Form.Field>
               <Form.Label>{t('form.name.label')}</Form.Label>
               <Form.Input
@@ -97,13 +102,13 @@ const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
               />
               <Form.Errors>{errors.name?.message}</Form.Errors>
             </Form.Field>
-          </Grid.Item>
+          </div>
           {rolesQuery.isPending && (
-            <Grid.Item className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0">
               <Loading />
-            </Grid.Item>
+            </div>
           )}
-          <Grid.Item className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0">
             <Form.Field>
               <Form.Label>{t('form.access-control.label')}</Form.Label>
               <Form.Select
@@ -118,8 +123,8 @@ const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
               </Form.Select>
               <Form.Errors>{errors.role?.message}</Form.Errors>
             </Form.Field>
-          </Grid.Item>
-        </Grid.Container>
+          </div>
+        </div>
       </form>
     </Dialog>
   );

@@ -1,6 +1,7 @@
-import { motion } from 'framer-motion';
+import { cx } from 'class-variance-authority';
+import { AnimatePresence, motion } from 'framer-motion';
+import type { ForwardedRef } from 'react';
 import { forwardRef } from 'react';
-import styled, { css } from 'styled-components';
 
 type OverlayProps = {
   isVisible?: boolean;
@@ -8,23 +9,26 @@ type OverlayProps = {
 };
 
 const Overlay = forwardRef<HTMLDivElement, OverlayProps>(
-  ({ isVisible = false, isConfirmation = false }: OverlayProps, ref) =>
-    isVisible && <OverlayLayer ref={ref} $isConfirmation={isConfirmation} />,
-);
+  ({ isVisible, isConfirmation = false }: OverlayProps, ref: ForwardedRef<HTMLDivElement>) => {
+    if (!isVisible) return null;
 
-const OverlayLayer = styled(motion.div)<{ $isConfirmation: boolean }>`
-  ${({ theme, $isConfirmation }) => css`
-    position: fixed;
-    background-color: ${theme.screenOverlay};
-    height: 100vh;
-    width: 100vw;
-    left: 0;
-    top: 0;
-    user-select: none;
-    z-index: ${$isConfirmation ? theme.zIndex.confirmationOverlay : theme.zIndex.overlay};
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
-  `}
-`;
+    return (
+      <AnimatePresence>
+        {isVisible && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1, transition: { duration: 0.2, ease: 'easeInOut' } }}
+            exit={{ opacity: 0, transition: { duration: 0.15, ease: 'easeInOut' } }}
+            ref={ref}
+            className={cx(
+              'fixed inset-0 h-screen w-screen select-none bg-primary/20 backdrop-blur-[2px]',
+              isConfirmation ? 'z-confirmationOverlay' : 'z-overlay',
+            )}
+          />
+        )}
+      </AnimatePresence>
+    );
+  },
+);
 
 export default Overlay;

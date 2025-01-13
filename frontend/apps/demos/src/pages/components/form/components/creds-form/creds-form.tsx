@@ -2,7 +2,6 @@ import { Button, Checkbox, Text, TextInput } from '@onefootprint/ui';
 import { useForm } from 'react-hook-form';
 import type { ClientTokenResponse } from 'src/hooks/use-client-token';
 import useClientToken from 'src/hooks/use-client-token';
-import styled, { css } from 'styled-components';
 
 type FormData = {
   userId: string;
@@ -47,7 +46,7 @@ const CredsForm = ({ onSubmit }: CredsFormProps) => {
   };
 
   return (
-    <Form onSubmit={handleSubmit(handleBeforeSubmit)}>
+    <form className="flex flex-col gap-4 w-full max-w-[500px]" onSubmit={handleSubmit(handleBeforeSubmit)}>
       <TextInput
         autoFocus
         label="Footprint User Id (from prod)"
@@ -76,16 +75,8 @@ const CredsForm = ({ onSubmit }: CredsFormProps) => {
       <Button loading={clientTokenMutation.isPending} type="submit">
         Continue
       </Button>
-    </Form>
+    </form>
   );
 };
-
-const Form = styled.form`
-  ${({ theme }) => css`
-    display: grid;
-    row-gap: ${theme.spacing[7]};
-    text-align: left;
-  `}
-`;
 
 export default CredsForm;

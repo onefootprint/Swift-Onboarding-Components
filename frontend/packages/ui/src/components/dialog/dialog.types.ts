@@ -18,6 +18,7 @@ export type DialogLinkButton = {
 };
 
 export type DialogFooter = {
+  hasScroll?: boolean;
   linkButton?: DialogLinkButton;
   primaryButton?: DialogButton;
   secondaryButton?: DialogButton;

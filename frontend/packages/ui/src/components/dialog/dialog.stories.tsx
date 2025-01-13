@@ -2,8 +2,6 @@ import type { Meta, StoryFn } from '@storybook/react';
 import { uniqueId } from 'lodash';
 import { useState } from 'react';
 import Button from '../button';
-import Stack from '../stack';
-import Text from '../text';
 import type { DialogProps } from './dialog';
 import Dialog from './dialog';
 
@@ -94,7 +92,7 @@ export const Confirmation: StoryFn<DialogProps> = args => {
         primaryButton={{ label: 'Open Confirmation', onClick: openConfirmation }}
         secondaryButton={{ label: 'Also Open Confirmation', onClick: openConfirmation }}
       >
-        <Text variant="body-3">This is the regular dialog. Click a button to open the confirmation dialog.</Text>
+        <p className="text-body-3">This is the regular dialog. Click a button to open the confirmation dialog.</p>
       </Dialog>
       <Dialog
         {...args}
@@ -111,7 +109,7 @@ export const Confirmation: StoryFn<DialogProps> = args => {
         }}
         secondaryButton={{ label: 'Cancel', onClick: handleConfirmationClose }}
       >
-        <Text variant="body-3">Are you sure you want to proceed?</Text>
+        <p className="text-body-3">Are you sure you want to proceed?</p>
       </Dialog>
       {!regularOpen && <Button onClick={openRegular}>Open Regular Dialog</Button>}
     </>
@@ -122,13 +120,13 @@ export const FullScreen = Template.bind({});
 FullScreen.args = {
   ...Base.args,
   children: (
-    <Stack direction="column" gap={4}>
+    <div className="flex flex-col gap-4">
       {Array.from({ length: 100 }, (_, i) => (
-        <Text key={uniqueId()} variant="body-3">
+        <p key={uniqueId()} className="text-body-3">
           Dialog with overflowing content. Item {i + 1}
-        </Text>
+        </p>
       ))}
-    </Stack>
+    </div>
   ),
   primaryButton: { label: 'Continue', onClick: () => alert('Continue') },
   secondaryButton: { label: 'Cancel', onClick: () => alert('Cancelled') },
@@ -161,12 +159,19 @@ OverflowingContent.args = {
     'Irure velit ea non id aute exercitation in. Magna elit enim esse. Minim amet non reprehenderit duis ea amet commodo culpa. Tempor nisi ullamco pariatur ullamco ipsum excepteur. Magna aliquip deserunt reprehenderit ullamco ipsum aliqua sit consequat commodo. Proident ex cupidatat ipsum in ipsum.',
   size: 'default',
   children: (
-    <Stack direction="column" gap={4}>
+    <div className="flex flex-col gap-4">
       {Array.from({ length: 100 }, (_, i) => (
-        <Text key={uniqueId()} variant="body-3">
+        <p key={uniqueId()} className="text-body-3">
           Dialog with overflowing content. Item {i + 1}
-        </Text>
+        </p>
       ))}
-    </Stack>
+    </div>
   ),
+};
+
+export const OverflowingContentWithFooter = Template.bind({});
+OverflowingContentWithFooter.args = {
+  ...OverflowingContent.args,
+  primaryButton: { label: 'Continue', onClick: () => alert('Continue') },
+  secondaryButton: { label: 'Cancel', onClick: () => alert('Cancelled') },
 };

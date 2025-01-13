@@ -1,4 +1,4 @@
-import { Box, Form as FormComponent } from '@onefootprint/ui';
+import { Form as FormComponent } from '@onefootprint/ui';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -63,8 +63,8 @@ const Form = ({
 
   return (
     <FormProvider {...formMethods}>
-      <form id="roles-form" onSubmit={handleSubmit(handleAfterSubmit)}>
-        <Box marginBottom={8}>
+      <form id="roles-form" onSubmit={handleSubmit(handleAfterSubmit)} className="w-full">
+        <div className="mb-7">
           <FormComponent.Field>
             <FormComponent.Label>{t('name.label')}</FormComponent.Label>
             <FormComponent.Input
@@ -80,7 +80,7 @@ const Form = ({
             />
             <FormComponent.Errors>{errors.name?.message}</FormComponent.Errors>
           </FormComponent.Field>
-        </Box>
+        </div>
         <Permissions kind={kind} />
       </form>
     </FormProvider>

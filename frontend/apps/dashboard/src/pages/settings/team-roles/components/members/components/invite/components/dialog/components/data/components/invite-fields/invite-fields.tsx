@@ -1,5 +1,5 @@
 import type { SelectOption } from '@onefootprint/ui';
-import { Grid, Select, TextInput } from '@onefootprint/ui';
+import { SelectCustom, TextInput } from '@onefootprint/ui';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -17,7 +17,7 @@ const InviteFields = ({ index, roles }: InviteFieldsProps) => {
   const isRequired = index === 0;
 
   return (
-    <Grid.Container columns={['2fr', '1fr']} gap={5}>
+    <div className="grid grid-cols-[2fr_minmax(68px,1fr)] gap-4">
       <TextInput
         type="email"
         label={shouldShowLabel ? t('form.email.label') : undefined}
@@ -38,20 +38,47 @@ const InviteFields = ({ index, roles }: InviteFieldsProps) => {
         control={control}
         name={`invitations.${index}.role`}
         rules={{ required: isRequired }}
-        render={select => (
-          <Select
-            hasError={!!select.fieldState.error}
-            hint={select.fieldState.error && t('form.role.errors.required')}
-            label={shouldShowLabel ? t('form.role.label') : undefined}
-            onBlur={select.field.onBlur}
-            onChange={select.field.onChange}
-            options={roles}
-            placeholder={t('form.role.placeholder')}
-            value={select.field.value}
-          />
+        render={({ field, fieldState }) => (
+          <div className="w-full">
+            {shouldShowLabel && (
+              <div className="flex mb-2">
+                <label className="text-label-3 text-primary" htmlFor={`invitations.${index}.role`}>
+                  {t('form.role.label')}
+                </label>
+              </div>
+            )}
+            <SelectCustom.Root
+              value={field.value?.value}
+              onValueChange={value => {
+                const selectedRole = roles.find(role => role.value === value);
+                field.onChange(selectedRole);
+              }}
+            >
+              <SelectCustom.Trigger className="w-full" asChild>
+                <div className="w-ful h-fit" id={`invitations.${index}.role`}>
+                  <SelectCustom.Input
+                    placeholder={t('form.role.placeholder')}
+                    hasError={!!fieldState.error}
+                    width="100%"
+                  >
+                    {field.value?.label}
+                  </SelectCustom.Input>
+                </div>
+              </SelectCustom.Trigger>
+              <SelectCustom.Content popper>
+                <SelectCustom.Group>
+                  {roles.map(role => (
+                    <SelectCustom.Item key={role.value} value={role.value}>
+                      {role.label}
+                    </SelectCustom.Item>
+                  ))}
+                </SelectCustom.Group>
+              </SelectCustom.Content>
+            </SelectCustom.Root>
+          </div>
         )}
       />
-    </Grid.Container>
+    </div>
   );
 };
 

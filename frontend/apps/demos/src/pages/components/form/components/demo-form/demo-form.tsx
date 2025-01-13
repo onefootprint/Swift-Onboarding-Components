@@ -1,10 +1,9 @@
 import type { FootprintFormRef } from '@onefootprint/footprint-js';
 import { FootprintComponentKind } from '@onefootprint/footprint-js';
-import { Button, Divider, media, useToast } from '@onefootprint/ui';
+import { Button, useToast } from '@onefootprint/ui';
 import debounce from 'lodash/debounce';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import styled, { css } from 'styled-components';
 
 import fakeSdk from '../../../../../helpers/fake-sdk';
 import getQueryArgs from '../../../../../helpers/get-query-args';
@@ -92,29 +91,13 @@ const DemoForm = ({ authToken }: DemoFormProps) => {
 
   return (
     <>
-      <SecureFormContainer id="footprint-secure-form" />
-      <StyledDivider />
+      <div className="w-full h-full max-w-[700px]" id="footprint-secure-form" />
+
       <Button variant="secondary" onClick={handleClick} loading={isCustomSaveLoading}>
         Custom Save via Ref
       </Button>
     </>
   );
 };
-
-const SecureFormContainer = styled.div`
-  ${({ theme }) => css`
-    width: 100%;
-    height: 100%;
-
-    ${media.greaterThan('md')`
-      padding: ${theme.spacing[2]};
-      min-height: 400px;
-    `}
-  `}
-`;
-
-const StyledDivider = styled(Divider)`
-  margin: ${({ theme }) => theme.spacing[4]} 0;
-`;
 
 export default DemoForm;
