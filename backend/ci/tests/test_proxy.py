@@ -1,10 +1,8 @@
 from tests.cert_fixtures import GOOGLE_CERT
-from tests.utils import _make_request
 from tests.headers import BaseAuth
-from tests.utils import post, get, patch
+from tests.utils import post, get, patch, post_raw
 from tests.constants import ID_DATA
 from tests.dashboard.utils import latest_audit_event_for
-import requests
 import urllib.parse
 
 
@@ -54,6 +52,9 @@ class ProxyTokenAssignment(BaseAuth):
 
 class ProxyPathAndQuery(BaseAuth):
     HEADER_NAME = "x-fp-path-and-query"
+
+
+DITTO_URL = "https://ditto.footprint.dev"
 
 
 def read_file(name):
@@ -121,25 +122,21 @@ class TestVaultProxy:
 
         # send the proxy request
         data = {
-            "full_name": f"{{{{ {fp_id}.id.first_name }}}} {{{{ {fp_id}.id.last_name }}}}",
-            "last4_credit_card": f"{{{{ {fp_id}.custom.cc4 }}}}",
-            "ach": f"{{{{ {fp_id}.custom.ach_account_number }}}}",
-            "zip": f"{{{{ {fp_id}.id.zip }}}}",
+            "full_name": (
+                "{{ " + fp_id + ".id.first_name }} {{ " + fp_id + ".id.last_name }}"
+            ),
+            "last4_credit_card": "{{ " + fp_id + ".custom.cc4 }}",
+            "ach": "{{ " + fp_id + ".custom.ach_account_number }}",
+            "zip": "{{ " + fp_id + ".id.zip }}",
         }
 
-        response = _make_request(
-            method=requests.post,
-            path="vault_proxy/jit",
-            data=data,
-            params=None,
-            status_code=200,
-            auths=[
-                sandbox_tenant.sk.key,
-                FwdTestHeader("test1234"),
-                ProxyDestinationHeader(ditto_url),
-                ProxyAccessReason("test reason"),
-            ],
-            files=None,
+        response = post_raw(
+            "vault_proxy/jit",
+            data,
+            sandbox_tenant.sk.key,
+            FwdTestHeader("test1234"),
+            ProxyDestinationHeader(ditto_url),
+            ProxyAccessReason("test reason"),
         )
 
         # test the header came in
@@ -171,41 +168,35 @@ class TestVaultProxy:
         patch(f"entities/{fp_id}/vault", data, sandbox_tenant.sk.key)
 
         # specify the ditto server
-        ditto_url = "https://ditto.footprint.dev:8443"
+        ditto_url_8443 = "https://ditto.footprint.dev:8443"
 
         # send the proxy request
         data = {
-            "message": f"{{{{ {fp_id}.custom.test_field }}}}",
+            "message": "{{ " + fp_id + ".custom.test_field }}",
         }
 
-        response = _make_request(
-            method=requests.post,
-            path="vault_proxy/jit",
-            data=data,
-            params=None,
-            status_code=200,
-            auths=[
-                sandbox_tenant.sk.key,
-                FwdTestHeader("test1234"),
-                ProxyDestinationHeader(ditto_url),
-                ProxyAccessReason("test reason"),
-                ProxyClientCertPem(
-                    read_pem_file_to_header_encoded(
-                        "backend/external_tools/ditto/src/dummy_cert/client.crt"
-                    )
-                ),
-                ProxyClientKeyPem(
-                    read_pem_file_to_header_encoded(
-                        "backend/external_tools/ditto/src/dummy_cert/client.key"
-                    )
-                ),
-                ProxyServerCertPem(
-                    read_pem_file_to_header_encoded(
-                        "backend/external_tools/ditto/src/dummy_cert/server.crt"
-                    )
-                ),
-            ],
-            files=None,
+        response = post_raw(
+            "vault_proxy/jit",
+            data,
+            sandbox_tenant.sk.key,
+            FwdTestHeader("test1234"),
+            ProxyDestinationHeader(ditto_url_8443),
+            ProxyAccessReason("test reason"),
+            ProxyClientCertPem(
+                read_pem_file_to_header_encoded(
+                    "backend/external_tools/ditto/src/dummy_cert/client.crt"
+                )
+            ),
+            ProxyClientKeyPem(
+                read_pem_file_to_header_encoded(
+                    "backend/external_tools/ditto/src/dummy_cert/client.key"
+                )
+            ),
+            ProxyServerCertPem(
+                read_pem_file_to_header_encoded(
+                    "backend/external_tools/ditto/src/dummy_cert/server.crt"
+                )
+            ),
         )
 
         # test the header came in
@@ -230,19 +221,14 @@ class TestVaultProxy:
             "http://magic.169.254.170.2.nip.io/example",
             "ftp://myserver.com",
         ]:
-            response = _make_request(
-                method=requests.post,
-                path="vault_proxy/jit",
-                data={},
-                params=None,
+            post(
+                "vault_proxy/jit",
+                {},
+                sandbox_tenant.sk.key,
+                FwdTestHeader("test1234"),
+                ProxyDestinationHeader(url),
+                ProxyAccessReason("test reason"),
                 status_code=400,
-                auths=[
-                    sandbox_tenant.sk.key,
-                    FwdTestHeader("test1234"),
-                    ProxyDestinationHeader(url),
-                    ProxyAccessReason("test reason"),
-                ],
-                files=None,
             )
 
     def test_ingress(self, sandbox_tenant):
@@ -267,25 +253,18 @@ class TestVaultProxy:
         # for the proxy to ingress vault
         data = {"data": {"card_number": "12345678910"}}
 
-        response = _make_request(
-            method=requests.post,
-            path="vault_proxy/jit",
-            data=data,
-            params=None,
-            status_code=200,
-            auths=[
-                sandbox_tenant.sk.key,
-                FwdTestHeader("test1234"),
-                ProxyDestinationHeader(ditto_url),
-                ProxyAccessReason("test reason"),
-                ProxyIngressRule(f"{fp_id}.custom.card_number=$.data.card_number"),
-                ProxyIngressContentType("json"),
-            ],
-            files=None,
+        response = post(
+            "vault_proxy/jit",
+            data,
+            sandbox_tenant.sk.key,
+            FwdTestHeader("test1234"),
+            ProxyDestinationHeader(ditto_url),
+            ProxyAccessReason("test reason"),
+            ProxyIngressRule(f"{fp_id}.custom.card_number=$.data.card_number"),
+            ProxyIngressContentType("json"),
         )
 
-        result = response.json()
-        assert result["data"]["card_number"] == f"{fp_id}.custom.card_number"
+        assert response["data"]["card_number"] == f"{fp_id}.custom.card_number"
 
         data = dict(reason="test", fields=["custom.card_number"])
         response = post(f"entities/{fp_id}/vault/decrypt", data, sandbox_tenant.sk.key)
@@ -313,24 +292,21 @@ class TestVaultProxy:
 
         # fire the proxy request
         data = {
-            "full_name": f"{{{{ {fp_id}.id.first_name }}}} {{{{ {fp_id}.id.last_name }}}}",
+            "full_name": (
+                "{{" + fp_id + ".id.first_name}} {{" + fp_id + ".id.last_name}}"
+            ),
             # here we test the token assignment also works for egress
             "msg": "{{ custom.message }}",
             "data": {"card_number": "4242424242424242424"},
             "msg2": "{{ custom.message | to_uppercase | prefix(5) }}",
         }
 
-        response = _make_request(
-            method=requests.post,
-            path=f"vault_proxy/{proxy_id}",
-            data=data,
-            params=None,
+        response = post_raw(
+            f"vault_proxy/{proxy_id}",
+            data,
+            sandbox_tenant.sk.key,
+            ProxyTokenAssignment(fp_id),
             status_code=200,
-            auths=[
-                sandbox_tenant.sk.key,
-                ProxyTokenAssignment(fp_id),
-            ],
-            files=None,
         )
 
         # test the header came in
@@ -412,16 +388,11 @@ class TestVaultProxy:
             status_code=404,
         )
 
-        response = _make_request(
-            method=requests.post,
-            path=f"vault_proxy/{proxy_id}",
-            data={},
-            params=None,
+        post(
+            f"vault_proxy/{proxy_id}",
+            {},
+            sandbox_tenant.sk.key,
             status_code=404,
-            auths=[
-                sandbox_tenant.sk.key,
-            ],
-            files=None,
         )
 
     def test_ingress_non_custom(self, sandbox_tenant):
@@ -455,23 +426,17 @@ class TestVaultProxy:
             }
         }
 
-        response = _make_request(
-            method=requests.post,
-            path="vault_proxy/jit",
-            data=data,
-            params=None,
-            status_code=200,
-            auths=[
-                sandbox_tenant.sk.key,
-                ProxyDestinationHeader(ditto_url),
-                ProxyAccessReason("test reason"),
-                ProxyTokenAssignment(fp_id),
-                ProxyIngressRule(
-                    "card.primary.number=$.data.card_number,card.primary.cvc=$.data.card_cvc,id.dob=$.data.date_of_birth"
-                ),
-                ProxyIngressContentType("json"),
-            ],
-            files=None,
+        response = post_raw(
+            "vault_proxy/jit",
+            data,
+            sandbox_tenant.sk.key,
+            ProxyDestinationHeader(ditto_url),
+            ProxyAccessReason("test reason"),
+            ProxyTokenAssignment(fp_id),
+            ProxyIngressRule(
+                "card.primary.number=$.data.card_number,card.primary.cvc=$.data.card_cvc,id.dob=$.data.date_of_birth"
+            ),
+            ProxyIngressContentType("json"),
         )
 
         result = response.json()
@@ -509,40 +474,31 @@ class TestVaultProxy:
         }
         patch(f"entities/{fp_id}/vault", data, sandbox_tenant.sk.key)
 
-        # specify the ditto server
-        ditto_url = "https://ditto.footprint.dev"
-
         # send the proxy request
         # ditto will simulate this data for the proxy to ingress vault
         from .image_fixtures import test_image
 
         data = {"data": {"id_card": test_image, "type": "image/jpeg"}}
 
-        response = _make_request(
-            method=requests.post,
-            path="vault_proxy/jit",
-            data=data,
-            params=None,
-            status_code=200,
-            auths=[
-                sandbox_tenant.sk.key,
-                ProxyDestinationHeader(ditto_url),
-                ProxyAccessReason("test reason"),
-                ProxyTokenAssignmentOld(fp_id),
-                ProxyIngressRule(
-                    "document.drivers_license.front.image=$.data.id_card,document.drivers_license.front.mime_type=$.data.type"
-                ),
-                ProxyIngressContentType("json"),
-            ],
-            files=None,
+        response = post(
+            "vault_proxy/jit",
+            data,
+            sandbox_tenant.sk.key,
+            ProxyDestinationHeader(DITTO_URL),
+            ProxyAccessReason("test reason"),
+            ProxyTokenAssignmentOld(fp_id),
+            ProxyIngressRule(
+                "document.drivers_license.front.image=$.data.id_card,document.drivers_license.front.mime_type=$.data.type"
+            ),
+            ProxyIngressContentType("json"),
         )
 
-        result = response.json()
         assert (
-            result["data"]["id_card"] == f"{fp_id}.document.drivers_license.front.image"
+            response["data"]["id_card"]
+            == f"{fp_id}.document.drivers_license.front.image"
         )
         assert (
-            result["data"]["type"]
+            response["data"]["type"]
             == f"{fp_id}.document.drivers_license.front.mime_type"
         )
 
@@ -570,35 +526,25 @@ class TestVaultProxy:
         }
         patch(f"entities/{fp_id}/vault", data, sandbox_tenant.sk.key)
 
-        # specify the ditto server
-        ditto_url = "https://ditto.footprint.dev"
-
         # send the proxy request
         # ditto will simulate this data for the proxy to ingress vault
 
         data = {"data": {"message": "my really really really long message"}}
 
-        response = _make_request(
-            method=requests.post,
-            path="vault_proxy/jit",
-            data=data,
-            params=None,
-            status_code=200,
-            auths=[
-                sandbox_tenant.sk.key,
-                ProxyDestinationHeader(ditto_url),
-                ProxyAccessReason("test reason"),
-                ProxyTokenAssignment(fp_id),
-                ProxyIngressRule(
-                    "custom.message = $.data.message | prefix(16) | to_uppercase"
-                ),
-                ProxyIngressContentType("json"),
-            ],
-            files=None,
+        response = post(
+            "vault_proxy/jit",
+            data,
+            sandbox_tenant.sk.key,
+            ProxyDestinationHeader(DITTO_URL),
+            ProxyAccessReason("test reason"),
+            ProxyTokenAssignment(fp_id),
+            ProxyIngressRule(
+                "custom.message = $.data.message | prefix(16) | to_uppercase"
+            ),
+            ProxyIngressContentType("json"),
         )
 
-        result = response.json()
-        assert result["data"]["message"] == f"{fp_id}.custom.message"
+        assert response["data"]["message"] == f"{fp_id}.custom.message"
 
         data = dict(
             reason="test",
@@ -628,15 +574,19 @@ class TestVaultProxy:
 
         data = {
             "data": {
-                "name": f"{{{{ {fp_id}.id.first_name | to_uppercase }}}} {{{{ {fp_id}.id.last_name | to_uppercase }}}}",
-                "message": f"{{{{ {fp_id}.custom.message }}}}",
+                "name": ("{{ " + fp_id + ".id.first_name | to_uppercase }}")
+                + " "
+                + ("{{ " + fp_id + ".id.last_name | to_uppercase }}"),
+                "message": "{{ " + fp_id + ".custom.message }}",
             },
-            "cc_first_3": f"{{{{ {fp_id}.card.primary.number | prefix(3) }}}}",
-            "flerp": f"{{{{ {fp_id}.custom.message | suffix(5) | to_lowercase }}}}",
-            "office_location": f"{{{{ {fp_id2}.id.first_name }}}} {{{{ {fp_id2}.id.last_name }}}}",
+            "cc_first_3": "{{ " + fp_id + ".card.primary.number | prefix(3) }}",
+            "flerp": "{{ " + fp_id + ".custom.message | suffix(5) | to_lowercase }}",
+            "office_location": (
+                "{{ " + fp_id2 + ".id.first_name }} {{ " + fp_id2 + ".id.last_name }}"
+            ),
         }
 
-        response = post(f"vault_proxy/reflect", data, sandbox_tenant.sk.key)
+        response = post("vault_proxy/reflect", data, sandbox_tenant.sk.key)
         assert response["data"]["name"] == "PIIP PENGUIN"
         assert response["data"]["message"] == "lorem ipsum dolor FLERP"
         assert response["cc_first_3"] == "424"
@@ -662,18 +612,18 @@ class TestVaultProxy:
         # bad filter
         data = {
             "data": {
-                "invalid": f"{{{{ {fp_id}.id.first_name | prefix('hi') }}}}",
+                "invalid": "{{ " + fp_id + ".id.first_name | prefix('hi') }}",
             },
         }
-        post(f"vault_proxy/reflect", data, sandbox_tenant.sk.key, status_code=400)
+        post("vault_proxy/reflect", data, sandbox_tenant.sk.key, status_code=400)
 
         # invalid id
         data = {
             "data": {
-                "invalid": f"{{{{ {fp_id}.id.middle_name | prefix(3) }}}}",
+                "invalid": "{{ " + fp_id + ".id.middle_name | prefix(3) }}",
             },
         }
-        post(f"vault_proxy/reflect", data, sandbox_tenant.sk.key, status_code=400)
+        post("vault_proxy/reflect", data, sandbox_tenant.sk.key, status_code=400)
 
 
 ### Tests to do ###
