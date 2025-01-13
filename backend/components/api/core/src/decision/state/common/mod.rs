@@ -64,6 +64,7 @@ use newtypes::FootprintReasonCode;
 use newtypes::ListId;
 use newtypes::Locked;
 use newtypes::OnboardingStatus;
+use newtypes::PhoneLookupAttributes;
 use newtypes::PiiBytes;
 use newtypes::PiiString;
 use newtypes::ReviewReason;
@@ -227,7 +228,7 @@ pub async fn run_neuro_check(
 pub async fn run_twilio_check(
     state: &State,
     wf_id: &WorkflowId,
-    obc: &ObConfiguration,
+    attributes: &Vec<PhoneLookupAttributes>,
 ) -> FpResult<Option<(LookupV2Response, VerificationResultId)>> {
     let wfid = wf_id.clone();
     let (wf, di) = state
@@ -242,7 +243,7 @@ pub async fn run_twilio_check(
             Ok((wf, di))
         })
         .await?;
-    run_twilio_call(state, &di, &wf.id, obc).await
+    run_twilio_call(state, &di, &wf.id, attributes).await
 }
 
 // TODO: code share/new abstraction to consolidate this with run_kyc_vendor_calls

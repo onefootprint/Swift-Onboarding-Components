@@ -69,6 +69,7 @@ use newtypes::OnboardingStatus;
 use newtypes::RiskSignalGroupKind;
 use newtypes::RuleSetResultKind;
 use newtypes::VendorAPI;
+use newtypes::VerificationCheck;
 use newtypes::VerificationCheckKind;
 use newtypes::VerificationResultId;
 use newtypes::WorkflowFixtureResult;
@@ -235,12 +236,10 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             None
         };
 
-        let twilio_result = if obc
-            .verification_checks()
-            .get(VerificationCheckKind::Phone)
-            .is_some()
+        let twilio_result = if let Some(VerificationCheck::Phone { attributes }) =
+            obc.verification_checks().get(VerificationCheckKind::Phone)
         {
-            match common::run_twilio_check(state, &self.wf_id, &obc).await {
+            match common::run_twilio_check(state, &self.wf_id, &attributes).await {
                 Ok(res) => res,
                 Err(err) => {
                     log_optional_vendor_error(VendorAPI::TwilioLookupV2, err);

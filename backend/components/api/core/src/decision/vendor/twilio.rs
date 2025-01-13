@@ -10,18 +10,16 @@ use crate::State;
 use api_errors::FpError;
 use db::models::data_lifetime::DataLifetime;
 use db::models::decision_intent::DecisionIntent;
-use db::models::ob_configuration::ObConfiguration;
 use db::models::verification_request::VReqIdentifier;
 use idv::twilio::TwilioLookupV2APIResponse;
 use idv::twilio::TwilioLookupV2Request;
 use newtypes::DecisionIntentId;
+use newtypes::PhoneLookupAttributes;
 use newtypes::ScopedVaultId;
 use newtypes::ScrubbedPiiVendorResponse;
 use newtypes::TwilioLookupV2;
 use newtypes::VaultPublicKey;
 use newtypes::VendorAPI;
-use newtypes::VerificationCheck;
-use newtypes::VerificationCheckKind;
 use newtypes::VerificationResultId;
 use newtypes::WorkflowId;
 use twilio::response::lookup::LookupV2Response;
@@ -67,7 +65,7 @@ pub async fn run_twilio_call(
     state: &State,
     di: &DecisionIntent,
     wf_id: &WorkflowId,
-    obc: &ObConfiguration,
+    attributes: &Vec<PhoneLookupAttributes>,
 ) -> FpResult<Option<(LookupV2Response, VerificationResultId)>> {
     let svid = di.scoped_vault_id.clone();
     // TODO: Make this WF created
@@ -100,14 +98,9 @@ pub async fn run_twilio_call(
         build_request::build_idv_data_at(&state.db_pool, &state.enclave_client, &di.scoped_vault_id, seqno)
             .await?;
     // Should not ever happen
-    let Some(VerificationCheck::Phone { attributes }) =
-        obc.verification_checks().get(VerificationCheckKind::Phone)
-    else {
-        return Ok(None);
-    };
     let request = TwilioLookupV2Request {
         idv_data,
-        lookup_fields: attributes.into_iter().map(|a| a.into()).collect(),
+        lookup_fields: attributes.iter().map(|a| (*a).into()).collect(),
     };
     let res = state.vendor_clients.twilio_lookup_v2.make_request(request).await;
 

@@ -22,9 +22,11 @@ use newtypes::Locked;
 use newtypes::RiskSignalGroupKind;
 use newtypes::ScopedVaultId;
 use newtypes::VendorAPI;
+use newtypes::VerificationCheck;
 use newtypes::VerificationCheckKind;
 use newtypes::VerificationResultId;
 use newtypes::WorkflowId;
+use twilio::response::lookup::LookupV2Response;
 
 #[derive(Clone)]
 
@@ -53,7 +55,10 @@ impl AdhocVendorCallVendorCalls {
 /// ////////////////
 #[async_trait]
 impl OnAction<MakeVendorCalls, AdhocVendorCallState> for AdhocVendorCallVendorCalls {
-    type AsyncRes = Box<Option<(ValidatedApplicationRiskResponse, VerificationResultId)>>;
+    type AsyncRes = Box<(
+        Option<(ValidatedApplicationRiskResponse, VerificationResultId)>,
+        Option<(LookupV2Response, VerificationResultId)>,
+    )>;
 
     async fn execute_async_idempotent_actions(
         &self,
@@ -71,7 +76,15 @@ impl OnAction<MakeVendorCalls, AdhocVendorCallState> for AdhocVendorCallVendorCa
             None
         };
 
-        Ok(Box::new(sentilink_result))
+        let twilio_result = if let Some(VerificationCheck::Phone { attributes }) =
+            verification_checks.get(VerificationCheckKind::Phone)
+        {
+            common::run_twilio_check(state, &self.wf_id, &attributes).await?
+        } else {
+            None
+        };
+
+        Ok(Box::new((sentilink_result, twilio_result)))
     }
 
     fn on_commit(
@@ -80,7 +93,7 @@ impl OnAction<MakeVendorCalls, AdhocVendorCallState> for AdhocVendorCallVendorCa
         async_res: Self::AsyncRes,
         conn: &mut db::TxnPgConn,
     ) -> FpResult<AdhocVendorCallState> {
-        let sentilink_result = *async_res;
+        let (sentilink_result, twilio_result) = *async_res;
         // For all reason codes, we scope them to the onboarding/wf
         let risk_signal_group_scope = RiskSignalGroupScope::WorkflowId {
             id: &wf.id,
@@ -94,9 +107,27 @@ impl OnAction<MakeVendorCalls, AdhocVendorCallState> for AdhocVendorCallVendorCa
                 .collect();
             RiskSignal::bulk_save_for_scope(
                 conn,
-                risk_signal_group_scope,
+                risk_signal_group_scope.clone(),
                 sentilink_frc,
                 RiskSignalGroupKind::Synthetic,
+                false,
+            )?;
+        }
+
+        if let Some((twilio_res, vres_id)) = twilio_result {
+            // TODO: cleaning this up in separate stack
+            // https://linear.app/footprint/issue/BE-365/remove-parsedresponse
+            let vendor_api: VendorAPI = VendorAPI::TwilioLookupV2;
+            let twilio_frc = features::twilio::footprint_reason_codes(&twilio_res)
+                .into_iter()
+                .map(|frc| (frc, vendor_api, vres_id.clone()))
+                .collect();
+
+            RiskSignal::bulk_save_for_scope(
+                conn,
+                risk_signal_group_scope,
+                twilio_frc,
+                RiskSignalGroupKind::Phone,
                 false,
             )?;
         }
