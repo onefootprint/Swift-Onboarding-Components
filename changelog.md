@@ -2,4 +2,4 @@
 *Updating this file is the requirement for GitHub CI/CD for Swift package release*
 
 # v0.2.11
-Initial test release
+Initial test release!
