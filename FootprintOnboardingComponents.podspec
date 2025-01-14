@@ -1,5 +1,5 @@
 Pod::Spec.new do |s|
-    s.name             = 'Footprint'
+    s.name             = 'FootprintOnboardingComponents'
     s.version          = '0.2.13'
     s.summary          = 'A package for Swift onboarding components.'
     s.description      = <<-DESC
@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
     s.license          = { :type => 'MIT', :file => 'LICENSE' }
     s.author           = { 'Rodrigo Pagnuzzi' => 'rodrigo@onefootprint.com' }
     s.source           = { :git => 'https://github.com/onefootprint/Swift-Onboarding-Components.git', :tag => s.version.to_s }
-     
+    s.module_name      = 'Footprint' 
     s.ios.deployment_target = '14.0'    
     s.swift_version = '6.0'
     s.source_files = 'Sources/**/*'
