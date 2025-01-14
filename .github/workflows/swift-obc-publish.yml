@@ -32,102 +32,88 @@ jobs:
           echo "Latest version is $VERSION"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-      - name: Update version in IOSPackage
-        working-directory: ${{ env.KMM_DIR }}
-        run: |
-          # Define the file to update and the placeholder
-          FILE="shared/src/iosMain/kotlin/com/onefootprint/native_onboarding_components/Package.ios.kt"
-          VERSION_PATTERN='override val version: String = ".*"'
-          NEW_VERSION_LINE="override val version: String = \"$VERSION\""
+      # - name: Update version in IOSPackage
+      #   working-directory: ${{ env.KMM_DIR }}
+      #   run: |
+      #     # Define the file to update and the placeholder
+      #     FILE="shared/src/iosMain/kotlin/com/onefootprint/native_onboarding_components/Package.ios.kt"
+      #     VERSION_PATTERN='override val version: String = ".*"'
+      #     NEW_VERSION_LINE="override val version: String = \"$VERSION\""
 
-          # Use an alternate delimiter (e.g., @) to avoid conflicts with slashes or quotes
-          sed -i '' "s@${VERSION_PATTERN}@${NEW_VERSION_LINE}@" "$FILE"
+      #     # Use an alternate delimiter (e.g., @) to avoid conflicts with slashes or quotes
+      #     sed -i '' "s@${VERSION_PATTERN}@${NEW_VERSION_LINE}@" "$FILE"
 
-          # Verify the change
-          echo "Updated version in $FILE to $VERSION"
+      #     # Verify the change
+      #     echo "Updated version in $FILE to $VERSION"
 
-      # Set up JDK 22
-      - name: Set up JDK 22
-        uses: actions/setup-java@0ab4596768b603586c0de567f2430c30f5b0d2b0 # ratchet:actions/setup-java@v3
-        with:
-          java-version: "22"
-          distribution: "temurin"
-          server-id: github
-          settings-path: ${{ github.workspace }}
+      # # Set up JDK 22
+      # - name: Set up JDK 22
+      #   uses: actions/setup-java@0ab4596768b603586c0de567f2430c30f5b0d2b0 # ratchet:actions/setup-java@v3
+      #   with:
+      #     java-version: "22"
+      #     distribution: "temurin"
+      #     server-id: github
+      #     settings-path: ${{ github.workspace }}
 
-      - name: Cache Gradle
-        uses: actions/cache@f4b3439a656ba812b8cb417d2d49f9c810103092 # ratchet:actions/cache@v3
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('${{ env.KMM_DIR }}/**/*.gradle*', '${{ env.KMM_DIR }}/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+      # - name: Cache Gradle
+      #   uses: actions/cache@f4b3439a656ba812b8cb417d2d49f9c810103092 # ratchet:actions/cache@v3
+      #   with:
+      #     path: |
+      #       ~/.gradle/caches
+      #       ~/.gradle/wrapper
+      #     key: ${{ runner.os }}-gradle-${{ hashFiles('${{ env.KMM_DIR }}/**/*.gradle*', '${{ env.KMM_DIR }}/gradle-wrapper.properties') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-gradle-
 
-      # Assemble the Swift XCFramework using Gradle
-      - name: Assemble SwiftOnboardingComponentsShared XCFramework
-        working-directory: ${{ env.KMM_DIR }}
-        run: ./gradlew :shared:assembleSwiftOnboardingComponentsSharedReleaseXCFramework
+      # # Assemble the Swift XCFramework using Gradle
+      # - name: Assemble SwiftOnboardingComponentsShared XCFramework
+      #   working-directory: ${{ env.KMM_DIR }}
+      #   run: ./gradlew :shared:assembleSwiftOnboardingComponentsSharedReleaseXCFramework
 
-      # Create a ZIP file from the generated XCFramework
-      - name: Zip XCFramework
-        working-directory: ${{ env.KMM_DIR }}
-        run: |
-          echo "Zipping the generated XCFramework to the root path..."
-          zip -r ./${{ env.ZIP_FILE }} ./shared/build/XCFrameworks/release/SwiftOnboardingComponentsShared.xcframework
+      # # Create a ZIP file from the generated XCFramework
+      # - name: Zip XCFramework
+      #   working-directory: ${{ env.KMM_DIR }}
+      #   run: |
+      #     echo "Zipping the generated XCFramework to the root path..."
+      #     zip -r ./${{ env.ZIP_FILE }} ./shared/build/XCFrameworks/release/SwiftOnboardingComponentsShared.xcframework
 
-      # Compute the checksum for the ZIP file
-      - name: Compute Checksum
-        working-directory: ${{ env.KMM_DIR }}
-        id: checksum
-        run: |
-          echo "Computing checksum for the binary..."
-          CHECKSUM=$(swift package compute-checksum ./${{ env.ZIP_FILE }})
-          echo "CHECKSUM=$CHECKSUM" >> $GITHUB_ENV
+      # # Compute the checksum for the ZIP file
+      # - name: Compute Checksum
+      #   working-directory: ${{ env.KMM_DIR }}
+      #   id: checksum
+      #   run: |
+      #     echo "Computing checksum for the binary..."
+      #     CHECKSUM=$(swift package compute-checksum ./${{ env.ZIP_FILE }})
+      #     echo "CHECKSUM=$CHECKSUM" >> $GITHUB_ENV
 
-      # Create a release in the target repository
-      - name: Create Release in Target Repo
-        working-directory: ${{ env.KMM_DIR }}
-        run: |
-          RELEASE_NAME="Release ${{ env.VERSION }}"
-          ASSET_PATH="${{ env.ZIP_FILE }}"
+      # # Create a release in the target repository
+      # - name: Create Release in Target Repo
+      #   working-directory: ${{ env.KMM_DIR }}
+      #   run: |
+      #     RELEASE_NAME="Release ${{ env.VERSION }}"
+      #     ASSET_PATH="${{ env.ZIP_FILE }}"
 
-          # Create the release
-          RELEASE_RESPONSE=$(curl -s -X POST \
-            -H "Authorization: token ${{ secrets.SWIFT_OBC_TOKEN }}" \
-            -H "Accept: application/vnd.github+json" \
-            -d "{\"tag_name\": \"${{ env.VERSION }}\", \"name\": \"$RELEASE_NAME\"}" \
-            https://api.github.com/repos/onefootprint/Swift-Onboarding-Components/releases)
+      #     # Create the release
+      #     RELEASE_RESPONSE=$(curl -s -X POST \
+      #       -H "Authorization: token ${{ secrets.SWIFT_OBC_TOKEN }}" \
+      #       -H "Accept: application/vnd.github+json" \
+      #       -d "{\"tag_name\": \"${{ env.VERSION }}\", \"name\": \"$RELEASE_NAME\"}" \
+      #       https://api.github.com/repos/onefootprint/Swift-Onboarding-Components/releases)
 
-          # Extract upload URL
-          UPLOAD_URL=$(echo $RELEASE_RESPONSE | jq -r '.upload_url' | sed 's/{.*}//')
+      #     # Extract upload URL
+      #     UPLOAD_URL=$(echo $RELEASE_RESPONSE | jq -r '.upload_url' | sed 's/{.*}//')
 
-          # Log release response for debugging
-          echo "Release Response: $RELEASE_RESPONSE"
+      #     # Log release response for debugging
+      #     echo "Release Response: $RELEASE_RESPONSE"
 
-          # Upload the XCFramework asset
-          curl -X POST \
-            -H "Authorization: token ${{ secrets.SWIFT_OBC_TOKEN }}" \
-            -H "Content-Type: application/zip" \
-            --data-binary @"$ASSET_PATH" \
-            "$UPLOAD_URL?name=$(basename $ASSET_PATH)"
+      #     # Upload the XCFramework asset
+      #     curl -X POST \
+      #       -H "Authorization: token ${{ secrets.SWIFT_OBC_TOKEN }}" \
+      #       -H "Content-Type: application/zip" \
+      #       --data-binary @"$ASSET_PATH" \
+      #       "$UPLOAD_URL?name=$(basename $ASSET_PATH)"
 
-      # Install git-filter-repo
-      - name: Install git-filter-repo
-        run: |
-          brew update
-          brew install python3 git-filter-repo
-      # Run git-filter-repo to isolate subdirectory
-      - name: Filter Subdirectory
-        run: |
-          git filter-repo --force --subdirectory-filter ${{ env.KMM_DIR }}/SwiftOnboardingComponents
-
-      # Ensure branch state and reset if needed
-      - name: Ensure Branch State
-        run: |
-          git reset --hard
-
+    
       - name: Set up SSH
         run: |
           mkdir -p ~/.ssh
@@ -138,6 +124,7 @@ jobs:
 
       # Modify Package.swift
       - name: Set new version in Package.swift
+        working-directory: ${{ env.KMM_DIR }}/SwiftOnboardingComponents
         run: |
           PACKAGE_SWIFT_PATH="./Package.swift"
           echo "Updating checksum and version in $PACKAGE_SWIFT_PATH..."
@@ -147,10 +134,12 @@ jobs:
                   url: \"https://github.com/onefootprint/Swift-Onboarding-Components/releases/download/${{ env.VERSION }}/SwiftOnboardingComponentsShared.xcframework.zip\",\\
                   checksum: \"${{ env.CHECKSUM }}\"\\
               )," "$PACKAGE_SWIFT_PATH"
-          echo "Updated $PACKAGE_SWIFT_PATH"    
+          rm -f "$PACKAGE_SWIFT_PATH.bak"
+          echo "Updated $PACKAGE_SWIFT_PATH"
 
       # Modify Footprint.podspec
       - name: Set new version in podspec
+        working-directory: ${{ env.KMM_DIR }}/SwiftOnboardingComponents
         id: update_version
         run: |
           PODSPEC_FILE="./FootprintOnboardingComponents.podspec"
@@ -166,14 +155,13 @@ jobs:
 
           # Confirm the replacement
           echo "Replaced VERSION_PLACEHOLDER with ${{ env.VERSION }} in $PODSPEC_FILE"      
-        
       # Commit the changes
       - name: Commit Changes and Tag
+        working-directory: ${{ env.KMM_DIR }}/SwiftOnboardingComponents
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          git add ./Package.swift
-          git add ./FootprintOnboardingComponents.podspec
+          git add -A
           git commit -m "Update Package and podspec with version ${{ env.VERSION }} and checksum ${{ env.CHECKSUM }}"
           git tag -a ${{ env.VERSION }} -m "Release ${{ env.VERSION }}"
           echo "Last commits:\n$(git log --oneline -5)"
@@ -181,17 +169,17 @@ jobs:
       - name: Push to Target Repository
         run: |
           git remote add swift-obc git@github.com:onefootprint/Swift-Onboarding-Components.git
-          git push --force --follow-tags swift-obc ${{ github.ref_name }}:master
+          git push --follow-tags swift-obc ${{ github.ref_name }}:master
           
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@4a9ddd6f338a97768b8006bf671dfbad383215f4 # ratchet:ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.0'
+      # - name: Set up Ruby
+      #   uses: ruby/setup-ruby@4a9ddd6f338a97768b8006bf671dfbad383215f4 # ratchet:ruby/setup-ruby@v1
+      #   with:
+      #     ruby-version: '3.0'
 
-      - name: Validate podspec
-        run: pod lib lint FootprintOnboardingComponents.podspec --allow-warnings
+      # - name: Validate podspec
+      #   run: pod lib lint FootprintOnboardingComponents.podspec --allow-warnings
 
-      - name: Publish to CocoaPods
-        env:
-          COCOAPODS_TRUNK_TOKEN: ${{ secrets.SWIFT_OBC_COCOAPODS_TOKEN }}
-        run: pod trunk push FootprintOnboardingComponents.podspec --allow-warnings
+      # - name: Publish to CocoaPods
+      #   env:
+      #     COCOAPODS_TRUNK_TOKEN: ${{ secrets.SWIFT_OBC_COCOAPODS_TOKEN }}
+      #   run: pod trunk push FootprintOnboardingComponents.podspec --allow-warnings
