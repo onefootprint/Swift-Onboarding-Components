@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
     s.name             = 'Footprint'
-    s.version          = '0.2.12'
+    s.version          = '0.2.13'
     s.summary          = 'A package for Swift onboarding components.'
     s.description      = <<-DESC
     Footprint-powered onboarding flows to your application
