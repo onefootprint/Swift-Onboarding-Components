@@ -1,0 +1,30 @@
+name: Publish to CocoaPods
+
+on:
+  push:
+    tags:
+      - '*.*.*' # Matches version tags like 1.0.0
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.0' # Specify Ruby version compatible with CocoaPods
+
+      - name: Install CocoaPods
+        run: gem install cocoapods
+
+      - name: Validate Podspec
+        run: pod lib lint FootprintOnboardingComponents.podspec --allow-warnings
+
+      - name: Publish to CocoaPods
+        env:
+          COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
+        run: pod trunk push FootprintOnboardingComponents.podspec --allow-warnings
