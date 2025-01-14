@@ -1,5 +1,5 @@
 ### Changelog for Swift onboarding components SDK
 *Updating this file is the requirement for GitHub CI/CD for Swift package release*
 
-# v0.2.14
+# v0.2.15
 Initial test release!
