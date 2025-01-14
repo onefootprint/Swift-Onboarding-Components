@@ -3,7 +3,7 @@ name: Publish to CocoaPods
 on:
   push:
     tags:
-      - '*.*.*' # Matches version tags like 1.0.0
+      - '*' # Matches any tag
 
 jobs:
   publish:
