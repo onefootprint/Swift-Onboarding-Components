@@ -17,11 +17,11 @@ let package = Package(
     ],
     targets: [
         // Define the binary target for the shared framework.
-        .binaryTarget(
-            name: "SwiftOnboardingComponentsShared",
-            path: "./Frameworks/SwiftOnboardingComponentsShared.xcframework"
-        ),
-        // Define the internal target that depends on the binary target.
+    .binaryTarget(
+        name: "SwiftOnboardingComponentsShared",
+        url: "https://github.com/onefootprint/Swift-Onboarding-Components/releases/download/0.2.26/SwiftOnboardingComponentsShared.xcframework.zip",
+        checksum: ""
+    ),        // Define the internal target that depends on the binary target.
         .target(
             name: "Footprint",
             dependencies: ["SwiftOnboardingComponentsShared"]
