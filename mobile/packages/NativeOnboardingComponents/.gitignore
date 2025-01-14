@@ -19,3 +19,33 @@ captures
 binaries
 
 Frameworks
+
+# CocoaPods
+Pods/
+Podfile.lock
+*.xcworkspace
+
+# Xcode
+DerivedData/
+build/
+*.xcuserdatad/
+*.xcscmblueprint
+*.xcconfig
+
+# Temp files
+*.tmp
+*.swp
+*.log
+.DS_Store
+
+# Generated Files
+*-dummy.m
+*-input-files.xcfilelist
+*-output-files.xcfilelist
+
+# Lock Files
+Manifest.lock
+
+# Build Configurations
+*.debug.xcconfig
+*.release.xcconfig

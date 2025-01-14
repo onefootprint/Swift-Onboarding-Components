@@ -1,0 +1,8 @@
+platform :ios, '14.0'
+
+target 'iosApp' do
+  use_frameworks!
+
+    # Reference your local podspec
+  pod 'Footprint', :path => '../SwiftOnboardingComponents'
+end

@@ -2,7 +2,6 @@ package com.onefootprint.native_onboarding_components.hosted
 
 import FootprintErrorManager
 import com.onefootprint.native_onboarding_components.FootprintQueries
-import com.onefootprint.native_onboarding_components.getPackage
 import io.ktor.http.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json

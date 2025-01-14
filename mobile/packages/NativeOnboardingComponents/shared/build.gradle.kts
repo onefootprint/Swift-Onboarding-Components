@@ -37,7 +37,7 @@ kotlin {
     val iosTargets = if (isEmulatorOnly) {
         listOf(iosSimulatorArm64())
     } else {
-        listOf(iosX64(), iosArm64(), iosSimulatorArm64())
+        listOf(iosArm64(), iosSimulatorArm64(), iosX64())
     }
 
     iosTargets.forEach { target ->

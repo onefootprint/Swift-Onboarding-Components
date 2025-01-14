@@ -7,6 +7,9 @@ on:
     paths:
       - mobile/packages/NativeOnboardingComponents/android-changelog.md
 
+env:
+  KMM_DIR: "./mobile/packages/NativeOnboardingComponents"
+
 jobs:
   publish:
     if: ${{ contains(github.event.head_commit.message, '[kmm-android-obc-publish]') }}
@@ -14,25 +17,25 @@ jobs:
 
     steps:
       # Checkout the code
-      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # ratchet:actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # ratchet:actions/checkout@v4
 
-      # Set up JDK 17
-      - name: Set up JDK 17
-        uses: actions/setup-java@bee7c8545cf1a9ff664750a2d6717c36377f2117 # ratchet:actions/setup-java@v4
+      # Set up JDK 22
+      - name: Set up JDK 22
+        uses: actions/setup-java@0ab4596768b603586c0de567f2430c30f5b0d2b0 # ratchet:actions/setup-java@v3
         with:
-          java-version: "17"
+          java-version: "22"
           distribution: "temurin"
           server-id: github
           settings-path: ${{ github.workspace }}
 
       # Ensure gradlew has execute permissions
       - name: Give gradlew execute permission
-        run: chmod +x ./mobile/packages/NativeOnboardingComponents/gradlew
+        run: chmod +x ${{ env.KMM_DIR }}/gradlew
 
       # Publish to Maven Central using the specific Gradle task
       - name: Publish to Maven Central
         run: |
-          ./mobile/packages/NativeOnboardingComponents/gradlew -p ./mobile/packages/NativeOnboardingComponents/ shared:publishAndroidReleasePublicationToMavenCentralRepository
+          ${{ env.KMM_DIR }}/gradlew -p ${{ env.KMM_DIR }} shared:publishAndroidReleasePublicationToMavenCentralRepository
         env:
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.KMM_ANDROID_SIGNING_SECRET_KEY }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.KMM_ANDROID_SIGNING_PASSWORD }}
