@@ -12,13 +12,19 @@ Pod::Spec.new do |s|
     s.source           = { :git => 'https://github.com/onefootprint/Swift-Onboarding-Components.git', :tag => s.version.to_s }
     s.module_name      = 'Footprint' 
     s.ios.deployment_target = '14.0'    
-    s.swift_version = '6.0'
+    s.swift_version = '5.9'
     s.source_files = 'Sources/**/*'
 
     # Add remote binary URL
     s.prepare_command = <<-CMD
+        set -e
         curl -L https://github.com/onefootprint/Swift-Onboarding-Components/releases/download/#{s.version}/SwiftOnboardingComponentsShared.xcframework.zip -o SwiftOnboardingComponentsShared.xcframework.zip
         unzip -o SwiftOnboardingComponentsShared.xcframework.zip
+
+        # Ensure the target directory is clean
+        rm -rf ./SwiftOnboardingComponentsShared.xcframework
+
+        # Move the extracted XCFramework
         mv shared/build/XCFrameworks/release/SwiftOnboardingComponentsShared.xcframework ./
     CMD
 
