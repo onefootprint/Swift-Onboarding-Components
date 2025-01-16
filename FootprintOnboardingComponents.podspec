@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
     s.name             = 'FootprintOnboardingComponents'
     # Do not change this line as it is automatically updated by the GitHub action
-    s.version          = '0.2.42'
+    s.version          = '1.0.0-alpha'
     s.summary          = 'A package for Swift onboarding components.'
     s.description      = <<-DESC
     Footprint-powered onboarding flows to your application

@@ -288,43 +288,21 @@ class FormManager: ObservableObject {
     
     
     func getVaultData() -> VaultData {
-        return VaultData(
+        return VaultData.createVault(
             idAddressLine1: idAddressLine1.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idAddressLine1,
-            idAddressLine2: idAddressLine2.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idAddressLine2,
-            idCitizenships: nil,
+            idAddressLine2: idAddressLine2.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idAddressLine2,            
             idCity: idCity.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idCity,
             idCountry: idCountry.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idCountry,
             idDob: idDob.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idDob,
-            idDriversLicenseNumber: nil,
-            idDriversLicenseState: nil,
             idEmail: idEmail.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idEmail,
             idFirstName: idFirstName.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idFirstName,
-            idItin: nil,
             idLastName: idLastName.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idLastName,
             idMiddleName: idMiddleName.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idMiddleName,
-            idNationality: nil,
             idPhoneNumber: idPhoneNumber.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idPhoneNumber,
             idSsn4: idSsn4.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idSsn4,
             idSsn9: idSsn9.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idSsn9,
             idState: idState.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idState,
-            idUsLegalStatus: nil,
-            idUsTaxId: nil,
-            idVisaExpirationDate: nil,
-            idVisaKind: nil,
-            idZip: idZip.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idZip,
-            investorProfileAnnualIncome: nil,
-            investorProfileBrokerageFirmEmployer: nil,
-            investorProfileDeclarations: nil,
-            investorProfileEmployer: nil,
-            investorProfileEmploymentStatus: nil,
-            investorProfileFamilyMemberNames: nil,
-            investorProfileFundingSources: nil,
-            investorProfileInvestmentGoals: nil,
-            investorProfileNetWorth: nil,
-            investorProfileOccupation: nil,
-            investorProfilePoliticalOrganization: nil,
-            investorProfileRiskTolerance: nil,
-            investorProfileSeniorExecutiveSymbols: nil
+            idZip: idZip.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idZip
         )
     }
     
