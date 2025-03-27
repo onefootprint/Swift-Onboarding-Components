@@ -30,4 +30,7 @@ Pod::Spec.new do |s|
 
      # Define the binary framework
     s.vendored_frameworks = 'SwiftOnboardingComponentsShared.xcframework'    
+
+     # Dependencies
+    s.dependency 'FingerprintPro', '~> 2.7'
 end
