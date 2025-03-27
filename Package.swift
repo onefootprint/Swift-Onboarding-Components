@@ -15,16 +15,22 @@ let package = Package(
             targets: ["Footprint"]
         ),
     ],
+    dependencies: [
+        .package(url: "https://github.com/fingerprintjs/fingerprintjs-pro-ios", from: "2.7.0")
+    ],
     targets: [
         // Define the binary target for the shared framework.
     .binaryTarget(
         name: "SwiftOnboardingComponentsShared",
-        url: "https://github.com/onefootprint/Swift-Onboarding-Components/releases/download/1.0.0-beta/SwiftOnboardingComponentsShared.xcframework.zip",
-        checksum: "7068a2e50652d3af53ee3b317cdd1f65849dffc4f047d42e8bed604acfc01774"
+        url: "https://github.com/onefootprint/Swift-Onboarding-Components/releases/download/1.0.1-beta/SwiftOnboardingComponentsShared.xcframework.zip",
+        checksum: "df3d8476b571f7460bb79c1511ca41fc105c63dead6b3c646c5268c460acaad0"
     ),        // Define the internal target that depends on the binary target.
         .target(
             name: "Footprint",
-            dependencies: ["SwiftOnboardingComponentsShared"]
+            dependencies: [
+                "SwiftOnboardingComponentsShared",
+                .product(name: "FingerprintPro", package: "fingerprintjs-pro-ios")
+            ]
         )
     ]
 )

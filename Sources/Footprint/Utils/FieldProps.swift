@@ -9,7 +9,7 @@ internal struct FootprintInputProps{
 }
 
 internal func getValidations(fieldName: FpFieldName) -> (String) -> String?{
-    let translation = Footprint.shared.l10n.translation
+    let translation = Footprint.shared.getL10n().translation
     
     switch fieldName {
     case .idEmail:
@@ -22,7 +22,7 @@ internal func getValidations(fieldName: FpFieldName) -> (String) -> String?{
         }
     case .idDob:
         return { (value: String) -> String? in
-            return Validations.shared.isDob(dob: value, locale: Footprint.shared.l10n.locale!, translation: translation)
+            return Validations.shared.isDob(dob: value, locale: Footprint.shared.getL10n().locale!, translation: translation)
         }
     case .idSsn4:
         return { (value: String) -> String? in
