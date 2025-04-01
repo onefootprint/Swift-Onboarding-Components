@@ -1,6 +1,9 @@
 ### Changelog for Swift onboarding components SDK
 *Updating this file is one of the requirements for GitHub CI/CD for Swift package release*
 
+# v1.0.2-beta
+Bump some dependencies version
+
 # v1.0.1-beta
 Add fingerprint integration
 

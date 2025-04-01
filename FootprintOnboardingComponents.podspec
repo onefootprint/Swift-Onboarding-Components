@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
     s.name             = 'FootprintOnboardingComponents'
     # Do not change this line as it is automatically updated by the GitHub action
-    s.version          = '1.0.1-beta'
+    s.version          = '1.0.2-beta'
     s.summary          = 'A package for Swift onboarding components.'
     s.description      = <<-DESC
     Footprint-powered onboarding flows to your application
@@ -29,8 +29,8 @@ Pod::Spec.new do |s|
     CMD
 
      # Define the binary framework
-    s.vendored_frameworks = 'SwiftOnboardingComponentsShared.xcframework'    
-
-     # Dependencies
+    s.vendored_frameworks = 'SwiftOnboardingComponentsShared.xcframework'
+    
+    # Dependencies
     s.dependency 'FingerprintPro', '~> 2.7'
 end
