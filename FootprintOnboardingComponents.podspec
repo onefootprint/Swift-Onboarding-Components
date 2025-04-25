@@ -33,4 +33,5 @@ Pod::Spec.new do |s|
     
     # Dependencies
     s.dependency 'FingerprintPro', '~> 2.7'
+    s.dependency 'MoneyKit', '~> 1.9.4'
 end
