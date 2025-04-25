@@ -1,6 +1,9 @@
 ### Changelog for Swift onboarding components SDK
 *Updating this file is one of the requirements for GitHub CI/CD for Swift package release*
 
+# v1.0.3-beta
+Publish Footprint Bank Linking
+
 # v1.0.2-beta
 Bump some dependencies version
 

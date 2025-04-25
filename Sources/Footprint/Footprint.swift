@@ -28,6 +28,9 @@ internal actor FingerprintPropsManager {
     }
 }
 
+public struct FootprintAuthRequirement: Sendable {
+    public let requiresAuth: Bool
+}
 
 public final class Footprint: Sendable {
     public static let shared = Footprint()
@@ -136,6 +139,19 @@ public final class Footprint: Sendable {
         }catch{
             // ...
         }
+    }
+    
+    internal func getSesstionId() -> String? {
+        SwiftOnboardingComponentsShared._Footprint.shared.getSessionId()
+    }
+    
+    internal func getMoneyKitLinkSessionToken(redirectUri: String) async throws -> String {
+        try await SwiftOnboardingComponentsShared._Footprint.shared.getMoneyKitLinkSessionToken(redirectUri: redirectUri)
+    }
+    
+    internal func postUserBankLinkingLinkSessionExchangeData (exchangeableToken: String) async throws -> String? {
+        let linkId = try await SwiftOnboardingComponentsShared._Footprint.shared.postUserBankLinkingLinkSessionExchangeData(exchangeableToken: exchangeableToken).linkId
+        return linkId
     }
 }
 
