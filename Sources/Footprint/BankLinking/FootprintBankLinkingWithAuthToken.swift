@@ -7,9 +7,13 @@
 import SwiftUI
 import SwiftOnboardingComponentsShared
 
+public struct BankLinkingCompletionResponse {
+    public let validationToken: String
+}
+
 public struct FootprintBankLinkingWithAuthToken: View {
     private let authToken: String
-    private var onSuccess: ((BankLinkingSuccessResponse) -> Void)? = nil
+    private var onSuccess: ((BankLinkingCompletionResponse) -> Void)? = nil
     private var onError: ((FootprintException) -> Void)? = nil
     private var onClose: (() -> Void)? = nil
     private var sessionId: String? = nil
@@ -19,7 +23,7 @@ public struct FootprintBankLinkingWithAuthToken: View {
     public init(
         authToken: String,
         redirectUri: String,
-        onSuccess: ((BankLinkingSuccessResponse) -> Void)? = nil,
+        onSuccess: ((BankLinkingCompletionResponse) -> Void)? = nil,
         onError: ((FootprintException) -> Void)? = nil,
         onClose: (() -> Void)? = nil,
         sessionId: String? = nil
@@ -57,11 +61,11 @@ public struct FootprintBankLinkingWithAuthToken: View {
             } else {
                 FootprintBankLinking(
                     redirectUri: self.redirectUri,
-                    onSuccess: { response in
+                    onSuccess: {
                         Task {
                             do {
-                                try await Footprint.shared.process()
-                                self.onSuccess?(response)
+                                let validationToken = try await Footprint.shared.process()
+                                self.onSuccess?(BankLinkingCompletionResponse(validationToken: validationToken))
                             } catch {
                                 let footprintError = (error as? FootprintException) ?? FootprintException(
                                     kind: FootprintException.ErrorKind.bankLinkingError,

@@ -9,22 +9,18 @@ import MoneyKit
 import SwiftUI
 import SwiftOnboardingComponentsShared
 
-public struct BankLinkingSuccessResponse {
-    public let linkId: String?
-}
-
 public struct FootprintBankLinking: View {
     @StateObject private var connectViewModel = MKConnectViewModel()
     @State private var linkSessionToken: String? = nil
     @State private var isLoading: Bool = true
-    private var onSuccess: ((BankLinkingSuccessResponse) -> Void)? = nil
+    private var onSuccess: (() -> Void)? = nil
     private var onError: ((FootprintException) -> Void)? = nil
     private var onClose: (() -> Void)? = nil
     private var redirectUri: String
     
     public init(
         redirectUri: String,
-        onSuccess: ((BankLinkingSuccessResponse) -> Void)? = nil,
+        onSuccess: (() -> Void)? = nil,
         onError: ((FootprintException) -> Void)? = nil,
         onClose: (() -> Void)? = nil
     ) {
@@ -105,23 +101,22 @@ extension FootprintBankLinking {
         case let .linked(institution):
             Task{
                 do {
-                    let linkId = try await Footprint.shared.postUserBankLinkingLinkSessionExchangeData(exchangeableToken: institution.token.value)
-                    self.onSuccess?(BankLinkingSuccessResponse(linkId: linkId))
+                    try await Footprint.shared.postUserBankLinkingLinkSessionExchangeData(exchangeableToken: institution.token.value)
+                    self.onSuccess?()
                 }catch {
                     handleError(error)
                 }
             }
         case let .relinked(institution):
-            self.onSuccess?(BankLinkingSuccessResponse(linkId: nil))
+            self.onSuccess?()
         @unknown default:
             // TODO: what to do when this happens?
-            self.onSuccess?(BankLinkingSuccessResponse(linkId: nil))
+            self.onSuccess?()
         }
     }
     
     private func onExit(error: MKLinkError?) {
         connectViewModel.linkHandler = nil
-        
         if let error = error {
             handleMkError(error)
         } else {
@@ -133,7 +128,7 @@ extension FootprintBankLinking {
         Task{
             let fpError = FootprintException(
                 kind: FootprintException.ErrorKind.bankLinkingError,
-                message: "Error: mkErrorId: \(error.errorId), mkRequestId \(error.requestId). Error: \(error.displayedMessage)",
+                message: "Error: mkErrorId: \(error.errorId), mkRequestId \(String(describing: error.requestId)). Error: \(error.displayedMessage)",
                 supportId: nil,
                 sessionId: Footprint.shared.getSesstionId(),
                 context: nil

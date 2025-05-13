@@ -74,9 +74,6 @@ public final class Footprint: Sendable {
         // Use actor to set API key safely
         await Self.propManager.setFingerprintAPIKey(response.fingerprintApiKey)
         await Self.propManager.setSessionId(sessionId)
-        if(response.requiresAuth){
-            await sendFingerprintData()
-        }
     }
     
     public func initializeWithAuthToken(
@@ -149,9 +146,8 @@ public final class Footprint: Sendable {
         try await SwiftOnboardingComponentsShared._Footprint.shared.getMoneyKitLinkSessionToken(redirectUri: redirectUri)
     }
     
-    internal func postUserBankLinkingLinkSessionExchangeData (exchangeableToken: String) async throws -> String? {
-        let linkId = try await SwiftOnboardingComponentsShared._Footprint.shared.postUserBankLinkingLinkSessionExchangeData(exchangeableToken: exchangeableToken).linkId
-        return linkId
+    internal func postUserBankLinkingLinkSessionExchangeData (exchangeableToken: String) async throws {
+        try await SwiftOnboardingComponentsShared._Footprint.shared.postUserBankLinkingLinkSessionExchangeData(exchangeableToken: exchangeableToken)
     }
 }
 
