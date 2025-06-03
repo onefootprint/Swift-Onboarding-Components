@@ -1,6 +1,9 @@
 ### Changelog for Swift onboarding components SDK
 *Updating this file is one of the requirements for GitHub CI/CD for Swift package release*
 
+# v1.0.2
+Update APIs for OBE support
+
 # v1.0.1
 Patch Bank linking to return validation token onSuccess
 
