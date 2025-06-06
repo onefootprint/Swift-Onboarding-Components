@@ -1,6 +1,9 @@
 ### Changelog for Swift onboarding components SDK
 *Updating this file is one of the requirements for GitHub CI/CD for Swift package release*
 
+# v1.0.3
+Add better support appearance and bootstrap data in hosted flow (launchHosted function)
+
 # v1.0.2
 Update APIs for OBE support
 
