@@ -302,7 +302,7 @@ class FormManager: ObservableObject {
             idSsn4: idSsn4.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idSsn4,
             idSsn9: idSsn9.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idSsn9,
             idState: idState.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idState,
-            idZip: idZip.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idZip
+            idZip: idZip.trimmingCharacters(in: .whitespaces).isEmpty ? nil : idZip            
         )
     }
     

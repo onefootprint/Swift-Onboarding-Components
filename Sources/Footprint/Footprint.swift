@@ -158,7 +158,7 @@ public struct FootprintBootstrapData {
         businessAddressLine1: String? = nil,
         businessAddressLine2: String? = nil,
         businessCity: String? = nil,
-        businessCorporationType: String? = nil,
+        businessCorporationType: BusinessCorporationType? = nil,
         businessCountry: String? = nil,
         businessDba: String? = nil,
         businessFormationDate: String? = nil,

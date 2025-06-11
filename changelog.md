@@ -1,6 +1,9 @@
 ### Changelog for Swift onboarding components SDK
 *Updating this file is one of the requirements for GitHub CI/CD for Swift package release*
 
+# v1.1.0
+Add custom fields support
+
 # v1.0.3
 Add better support appearance and bootstrap data in hosted flow (launchHosted function)
 

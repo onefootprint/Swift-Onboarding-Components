@@ -1,5 +1,48 @@
 // extension required due to limitations of KMM not able to generate default values in obj-c
+
+import Foundation
+
+public extension DataIdentifier {
+    static func custom(fieldName: String) -> DataIdentifier {
+        return DataIdentifier.companion.custom(fieldName: fieldName)
+    }
+}
+
 public extension VaultData {
+    
+    // MARK: - Native Swift Custom Fields Type
+    
+    /// Swift-friendly custom fields type - just a simple [String: String] dictionary
+    typealias CustomFields = [String: String]
+    
+    // MARK: - Computed Property for Swift-Friendly Access
+    
+    /// Gets custom fields as a clean Swift dictionary (without "custom." prefix)
+    private var swiftCustomFields: CustomFields {
+        var result: [String: String] = [:]
+        for (key, value) in customFields {
+            if key.hasPrefix("custom.") {
+                let cleanKey = String(key.dropFirst("custom.".count))
+                // Handle the Kotlin-Swift bridge JsonElement
+                if let primitive = value as? Kotlinx_serialization_jsonJsonPrimitive {
+                    result[cleanKey] = primitive.content
+                } else {
+                    // Fallback: use string representation and clean quotes
+                    let stringValue = String(describing: value)
+                    let cleaned = stringValue.trimmingCharacters(in: CharacterSet(charactersIn: "\""))
+                    result[cleanKey] = cleaned
+                }
+            }
+        }
+            
+        return result
+    }
+    
+    // MARK: - Convenience Initializers (Main API)
+    
+    /// Swift-friendly convenience initializer for basic user data
+    /// Usage: VaultData(firstName: "John", customFields: ["company": "Acme"])
+    ///
     static func createVault( idAddressLine1: String? = nil,
                              idAddressLine2: String? = nil,
                              idCitizenships: [Iso3166TwoDigitCountryCode]? = nil,
@@ -35,7 +78,25 @@ public extension VaultData {
                              investorProfileOccupation: String? = nil,
                              investorProfilePoliticalOrganization: String? = nil,
                              investorProfileRiskTolerance: String? = nil,
-                             investorProfileSeniorExecutiveSymbols: [String]? = nil) -> VaultData {
+                             investorProfileSeniorExecutiveSymbols: [String]? = nil,
+                             customFields: CustomFields = [:]) -> VaultData {
+        
+        // Convert Swift custom fields to Kotlin format with "custom." prefix
+        let kotlinCustomFields = customFields.reduce(into: [String: Kotlinx_serialization_jsonJsonElement]()) { result, pair in
+            let fullKey = pair.key.hasPrefix("custom.") ? pair.key : "custom.\(pair.key)"
+            
+            do {
+                let jsonData = try JSONEncoder().encode(pair.value)
+                guard let jsonString = String(data: jsonData, encoding: .utf8) else {
+                    return
+                }
+                
+                let jsonElement = try Kotlinx_serialization_jsonJson.companion.parseToJsonElement(string: jsonString)
+                result[fullKey] = jsonElement
+            } catch {
+                print("✗ Failed to convert field: \(fullKey), error: \(error.localizedDescription)")
+            }
+        }
         return VaultData( idAddressLine1: idAddressLine1,
                           idAddressLine2: idAddressLine2,
                           idCitizenships: idCitizenships,
@@ -71,17 +132,19 @@ public extension VaultData {
                           investorProfileOccupation: investorProfileOccupation,
                           investorProfilePoliticalOrganization: investorProfilePoliticalOrganization,
                           investorProfileRiskTolerance: investorProfileRiskTolerance,
-                          investorProfileSeniorExecutiveSymbols: investorProfileSeniorExecutiveSymbols)
+                          investorProfileSeniorExecutiveSymbols: investorProfileSeniorExecutiveSymbols,
+                          customFields: kotlinCustomFields
+        )
     }
 }
 
 public extension BootstrapDataV1 {
-        
+    
     static func createBootstrapData(
         businessAddressLine1: String? = nil,
         businessAddressLine2: String? = nil,
         businessCity: String? = nil,
-        businessCorporationType: String? = nil,
+        businessCorporationType: BusinessCorporationType? = nil,
         businessCountry: String? = nil,
         businessDba: String? = nil,
         businessFormationDate: String? = nil,
@@ -118,46 +181,46 @@ public extension BootstrapDataV1 {
         idVisaKind: String? = nil,
         idZip: String? = nil
     ) -> BootstrapDataV1 {
-            return BootstrapDataV1(businessAddressLine1: businessAddressLine1,
-                                   businessAddressLine2: businessAddressLine2,
-                                   businessCity: businessCity,
-                                   businessCorporationType: businessCorporationType,
-                                   businessCountry: businessCountry,
-                                   businessDba: businessDba,
-                                   businessFormationDate: businessFormationDate,
-                                   businessFormationState: businessFormationState,
-                                   businessName: businessName,
-                                   businessPhoneNumber: businessPhoneNumber,
-                                   businessPrimaryOwnerStake: businessPrimaryOwnerStake != nil ? KotlinLong(integerLiteral: businessPrimaryOwnerStake!) : nil,
-                                   businessSecondaryOwners: businessSecondaryOwners,
-                                   businessState: businessState,
-                                   businessTin: businessTin,
-                                   businessWebsite: businessWebsite,
-                                   businessZip: businessZip,
-                                   idAddressLine1: idAddressLine1,
-                                   idAddressLine2: idAddressLine2,
-                                   idCitizenships: idCitizenships,
-                                   idCity: idCity,
-                                   idCountry: idCountry,
-                                   idDob: idDob,
-                                   idDriversLicenseNumber: idDriversLicenseNumber,
-                                   idDriversLicenseState: idDriversLicenseState,
-                                   idEmail: idEmail,
-                                   idFirstName: idFirstName,
-                                   idItin: idItin,
-                                   idLastName: idLastName,
-                                   idMiddleName: idMiddleName,
-                                   idNationality: idNationality,
-                                   idPhoneNumber: idPhoneNumber,
-                                   idSsn4: idSsn4,
-                                   idSsn9: idSsn9,
-                                   idState: idState,
-                                   idUsLegalStatus: idUsLegalStatus,
-                                   idUsTaxId: idUsTaxId,
-                                   idVisaExpirationDate: idVisaExpirationDate,
-                                   idVisaKind: idVisaKind,
-                                   idZip: idZip)
-        }
+        return BootstrapDataV1(businessAddressLine1: businessAddressLine1,
+                               businessAddressLine2: businessAddressLine2,
+                               businessCity: businessCity,
+                               businessCorporationType: businessCorporationType,
+                               businessCountry: businessCountry,
+                               businessDba: businessDba,
+                               businessFormationDate: businessFormationDate,
+                               businessFormationState: businessFormationState,
+                               businessName: businessName,
+                               businessPhoneNumber: businessPhoneNumber,
+                               businessPrimaryOwnerStake: businessPrimaryOwnerStake != nil ? KotlinLong(integerLiteral: businessPrimaryOwnerStake!) : nil,
+                               businessSecondaryOwners: businessSecondaryOwners,
+                               businessState: businessState,
+                               businessTin: businessTin,
+                               businessWebsite: businessWebsite,
+                               businessZip: businessZip,
+                               idAddressLine1: idAddressLine1,
+                               idAddressLine2: idAddressLine2,
+                               idCitizenships: idCitizenships,
+                               idCity: idCity,
+                               idCountry: idCountry,
+                               idDob: idDob,
+                               idDriversLicenseNumber: idDriversLicenseNumber,
+                               idDriversLicenseState: idDriversLicenseState,
+                               idEmail: idEmail,
+                               idFirstName: idFirstName,
+                               idItin: idItin,
+                               idLastName: idLastName,
+                               idMiddleName: idMiddleName,
+                               idNationality: idNationality,
+                               idPhoneNumber: idPhoneNumber,
+                               idSsn4: idSsn4,
+                               idSsn9: idSsn9,
+                               idState: idState,
+                               idUsLegalStatus: idUsLegalStatus,
+                               idUsTaxId: idUsTaxId,
+                               idVisaExpirationDate: idVisaExpirationDate,
+                               idVisaKind: idVisaKind,
+                               idZip: idZip)
+    }
 }
 
 public extension FootprintAppearance {
@@ -193,7 +256,7 @@ public extension FootprintAppearanceRules {
         linkButtonHover: [String: String]? = nil,
         linkButtonFocus: [String: String]? = nil,
         linkButtonActive: [String: String]? = nil
-    ) -> FootprintAppearanceRules {     
+    ) -> FootprintAppearanceRules {
         return FootprintAppearanceRules(
             button: button,
             buttonHover: buttonHover,
@@ -348,133 +411,133 @@ public extension FootprintAppearanceVariables {
         radioSelectComponentsIconBg: String? = nil,
         radioSelectComponentsIconHoverBg: String? = nil,
         radioSelectComponentsIconSelectedBg: String? = nil) -> FootprintAppearanceVariables {
-        return FootprintAppearanceVariables(
-            // globals
-            borderRadius: borderRadius,
-            colorError: colorError,
-            colorWarning: colorWarning,
-            colorSuccess: colorSuccess,
-            colorAccent: colorAccent,
-            borderColorError: borderColorError,
-            
-            // container
-            containerBg: containerBg,
-            containerElevation: containerElevation,
-            containerBorder: containerBorder,
-            containerBorderRadius: containerBorderRadius,
-            
-            // link
-            linkColor: linkColor,
-            
-            // typography
-            fontFamily: fontFamily,
-            
-            // label
-            labelColor: labelColor,
-            labelFont: labelFont,
-            
-            // input
-            inputBorderRadius: inputBorderRadius,
-            inputBorderWidth: inputBorderWidth,
-            inputFont: inputFont,
-            inputHeight: inputHeight,
-            inputPlaceholderColor: inputPlaceholderColor,
-            inputColor: inputColor,
-            inputBg: inputBg,
-            inputBorderColor: inputBorderColor,
-            inputElevation: inputElevation,
-            inputHoverBg: inputHoverBg,
-            inputHoverBorderColor: inputHoverBorderColor,
-            inputHoverElevation: inputHoverElevation,
-            inputFocusBg: inputFocusBg,
-            inputFocusBorderColor: inputFocusBorderColor,
-            inputFocusElevation: inputFocusElevation,
-            inputErrorBg: inputErrorBg,
-            inputErrorBorderColor: inputErrorBorderColor,
-            inputErrorElevation: inputErrorElevation,
-            inputErrorHoverBg: inputErrorHoverBg,
-            inputErrorHoverBorderColor: inputErrorHoverBorderColor,
-            inputErrorHoverElevation: inputErrorHoverElevation,
-            inputErrorFocusBg: inputErrorFocusBg,
-            inputErrorFocusBorderColor: inputErrorFocusBorderColor,
-            inputErrorFocusElevation: inputErrorFocusElevation,
-            
-            // hint
-            hintColor: hintColor,
-            hintErrorColor: hintErrorColor,
-            hintFont: hintFont,
-            
-            // link button
-            linkButtonColor: linkButtonColor,
-            linkButtonHoverColor: linkButtonHoverColor,
-            linkButtonActiveColor: linkButtonActiveColor,
-            linkButtonDestructiveColor: linkButtonDestructiveColor,
-            linkButtonDestructiveHoverColor: linkButtonDestructiveHoverColor,
-            linkButtonDestructiveActiveColor: linkButtonDestructiveActiveColor,
-            
-            // button
-            buttonBorderRadius: buttonBorderRadius,
-            buttonBorderWidth: buttonBorderWidth,
-            buttonElevation: buttonElevation,
-            buttonElevationHover: buttonElevationHover,
-            buttonElevationActive: buttonElevationActive,
-            buttonOutlineOffset: buttonOutlineOffset,
-            buttonPrimaryBg: buttonPrimaryBg,
-            buttonPrimaryColor: buttonPrimaryColor,
-            buttonPrimaryBorderColor: buttonPrimaryBorderColor,
-            buttonPrimaryHoverBg: buttonPrimaryHoverBg,
-            buttonPrimaryHoverColor: buttonPrimaryHoverColor,
-            buttonPrimaryHoverBorderColor: buttonPrimaryHoverBorderColor,
-            buttonPrimaryActiveBg: buttonPrimaryActiveBg,
-            buttonPrimaryActiveColor: buttonPrimaryActiveColor,
-            buttonPrimaryActiveBorderColor: buttonPrimaryActiveBorderColor,
-            buttonPrimaryDisabledBg: buttonPrimaryDisabledBg,
-            buttonPrimaryDisabledColor: buttonPrimaryDisabledColor,
-            buttonPrimaryDisabledBorderColor: buttonPrimaryDisabledBorderColor,
-            buttonPrimaryLoadingBg: buttonPrimaryLoadingBg,
-            buttonPrimaryLoadingColor: buttonPrimaryLoadingColor,
-            buttonsPrimaryLoadingBorderColor: buttonsPrimaryLoadingBorderColor,
-            buttonSecondaryBg: buttonSecondaryBg,
-            buttonSecondaryColor: buttonSecondaryColor,
-            buttonSecondaryBorderColor: buttonSecondaryBorderColor,
-            buttonSecondaryHoverBg: buttonSecondaryHoverBg,
-            buttonSecondaryHoverColor: buttonSecondaryHoverColor,
-            buttonSecondaryHoverBorderColor: buttonSecondaryHoverBorderColor,
-            buttonSecondaryActiveBg: buttonSecondaryActiveBg,
-            buttonSecondaryActiveColor: buttonSecondaryActiveColor,
-            buttonSecondaryActiveBorderColor: buttonSecondaryActiveBorderColor,
-            buttonSecondaryDisabledBg: buttonSecondaryDisabledBg,
-            buttonSecondaryDisabledColor: buttonSecondaryDisabledColor,
-            buttonSecondaryDisabledBorderColor: buttonSecondaryDisabledBorderColor,
-            buttonSecondaryLoadingBg: buttonSecondaryLoadingBg,
-            buttonSecondaryLoadingColor: buttonSecondaryLoadingColor,
-            
-            // Dropdown
-            dropdownBg: dropdownBg,
-            dropdownHoverBg: dropdownHoverBg,
-            dropdownBorderColor: dropdownBorderColor,
-            dropdownBorderWidth: dropdownBorderWidth,
-            dropdownBorderRadius: dropdownBorderRadius,
-            dropdownElevation: dropdownElevation,
-            dropdownColorPrimary: dropdownColorPrimary,
-            dropdownColorSecondary: dropdownColorSecondary,
-            dropdownFooterBg: dropdownFooterBg,
-            
-            // Radio select
-            radioSelectBg: radioSelectBg,
-            radioSelectColor: radioSelectColor,
-            radioSelectHoverColor: radioSelectHoverColor,
-            radioSelectSelectedColor: radioSelectSelectedColor,
-            radioSelectBorderRadius: radioSelectBorderRadius,
-            radioSelectBorderWidth: radioSelectBorderWidth,
-            radioSelectBorderColor: radioSelectBorderColor,
-            radioSelectHoverBg: radioSelectHoverBg,
-            radioSelectHoverBorderColor: radioSelectHoverBorderColor,
-            radioSelectSelectedBg: radioSelectSelectedBg,
-            radioSelectSelectedBorderColor: radioSelectSelectedBorderColor,
-            radioSelectComponentsIconBg: radioSelectComponentsIconBg,
-            radioSelectComponentsIconHoverBg: radioSelectComponentsIconHoverBg,
-            radioSelectComponentsIconSelectedBg: radioSelectComponentsIconSelectedBg
-        )
-    }
+            return FootprintAppearanceVariables(
+                // globals
+                borderRadius: borderRadius,
+                colorError: colorError,
+                colorWarning: colorWarning,
+                colorSuccess: colorSuccess,
+                colorAccent: colorAccent,
+                borderColorError: borderColorError,
+                
+                // container
+                containerBg: containerBg,
+                containerElevation: containerElevation,
+                containerBorder: containerBorder,
+                containerBorderRadius: containerBorderRadius,
+                
+                // link
+                linkColor: linkColor,
+                
+                // typography
+                fontFamily: fontFamily,
+                
+                // label
+                labelColor: labelColor,
+                labelFont: labelFont,
+                
+                // input
+                inputBorderRadius: inputBorderRadius,
+                inputBorderWidth: inputBorderWidth,
+                inputFont: inputFont,
+                inputHeight: inputHeight,
+                inputPlaceholderColor: inputPlaceholderColor,
+                inputColor: inputColor,
+                inputBg: inputBg,
+                inputBorderColor: inputBorderColor,
+                inputElevation: inputElevation,
+                inputHoverBg: inputHoverBg,
+                inputHoverBorderColor: inputHoverBorderColor,
+                inputHoverElevation: inputHoverElevation,
+                inputFocusBg: inputFocusBg,
+                inputFocusBorderColor: inputFocusBorderColor,
+                inputFocusElevation: inputFocusElevation,
+                inputErrorBg: inputErrorBg,
+                inputErrorBorderColor: inputErrorBorderColor,
+                inputErrorElevation: inputErrorElevation,
+                inputErrorHoverBg: inputErrorHoverBg,
+                inputErrorHoverBorderColor: inputErrorHoverBorderColor,
+                inputErrorHoverElevation: inputErrorHoverElevation,
+                inputErrorFocusBg: inputErrorFocusBg,
+                inputErrorFocusBorderColor: inputErrorFocusBorderColor,
+                inputErrorFocusElevation: inputErrorFocusElevation,
+                
+                // hint
+                hintColor: hintColor,
+                hintErrorColor: hintErrorColor,
+                hintFont: hintFont,
+                
+                // link button
+                linkButtonColor: linkButtonColor,
+                linkButtonHoverColor: linkButtonHoverColor,
+                linkButtonActiveColor: linkButtonActiveColor,
+                linkButtonDestructiveColor: linkButtonDestructiveColor,
+                linkButtonDestructiveHoverColor: linkButtonDestructiveHoverColor,
+                linkButtonDestructiveActiveColor: linkButtonDestructiveActiveColor,
+                
+                // button
+                buttonBorderRadius: buttonBorderRadius,
+                buttonBorderWidth: buttonBorderWidth,
+                buttonElevation: buttonElevation,
+                buttonElevationHover: buttonElevationHover,
+                buttonElevationActive: buttonElevationActive,
+                buttonOutlineOffset: buttonOutlineOffset,
+                buttonPrimaryBg: buttonPrimaryBg,
+                buttonPrimaryColor: buttonPrimaryColor,
+                buttonPrimaryBorderColor: buttonPrimaryBorderColor,
+                buttonPrimaryHoverBg: buttonPrimaryHoverBg,
+                buttonPrimaryHoverColor: buttonPrimaryHoverColor,
+                buttonPrimaryHoverBorderColor: buttonPrimaryHoverBorderColor,
+                buttonPrimaryActiveBg: buttonPrimaryActiveBg,
+                buttonPrimaryActiveColor: buttonPrimaryActiveColor,
+                buttonPrimaryActiveBorderColor: buttonPrimaryActiveBorderColor,
+                buttonPrimaryDisabledBg: buttonPrimaryDisabledBg,
+                buttonPrimaryDisabledColor: buttonPrimaryDisabledColor,
+                buttonPrimaryDisabledBorderColor: buttonPrimaryDisabledBorderColor,
+                buttonPrimaryLoadingBg: buttonPrimaryLoadingBg,
+                buttonPrimaryLoadingColor: buttonPrimaryLoadingColor,
+                buttonsPrimaryLoadingBorderColor: buttonsPrimaryLoadingBorderColor,
+                buttonSecondaryBg: buttonSecondaryBg,
+                buttonSecondaryColor: buttonSecondaryColor,
+                buttonSecondaryBorderColor: buttonSecondaryBorderColor,
+                buttonSecondaryHoverBg: buttonSecondaryHoverBg,
+                buttonSecondaryHoverColor: buttonSecondaryHoverColor,
+                buttonSecondaryHoverBorderColor: buttonSecondaryHoverBorderColor,
+                buttonSecondaryActiveBg: buttonSecondaryActiveBg,
+                buttonSecondaryActiveColor: buttonSecondaryActiveColor,
+                buttonSecondaryActiveBorderColor: buttonSecondaryActiveBorderColor,
+                buttonSecondaryDisabledBg: buttonSecondaryDisabledBg,
+                buttonSecondaryDisabledColor: buttonSecondaryDisabledColor,
+                buttonSecondaryDisabledBorderColor: buttonSecondaryDisabledBorderColor,
+                buttonSecondaryLoadingBg: buttonSecondaryLoadingBg,
+                buttonSecondaryLoadingColor: buttonSecondaryLoadingColor,
+                
+                // Dropdown
+                dropdownBg: dropdownBg,
+                dropdownHoverBg: dropdownHoverBg,
+                dropdownBorderColor: dropdownBorderColor,
+                dropdownBorderWidth: dropdownBorderWidth,
+                dropdownBorderRadius: dropdownBorderRadius,
+                dropdownElevation: dropdownElevation,
+                dropdownColorPrimary: dropdownColorPrimary,
+                dropdownColorSecondary: dropdownColorSecondary,
+                dropdownFooterBg: dropdownFooterBg,
+                
+                // Radio select
+                radioSelectBg: radioSelectBg,
+                radioSelectColor: radioSelectColor,
+                radioSelectHoverColor: radioSelectHoverColor,
+                radioSelectSelectedColor: radioSelectSelectedColor,
+                radioSelectBorderRadius: radioSelectBorderRadius,
+                radioSelectBorderWidth: radioSelectBorderWidth,
+                radioSelectBorderColor: radioSelectBorderColor,
+                radioSelectHoverBg: radioSelectHoverBg,
+                radioSelectHoverBorderColor: radioSelectHoverBorderColor,
+                radioSelectSelectedBg: radioSelectSelectedBg,
+                radioSelectSelectedBorderColor: radioSelectSelectedBorderColor,
+                radioSelectComponentsIconBg: radioSelectComponentsIconBg,
+                radioSelectComponentsIconHoverBg: radioSelectComponentsIconHoverBg,
+                radioSelectComponentsIconSelectedBg: radioSelectComponentsIconSelectedBg
+            )
+        }
 }
