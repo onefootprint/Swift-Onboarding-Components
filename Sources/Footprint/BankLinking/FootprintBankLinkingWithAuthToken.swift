@@ -16,6 +16,7 @@ public struct FootprintBankLinkingWithAuthToken: View {
     private var onSuccess: ((BankLinkingCompletionResponse) -> Void)? = nil
     private var onError: ((FootprintException) -> Void)? = nil
     private var onClose: (() -> Void)? = nil
+    private var onEvent: ((FootprintBankLinkingEvent) -> Void)? = nil
     private var sessionId: String? = nil
     private let redirectUri: String
     @State private var initialized: Bool = false
@@ -26,6 +27,7 @@ public struct FootprintBankLinkingWithAuthToken: View {
         onSuccess: ((BankLinkingCompletionResponse) -> Void)? = nil,
         onError: ((FootprintException) -> Void)? = nil,
         onClose: (() -> Void)? = nil,
+        onEvent: ((FootprintBankLinkingEvent) -> Void)? = nil,
         sessionId: String? = nil
     ) {
         self.authToken = authToken
@@ -33,6 +35,7 @@ public struct FootprintBankLinkingWithAuthToken: View {
         self.onSuccess = onSuccess
         self.onError = onError
         self.onClose = onClose
+        self.onEvent = onEvent
         self.sessionId = sessionId
     }
     
@@ -83,7 +86,8 @@ public struct FootprintBankLinkingWithAuthToken: View {
                     onError: { error in
                         self.onError?(error)
                     },
-                    onClose: self.onClose
+                    onClose: self.onClose,
+                    onEvent: self.onEvent
                 )
             }
         }

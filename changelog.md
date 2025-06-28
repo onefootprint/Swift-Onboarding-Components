@@ -1,6 +1,9 @@
 ### Changelog for Swift onboarding components SDK
 *Updating this file is one of the requirements for GitHub CI/CD for Swift package release*
 
+# v1.1.1
+Add support for onEvent callback in bank linking
+
 # v1.1.0
 Add custom fields support
 

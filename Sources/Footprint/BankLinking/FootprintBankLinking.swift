@@ -16,18 +16,21 @@ public struct FootprintBankLinking: View {
     private var onSuccess: (() -> Void)? = nil
     private var onError: ((FootprintException) -> Void)? = nil
     private var onClose: (() -> Void)? = nil
+    private var onEvent: ((FootprintBankLinkingEvent) -> Void)? = nil
     private var redirectUri: String
     
     public init(
         redirectUri: String,
         onSuccess: (() -> Void)? = nil,
         onError: ((FootprintException) -> Void)? = nil,
-        onClose: (() -> Void)? = nil
+        onClose: (() -> Void)? = nil,
+        onEvent: ((FootprintBankLinkingEvent) -> Void)? = nil
     ) {
         self.onSuccess = onSuccess
         self.onError = onError
         self.onClose = onClose
         self.redirectUri = redirectUri
+        self.onEvent = onEvent
     }
     
     public var body: some View {
@@ -43,6 +46,18 @@ public struct FootprintBankLinking: View {
             handleIncomingURL(incomingURL)
         }
         .onAppear{
+            NotificationCenter.default.addObserver(
+                forName: .footprintBankLinkingRedirectReceived,
+                object: nil,
+                queue: .main
+            ) { notification in
+                if let url = notification.userInfo?["url"] as? URL {
+                    Task { @MainActor in
+                        handleIncomingURL(url)
+                    }
+                }
+            }
+            
             Task {
                 do {
                     linkSessionToken = try await Footprint.shared.getMoneyKitLinkSessionToken(redirectUri: redirectUri)
@@ -52,6 +67,14 @@ public struct FootprintBankLinking: View {
                 }
             }
         }
+    }
+    
+    public static func handleRedirectURL(_ url: URL) {
+        NotificationCenter.default.post(
+            name: .footprintBankLinkingRedirectReceived,
+            object: nil,
+            userInfo: ["url": url]
+        )
     }
 }
 
@@ -81,8 +104,8 @@ extension FootprintBankLinking {
             let configuration = try MKConfiguration(
                 sessionToken: sessionToken,
                 onSuccess: onSuccess(successType:),
-                onExit: onExit(error:)
-                // onEvent: onEvent(event:) // TODO: in the future we should add logging to DD for this SDK and log these events
+                onExit: onExit(error:),
+                onEvent: onEvent(event:) // TODO: in the future we should add logging to DD for this SDK and log these events
             )
             
             let linkHandler = MKLinkHandler(configuration: configuration)
@@ -124,6 +147,16 @@ extension FootprintBankLinking {
         }
     }
     
+    private func onEvent(event: MKLinkEvent) {
+        let footprintBalEvent = FootprintBankLinkingEvent(
+            name: event.name,
+            properties: event.properties,
+            meta: event.meta
+        )
+        // TODO: in the future we should add logging to DD for this SDK and log these events
+        self.onEvent?(footprintBalEvent)
+    }
+    
     private func handleMkError(_ error: MKLinkError)  {
         Task{
             let fpError = FootprintException(
@@ -152,13 +185,11 @@ extension FootprintBankLinking {
         }
     }
     
-    
-    // TODO: in the future we should add logging to DD for this SDK and log these events
-    //    private func onEvent(event: MKLinkEvent) {
-    //        print("MKLinkEvent: \(event.name)")
-    //    }
-    
     private func handleIncomingURL(_ url: URL) {
         self.connectViewModel.linkHandler?.continueFlow(from: url)
     }
+}
+
+extension Notification.Name {
+    static let footprintBankLinkingRedirectReceived = Notification.Name("footprintBankLinkingRedirectReceived")
 }
