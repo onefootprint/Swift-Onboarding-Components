@@ -8,9 +8,9 @@
 import MoneyKit
 
 public struct BankLinkingCompletionMeta {
-    let accounts: [FootprintBankLinkingAccount]
-    let institution: FootprintBankLinkingInstitution
-    let trackedScreens: [FootprintBankLinkingTrackedScreen]
+    public let accounts: [FootprintBankLinkingAccount]
+    public let institution: FootprintBankLinkingInstitution
+    public let trackedScreens: [FootprintBankLinkingTrackedScreen]
 }
 
 

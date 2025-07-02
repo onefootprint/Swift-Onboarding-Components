@@ -7,9 +7,9 @@
 import Foundation
 
 public struct FootprintBankLinkingTrackedScreen {
-    let name: String
-    let duration: TimeInterval
-    let gameTime: TimeInterval?
-    let requestTime: TimeInterval?
+    public let name: String
+    public let duration: TimeInterval
+    public let gameTime: TimeInterval?
+    public let requestTime: TimeInterval?
 }
 

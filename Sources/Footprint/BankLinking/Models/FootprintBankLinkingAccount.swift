@@ -6,8 +6,8 @@
 //
 
 public struct FootprintBankLinkingAccount {
-    let id: String
-    let name: String
-    let type: String
-    let mask: String?
+    public let id: String
+    public let name: String
+    public let type: String
+    public let mask: String?
 }

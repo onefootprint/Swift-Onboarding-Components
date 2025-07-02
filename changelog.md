@@ -1,6 +1,9 @@
 ### Changelog for Swift onboarding components SDK
 *Updating this file is one of the requirements for GitHub CI/CD for Swift package release*
 
+# v1.2.1
+Patch: make the success meta fields public BAL
+
 # v1.2.0
 Added additional metadata in onSuccess callback for bank linking
 

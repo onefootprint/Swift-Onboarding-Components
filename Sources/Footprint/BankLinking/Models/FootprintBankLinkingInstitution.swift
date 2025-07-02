@@ -6,8 +6,8 @@
 //
 
 public struct FootprintBankLinkingInstitution {
-    let id: String
-    let name: String
-    let domain: String?
+    public let id: String
+    public let name: String
+    public let domain: String?
 }
 
