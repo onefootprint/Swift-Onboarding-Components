@@ -13,7 +13,7 @@ public struct FootprintBankLinking: View {
     @StateObject private var connectViewModel = MKConnectViewModel()
     @State private var linkSessionToken: String? = nil
     @State private var isLoading: Bool = true
-    private var onSuccess: (() -> Void)? = nil
+    private var onSuccess: ((BankLinkingCompletionMeta) -> Void)? = nil
     private var onError: ((FootprintException) -> Void)? = nil
     private var onClose: (() -> Void)? = nil
     private var onEvent: ((FootprintBankLinkingEvent) -> Void)? = nil
@@ -21,7 +21,7 @@ public struct FootprintBankLinking: View {
     
     public init(
         redirectUri: String,
-        onSuccess: (() -> Void)? = nil,
+        onSuccess: ((BankLinkingCompletionMeta) -> Void)? = nil,
         onError: ((FootprintException) -> Void)? = nil,
         onClose: (() -> Void)? = nil,
         onEvent: ((FootprintBankLinkingEvent) -> Void)? = nil
@@ -125,16 +125,26 @@ extension FootprintBankLinking {
             Task{
                 do {
                     try await Footprint.shared.postUserBankLinkingLinkSessionExchangeData(exchangeableToken: institution.token.value)
-                    self.onSuccess?()
+                    self.onSuccess?(
+                        getBankLinkingCompletionMetaFromLinked(institution: institution)
+                    )
                 }catch {
                     handleError(error)
                 }
             }
         case let .relinked(institution):
-            self.onSuccess?()
+            self.onSuccess?(
+                getBankLinkingCompletionMetaFromRelinked(institution: institution)
+            )
         @unknown default:
             // TODO: what to do when this happens?
-            self.onSuccess?()
+            self.onSuccess?(
+                BankLinkingCompletionMeta(
+                    accounts: [],
+                    institution: FootprintBankLinkingInstitution(id: "", name: "", domain: nil),
+                    trackedScreens: []
+                )
+            )
         }
     }
     

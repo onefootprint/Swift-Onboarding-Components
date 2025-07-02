@@ -9,6 +9,7 @@ import SwiftOnboardingComponentsShared
 
 public struct BankLinkingCompletionResponse {
     public let validationToken: String
+    public let meta: BankLinkingCompletionMeta
 }
 
 public struct FootprintBankLinkingWithAuthToken: View {
@@ -64,11 +65,16 @@ public struct FootprintBankLinkingWithAuthToken: View {
             } else {
                 FootprintBankLinking(
                     redirectUri: self.redirectUri,
-                    onSuccess: {
+                    onSuccess: { meta in
                         Task {
                             do {
                                 let validationToken = try await Footprint.shared.process()
-                                self.onSuccess?(BankLinkingCompletionResponse(validationToken: validationToken))
+                                self.onSuccess?(
+                                    BankLinkingCompletionResponse(
+                                        validationToken: validationToken,
+                                        meta: meta
+                                    )
+                                )
                             } catch {
                                 let footprintError = (error as? FootprintException) ?? FootprintException(
                                     kind: FootprintException.ErrorKind.bankLinkingError,
@@ -77,7 +83,7 @@ public struct FootprintBankLinkingWithAuthToken: View {
                                     sessionId: sessionId,
                                     context: nil
                                 )
-
+                                
                                 logError(error)
                                 onError?(footprintError)
                             }
@@ -107,7 +113,7 @@ public struct FootprintBankLinkingWithAuthToken: View {
                         sessionId: sessionId,
                         context: nil
                     )
-
+                    
                     logError(error)
                     onError?(footprintError)
                 }
