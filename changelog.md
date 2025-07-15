@@ -1,6 +1,9 @@
 ### Changelog for Swift onboarding components SDK
 *Updating this file is one of the requirements for GitHub CI/CD for Swift package release*
 
+# v1.2.2
+Patch: Fix weird rare duplicate symbol issue with dng_color_spec::CameraWhite
+
 # v1.2.1
 Patch: make the success meta fields public BAL
 
