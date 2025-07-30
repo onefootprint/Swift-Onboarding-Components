@@ -149,6 +149,23 @@ public final class Footprint: Sendable {
     internal func postUserBankLinkingLinkSessionExchangeData (exchangeableToken: String) async throws {
         try await SwiftOnboardingComponentsShared._Footprint.shared.postUserBankLinkingLinkSessionExchangeData(exchangeableToken: exchangeableToken)
     }
+    
+    internal func getOnboardingConfig(
+        authToken: String? = nil,
+        publicKey: String? = nil
+    ) async throws -> OnboardingSessionConfig {
+        return try await SwiftOnboardingComponentsShared._Footprint.shared.getOnboardingConfig(publicKey: publicKey, authToken: authToken)
+    }
+    
+    internal func postHostedOnboardingSilent(
+        authToken: String,
+        fingerprintVisitRequest: FingerprintVisitRequest? = nil
+    ) async throws -> OnboardingExpressResponse {
+        return try await SwiftOnboardingComponentsShared._Footprint.shared.postHostedOnboardingSilent(
+            authToken: authToken,
+            fingerprintVisitRequest: fingerprintVisitRequest
+        )
+    }
 }
 
 public struct FootprintBootstrapData {
@@ -241,7 +258,7 @@ public struct FootprintBootstrapData {
 
 public struct Appearance {
     public let data: FootprintAppearance
-
+    
     public init(
         fontSrc: String? = nil,
         rules: AppearanceRules? = nil,
@@ -257,7 +274,7 @@ public struct Appearance {
 
 public struct AppearanceRules {
     public let data: FootprintAppearanceRules
-
+    
     public init(
         button: [String: String]? = nil,
         buttonHover: [String: String]? = nil,
@@ -309,7 +326,7 @@ public struct AppearanceRules {
 
 public struct AppearanceVariables {
     public let data: FootprintAppearanceVariables
-
+    
     public init(
         borderRadius: String? = nil,
         colorError: String? = nil,
