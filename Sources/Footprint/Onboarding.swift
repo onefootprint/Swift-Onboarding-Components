@@ -70,7 +70,7 @@ public final class Onboarding: Sendable {
     
     @MainActor
     public func initialize(
-        authToken: String,
+        onboardingSessionToken: String,
         sandboxOutcome: SandboxOutcome? = nil,
         l10n: FootprintL10n? = nil,
         sessionId: String? = nil,
@@ -111,7 +111,7 @@ public final class Onboarding: Sendable {
             // First, if shouldRunInBackground is true, we try to run the silent onboarding
             if shouldRunInBackground {
                 do {
-                    silentOnboardingResult = try await self.runOnboardingInBackground(authToken: authToken)
+                    silentOnboardingResult = try await self.runOnboardingInBackground(authToken: onboardingSessionToken)
                 } catch {
                     // Ignore error, fall through to hosted flow
                 }
@@ -125,11 +125,11 @@ public final class Onboarding: Sendable {
             
             // If silent onboarding is not successful, not complete, or not required, we proceed with the hosted flow
             // If there was an error related to invalid token or session, "Footprint.shared.initializeWithAuthToken" will throw error
-            let updatedAuthToken: String = (silentOnboardingResult as? OnboardingExpressResponseIncomplete)?.authToken ?? authToken
+            let updatedAuthToken: String = (silentOnboardingResult as? OnboardingExpressResponseIncomplete)?.authToken ?? onboardingSessionToken
             
             do {
                 let initResult = try await Footprint.shared.initializeWithAuthToken(
-                    authToken: authToken,
+                    authToken: onboardingSessionToken,
                     sandboxOutcome: sandboxOutcome,
                     l10n: l10n,
                     sessionId: sessionId

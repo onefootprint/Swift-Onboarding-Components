@@ -1,6 +1,9 @@
 ### Changelog for Swift onboarding components SDK
 *Updating this file is one of the requirements for GitHub CI/CD for Swift package release*
 
+# v1.3.1
+Update prop name in Onboarding.shared.initialize
+
 # v1.3.0
 Onboarding in background
 
