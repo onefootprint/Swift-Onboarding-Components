@@ -9,19 +9,6 @@ extension OnboardingExpressResponse: @unchecked @retroactive Sendable {}
 extension OnboardingExpressResponseComplete: @unchecked Sendable {}
 extension OnboardingExpressResponseIncomplete: @unchecked Sendable {}
 
-public struct OnboardingOptions {
-    public let showCompletionPage: Bool?
-    public let showLogo: Bool?
-    
-    public init(
-        showCompletionPage: Bool? = nil,
-        showLogo: Bool? = nil
-    ) {
-        self.showCompletionPage = showCompletionPage
-        self.showLogo = showLogo
-    }
-}
-
 
 
 public final class Onboarding: Sendable {
@@ -68,14 +55,12 @@ public final class Onboarding: Sendable {
     @MainActor
     public func initialize(
         onboardingSessionToken: String,
-        sandboxOutcome: SandboxOutcome? = nil,
         l10n: FootprintL10n? = nil,
         sessionId: String? = nil,
         onComplete: ((String) -> Void)? = nil,
         onCancel: (() -> Void)? = nil,
         onError: ((FootprintException) -> Void)? = nil,
-        appearance: FootprintAppearance? = nil,
-        options: OnboardingOptions? = nil
+        appearance: FootprintAppearance? = nil
     ){
         var silentOnboardingResult: OnboardingExpressResponse?
         
@@ -95,11 +80,7 @@ public final class Onboarding: Sendable {
                         )
                     )
                 },
-                appearance: appearance,
-                options: FootprintOptions(
-                    showCompletionPage: toKotlinBoolean(options?.showCompletionPage),
-                    showLogo: toKotlinBoolean(options?.showLogo)
-                )
+                appearance: appearance
             )
         }
         
@@ -123,7 +104,6 @@ public final class Onboarding: Sendable {
             do {
                 try await Footprint.shared.initializeForSilentOnboarding(
                     authToken: updatedAuthToken,
-                    sandboxOutcome: sandboxOutcome,
                     l10n: l10n,
                     sessionId: sessionId
                 )
