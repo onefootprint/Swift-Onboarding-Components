@@ -121,7 +121,7 @@ public final class Onboarding: Sendable {
             let updatedAuthToken: String = (silentOnboardingResult as? OnboardingExpressResponseIncomplete)?.authToken ?? onboardingSessionToken
             
             do {
-                _ = try await Footprint.shared.initializeWithAuthToken(
+                try await Footprint.shared.initializeForSilentOnboarding(
                     authToken: updatedAuthToken,
                     sandboxOutcome: sandboxOutcome,
                     l10n: l10n,

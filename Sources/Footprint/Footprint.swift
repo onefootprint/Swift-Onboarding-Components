@@ -86,7 +86,8 @@ public final class Footprint: Sendable {
             authToken: authToken,
             sandboxOutcome: sandboxOutcome,
             l10n: l10n,
-            sessionId: sessionId
+            sessionId: sessionId,
+            isSilentOnboarding: false
         )
         
         // Use actor to set API key safely
@@ -97,6 +98,21 @@ public final class Footprint: Sendable {
             await sendFingerprintData()
         }
         return FootprintAuthRequirement(requiresAuth: requiresAuth)
+    }
+    
+    func initializeForSilentOnboarding(
+        authToken: String,
+        sandboxOutcome: SandboxOutcome? = nil,
+        l10n: FootprintL10n? = nil,
+        sessionId: String? = nil
+    ) async throws {
+        _ = try await SwiftOnboardingComponentsShared._Footprint.shared.initializeWithAuthToken(
+            authToken: authToken,
+            sandboxOutcome: sandboxOutcome,
+            l10n: l10n,
+            sessionId: sessionId,
+            isSilentOnboarding: true
+        )
     }
     
     // Rest of the methods remain unchanged
