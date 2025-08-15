@@ -12,16 +12,13 @@ extension OnboardingExpressResponseIncomplete: @unchecked Sendable {}
 public struct OnboardingOptions {
     public let showCompletionPage: Bool?
     public let showLogo: Bool?
-    public let runInBackground: Bool?
     
     public init(
         showCompletionPage: Bool? = nil,
-        showLogo: Bool? = nil,
-        runInBackground: Bool? = nil
+        showLogo: Bool? = nil
     ) {
         self.showCompletionPage = showCompletionPage
         self.showLogo = showLogo
-        self.runInBackground = runInBackground
     }
 }
 
@@ -80,7 +77,6 @@ public final class Onboarding: Sendable {
         appearance: FootprintAppearance? = nil,
         options: OnboardingOptions? = nil
     ){
-        let shouldRunInBackground = options?.runInBackground ?? false
         var silentOnboardingResult: OnboardingExpressResponse?
         
         
@@ -108,13 +104,10 @@ public final class Onboarding: Sendable {
         }
         
         Task{
-            // First, if shouldRunInBackground is true, we try to run the silent onboarding
-            if shouldRunInBackground {
-                do {
-                    silentOnboardingResult = try await self.runOnboardingInBackground(authToken: onboardingSessionToken)
-                } catch {
-                    // Ignore error, fall through to hosted flow
-                }
+            do {
+                silentOnboardingResult = try await self.runOnboardingInBackground(authToken: onboardingSessionToken)
+            } catch {
+                // Ignore error, fall through to hosted flow
             }
             
             // If silent onboarding is successful and complete, we can return the validation token
@@ -128,8 +121,8 @@ public final class Onboarding: Sendable {
             let updatedAuthToken: String = (silentOnboardingResult as? OnboardingExpressResponseIncomplete)?.authToken ?? onboardingSessionToken
             
             do {
-                let initResult = try await Footprint.shared.initializeWithAuthToken(
-                    authToken: onboardingSessionToken,
+                _ = try await Footprint.shared.initializeWithAuthToken(
+                    authToken: updatedAuthToken,
                     sandboxOutcome: sandboxOutcome,
                     l10n: l10n,
                     sessionId: sessionId
