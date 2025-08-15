@@ -23,8 +23,8 @@ let package = Package(
         // Define the binary target for the shared framework.
         .binaryTarget(
             name: "SwiftOnboardingComponentsShared",
-            url: "https://github.com/onefootprint/Swift-Onboarding-Components/releases/download/1.3.3/SwiftOnboardingComponentsShared.xcframework.zip",
-            checksum: "27dd70eb4074344940cc493fd56e8c948649e8de6e627c6028face59f297852f"
+            url: "https://github.com/onefootprint/Swift-Onboarding-Components/releases/download/1.3.4/SwiftOnboardingComponentsShared.xcframework.zip",
+            checksum: "721255fd6463d21ef5382c53ffb07dd09de6f04731f2434455ebb3bb6dbf9fa8"
         ),
         .target(
             name: "Footprint",
