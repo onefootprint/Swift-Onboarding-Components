@@ -47,7 +47,8 @@ public struct FootprintBankLinkingWithAuthToken: View {
                 message: error.localizedDescription,
                 supportId: nil,
                 sessionId: sessionId,
-                context: nil
+                context: nil,
+                code: nil
             )
             await Footprint.shared.logError(error: footprintError)
         }
@@ -81,7 +82,8 @@ public struct FootprintBankLinkingWithAuthToken: View {
                                     message: error.localizedDescription,
                                     supportId: nil,
                                     sessionId: sessionId,
-                                    context: nil
+                                    context: nil,
+                                    code: nil
                                 )
                                 
                                 logError(error)
@@ -111,7 +113,8 @@ public struct FootprintBankLinkingWithAuthToken: View {
                         message: error.localizedDescription,
                         supportId: nil,
                         sessionId: sessionId,
-                        context: nil
+                        context: nil,
+                        code: nil
                     )
                     
                     logError(error)

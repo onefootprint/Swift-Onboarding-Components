@@ -62,11 +62,12 @@ public final class Onboarding: Sendable {
         onError: ((FootprintException) -> Void)? = nil,
         appearance: FootprintAppearance? = nil
     ){
-        var silentOnboardingResult: OnboardingExpressResponse?
-        
-        
-        func launchHostedFlow(){
+        func launchHostedFlow(
+            authToken: String
+        ){
             FootprintHosted.shared.launchHosted(
+                authToken: authToken,
+                l10n: l10n,
                 onComplete: onComplete ?? {_ in},
                 onCancel: onCancel ?? {},
                 onError: { error in
@@ -76,56 +77,39 @@ public final class Onboarding: Sendable {
                             message: error,
                             supportId: nil,
                             sessionId: sessionId,
-                            context: nil
+                            context: nil,
+                            code: nil
                         )
                     )
                 },
-                appearance: appearance
+                appearance: appearance,
+                sessionId: sessionId
             )
         }
         
         Task{
             do {
-                silentOnboardingResult = try await self.runOnboardingInBackground(authToken: onboardingSessionToken)
-            } catch {
-                // Ignore error, fall through to hosted flow
-            }
-            
-            // If silent onboarding is successful and complete, we can return the validation token
-            if let complete = silentOnboardingResult as? OnboardingExpressResponseComplete {
-                onComplete?(complete.validationToken)
-                return
-            }
-            
-            // If silent onboarding is not successful, not complete, or not required, we proceed with the hosted flow
-            // If there was an error related to invalid token or session, "Footprint.shared.initializeWithAuthToken" will throw error
-            let updatedAuthToken: String = (silentOnboardingResult as? OnboardingExpressResponseIncomplete)?.authToken ?? onboardingSessionToken
-            
-            do {
-                try await Footprint.shared.initializeForSilentOnboarding(
-                    authToken: updatedAuthToken,
-                    l10n: l10n,
-                    sessionId: sessionId
-                )
-                launchHostedFlow()
+                let silentOnboardingResult = try await self.runOnboardingInBackground(authToken: onboardingSessionToken)
+                
+                // If silent onboarding is successful and complete, we can return the validation token
+                if let complete = silentOnboardingResult as? OnboardingExpressResponseComplete {
+                    onComplete?(complete.validationToken)
+                    return
+                }
+                
+                // If silent onboarding is not successful, not complete, or not required, we proceed with the hosted flow
+                let updatedAuthToken: String = (silentOnboardingResult as? OnboardingExpressResponseIncomplete)?.authToken ?? onboardingSessionToken
+                
+                launchHostedFlow(authToken: updatedAuthToken)
             } catch {
                 if let fpException = extractFootprintException(error) {
-                    if(fpException.kind == .deprecatedSdkVersionError || fpException.kind == .inlineProcessNotSupported){
-                        launchHostedFlow()
-                    }else{
+                    if(fpException.code == "E117"){
                         onError?(fpException)
+                        return
                     }
                 }
-                else {
-                    let wrappedError = FootprintException(
-                        kind: .sdkError,
-                        message: error.localizedDescription,
-                        supportId: nil,
-                        sessionId: sessionId,
-                        context: nil
-                    )
-                    onError?(wrappedError)
-                }
+                
+                launchHostedFlow(authToken: onboardingSessionToken)
             }
         }
     }

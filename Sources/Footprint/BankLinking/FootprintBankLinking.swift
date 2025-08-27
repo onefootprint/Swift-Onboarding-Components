@@ -174,7 +174,8 @@ extension FootprintBankLinking {
                 message: "Error: mkErrorId: \(error.errorId), mkRequestId \(String(describing: error.requestId)). Error: \(error.displayedMessage)",
                 supportId: nil,
                 sessionId: Footprint.shared.getSesstionId(),
-                context: nil
+                context: nil,
+                code: nil
             )
             self.onError?(fpError)
             await Footprint.shared.logError(error: fpError)
@@ -188,7 +189,8 @@ extension FootprintBankLinking {
                 message: "Error: \(error.localizedDescription)",
                 supportId: nil,
                 sessionId: Footprint.shared.getSesstionId(),
-                context: nil
+                context: nil,
+                code: nil
             )
             self.onError?(fpError)
             await Footprint.shared.logError(error: fpError)
