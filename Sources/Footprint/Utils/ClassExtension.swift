@@ -197,6 +197,7 @@ public extension BootstrapDataV1 {
                                businessTin: businessTin,
                                businessWebsite: businessWebsite,
                                businessZip: businessZip,
+                               customStar: nil,
                                idAddressLine1: idAddressLine1,
                                idAddressLine2: idAddressLine2,
                                idCitizenships: idCitizenships,

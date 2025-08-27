@@ -4,6 +4,7 @@
 @_exported import SwiftOnboardingComponentsShared
 
 typealias _Footprint = Never
+typealias _FootprintHosted = Never
 
 import Foundation
 
@@ -49,12 +50,14 @@ public final class Footprint: Sendable {
                 )
             }
         }catch {
-            await logError(error: FootprintException(
-                kind: .fingerprintError,
-                message: error.localizedDescription,
-                supportId: nil,
-                sessionId: Self.propManager.getSessionId(),
-                context: nil)
+            await logError(
+                error: FootprintException(
+                    kind: .fingerprintError,
+                    message: error.localizedDescription,
+                    supportId: nil,
+                    sessionId: Self.propManager.getSessionId(),
+                    context: nil,
+                    code: nil)
             )
         }
     }
@@ -86,8 +89,7 @@ public final class Footprint: Sendable {
             authToken: authToken,
             sandboxOutcome: sandboxOutcome,
             l10n: l10n,
-            sessionId: sessionId,
-            isSilentOnboarding: false
+            sessionId: sessionId
         )
         
         // Use actor to set API key safely
@@ -98,21 +100,6 @@ public final class Footprint: Sendable {
             await sendFingerprintData()
         }
         return FootprintAuthRequirement(requiresAuth: requiresAuth)
-    }
-    
-    func initializeForSilentOnboarding(
-        authToken: String,
-        sandboxOutcome: SandboxOutcome? = nil,
-        l10n: FootprintL10n? = nil,
-        sessionId: String? = nil
-    ) async throws {
-        _ = try await SwiftOnboardingComponentsShared._Footprint.shared.initializeWithAuthToken(
-            authToken: authToken,
-            sandboxOutcome: sandboxOutcome,
-            l10n: l10n,
-            sessionId: sessionId,
-            isSilentOnboarding: true
-        )
     }
     
     // Rest of the methods remain unchanged
@@ -184,6 +171,73 @@ public final class Footprint: Sendable {
     }
 }
 
+public final class FootprintHosted: Sendable {
+    public static let shared = FootprintHosted()
+    
+    
+    private init() {}
+    
+    public func launchIdentify(
+        email: String? = nil,
+        phone: String? = nil,
+        onAuthenticated: @escaping (VerificationResponse) -> Void,
+        onCancel: (() -> Void)? = nil,
+        onError: ((String) -> Void)? = nil,
+        appearance: FootprintAppearance? = nil
+    ) {
+        SwiftOnboardingComponentsShared._FootprintHosted.shared.launchIdentify(
+            email: email,
+            phone: phone,
+            onAuthenticated: onAuthenticated,
+            onCancel: onCancel,
+            onError: onError,
+            appearance: appearance
+        )
+    }
+    
+    public func handoff(
+        onComplete: @escaping (_ validationToken: String) -> Void,
+        onCancel: (() -> Void)? = nil,
+        onError: ((String) -> Void)? = nil,
+        appearance: FootprintAppearance? = nil
+    ) {
+        SwiftOnboardingComponentsShared._FootprintHosted.shared.handoff(
+            onComplete: onComplete,
+            onCancel: onCancel,
+            onError: onError,
+            appearance: appearance
+        )
+    }
+    
+    public func launchHosted(
+        authToken: String? = nil,
+        publicKey: String? = nil,
+        l10n: FootprintL10n? = nil,
+        sandboxOutcome: SandboxOutcome? = nil,
+        onComplete: @escaping (_ validationToken: String) -> Void,
+        onCancel: (() -> Void)? = nil,
+        onError: ((String) -> Void)? = nil,
+        appearance: FootprintAppearance? = nil,
+        options: FootprintOptions? = nil,
+        sessionId: String? = nil,
+        bootstrapData: FootprintBootstrapData? = nil
+    ) {
+        SwiftOnboardingComponentsShared._FootprintHosted.shared.launchHosted(
+            authToken: authToken,
+            publicKey: publicKey,
+            l10n: l10n,
+            sandboxOutcome: sandboxOutcome,
+            onComplete: onComplete,
+            onCancel: onCancel,
+            onError: onError,
+            appearance: appearance,
+            options: options,
+            sessionId: sessionId,
+            bootstrapData: bootstrapData?.data
+        )
+    }
+}
+
 public struct FootprintBootstrapData {
     public var data: BootstrapDataV1
     
@@ -245,6 +299,7 @@ public struct FootprintBootstrapData {
             businessTin: businessTin,
             businessWebsite: businessWebsite,
             businessZip: businessZip,
+            customStar: nil,
             idAddressLine1: idAddressLine1,
             idAddressLine2: idAddressLine2,
             idCitizenships: idCitizenships,
