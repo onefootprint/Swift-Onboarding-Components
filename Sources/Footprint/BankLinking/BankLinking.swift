@@ -12,8 +12,8 @@ public struct BankLinkingCompletionResponse {
     public let meta: BankLinkingCompletionMeta
 }
 
-public struct FootprintBankLinkingWithAuthToken: View {
-    private let authToken: String
+public struct BankLinking: View {
+    private let onboardingSessionToken: String
     private var onSuccess: ((BankLinkingCompletionResponse) -> Void)? = nil
     private var onError: ((FootprintException) -> Void)? = nil
     private var onClose: (() -> Void)? = nil
@@ -23,7 +23,7 @@ public struct FootprintBankLinkingWithAuthToken: View {
     @State private var initialized: Bool = false
     
     public init(
-        authToken: String,
+        onboardingSessionToken: String,
         redirectUri: String,
         onSuccess: ((BankLinkingCompletionResponse) -> Void)? = nil,
         onError: ((FootprintException) -> Void)? = nil,
@@ -31,7 +31,7 @@ public struct FootprintBankLinkingWithAuthToken: View {
         onEvent: ((FootprintBankLinkingEvent) -> Void)? = nil,
         sessionId: String? = nil
     ) {
-        self.authToken = authToken
+        self.onboardingSessionToken = onboardingSessionToken
         self.redirectUri = redirectUri
         self.onSuccess = onSuccess
         self.onError = onError
@@ -64,7 +64,7 @@ public struct FootprintBankLinkingWithAuthToken: View {
                         .scaleEffect(1.5)
                 }
             } else {
-                FootprintBankLinking(
+                BankLinkingComponent(
                     redirectUri: self.redirectUri,
                     onSuccess: { meta in
                         Task {
@@ -103,7 +103,7 @@ public struct FootprintBankLinkingWithAuthToken: View {
             Task {
                 do {
                     try await Footprint.shared.initializeWithAuthToken(
-                        authToken: authToken,
+                        authToken: onboardingSessionToken,
                         sessionId: sessionId
                     )
                     initialized = true
