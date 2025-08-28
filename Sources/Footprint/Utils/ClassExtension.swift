@@ -34,7 +34,7 @@ public extension VaultData {
                 }
             }
         }
-            
+        
         return result
     }
     
@@ -135,92 +135,6 @@ public extension VaultData {
                           investorProfileSeniorExecutiveSymbols: investorProfileSeniorExecutiveSymbols,
                           customFields: kotlinCustomFields
         )
-    }
-}
-
-public extension BootstrapDataV1 {
-    
-    static func createBootstrapData(
-        businessAddressLine1: String? = nil,
-        businessAddressLine2: String? = nil,
-        businessCity: String? = nil,
-        businessCorporationType: BusinessCorporationType? = nil,
-        businessCountry: String? = nil,
-        businessDba: String? = nil,
-        businessFormationDate: String? = nil,
-        businessFormationState: String? = nil,
-        businessName: String? = nil,
-        businessPhoneNumber: String? = nil,
-        businessPrimaryOwnerStake: Int? = nil,
-        businessSecondaryOwners: [String]? = nil,
-        businessState: String? = nil,
-        businessTin: String? = nil,
-        businessWebsite: String? = nil,
-        businessZip: String? = nil,
-        idAddressLine1: String? = nil,
-        idAddressLine2: String? = nil,
-        idCitizenships: [Iso3166TwoDigitCountryCode]? = nil,
-        idCity: String? = nil,
-        idCountry: String? = nil,
-        idDob: String? = nil,
-        idDriversLicenseNumber: String? = nil,
-        idDriversLicenseState: String? = nil,
-        idEmail: String? = nil,
-        idFirstName: String? = nil,
-        idItin: String? = nil,
-        idLastName: String? = nil,
-        idMiddleName: String? = nil,
-        idNationality: String? = nil,
-        idPhoneNumber: String? = nil,
-        idSsn4: String? = nil,
-        idSsn9: String? = nil,
-        idState: String? = nil,
-        idUsLegalStatus: String? = nil,
-        idUsTaxId: String? = nil,
-        idVisaExpirationDate: String? = nil,
-        idVisaKind: String? = nil,
-        idZip: String? = nil
-    ) -> BootstrapDataV1 {
-        return BootstrapDataV1(businessAddressLine1: businessAddressLine1,
-                               businessAddressLine2: businessAddressLine2,
-                               businessCity: businessCity,
-                               businessCorporationType: businessCorporationType,
-                               businessCountry: businessCountry,
-                               businessDba: businessDba,
-                               businessFormationDate: businessFormationDate,
-                               businessFormationState: businessFormationState,
-                               businessName: businessName,
-                               businessPhoneNumber: businessPhoneNumber,
-                               businessPrimaryOwnerStake: businessPrimaryOwnerStake != nil ? KotlinLong(integerLiteral: businessPrimaryOwnerStake!) : nil,
-                               businessSecondaryOwners: businessSecondaryOwners,
-                               businessState: businessState,
-                               businessTin: businessTin,
-                               businessWebsite: businessWebsite,
-                               businessZip: businessZip,
-                               customStar: nil,
-                               idAddressLine1: idAddressLine1,
-                               idAddressLine2: idAddressLine2,
-                               idCitizenships: idCitizenships,
-                               idCity: idCity,
-                               idCountry: idCountry,
-                               idDob: idDob,
-                               idDriversLicenseNumber: idDriversLicenseNumber,
-                               idDriversLicenseState: idDriversLicenseState,
-                               idEmail: idEmail,
-                               idFirstName: idFirstName,
-                               idItin: idItin,
-                               idLastName: idLastName,
-                               idMiddleName: idMiddleName,
-                               idNationality: idNationality,
-                               idPhoneNumber: idPhoneNumber,
-                               idSsn4: idSsn4,
-                               idSsn9: idSsn9,
-                               idState: idState,
-                               idUsLegalStatus: idUsLegalStatus,
-                               idUsTaxId: idUsTaxId,
-                               idVisaExpirationDate: idVisaExpirationDate,
-                               idVisaKind: idVisaKind,
-                               idZip: idZip)
     }
 }
 
