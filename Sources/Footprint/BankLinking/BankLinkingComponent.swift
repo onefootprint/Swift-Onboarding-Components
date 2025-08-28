@@ -9,7 +9,7 @@ import MoneyKit
 import SwiftUI
 import SwiftOnboardingComponentsShared
 
-public struct FootprintBankLinking: View {
+public struct BankLinkingComponent: View {
     @StateObject private var connectViewModel = MKConnectViewModel()
     @State private var linkSessionToken: String? = nil
     @State private var isLoading: Bool = true
@@ -78,7 +78,7 @@ public struct FootprintBankLinking: View {
     }
 }
 
-extension FootprintBankLinking {
+extension BankLinkingComponent {
     private func loadingView() -> some View {
         VStack(spacing: 16) {
             ProgressView()
