@@ -44,7 +44,8 @@ public final class Onboarding: Sendable {
                 return FingerprintVisitRequest(
                     path: .onboardStart,
                     requestId: creds.requestId,
-                    visitorId: creds.visitorId
+                    visitorId: creds.visitorId,
+                    documentId: nil
                 )
             }()
         )

@@ -1,6 +1,9 @@
 ### Changelog for Swift onboarding components SDK
 *Updating this file is one of the requirements for GitHub CI/CD for Swift package release*
 
+# v1.3.7
+Internal API updates
+
 # v1.3.4
 Add SDK version to the URL, remove sandbox outcome and options props from `Onboarding.shared.initialize()`
 
