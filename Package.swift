@@ -17,14 +17,14 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/fingerprintjs/fingerprintjs-pro-ios", from: "2.10.0"),
-        .package(url: "https://github.com/moneykit/moneykit-ios", from: "1.9.4")
+        .package(url: "https://github.com/moneykit/moneykit-ios", from: "1.9.5")
     ],
     targets: [
         // Define the binary target for the shared framework.
         .binaryTarget(
             name: "SwiftOnboardingComponentsShared",
-            url: "https://github.com/onefootprint/Swift-Onboarding-Components/releases/download/1.3.7/SwiftOnboardingComponentsShared.xcframework.zip",
-            checksum: "871c0416f1bff74e3907fba94c71cad8e9024b19a28929286ad00a117b737b10"
+            url: "https://github.com/onefootprint/Swift-Onboarding-Components/releases/download/1.3.8/SwiftOnboardingComponentsShared.xcframework.zip",
+            checksum: "8c0f2d34347d85781ce94d566d142df2cd21588d6a52ed5e750b7c1a39864af1"
         ),
         .target(
             name: "Footprint",
