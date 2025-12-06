@@ -17,21 +17,23 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/fingerprintjs/fingerprintjs-pro-ios", from: "2.10.0"),
-        .package(url: "https://github.com/moneykit/moneykit-ios", from: "1.9.5")
+        .package(url: "https://github.com/moneykit/moneykit-ios", branch: "release/1.10.3"),
+        .package(url: "https://github.com/plaid/plaid-link-ios", from: "6.4.2")
     ],
     targets: [
         // Define the binary target for the shared framework.
         .binaryTarget(
             name: "SwiftOnboardingComponentsShared",
-            url: "https://github.com/onefootprint/Swift-Onboarding-Components/releases/download/1.3.8/SwiftOnboardingComponentsShared.xcframework.zip",
-            checksum: "8c0f2d34347d85781ce94d566d142df2cd21588d6a52ed5e750b7c1a39864af1"
+            url: "https://github.com/onefootprint/Swift-Onboarding-Components/releases/download/1.3.9/SwiftOnboardingComponentsShared.xcframework.zip",
+            checksum: "9b89860121e55cca2477feffee561e0cb148d17520a73e3b47931ab3b053102f"
         ),
         .target(
             name: "Footprint",
             dependencies: [
                 "SwiftOnboardingComponentsShared",
                 .product(name: "FingerprintPro", package: "fingerprintjs-pro-ios"),
-                .product(name: "MoneyKit", package: "moneykit-ios")
+                .product(name: "MoneyKit", package: "moneykit-ios"),
+                .product(name: "LinkKit", package: "plaid-link-ios")
             ]
         )
     ]

@@ -1,6 +1,9 @@
 ### Changelog for Swift onboarding components SDK
 *Updating this file is one of the requirements for GitHub CI/CD for Swift package release*
 
+# 1.3.9
+Use MK branch "release/1.10.3"
+
 # v1.3.8
 BAL thread callback issue fixed in new MoneyKit release
 
