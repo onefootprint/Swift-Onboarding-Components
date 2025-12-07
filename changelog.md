@@ -1,6 +1,9 @@
 ### Changelog for Swift onboarding components SDK
 *Updating this file is one of the requirements for GitHub CI/CD for Swift package release*
 
+# 1.4.1
+Upgrade to MK 1.10.4
+
 # 1.4.0
 Previous 1.3.9 got corrupt because MK didn't provide stable version. Releasing with stable MK 1.10.3
 
