@@ -7,7 +7,7 @@
 
 import MoneyKit
 
-public struct BankLinkingCompletionMeta {
+public struct BankLinkingCompletionMeta: Equatable {
     public let accounts: [FootprintBankLinkingAccount]
     public let institution: FootprintBankLinkingInstitution
     public let trackedScreens: [FootprintBankLinkingTrackedScreen]

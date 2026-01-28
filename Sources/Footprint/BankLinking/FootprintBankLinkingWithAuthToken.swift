@@ -21,6 +21,7 @@ public struct FootprintBankLinkingWithAuthToken: View {
     private var sessionId: String? = nil
     private let redirectUri: String
     @State private var initialized: Bool = false
+    @State private var bankLinkingMeta: BankLinkingCompletionMeta? = nil
     
     public init(
         authToken: String,
@@ -56,8 +57,7 @@ public struct FootprintBankLinkingWithAuthToken: View {
     
     public var body: some View {
         VStack {
-            if !initialized {
-                // Loading
+            if !initialized || bankLinkingMeta != nil {
                 VStack(spacing: 16) {
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle())
@@ -67,29 +67,7 @@ public struct FootprintBankLinkingWithAuthToken: View {
                 FootprintBankLinking(
                     redirectUri: self.redirectUri,
                     onSuccess: { meta in
-                        Task {
-                            do {
-                                let validationToken = try await Footprint.shared.process()
-                                self.onSuccess?(
-                                    BankLinkingCompletionResponse(
-                                        validationToken: validationToken,
-                                        meta: meta
-                                    )
-                                )
-                            } catch {
-                                let footprintError = (error as? FootprintException) ?? FootprintException(
-                                    kind: FootprintException.ErrorKind.bankLinkingError,
-                                    message: error.localizedDescription,
-                                    supportId: nil,
-                                    sessionId: sessionId,
-                                    context: nil,
-                                    code: nil
-                                )
-                                
-                                logError(error)
-                                onError?(footprintError)
-                            }
-                        }
+                        bankLinkingMeta = meta
                     },
                     onError: { error in
                         self.onError?(error)
@@ -97,6 +75,40 @@ public struct FootprintBankLinkingWithAuthToken: View {
                     onClose: self.onClose,
                     onEvent: self.onEvent
                 )
+            }
+        }
+        .onChange(of: bankLinkingMeta) { meta in
+            guard let meta = meta else { return }
+            Task {
+                do {
+                    while true {
+                        let result = try await Footprint.shared.processBankLinking()
+                        switch result {
+                        case .complete(let validationToken):
+                            self.onSuccess?(
+                                BankLinkingCompletionResponse(
+                                    validationToken: validationToken,
+                                    meta: meta
+                                )
+                            )
+                            return
+                        case .sleepRequired(let seconds):
+                            try await Task.sleep(nanoseconds: UInt64(seconds) * 1_000_000_000)
+                        }
+                    }
+                } catch {
+                    let footprintError = (error as? FootprintException) ?? FootprintException(
+                        kind: FootprintException.ErrorKind.bankLinkingError,
+                        message: error.localizedDescription,
+                        supportId: nil,
+                        sessionId: sessionId,
+                        context: nil,
+                        code: nil
+                    )
+                    
+                    logError(error)
+                    onError?(footprintError)
+                }
             }
         }
         .onAppear {

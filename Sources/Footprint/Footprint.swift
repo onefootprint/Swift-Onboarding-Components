@@ -169,6 +169,27 @@ public final class Footprint: Sendable {
             fingerprintVisitRequest: fingerprintVisitRequest
         )
     }
+    
+    internal func processBankLinking() async throws -> BankLinkingResult {
+        let response = try await SwiftOnboardingComponentsShared._Footprint.shared.processBankLinking()
+        
+        if let complete = response as? BankLinkingProcessResponse.Complete {
+            return .complete(validationToken: complete.validationToken)
+        } else if let sleepRequired = response as? BankLinkingProcessResponse.SleepRequired {
+            return .sleepRequired(seconds: Int(sleepRequired.sleepTimeInSecs))
+        } else {
+            throw BankLinkingError.unexpectedResponseType
+        }
+    }
+}
+
+internal enum BankLinkingResult: Sendable {
+    case complete(validationToken: String)
+    case sleepRequired(seconds: Int)
+}
+
+internal enum BankLinkingError: Error {
+    case unexpectedResponseType
 }
 
 public final class FootprintHosted: Sendable {

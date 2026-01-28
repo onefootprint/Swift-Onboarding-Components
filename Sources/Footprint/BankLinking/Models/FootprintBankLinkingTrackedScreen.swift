@@ -6,7 +6,7 @@
 //
 import Foundation
 
-public struct FootprintBankLinkingTrackedScreen {
+public struct FootprintBankLinkingTrackedScreen: Equatable {
     public let name: String
     public let duration: TimeInterval
     public let gameTime: TimeInterval?
