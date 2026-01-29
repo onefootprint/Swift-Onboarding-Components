@@ -22,6 +22,7 @@ public struct FootprintBankLinkingWithAuthToken: View {
     private let redirectUri: String
     @State private var initialized: Bool = false
     @State private var bankLinkingMeta: BankLinkingCompletionMeta? = nil
+    @State private var showBankLinkingSheet: Bool = false
     
     public init(
         authToken: String,
@@ -56,26 +57,28 @@ public struct FootprintBankLinkingWithAuthToken: View {
     }
     
     public var body: some View {
-        VStack {
-            if !initialized || bankLinkingMeta != nil {
-                VStack(spacing: 16) {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle())
-                        .scaleEffect(1.5)
-                }
-            } else {
-                FootprintBankLinking(
-                    redirectUri: self.redirectUri,
-                    onSuccess: { meta in
-                        bankLinkingMeta = meta
-                    },
-                    onError: { error in
-                        self.onError?(error)
-                    },
-                    onClose: self.onClose,
-                    onEvent: self.onEvent
-                )
-            }
+        VStack(spacing: 16) {
+            ProgressView()
+                .progressViewStyle(CircularProgressViewStyle())
+                .scaleEffect(1.5)
+        }
+        .sheet(isPresented: $showBankLinkingSheet) {
+            FootprintBankLinking(
+                redirectUri: self.redirectUri,
+                onSuccess: { meta in
+                    showBankLinkingSheet = false
+                    bankLinkingMeta = meta
+                },
+                onError: { error in
+                    showBankLinkingSheet = false
+                    self.onError?(error)
+                },
+                onClose: {
+                    showBankLinkingSheet = false
+                    self.onClose?()
+                },
+                onEvent: self.onEvent
+            )
         }
         .onChange(of: bankLinkingMeta) { meta in
             guard let meta = meta else { return }
@@ -109,6 +112,11 @@ public struct FootprintBankLinkingWithAuthToken: View {
                     logError(error)
                     onError?(footprintError)
                 }
+            }
+        }
+        .onChange(of: initialized) { isInitialized in
+            if isInitialized {
+                showBankLinkingSheet = true
             }
         }
         .onAppear {
