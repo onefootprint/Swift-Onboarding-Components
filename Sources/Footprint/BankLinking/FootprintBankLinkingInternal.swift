@@ -105,7 +105,8 @@ extension FootprintBankLinkingInternal {
                 sessionToken: sessionToken,
                 onSuccess: onSuccess(successType:),
                 onExit: onExit(error:),
-                onEvent: onEvent(event:) // TODO: in the future we should add logging to DD for this SDK and log these events
+                onEvent: onEvent(event:), // TODO: in the future we should add logging to DD for this SDK and log these events
+                automaticallyDismissOnSuccess: false
             )
             
             let linkHandler = MKLinkHandler(configuration: configuration)
