@@ -22,7 +22,7 @@ public struct FootprintBankLinking: View {
     private let redirectUri: String
     @State private var initialized: Bool = false
     @State private var bankLinkingMeta: BankLinkingCompletionMeta? = nil
-    @State private var showBankLinkingSheet: Bool = false
+    @State private var showBankLinking: Bool = false
     
     public init(
         authToken: String,
@@ -58,27 +58,28 @@ public struct FootprintBankLinking: View {
     
     public var body: some View {
         VStack(spacing: 16) {
-            ProgressView()
-                .progressViewStyle(CircularProgressViewStyle())
-                .scaleEffect(1.5)
-        }
-        .sheet(isPresented: $showBankLinkingSheet) {
-            FootprintBankLinkingInternal(
-                redirectUri: self.redirectUri,
-                onSuccess: { meta in
-                    showBankLinkingSheet = false
-                    bankLinkingMeta = meta
-                },
-                onError: { error in
-                    showBankLinkingSheet = false
-                    self.onError?(error)
-                },
-                onClose: {
-                    showBankLinkingSheet = false
-                    self.onClose?()
-                },
-                onEvent: self.onEvent
-            )
+            if(showBankLinking){
+                FootprintBankLinkingInternal(
+                    redirectUri: self.redirectUri,
+                    onSuccess: { meta in
+                        showBankLinking = false
+                        bankLinkingMeta = meta
+                    },
+                    onError: { error in
+                        showBankLinking = false
+                        self.onError?(error)
+                    },
+                    onClose: {
+                        showBankLinking = false
+                        self.onClose?()
+                    },
+                    onEvent: self.onEvent
+                )
+            }else{
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle())
+                    .scaleEffect(1.5)
+            }
         }
         .onChange(of: bankLinkingMeta) { meta in
             guard let meta = meta else { return }
@@ -116,7 +117,7 @@ public struct FootprintBankLinking: View {
         }
         .onChange(of: initialized) { isInitialized in
             if isInitialized {
-                showBankLinkingSheet = true
+                showBankLinking = true
             }
         }
         .onAppear {
