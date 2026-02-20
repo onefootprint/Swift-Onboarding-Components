@@ -1,6 +1,15 @@
 ### Changelog for Swift onboarding components SDK
 *Updating this file is one of the requirements for GitHub CI/CD for Swift package release*
 
+# 1.5.2
+Fix double sheet problem in BAL
+
+# 1.5.1
+Internal API fix
+
+# 1.5.0
+Update BAL interface
+
 # 1.4.1
 Upgrade to MK 1.10.4
 
