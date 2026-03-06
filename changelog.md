@@ -1,6 +1,9 @@
 ### Changelog for Swift onboarding components SDK
 *Updating this file is one of the requirements for GitHub CI/CD for Swift package release*
 
+# 1.5.3
+Upgrade internal dep MKit to v1.11.1. No changes required on the client apps other than just upgrading
+
 # 1.5.2
 Fix double sheet problem in BAL
 
