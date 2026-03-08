@@ -1,6 +1,9 @@
 ### Changelog for Swift onboarding components SDK
 *Updating this file is one of the requirements for GitHub CI/CD for Swift package release*
 
+# 1.5.4
+Upgrade MKit to v1.11.2. No changes needed on client side other than upgrading.
+
 # 1.5.3
 Lock internal dep MKit to v1.10.7. because the new version they released breaks the integration. No changes needed on client side other than upgrading.
 

@@ -1,5 +1,5 @@
 {
-  "originHash" : "f2f31bc92813bb42dee46aaaacdb4a2e99ecb79e962f57da7486b47a5719bb93",
+  "originHash" : "046e49cd63b46719e360254cdfaa569797b7ac7ccee6728c14886ad01392a608",
   "pins" : [
     {
       "identity" : "fingerprintjs-pro-ios",
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/moneykit/moneykit-ios",
       "state" : {
-        "revision" : "65138a50aa257cacbb31627c5a3cfdca599f8502",
-        "version" : "1.10.7"
+        "revision" : "112fb07f1296605e1dfc91d7bdc5af76786520f0",
+        "version" : "1.11.2"
       }
     },
     {
