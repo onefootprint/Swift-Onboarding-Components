@@ -181,6 +181,16 @@ public final class Footprint: Sendable {
             throw BankLinkingError.unexpectedResponseType
         }
     }
+    
+    internal func sendSdkVersionInfo(
+        authToken: String? = nil,
+        publicKey: String? = nil,
+        sessionId: String? = nil
+    ) {
+        Task {
+            try? await SwiftOnboardingComponentsShared._Footprint.shared.sendSdkVersionInfo(authToken: authToken, publicKey: publicKey, sessionId: sessionId)
+        }
+    }
 }
 
 internal enum BankLinkingResult: Sendable {
@@ -242,6 +252,12 @@ public final class FootprintHosted: Sendable {
         options: FootprintOptions? = nil,
         sessionId: String? = nil
     ) {
+        Footprint.shared.sendSdkVersionInfo(
+            authToken: authToken,
+            publicKey: publicKey,
+            sessionId: sessionId
+        )
+        
         SwiftOnboardingComponentsShared._FootprintHosted.shared.launchHosted(
             authToken: authToken,
             publicKey: publicKey,

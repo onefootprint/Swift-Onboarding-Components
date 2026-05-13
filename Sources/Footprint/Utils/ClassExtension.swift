@@ -142,9 +142,10 @@ public extension FootprintAppearance {
     static func createAppearance(
         fontSrc: String? = nil,
         rules: FootprintAppearanceRules? = nil,
-        variables: FootprintAppearanceVariables? = nil
+        variables: FootprintAppearanceVariables? = nil,
+        theme: FootprintAppearanceTheme? = nil
     ) -> FootprintAppearance {
-        return FootprintAppearance(fontSrc: fontSrc, rules: rules, variables: variables)
+        return FootprintAppearance(fontSrc: fontSrc, rules: rules, variables: variables, theme: theme)
     }
 }
 public extension FootprintAppearanceRules {

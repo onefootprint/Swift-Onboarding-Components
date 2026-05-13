@@ -88,6 +88,11 @@ public final class Onboarding: Sendable {
             )
         }
         
+        Footprint.shared.sendSdkVersionInfo(
+            authToken: onboardingSessionToken,
+            sessionId: sessionId
+        )
+        
         Task{
             do {
                 let silentOnboardingResult = try await self.runOnboardingInBackground(authToken: onboardingSessionToken)
