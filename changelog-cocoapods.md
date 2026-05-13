@@ -1,5 +1,8 @@
 ### Changelog for FootprintOnboardingComponents CocoaPod
 
+# 1.5.5
+Add internal tracking for SDK version to we can upgrade clients when their version is outdated. No changes required on the client side.
+
 # 1.5.4
 Sync cocoapods package with SPM package and use the same version.
 - `FootprintHosted.shared.launchHosted` doesn't accept `bootstrapData` prop anymore. If you were using the `bootstrapData` prop, use the endpoint `POST https://api.onefootprint.com/onboarding/session` to bootstrap data ahead of time, create an onboarding session token and use the token for `authToken` prop.
