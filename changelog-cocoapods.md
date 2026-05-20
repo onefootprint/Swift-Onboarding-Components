@@ -1,5 +1,8 @@
 ### Changelog for FootprintOnboardingComponents CocoaPod
 
+# 1.5.6
+Add internal baseUrl overrides for automated testing to enhance stability of releases. No changes required on the client side.
+
 # 1.5.5
 Add internal tracking for SDK version to we can upgrade clients when their version is outdated. No changes required on the client side.
 
