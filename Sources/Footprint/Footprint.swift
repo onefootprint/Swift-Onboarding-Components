@@ -250,7 +250,9 @@ public final class FootprintHosted: Sendable {
         onError: ((String) -> Void)? = nil,
         appearance: FootprintAppearance? = nil,
         options: FootprintOptions? = nil,
-        sessionId: String? = nil
+        sessionId: String? = nil,
+        bifrostBaseUrlOverride: String? = nil,
+        apiBaseUrlOverride: String? = nil
     ) {
         Footprint.shared.sendSdkVersionInfo(
             authToken: authToken,
@@ -268,7 +270,9 @@ public final class FootprintHosted: Sendable {
             onError: onError,
             appearance: appearance,
             options: options,
-            sessionId: sessionId
+            sessionId: sessionId,
+            bifrostBaseUrlOverride: bifrostBaseUrlOverride,
+            apiBaseUrlOverride: apiBaseUrlOverride
         )
     }
 }
