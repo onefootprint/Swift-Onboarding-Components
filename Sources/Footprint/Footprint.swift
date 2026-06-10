@@ -133,7 +133,7 @@ public final class Footprint: Sendable {
         SwiftOnboardingComponentsShared._Footprint.shared.getL10n()
     }
     
-    internal func logError(error: FootprintException) async {
+    package func logError(error: FootprintException) async {
         do{
             try await SwiftOnboardingComponentsShared._Footprint.shared.logError(error: error)
         }catch{
@@ -141,15 +141,15 @@ public final class Footprint: Sendable {
         }
     }
     
-    internal func getSesstionId() -> String? {
+    package func getSesstionId() -> String? {
         SwiftOnboardingComponentsShared._Footprint.shared.getSessionId()
     }
     
-    internal func getMoneyKitLinkSessionToken(redirectUri: String) async throws -> String {
+    package func getMoneyKitLinkSessionToken(redirectUri: String) async throws -> String {
         try await SwiftOnboardingComponentsShared._Footprint.shared.getMoneyKitLinkSessionToken(redirectUri: redirectUri)
     }
     
-    internal func postUserBankLinkingLinkSessionExchangeData (exchangeableToken: String) async throws {
+    package func postUserBankLinkingLinkSessionExchangeData (exchangeableToken: String) async throws {
         try await SwiftOnboardingComponentsShared._Footprint.shared.postUserBankLinkingLinkSessionExchangeData(exchangeableToken: exchangeableToken)
     }
     
@@ -170,7 +170,7 @@ public final class Footprint: Sendable {
         )
     }
     
-    internal func processBankLinking() async throws -> BankLinkingResult {
+    package func processBankLinking() async throws -> BankLinkingResult {
         let response = try await SwiftOnboardingComponentsShared._Footprint.shared.processBankLinking()
         
         if let complete = response as? BankLinkingProcessResponse.Complete {
@@ -193,7 +193,7 @@ public final class Footprint: Sendable {
     }
 }
 
-internal enum BankLinkingResult: Sendable {
+package enum BankLinkingResult: Sendable {
     case complete(validationToken: String)
     case sleepRequired(seconds: Int)
 }

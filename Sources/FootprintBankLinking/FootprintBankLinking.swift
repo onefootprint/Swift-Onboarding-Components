@@ -6,6 +6,11 @@
 //
 import SwiftUI
 import SwiftOnboardingComponentsShared
+// Under SwiftPM, Footprint (core) is a separate module. Under CocoaPods the core
+// and bank-linking sources compile into a single module, so this import is omitted.
+#if SWIFT_PACKAGE
+import Footprint
+#endif
 
 public struct BankLinkingCompletionResponse {
     public let validationToken: String

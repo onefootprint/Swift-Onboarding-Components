@@ -8,6 +8,9 @@
 import MoneyKit
 import SwiftUI
 import SwiftOnboardingComponentsShared
+#if SWIFT_PACKAGE
+import Footprint
+#endif
 
 internal struct FootprintBankLinkingInternal: View {
     @StateObject private var connectViewModel = MKConnectViewModel()
