@@ -1,5 +1,5 @@
 {
-  "originHash" : "046e49cd63b46719e360254cdfaa569797b7ac7ccee6728c14886ad01392a608",
+  "originHash" : "a47986422d8eb3e3288d41aca8a9784f0a4e621173786ff47596b59f806a084b",
   "pins" : [
     {
       "identity" : "fingerprintjs-pro-ios",
@@ -17,15 +17,6 @@
       "state" : {
         "revision" : "112fb07f1296605e1dfc91d7bdc5af76786520f0",
         "version" : "1.11.2"
-      }
-    },
-    {
-      "identity" : "plaid-link-ios",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/plaid/plaid-link-ios",
-      "state" : {
-        "revision" : "24a692f9dba3a933cd1703d328e4f3cf174663ea",
-        "version" : "6.4.2"
       }
     }
   ],
