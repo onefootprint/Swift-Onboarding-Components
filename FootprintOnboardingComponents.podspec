@@ -10,10 +10,9 @@ Pod::Spec.new do |s|
     s.license          = { :type => 'MIT', :file => 'LICENSE' }
     s.author           = { 'Rodrigo Pagnuzzi' => 'rodrigo@onefootprint.com' }
     s.source           = { :git => 'https://github.com/onefootprint/Swift-Onboarding-Components.git', :tag => s.version.to_s }
-    s.module_name      = 'Footprint' 
-    s.ios.deployment_target = '14.0'    
+    s.module_name      = 'Footprint'
+    s.ios.deployment_target = '14.0'
     s.swift_version = '5.9'
-    s.source_files = 'Sources/**/*'
 
     # Add remote binary URL
     s.prepare_command = <<-CMD
@@ -24,10 +23,25 @@ Pod::Spec.new do |s|
         rm -f SwiftOnboardingComponentsShared.xcframework.zip
     CMD
 
-     # Define the binary framework
-    s.vendored_frameworks = 'SwiftOnboardingComponentsShared.xcframework'
-    
-    # Dependencies
-    s.dependency 'FingerprintPro', '~> 2.10'
-    s.dependency 'MoneyKit', '1.11.2'
+    # CocoaPods compiles every subspec into the single `Footprint` module, so the
+    # `package` access level used to share plumbing between the core and bank-linking
+    # sources needs an explicit package name (SwiftPM sets this automatically).
+    s.pod_target_xcconfig = { 'OTHER_SWIFT_FLAGS' => '-package-name Footprint' }
+
+    s.default_subspec = 'Core'
+
+    # Core onboarding/KYC. Default install pulls in neither MoneyKit nor Plaid.
+    s.subspec 'Core' do |core|
+        core.source_files = 'Sources/Footprint/**/*'
+        core.vendored_frameworks = 'SwiftOnboardingComponentsShared.xcframework'
+        core.dependency 'FingerprintPro', '~> 2.10'
+    end
+
+    # Opt-in bank account linking. Adds MoneyKit; only pulled in when a consumer
+    # depends on 'FootprintOnboardingComponents/BankLinking'.
+    s.subspec 'BankLinking' do |bal|
+        bal.source_files = 'Sources/FootprintBankLinking/**/*'
+        bal.dependency 'FootprintOnboardingComponents/Core'
+        bal.dependency 'MoneyKit', '1.11.2'
+    end
 end

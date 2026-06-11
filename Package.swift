@@ -9,10 +9,15 @@ let package = Package(
         .iOS(.v14) // Specify the minimum platform version
     ],
     products: [
-        // Expose the library as "Footprint" to consumers.
+        // Core onboarding/KYC. Consumers who only need onboarding link this.
         .library(
             name: "Footprint", // Consumers will import "Footprint"
             targets: ["Footprint"]
+        ),
+        // Opt-in bank account linking. Pulls in MoneyKit; only link this if you use bank linking.
+        .library(
+            name: "FootprintBankLinking",
+            targets: ["FootprintBankLinking"]
         ),
     ],
     dependencies: [
@@ -30,7 +35,14 @@ let package = Package(
             name: "Footprint",
             dependencies: [
                 "SwiftOnboardingComponentsShared",
-                .product(name: "FingerprintPro", package: "fingerprintjs-pro-ios"),
+                .product(name: "FingerprintPro", package: "fingerprintjs-pro-ios")
+            ]
+        ),
+        .target(
+            name: "FootprintBankLinking",
+            dependencies: [
+                "Footprint",
+                "SwiftOnboardingComponentsShared",
                 .product(name: "MoneyKit", package: "moneykit-ios")
             ]
         )
