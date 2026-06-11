@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
     s.name             = 'FootprintOnboardingComponents'
     # Do not change this line as it is automatically updated by the GitHub action
-    s.version          = '1.5.6'
+    s.version          = '2.0.0'
     s.summary          = 'A package for Swift onboarding components.'
     s.description      = <<-DESC
     Footprint-powered onboarding flows to your application
@@ -30,7 +30,7 @@ Pod::Spec.new do |s|
 
     s.default_subspec = 'Core'
 
-    # Core onboarding/KYC. Default install pulls in neither MoneyKit nor Plaid.
+    # Core onboarding/KYC. Default install.
     s.subspec 'Core' do |core|
         core.source_files = 'Sources/Footprint/**/*'
         core.vendored_frameworks = 'SwiftOnboardingComponentsShared.xcframework'
