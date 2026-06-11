@@ -1,6 +1,15 @@
 ### Changelog for Swift onboarding components SDK
 *Updating this file is one of the requirements for GitHub CI/CD for Swift package release*
 
+ # 2.0.0
+  Bank linking is now a separate, opt-in product, and the previous Plaid dependency has been removed.
+
+  - **Removed the Plaid (LinkKit) dependency.** Removed the Plaid dependency.
+  - **Bank linking moved to a new `FootprintBankLinking` product.** If you use bank linking, you must:
+    1. Add the `FootprintBankLinking` library product to your target (alongside `Footprint`).
+    2. Add `import FootprintBankLinking` to any file that uses `FootprintBankLinking`, `BankLinkingCompletionResponse`, or the other bank-linking types.
+  - **Onboarding-only consumers:** no changes required. The core `Footprint` product no longer links MoneyKit or Plaid, so your app gets a smaller binary.
+
 # 1.5.6
 Add internal baseUrl overrides for automated testing to enhance stability of releases. No changes required on the client side.
 
