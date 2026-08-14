@@ -62,6 +62,40 @@ public final class Footprint: Sendable {
         }
     }
     
+    public func initialize(
+        authToken: String,
+        sandboxOutcome: SandboxOutcome? = nil,
+        l10n: FootprintL10n? = nil,
+        sessionId: String? = nil
+    ) async throws -> FootprintAuthRequirement {
+        let response = try await SwiftOnboardingComponentsShared._Footprint.shared.initialize(
+            authToken: authToken,
+            sandboxOutcome: sandboxOutcome,
+            l10n: l10n,
+            sessionId: sessionId
+        )
+
+        // Use actor to set API key safely
+        await Self.propManager.setFingerprintAPIKey(response.fingerprintApiKey)
+        await Self.propManager.setSessionId(sessionId)
+        let requiresAuth = response.requiresAuth
+        if(!requiresAuth){
+            await sendFingerprintData()
+        }
+        return FootprintAuthRequirement(requiresAuth: requiresAuth)
+    }
+
+    @available(*, deprecated, renamed: "initialize", message: "Use initialize(authToken:) with an onboarding session token.")
+    public func initializeWithAuthToken(
+        authToken: String,
+        sandboxOutcome: SandboxOutcome? = nil,
+        l10n: FootprintL10n? = nil,
+        sessionId: String? = nil
+    ) async throws -> FootprintAuthRequirement {
+        try await initialize(authToken: authToken, sandboxOutcome: sandboxOutcome, l10n: l10n, sessionId: sessionId)
+    }
+
+    @available(*, deprecated, message: "Public-key initialization is deprecated. Create an onboarding session token on your backend and use initialize(authToken:) instead.")
     public func initializeWithPublicKey(
         publicKey: String,
         sandboxOutcome: SandboxOutcome? = nil,
@@ -77,29 +111,6 @@ public final class Footprint: Sendable {
         // Use actor to set API key safely
         await Self.propManager.setFingerprintAPIKey(response.fingerprintApiKey)
         await Self.propManager.setSessionId(sessionId)
-    }
-    
-    public func initializeWithAuthToken(
-        authToken: String,
-        sandboxOutcome: SandboxOutcome? = nil,
-        l10n: FootprintL10n? = nil,
-        sessionId: String? = nil
-    ) async throws -> FootprintAuthRequirement {
-        let response = try await SwiftOnboardingComponentsShared._Footprint.shared.initializeWithAuthToken(
-            authToken: authToken,
-            sandboxOutcome: sandboxOutcome,
-            l10n: l10n,
-            sessionId: sessionId
-        )
-        
-        // Use actor to set API key safely
-        await Self.propManager.setFingerprintAPIKey(response.fingerprintApiKey)
-        await Self.propManager.setSessionId(sessionId)
-        let requiresAuth = response.requiresAuth
-        if(!requiresAuth){
-            await sendFingerprintData()
-        }
-        return FootprintAuthRequirement(requiresAuth: requiresAuth)
     }
     
     // Rest of the methods remain unchanged

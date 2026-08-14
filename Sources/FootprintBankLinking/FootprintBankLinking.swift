@@ -128,7 +128,7 @@ public struct FootprintBankLinking: View {
         .onAppear {
             Task {
                 do {
-                    try await Footprint.shared.initializeWithAuthToken(
+                    try await Footprint.shared.initialize(
                         authToken: authToken,
                         sessionId: sessionId
                     )
