@@ -19,10 +19,19 @@ let package = Package(
             name: "FootprintBankLinking",
             targets: ["FootprintBankLinking"]
         ),
+        // Opt-in native document capture. Pulls in the camera module; only link this if you
+        // collect ID documents inline (otherwise document collection uses the hosted flow).
+        .library(
+            name: "FootprintDocumentCapture",
+            targets: ["FootprintDocumentCapture"]
+        ),
     ],
     dependencies: [
         .package(url: "https://github.com/fingerprintjs/fingerprintjs-pro-ios", from: "2.10.0"),
-        .package(url: "https://github.com/moneykit/moneykit-ios", exact: "1.11.2")
+        .package(url: "https://github.com/moneykit/moneykit-ios", exact: "1.11.2"),
+        // Local path to the shared camera module's Swift package (monorepo is a sibling checkout).
+        // TODO(release): replace with a git-tagged SPM release of FootprintNativeCameraSwift.
+        .package(path: "../monorepo/mobile/packages/footprint-native-camera-module/FootprintNativeCameraSwift")
     ],
     targets: [
         // Define the binary target for the shared framework.
@@ -44,6 +53,14 @@ let package = Package(
                 "Footprint",
                 "SwiftOnboardingComponentsShared",
                 .product(name: "MoneyKit", package: "moneykit-ios")
+            ]
+        ),
+        .target(
+            name: "FootprintDocumentCapture",
+            dependencies: [
+                "Footprint",
+                "SwiftOnboardingComponentsShared",
+                .product(name: "FootprintNativeCameraSwift", package: "FootprintNativeCameraSwift")
             ]
         )
     ]
