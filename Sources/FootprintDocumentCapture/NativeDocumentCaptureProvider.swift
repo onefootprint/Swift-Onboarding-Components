@@ -32,6 +32,11 @@ private final class CaptureState: @unchecked Sendable {
     }
 }
 
+private struct UploadCallbacks: @unchecked Sendable {
+    let onResult: (DocumentProcessResult) -> Void
+    let onError: (String, String) -> Void
+}
+
 /// Presents the shared camera module's document-capture UI and routes each side's
 /// upload back through the SDK (`FootprintDocumentCaptureContext.uploadSide`).
 public final class NativeDocumentCaptureProvider: FootprintDocumentCaptureProvider {
@@ -47,25 +52,24 @@ public final class NativeDocumentCaptureProvider: FootprintDocumentCaptureProvid
             // module's DocumentProcessResult. KMM bridges the nested lambda params as
             // `-> KotlinUnit`, so wrap them as plain Swift closures.
             IosDocumentCaptureCoordinator.shared.uploadSide = { imageBase64, side, isManual, fromGallery, onResult, onError in
-                let onResultVoid: (DocumentProcessResult) -> Void = { onResult($0) }
-                let onErrorVoid: (String, String) -> Void = { onError($0, $1) }
+                let mappedSide = Self.mapSide(side)
+                let manual = isManual.boolValue
+                let gallery = fromGallery.boolValue
+                // The KMM callbacks aren't Sendable; box them so the Task can capture them. They're
+                // safe to invoke off the calling thread — they resolve the module's upload continuation.
+                let callbacks = UploadCallbacks(onResult: { onResult($0) }, onError: { onError($0, $1) })
                 Task {
                     do {
-                        let result = try await context.uploadSide(
-                            imageBase64,
-                            Self.mapSide(side),
-                            isManual,
-                            fromGallery
-                        )
-                        state.record(Self.mapSide(side))
-                        onResultVoid(DocumentProcessResult(
+                        let result = try await context.uploadSide(imageBase64, mappedSide, manual, gallery)
+                        state.record(mappedSide)
+                        callbacks.onResult(DocumentProcessResult(
                             errors: result.errors.map { CaptureImageError(code: $0, message: nil) },
                             isRetryLimitExceeded: result.isRetryLimitExceeded,
                             nextSideToCollect: result.nextSideToCollect?.value
                         ))
                     } catch {
                         let fp = error as? FootprintException
-                        onErrorVoid(fp?.code ?? "UPLOAD_ERROR", fp?.message ?? error.localizedDescription)
+                        callbacks.onError(fp?.code ?? "UPLOAD_ERROR", fp?.message ?? error.localizedDescription)
                     }
                 }
             }
