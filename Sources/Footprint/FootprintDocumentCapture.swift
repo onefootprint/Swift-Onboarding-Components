@@ -1,6 +1,11 @@
 import Foundation
 @_exported import SwiftOnboardingComponentsShared
 
+// SKIE bridges the Kotlin FootprintException as a plain class that isn't a Swift Error,
+// so it can't be thrown as-is. Conform it retroactively so captureDocument can throw it and
+// integrators catch it like any other Footprint error.
+extension FootprintException: @retroactive Error {}
+
 /// Options for `Footprint.captureDocument`, mirroring footprint-expo's `DocumentOptions`.
 public struct FootprintDocumentCaptureOptions: Sendable {
     public let kind: DocumentKind
