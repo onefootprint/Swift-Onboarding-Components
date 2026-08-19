@@ -6,10 +6,7 @@ import PackageDescription
 let package = Package(
     name: "Footprint",
     platforms: [
-        // Raised to iOS 16 because the opt-in FootprintDocumentCapture product depends on
-        // FootprintNativeCameraSwift, which requires iOS 16. SPM platforms are package-wide,
-        // so this also applies to the core Footprint / FootprintBankLinking products.
-        .iOS(.v16)
+        .iOS(.v14)
     ],
     products: [
         // Core onboarding/KYC. Consumers who only need onboarding link this.
