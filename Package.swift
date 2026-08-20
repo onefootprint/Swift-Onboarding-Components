@@ -29,9 +29,8 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/fingerprintjs/fingerprintjs-pro-ios", from: "2.10.0"),
         .package(url: "https://github.com/moneykit/moneykit-ios", exact: "1.11.2"),
-        // Local path to the shared camera module's Swift package (monorepo is a sibling checkout).
-        // TODO(release): replace with a git-tagged SPM release of FootprintNativeCameraSwift.
-        .package(path: "../monorepo/mobile/packages/footprint-native-camera-module/FootprintNativeCameraSwift")
+        // FootprintDocumentCapture's camera layer bridges KMM suspend/Flow to Swift via KMP-NativeCoroutines.
+        .package(url: "https://github.com/rickclephas/KMP-NativeCoroutines.git", exact: "1.0.2")
     ],
     targets: [
         // Define the binary target for the shared framework.
@@ -39,6 +38,18 @@ let package = Package(
             name: "SwiftOnboardingComponentsShared",
             url: "https://github.com/onefootprint/Swift-Onboarding-Components/releases/download/2.0.0/SwiftOnboardingComponentsShared.xcframework.zip",
             checksum: "a740df0ee7aa2bad975131bcef195ed35f5db89f42046ad1db59c4e54579f264"
+        ),
+        // Camera binaries for FootprintDocumentCapture. url + checksum are filled in per release
+        // by update-shared-swift-binary.sh (no prior release, so the checksums are placeholders).
+        .binaryTarget(
+            name: "FootprintNativeCamera",
+            url: "https://github.com/onefootprint/Swift-Onboarding-Components/releases/download/2.1.0/FootprintNativeCamera.xcframework.zip",
+            checksum: "REPLACE_ON_RELEASE"
+        ),
+        .binaryTarget(
+            name: "FootprintNativeCameraSwift",
+            url: "https://github.com/onefootprint/Swift-Onboarding-Components/releases/download/2.1.0/FootprintNativeCameraSwift.xcframework.zip",
+            checksum: "REPLACE_ON_RELEASE"
         ),
         .target(
             name: "Footprint",
@@ -60,7 +71,11 @@ let package = Package(
             dependencies: [
                 "Footprint",
                 "SwiftOnboardingComponentsShared",
-                .product(name: "FootprintNativeCameraSwift", package: "FootprintNativeCameraSwift")
+                "FootprintNativeCameraSwift",
+                "FootprintNativeCamera",
+                .product(name: "KMPNativeCoroutinesCore", package: "KMP-NativeCoroutines"),
+                .product(name: "KMPNativeCoroutinesAsync", package: "KMP-NativeCoroutines"),
+                .product(name: "KMPNativeCoroutinesCombine", package: "KMP-NativeCoroutines")
             ]
         )
     ]
