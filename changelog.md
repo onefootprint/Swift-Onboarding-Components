@@ -1,6 +1,10 @@
 ### Changelog for Swift onboarding components SDK
 *Updating this file is one of the requirements for GitHub CI/CD for Swift package release*
 
+ # 2.1.0
+- Added a single `initialize(authToken:)`; `initializeWithAuthToken` / `initializeWithPublicKey` are deprecated (still functional this version; public-key init is removed next major).
+- Added the opt-in `FootprintDocumentCapture` product for native document capture, and `collect_custom_data` support. See the [native onboarding docs](https://docs.onefootprint.com/articles/sdks/swift-native).
+
  # 2.0.0
   Bank linking is now a separate, opt-in product, and the previous Plaid dependency has been removed.
 
