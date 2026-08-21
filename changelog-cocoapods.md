@@ -1,5 +1,9 @@
 ### Changelog for FootprintOnboardingComponents CocoaPod
 
+# 2.1.0
+- Added a single `initialize(authToken:)`; `initializeWithAuthToken` / `initializeWithPublicKey` are deprecated (still functional this version; public-key init is removed next major).
+- Added `collect_custom_data` support. Native document capture is available via Swift Package Manager (the `FootprintDocumentCapture` product); CocoaPods support to follow. See the [native onboarding docs](https://docs.onefootprint.com/articles/sdks/swift-native).
+
 # 2.0.0
   Bank linking is now a separate, opt-in subspec, and the unused Plaid dependency has been removed.
 
