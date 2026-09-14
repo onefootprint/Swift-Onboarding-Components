@@ -42,11 +42,11 @@ public final class Footprint: Sendable {
     
     private func sendFingerprintData() async {
         do {
-            if let apiKey = await Self.propManager.getFingerprintAPIKey(){
-                let fingerprintCredentials = try await getFingerprintCredentials(apiKey: apiKey)
+            if let apiKey = await Self.propManager.getFingerprintAPIKey(),
+               let credentials = try await deviceIntelligenceCredentials(apiKey: apiKey) {
                 try await SwiftOnboardingComponentsShared._Footprint.shared.postFingerprintData(
-                    visitorId: fingerprintCredentials.visitorId,
-                    requestId: fingerprintCredentials.requestId
+                    visitorId: credentials.visitorId,
+                    requestId: credentials.requestId
                 )
             }
         }catch {

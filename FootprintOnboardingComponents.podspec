@@ -34,7 +34,6 @@ Pod::Spec.new do |s|
     s.subspec 'Core' do |core|
         core.source_files = 'Sources/Footprint/**/*'
         core.vendored_frameworks = 'SwiftOnboardingComponentsShared.xcframework'
-        core.dependency 'FingerprintPro', '~> 2.10'
     end
 
     # Opt-in bank account linking. Adds MoneyKit; only pulled in when a consumer
@@ -43,5 +42,11 @@ Pod::Spec.new do |s|
         bal.source_files = 'Sources/FootprintBankLinking/**/*'
         bal.dependency 'FootprintOnboardingComponents/Core'
         bal.dependency 'MoneyKit', '1.11.2'
+    end
+
+    s.subspec 'DeviceIntelligence' do |di|
+        di.source_files = 'Sources/FootprintDeviceIntelligence/**/*'
+        di.dependency 'FootprintOnboardingComponents/Core'
+        di.dependency 'FingerprintPro', '~> 2.10'
     end
 end

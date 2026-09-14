@@ -26,8 +26,7 @@ public final class Onboarding: Sendable {
     ) async throws -> (visitorId: String, requestId: String)?  {
         let config = try await Footprint.shared.getOnboardingConfig(authToken: authToken)
         guard let fpPublicKey = config.fpPublicKey else { return nil }
-        let fingerprintCredentials = try await getFingerprintCredentials(apiKey: fpPublicKey)
-        return fingerprintCredentials
+        return try await Footprint.shared.deviceIntelligenceCredentials(apiKey: fpPublicKey)
     }
     
     private func runOnboardingInBackground(

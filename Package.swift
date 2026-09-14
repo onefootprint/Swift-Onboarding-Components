@@ -25,6 +25,10 @@ let package = Package(
             name: "FootprintDocumentCapture",
             targets: ["FootprintDocumentCapture"]
         ),
+        .library(
+            name: "FootprintDeviceIntelligence",
+            targets: ["FootprintDeviceIntelligence"]
+        ),
     ],
     dependencies: [
         .package(url: "https://github.com/fingerprintjs/fingerprintjs-pro-ios", from: "2.10.0"),
@@ -54,7 +58,13 @@ let package = Package(
         .target(
             name: "Footprint",
             dependencies: [
-                "SwiftOnboardingComponentsShared",
+                "SwiftOnboardingComponentsShared"
+            ]
+        ),
+        .target(
+            name: "FootprintDeviceIntelligence",
+            dependencies: [
+                "Footprint",
                 .product(name: "FingerprintPro", package: "fingerprintjs-pro-ios")
             ]
         ),
