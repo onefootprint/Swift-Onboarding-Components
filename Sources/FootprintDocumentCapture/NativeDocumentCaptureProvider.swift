@@ -51,7 +51,7 @@ public final class NativeDocumentCaptureProvider: FootprintDocumentCaptureProvid
             // Per side: run the SDK's upload/process, map the result into the camera
             // module's DocumentProcessResult. KMM bridges the nested lambda params as
             // `-> KotlinUnit`, so wrap them as plain Swift closures.
-            IosDocumentCaptureCoordinator.shared.uploadSide = { imageBase64, side, isManual, fromGallery, onResult, onError in
+            IosDocumentCaptureCoordinator.shared.uploadSide = { imageBase64, side, isManual, fromGallery, videoPath, onResult, onError in
                 let mappedSide = Self.mapSide(side)
                 let manual = isManual.boolValue
                 let gallery = fromGallery.boolValue
@@ -60,7 +60,7 @@ public final class NativeDocumentCaptureProvider: FootprintDocumentCaptureProvid
                 let callbacks = UploadCallbacks(onResult: { onResult($0) }, onError: { onError($0, $1) })
                 Task {
                     do {
-                        let result = try await context.uploadSide(imageBase64, mappedSide, manual, gallery)
+                        let result = try await context.uploadSide(imageBase64, mappedSide, manual, gallery, videoPath)
                         state.record(mappedSide)
                         callbacks.onResult(DocumentProcessResult(
                             errors: result.errors.map { CaptureImageError(code: $0, message: nil) },
@@ -99,6 +99,7 @@ public final class NativeDocumentCaptureProvider: FootprintDocumentCaptureProvid
                     documentKind: context.documentKind.value,
                     appearance: CaptureAppearance.companion.fromVariables(theme: nil, variables: [:], fontFamily: nil),
                     language: context.language,
+                    recordSelfieVideo: context.shouldRecordSelfieVideo,
                     onError: { code, message in
                         finish {
                             if state.tryResume() {

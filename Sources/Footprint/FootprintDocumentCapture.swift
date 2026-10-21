@@ -47,6 +47,7 @@ public struct FootprintDocumentCaptureContext: Sendable {
     public let documentKind: DocumentKind
     public let countryCode: Iso3166TwoDigitCountryCode?
     public let shouldCollectSelfie: Bool
+    public let shouldRecordSelfieVideo: Bool
     public let autoCapture: Bool
     public let allowGalleryUpload: Bool
     public let language: String?
@@ -54,7 +55,8 @@ public struct FootprintDocumentCaptureContext: Sendable {
         _ imageBase64: String,
         _ side: DocumentSide,
         _ isManual: Bool,
-        _ fromGallery: Bool
+        _ fromGallery: Bool,
+        _ videoPath: String?
     ) async throws -> FootprintDocumentProcessResult
 
     public init(
@@ -62,15 +64,17 @@ public struct FootprintDocumentCaptureContext: Sendable {
         documentKind: DocumentKind,
         countryCode: Iso3166TwoDigitCountryCode?,
         shouldCollectSelfie: Bool,
+        shouldRecordSelfieVideo: Bool,
         autoCapture: Bool,
         allowGalleryUpload: Bool,
         language: String?,
-        uploadSide: @escaping @Sendable (String, DocumentSide, Bool, Bool) async throws -> FootprintDocumentProcessResult
+        uploadSide: @escaping @Sendable (String, DocumentSide, Bool, Bool, String?) async throws -> FootprintDocumentProcessResult
     ) {
         self.documentId = documentId
         self.documentKind = documentKind
         self.countryCode = countryCode
         self.shouldCollectSelfie = shouldCollectSelfie
+        self.shouldRecordSelfieVideo = shouldRecordSelfieVideo
         self.autoCapture = autoCapture
         self.allowGalleryUpload = allowGalleryUpload
         self.language = language
@@ -211,16 +215,18 @@ extension Footprint {
             documentKind: target.kind,
             countryCode: target.countryCode,
             shouldCollectSelfie: config.shouldCollectSelfie,
+            shouldRecordSelfieVideo: config.shouldRecordSelfieVideo,
             autoCapture: target.autoCapture,
             allowGalleryUpload: target.allowGalleryUpload,
             language: language,
-            uploadSide: { imageBase64, side, isManual, fromGallery in
+            uploadSide: { imageBase64, side, isManual, fromGallery, videoPath in
                 let result = try await SwiftOnboardingComponentsShared._Footprint.shared.uploadDocumentSide(
                     documentId: documentId,
                     side: side,
                     imageBase64: imageBase64,
                     isManual: isManual,
-                    fromGallery: fromGallery
+                    fromGallery: fromGallery,
+                    videoPath: videoPath
                 )
                 await retryLimit.record(result.isRetryLimitExceeded)
                 return result
