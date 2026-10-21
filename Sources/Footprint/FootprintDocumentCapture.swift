@@ -42,7 +42,7 @@ public struct FootprintCaptureDocumentResult: Sendable {
 public struct FootprintDocumentCaptureContext: Sendable {
     public let documentId: String
     public let documentKind: DocumentKind
-    public let countryCode: Iso3166TwoDigitCountryCode
+    public let countryCode: Iso3166TwoDigitCountryCode?
     public let shouldCollectSelfie: Bool
     public let autoCapture: Bool
     public let allowGalleryUpload: Bool
@@ -57,7 +57,7 @@ public struct FootprintDocumentCaptureContext: Sendable {
     public init(
         documentId: String,
         documentKind: DocumentKind,
-        countryCode: Iso3166TwoDigitCountryCode,
+        countryCode: Iso3166TwoDigitCountryCode?,
         shouldCollectSelfie: Bool,
         autoCapture: Bool,
         allowGalleryUpload: Bool,
@@ -117,6 +117,49 @@ extension Footprint {
     public func captureDocument(
         options: FootprintDocumentCaptureOptions
     ) async throws -> FootprintCaptureDocumentResult {
+        try await capture(
+            kind: options.kind,
+            countryCode: options.countryCode,
+            autoCapture: options.autoCapture,
+            allowGalleryUpload: options.allowGalleryUpload
+        ) { config in
+            if config.isSelfie {
+                throw FootprintException(
+                    kind: .onboardingError,
+                    message: "The pending document requirement is a selfie. Call captureSelfie instead.",
+                    supportId: nil,
+                    sessionId: nil,
+                    context: nil,
+                    code: nil
+                )
+            }
+        }
+    }
+
+    /// Captures the standalone selfie a Selfie node asks for, in manual mode when its face detection is off.
+    public func captureSelfie() async throws -> FootprintCaptureDocumentResult {
+        let autoCapture = try await getDocumentConfig()?.requireFaceDetection != .off
+        return try await capture(kind: .selfie, countryCode: nil, autoCapture: autoCapture, allowGalleryUpload: false) { config in
+            if !config.isSelfie {
+                throw FootprintException(
+                    kind: .onboardingError,
+                    message: "No selfie requirement is currently pending. Call captureDocument instead.",
+                    supportId: nil,
+                    sessionId: nil,
+                    context: nil,
+                    code: nil
+                )
+            }
+        }
+    }
+
+    private func capture(
+        kind: DocumentKind,
+        countryCode: Iso3166TwoDigitCountryCode?,
+        autoCapture: Bool,
+        allowGalleryUpload: Bool,
+        validate: (FootprintDocumentConfig) throws -> Void
+    ) async throws -> FootprintCaptureDocumentResult {
         guard let provider = await documentCaptureProviderStore.get() else {
             throw FootprintException(
                 kind: .sdkError,
@@ -138,20 +181,21 @@ extension Footprint {
                 code: nil
             )
         }
+        try validate(config)
         let documentId = try await SwiftOnboardingComponentsShared._Footprint.shared.createDocument(
             documentRequestId: config.documentRequestId,
-            documentType: options.kind,
-            countryCode: options.countryCode,
+            documentType: kind,
+            countryCode: countryCode,
             shouldCollectSelfie: config.shouldCollectSelfie
         )
         let language = SwiftOnboardingComponentsShared._Footprint.shared.getL10n().language?.value
         let context = FootprintDocumentCaptureContext(
             documentId: documentId,
-            documentKind: options.kind,
-            countryCode: options.countryCode,
+            documentKind: kind,
+            countryCode: countryCode,
             shouldCollectSelfie: config.shouldCollectSelfie,
-            autoCapture: options.autoCapture,
-            allowGalleryUpload: options.allowGalleryUpload,
+            autoCapture: autoCapture,
+            allowGalleryUpload: allowGalleryUpload,
             language: language,
             uploadSide: { imageBase64, side, isManual, fromGallery in
                 try await SwiftOnboardingComponentsShared._Footprint.shared.uploadDocumentSide(
