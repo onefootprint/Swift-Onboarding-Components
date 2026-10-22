@@ -93,7 +93,9 @@ public final class NativeDocumentCaptureProvider: FootprintDocumentCaptureProvid
                     host.dismiss(animated: true, completion: body)
                 }
                 let view = CameraCaptureView(
-                    startSide: "front",
+                    startSide: context.documentKind == .selfie ? "selfie" : "front",
+                    autoCapture: context.autoCapture,
+                    allowGalleryUpload: context.allowGalleryUpload,
                     documentKind: context.documentKind.value,
                     appearance: CaptureAppearance.companion.fromVariables(theme: nil, variables: [:], fontFamily: nil),
                     language: context.language,
