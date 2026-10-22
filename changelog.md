@@ -1,6 +1,11 @@
 ### Changelog for Swift onboarding components SDK
 *Updating this file is one of the requirements for GitHub CI/CD for Swift package release*
 
+ # 2.2.0
+- Added `captureSelfie()` for the standalone selfie a Selfie node asks for; `getDocumentConfig()` reports it with `isSelfie`. It opens the front camera and captures manually when the node's face detection is off. See the [native onboarding docs](https://docs.onefootprint.com/articles/sdks/swift-native).
+- Capture results gain `isRetryLimitExceeded`, set when the backend rejected the last allowed capture, and native capture honors `allowGalleryUpload`.
+- Breaking for custom capture providers: `FootprintDocumentCaptureContext.countryCode` is now optional, since a selfie has no country.
+
  # 2.1.0
 - Added a single `initialize(authToken:)`; `initializeWithAuthToken` / `initializeWithPublicKey` are deprecated (still functional this version; public-key init is removed next major).
 - Added the opt-in `FootprintDocumentCapture` product for native document capture, and `collect_custom_data` support. See the [native onboarding docs](https://docs.onefootprint.com/articles/sdks/swift-native).

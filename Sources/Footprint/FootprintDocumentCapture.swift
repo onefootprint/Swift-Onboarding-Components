@@ -29,10 +29,13 @@ public struct FootprintDocumentCaptureOptions: Sendable {
 public struct FootprintCaptureDocumentResult: Sendable {
     public let uploadedSides: [DocumentSide]
     public let canceled: Bool
+    /// The backend rejected the last allowed capture and failed the document, so the onboarding moves on without it.
+    public let isRetryLimitExceeded: Bool
 
-    public init(uploadedSides: [DocumentSide], canceled: Bool = false) {
+    public init(uploadedSides: [DocumentSide], canceled: Bool = false, isRetryLimitExceeded: Bool = false) {
         self.uploadedSides = uploadedSides
         self.canceled = canceled
+        self.isRetryLimitExceeded = isRetryLimitExceeded
     }
 }
 
@@ -117,12 +120,7 @@ extension Footprint {
     public func captureDocument(
         options: FootprintDocumentCaptureOptions
     ) async throws -> FootprintCaptureDocumentResult {
-        try await capture(
-            kind: options.kind,
-            countryCode: options.countryCode,
-            autoCapture: options.autoCapture,
-            allowGalleryUpload: options.allowGalleryUpload
-        ) { config in
+        try await capture { config in
             if config.isSelfie {
                 throw FootprintException(
                     kind: .onboardingError,
@@ -133,13 +131,18 @@ extension Footprint {
                     code: nil
                 )
             }
+            return CaptureTarget(
+                kind: options.kind,
+                countryCode: options.countryCode,
+                autoCapture: options.autoCapture,
+                allowGalleryUpload: options.allowGalleryUpload
+            )
         }
     }
 
     /// Captures the standalone selfie a Selfie node asks for, in manual mode when its face detection is off.
     public func captureSelfie() async throws -> FootprintCaptureDocumentResult {
-        let autoCapture = try await getDocumentConfig()?.requireFaceDetection != .off
-        return try await capture(kind: .selfie, countryCode: nil, autoCapture: autoCapture, allowGalleryUpload: false) { config in
+        try await capture { config in
             if !config.isSelfie {
                 throw FootprintException(
                     kind: .onboardingError,
@@ -150,15 +153,17 @@ extension Footprint {
                     code: nil
                 )
             }
+            return CaptureTarget(
+                kind: .selfie,
+                countryCode: nil,
+                autoCapture: config.requireFaceDetection != .off,
+                allowGalleryUpload: false
+            )
         }
     }
 
     private func capture(
-        kind: DocumentKind,
-        countryCode: Iso3166TwoDigitCountryCode?,
-        autoCapture: Bool,
-        allowGalleryUpload: Bool,
-        validate: (FootprintDocumentConfig) throws -> Void
+        toTarget: (FootprintDocumentConfig) throws -> CaptureTarget
     ) async throws -> FootprintCaptureDocumentResult {
         guard let provider = await documentCaptureProviderStore.get() else {
             throw FootprintException(
@@ -181,32 +186,52 @@ extension Footprint {
                 code: nil
             )
         }
-        try validate(config)
+        let target = try toTarget(config)
         let documentId = try await SwiftOnboardingComponentsShared._Footprint.shared.createDocument(
             documentRequestId: config.documentRequestId,
-            documentType: kind,
-            countryCode: countryCode,
+            documentType: target.kind,
+            countryCode: target.countryCode,
             shouldCollectSelfie: config.shouldCollectSelfie
         )
         let language = SwiftOnboardingComponentsShared._Footprint.shared.getL10n().language?.value
+        let retryLimit = RetryLimitFlag()
         let context = FootprintDocumentCaptureContext(
             documentId: documentId,
-            documentKind: kind,
-            countryCode: countryCode,
+            documentKind: target.kind,
+            countryCode: target.countryCode,
             shouldCollectSelfie: config.shouldCollectSelfie,
-            autoCapture: autoCapture,
-            allowGalleryUpload: allowGalleryUpload,
+            autoCapture: target.autoCapture,
+            allowGalleryUpload: target.allowGalleryUpload,
             language: language,
             uploadSide: { imageBase64, side, isManual, fromGallery in
-                try await SwiftOnboardingComponentsShared._Footprint.shared.uploadDocumentSide(
+                let result = try await SwiftOnboardingComponentsShared._Footprint.shared.uploadDocumentSide(
                     documentId: documentId,
                     side: side,
                     imageBase64: imageBase64,
                     isManual: isManual,
                     fromGallery: fromGallery
                 )
+                await retryLimit.record(result.isRetryLimitExceeded)
+                return result
             }
         )
-        return try await provider.present(context)
+        let result = try await provider.present(context)
+        return FootprintCaptureDocumentResult(
+            uploadedSides: result.uploadedSides,
+            canceled: result.canceled,
+            isRetryLimitExceeded: await retryLimit.isExceeded
+        )
     }
+}
+
+private struct CaptureTarget {
+    let kind: DocumentKind
+    let countryCode: Iso3166TwoDigitCountryCode?
+    let autoCapture: Bool
+    let allowGalleryUpload: Bool
+}
+
+private actor RetryLimitFlag {
+    private(set) var isExceeded = false
+    func record(_ exceeded: Bool) { isExceeded = exceeded }
 }
