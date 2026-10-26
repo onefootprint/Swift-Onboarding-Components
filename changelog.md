@@ -2,8 +2,9 @@
 *Updating this file is one of the requirements for GitHub CI/CD for Swift package release*
 
  # 2.2.0
-- Added `captureSelfie()` for the standalone selfie a Selfie node asks for; `getDocumentConfig()` reports it with `isSelfie`. It opens the front camera and captures manually when the node's face detection is off. See the [native onboarding docs](https://docs.onefootprint.com/articles/sdks/swift-native).
-- Capture results gain `isRetryLimitExceeded`, set when the backend rejected the last allowed capture, and native capture honors `allowGalleryUpload`.
+- Added `captureSelfie()` for the standalone selfie a Selfie node asks for; `getDocumentConfig()` reports it with `isSelfie`. It opens the front camera and captures manually when the node's face detection is off. A selfie that requires a video clip (`isSelfieVideoRequired`) throws `E_SELFIE_VIDEO_REQUIRED`, since native capture doesn't record video yet; hand it off to the hosted flow. See the [native onboarding docs](https://docs.onefootprint.com/articles/sdks/swift-native).
+- Capture results gain `isRetryLimitExceeded`, set when the backend rejected the last allowed capture.
+- Behavior change: native capture now honors `autoCapture` and `allowGalleryUpload`, which it ignored before, so `autoCapture: false` starts in manual capture and hides the toggle.
 - Breaking for custom capture providers: `FootprintDocumentCaptureContext.countryCode` is now optional, since a selfie has no country.
 
  # 2.1.0

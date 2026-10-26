@@ -153,6 +153,17 @@ extension Footprint {
                     code: nil
                 )
             }
+            // Native capture records no video clip, so the backend would reject every capture until the retry limit.
+            if config.isSelfieVideoRequired {
+                throw FootprintException(
+                    kind: .inlineProcessNotSupported,
+                    message: "This selfie needs a video clip, which native capture does not record yet. Use the hosted flow.",
+                    supportId: nil,
+                    sessionId: nil,
+                    context: nil,
+                    code: "E_SELFIE_VIDEO_REQUIRED"
+                )
+            }
             return CaptureTarget(
                 kind: .selfie,
                 countryCode: nil,
