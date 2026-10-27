@@ -6,7 +6,7 @@
 - Capture results gain `isRetryLimitExceeded`, set when the backend rejected the last allowed capture.
 - Behavior change: native capture now honors `autoCapture` and `allowGalleryUpload`, which it ignored before, so `autoCapture: false` starts in manual capture and hides the toggle.
 - Breaking for custom capture providers: `FootprintDocumentCaptureContext.countryCode` is now optional, since a selfie has no country.
-- Behavior change: device intelligence is now opt-in. FingerprintPro moved out of `Footprint` into the `FootprintDeviceIntelligence` product, so apps that already bundle FingerprintPro avoid a duplicate framework. To keep sending device signals, add that product and call `registerFootprintDeviceIntelligence()` once before onboarding; without it, onboarding completes without them.
+- Behavior change: device intelligence is now opt-in. FingerprintPro moved out of `Footprint` into the `FootprintDeviceIntelligence` product, so apps that already bundle FingerprintPro avoid a duplicate framework. To keep sending device signals, add that product and call `registerFootprintDeviceIntelligence()` once before onboarding; without it, onboarding completes without them. The product now uses Fingerprint's v4 SDK (`https://github.com/fingerprintjs/fingerprint-ios`, 4.2 or later) in place of `fingerprintjs-pro-ios`.
 
  # 2.1.0
 - Added a single `initialize(authToken:)`; `initializeWithAuthToken` / `initializeWithPublicKey` are deprecated (still functional this version; public-key init is removed next major).

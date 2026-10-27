@@ -1,4 +1,4 @@
-import FingerprintPro
+import Fingerprint
 #if SWIFT_PACKAGE
 import Footprint
 #endif
@@ -10,9 +10,9 @@ public final class FingerprintProProvider: FootprintDeviceIntelligenceProvider {
 
     public func getDeviceIntelligenceCredentials(apiKey: String) async throws -> (visitorId: String, requestId: String) {
         let configuration = Configuration(apiKey: apiKey)
-        let client = FingerprintProFactory.getInstance(configuration)
+        let client = FingerprintFactory.getInstance(configuration)
         let visitorIdResponse = try await client.getVisitorIdResponse()
-        return (visitorIdResponse.visitorId, visitorIdResponse.requestId)
+        return (visitorIdResponse.visitorId, visitorIdResponse.eventId)
     }
 }
 
