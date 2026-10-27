@@ -1,5 +1,9 @@
 ### Changelog for FootprintOnboardingComponents CocoaPod
 
+# 2.2.0
+- `getDocumentConfig()` marks the standalone selfie a Selfie node asks for with `isSelfie`. Capturing it with `captureSelfie()` needs the Swift Package Manager `FootprintDocumentCapture` product, which CocoaPods doesn't ship.
+- Breaking for custom capture providers: `FootprintDocumentCaptureContext.countryCode` is now optional, since a selfie has no country.
+
 # 2.1.0
 - Added a single `initialize(authToken:)`; `initializeWithAuthToken` / `initializeWithPublicKey` are deprecated (still functional this version; public-key init is removed next major).
 - Added `collect_custom_data` support. Native document capture is available via Swift Package Manager (the `FootprintDocumentCapture` product); CocoaPods support to follow. See the [native onboarding docs](https://docs.onefootprint.com/articles/sdks/swift-native).
