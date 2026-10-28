@@ -1,9 +1,12 @@
 ### Changelog for FootprintOnboardingComponents CocoaPod
 
+# 2.3.0
+- The `FootprintOnboardingComponents/DeviceIntelligence` subspec now depends on Fingerprint's v4 pod, `Fingerprint-iOS` (`~> 4.2`), in place of `FingerprintPro`. Apps that opted in pick it up with this update and need no code change.
+
 # 2.2.0
 - `getDocumentConfig()` marks the standalone selfie a Selfie node asks for with `isSelfie`. Capturing it with `captureSelfie()` needs the Swift Package Manager `FootprintDocumentCapture` product, which CocoaPods doesn't ship.
 - Breaking for custom capture providers: `FootprintDocumentCaptureContext.countryCode` is now optional, since a selfie has no country.
-- Behavior change: device intelligence is now opt-in. FingerprintPro moved out of the default `Core` subspec into `FootprintOnboardingComponents/DeviceIntelligence`, so apps that already bundle FingerprintPro avoid a duplicate framework. To keep sending device signals, add that subspec and call `registerFootprintDeviceIntelligence()` once before onboarding; without it, onboarding completes without them. The subspec now depends on Fingerprint's v4 pod, `Fingerprint-iOS` (`~> 4.2`), in place of `FingerprintPro`.
+- Behavior change: device intelligence is now opt-in. FingerprintPro moved out of the default `Core` subspec into `FootprintOnboardingComponents/DeviceIntelligence`, so apps that already bundle FingerprintPro avoid a duplicate framework. To keep sending device signals, add that subspec and call `registerFootprintDeviceIntelligence()` once before onboarding; without it, onboarding completes without them.
 
 # 2.1.0
 - Added a single `initialize(authToken:)`; `initializeWithAuthToken` / `initializeWithPublicKey` are deprecated (still functional this version; public-key init is removed next major).

@@ -1,12 +1,15 @@
 ### Changelog for Swift onboarding components SDK
 *Updating this file is one of the requirements for GitHub CI/CD for Swift package release*
 
+ # 2.3.0
+- The `FootprintDeviceIntelligence` product now uses Fingerprint's v4 SDK (`https://github.com/fingerprintjs/fingerprint-ios`, 4.2 or later) in place of `fingerprintjs-pro-ios`. Apps that opted in pick it up with this update and need no code change.
+
  # 2.2.0
 - Added `captureSelfie()` for the standalone selfie a Selfie node asks for; `getDocumentConfig()` reports it with `isSelfie`. It opens the front camera and captures manually when the node's face detection is off. A selfie that requires a video clip (`isSelfieVideoRequired`) throws `E_SELFIE_VIDEO_REQUIRED`, since native capture doesn't record video yet; hand it off to the hosted flow. See the [native onboarding docs](https://docs.onefootprint.com/articles/sdks/swift-native).
 - Capture results gain `isRetryLimitExceeded`, set when the backend rejected the last allowed capture.
 - Behavior change: native capture now honors `autoCapture` and `allowGalleryUpload`, which it ignored before, so `autoCapture: false` starts in manual capture and hides the toggle.
 - Breaking for custom capture providers: `FootprintDocumentCaptureContext.countryCode` is now optional, since a selfie has no country.
-- Behavior change: device intelligence is now opt-in. FingerprintPro moved out of `Footprint` into the `FootprintDeviceIntelligence` product, so apps that already bundle FingerprintPro avoid a duplicate framework. To keep sending device signals, add that product and call `registerFootprintDeviceIntelligence()` once before onboarding; without it, onboarding completes without them. The product now uses Fingerprint's v4 SDK (`https://github.com/fingerprintjs/fingerprint-ios`, 4.2 or later) in place of `fingerprintjs-pro-ios`.
+- Behavior change: device intelligence is now opt-in. FingerprintPro moved out of `Footprint` into the `FootprintDeviceIntelligence` product, so apps that already bundle FingerprintPro avoid a duplicate framework. To keep sending device signals, add that product and call `registerFootprintDeviceIntelligence()` once before onboarding; without it, onboarding completes without them.
 
  # 2.1.0
 - Added a single `initialize(authToken:)`; `initializeWithAuthToken` / `initializeWithPublicKey` are deprecated (still functional this version; public-key init is removed next major).

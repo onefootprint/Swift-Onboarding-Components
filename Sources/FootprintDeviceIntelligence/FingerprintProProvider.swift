@@ -3,8 +3,8 @@ import Fingerprint
 import Footprint
 #endif
 
-/// Device-intelligence provider backed by FingerprintPro. This is the only source that links
-/// FingerprintPro, so apps that omit the `FootprintDeviceIntelligence` product never bundle it.
+/// Device-intelligence provider backed by Fingerprint. This is the only source that links
+/// Fingerprint, so apps that omit the `FootprintDeviceIntelligence` product never bundle it.
 public final class FingerprintProProvider: FootprintDeviceIntelligenceProvider {
     public init() {}
 
@@ -16,7 +16,7 @@ public final class FingerprintProProvider: FootprintDeviceIntelligenceProvider {
     }
 }
 
-/// One-line opt-in: registers FingerprintPro-backed device intelligence with the Footprint SDK.
+/// One-line opt-in: registers Fingerprint-backed device intelligence with the Footprint SDK.
 public func registerFootprintDeviceIntelligence() {
     Footprint.shared.setDeviceIntelligenceProvider(FingerprintProProvider())
 }
