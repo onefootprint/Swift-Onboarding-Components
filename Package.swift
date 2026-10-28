@@ -31,7 +31,7 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/fingerprintjs/fingerprintjs-pro-ios", from: "2.10.0"),
+        .package(url: "https://github.com/fingerprintjs/fingerprint-ios", from: "4.2.0"),
         .package(url: "https://github.com/moneykit/moneykit-ios", exact: "1.11.2"),
         // FootprintDocumentCapture's camera layer bridges KMM suspend/Flow to Swift via KMP-NativeCoroutines.
         .package(url: "https://github.com/rickclephas/KMP-NativeCoroutines.git", exact: "1.0.2")
@@ -65,7 +65,7 @@ let package = Package(
             name: "FootprintDeviceIntelligence",
             dependencies: [
                 "Footprint",
-                .product(name: "FingerprintPro", package: "fingerprintjs-pro-ios")
+                .product(name: "Fingerprint", package: "fingerprint-ios")
             ]
         ),
         .target(

@@ -47,6 +47,6 @@ Pod::Spec.new do |s|
     s.subspec 'DeviceIntelligence' do |di|
         di.source_files = 'Sources/FootprintDeviceIntelligence/**/*'
         di.dependency 'FootprintOnboardingComponents/Core'
-        di.dependency 'FingerprintPro', '~> 2.10'
+        di.dependency 'Fingerprint-iOS', '~> 4.2'
     end
 end
