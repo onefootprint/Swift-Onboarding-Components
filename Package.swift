@@ -40,20 +40,20 @@ let package = Package(
         // Define the binary target for the shared framework.
         .binaryTarget(
             name: "SwiftOnboardingComponentsShared",
-            url: "https://github.com/onefootprint/Swift-Onboarding-Components/releases/download/2.2.0/SwiftOnboardingComponentsShared.xcframework.zip",
-            checksum: "ac29c51b9d32d78cda754a7ed61fc76af29cd015b33f96b5008c16a9e845103b"
+            url: "https://github.com/onefootprint/Swift-Onboarding-Components/releases/download/2.3.0/SwiftOnboardingComponentsShared.xcframework.zip",
+            checksum: "d02b02a6692b14cacc16e56bd0a1d010cde3851414cf940fc95a4fd65ce38579"
         ),
         // Camera binaries for FootprintDocumentCapture. url + checksum are rewritten per release
         // by update-shared-swift-binary.sh.
         .binaryTarget(
             name: "FootprintNativeCamera",
-            url: "https://github.com/onefootprint/Swift-Onboarding-Components/releases/download/2.2.0/FootprintNativeCamera.xcframework.zip",
-            checksum: "fb6a60a85e54ca4e789780aba9b1b1be14c9901aca9616b5856201c08c35e1c4"
+            url: "https://github.com/onefootprint/Swift-Onboarding-Components/releases/download/2.3.0/FootprintNativeCamera.xcframework.zip",
+            checksum: "1bf8b41673b7ec408948ec59f0b155530da665e5712c9311a177f17c82b77b1b"
         ),
         .binaryTarget(
             name: "FootprintNativeCameraSwift",
-            url: "https://github.com/onefootprint/Swift-Onboarding-Components/releases/download/2.2.0/FootprintNativeCameraSwift.xcframework.zip",
-            checksum: "4ecc476ef83a332a151f571bdee6e5a8899f6fd6cf5bedc6e8478873ee20334f"
+            url: "https://github.com/onefootprint/Swift-Onboarding-Components/releases/download/2.3.0/FootprintNativeCameraSwift.xcframework.zip",
+            checksum: "55489ffcb81d28c5462d9f382a433e3b7f6100df5041e94c4b5b54b2b50e9fd8"
         ),
         .target(
             name: "Footprint",
