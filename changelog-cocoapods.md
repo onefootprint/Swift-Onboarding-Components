@@ -1,5 +1,8 @@
 ### Changelog for FootprintOnboardingComponents CocoaPod
 
+# 2.3.0
+- The `FootprintOnboardingComponents/DeviceIntelligence` subspec now depends on Fingerprint's v4 pod, `Fingerprint-iOS` (`~> 4.2`), in place of `FingerprintPro`. Apps that opted in pick it up with this update and need no code change.
+
 # 2.2.0
 - `getDocumentConfig()` marks the standalone selfie a Selfie node asks for with `isSelfie`. Capturing it with `captureSelfie()` needs the Swift Package Manager `FootprintDocumentCapture` product, which CocoaPods doesn't ship.
 - Breaking for custom capture providers: `FootprintDocumentCaptureContext.countryCode` is now optional, since a selfie has no country.
