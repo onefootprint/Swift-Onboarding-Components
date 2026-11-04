@@ -13,6 +13,19 @@ private final class CaptureState: @unchecked Sendable {
     private let lock = NSLock()
     private var resumed = false
     private var uploaded: [DocumentSide] = []
+    private var upload: Task<Void, Never>?
+
+    /// Keeps the side's upload, so closing the camera stops it before it reaches /process.
+    func track(_ task: Task<Void, Never>) {
+        lock.lock(); defer { lock.unlock() }
+        upload = task
+    }
+
+    func cancelUpload() {
+        lock.lock(); defer { lock.unlock() }
+        upload?.cancel()
+        upload = nil
+    }
 
     func tryResume() -> Bool {
         lock.lock(); defer { lock.unlock() }
@@ -58,7 +71,7 @@ public final class NativeDocumentCaptureProvider: FootprintDocumentCaptureProvid
                 // The KMM callbacks aren't Sendable; box them so the Task can capture them. They're
                 // safe to invoke off the calling thread — they resolve the module's upload continuation.
                 let callbacks = UploadCallbacks(onResult: { onResult($0) }, onError: { onError($0, $1) })
-                Task {
+                state.track(Task {
                     do {
                         let result = try await context.uploadSide(imageBase64, mappedSide, manual, gallery, videoPath)
                         state.record(mappedSide)
@@ -68,10 +81,11 @@ public final class NativeDocumentCaptureProvider: FootprintDocumentCaptureProvid
                             nextSideToCollect: result.nextSideToCollect?.value
                         ))
                     } catch {
+                        if Task.isCancelled { return }
                         let fp = error as? FootprintException
                         callbacks.onError(fp?.code ?? "UPLOAD_ERROR", fp?.message ?? error.localizedDescription)
                     }
-                }
+                })
             }
 
             DispatchQueue.main.async {
@@ -90,6 +104,7 @@ public final class NativeDocumentCaptureProvider: FootprintDocumentCaptureProvid
                 var host: UIHostingController<CameraCaptureView>!
                 let finish: (@escaping () -> Void) -> Void = { body in
                     IosDocumentCaptureCoordinator.shared.uploadSide = nil
+                    state.cancelUpload()
                     host.dismiss(animated: true, completion: body)
                 }
                 let view = CameraCaptureView(

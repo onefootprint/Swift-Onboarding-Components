@@ -199,6 +199,8 @@ extension Footprint {
         )
         let language = SwiftOnboardingComponentsShared._Footprint.shared.getL10n().language?.value
         let retryLimit = RetryLimitFlag()
+        // The capture screen reports a failed upload under its own code, so keep this one to rethrow.
+        let missingClip = MissingClip()
         let context = FootprintDocumentCaptureContext(
             documentId: documentId,
             documentKind: target.kind,
@@ -209,19 +211,31 @@ extension Footprint {
             allowGalleryUpload: target.allowGalleryUpload,
             language: language,
             uploadSide: { imageBase64, side, isManual, fromGallery, videoPath in
-                let result = try await SwiftOnboardingComponentsShared._Footprint.shared.uploadDocumentSide(
-                    documentId: documentId,
-                    side: side,
-                    imageBase64: imageBase64,
-                    isManual: isManual,
-                    fromGallery: fromGallery,
-                    videoPath: videoPath
-                )
-                await retryLimit.record(result.isRetryLimitExceeded)
-                return result
+                do {
+                    let result = try await SwiftOnboardingComponentsShared._Footprint.shared.uploadDocumentSide(
+                        documentId: documentId,
+                        side: side,
+                        imageBase64: imageBase64,
+                        isManual: isManual,
+                        fromGallery: fromGallery,
+                        videoPath: videoPath
+                    )
+                    await retryLimit.record(result.isRetryLimitExceeded)
+                    return result
+                } catch {
+                    if extractFootprintException(error)?.code == "E_SELFIE_VIDEO_REQUIRED" {
+                        await missingClip.record(error)
+                    }
+                    throw error
+                }
             }
         )
-        let result = try await provider.present(context)
+        let result: FootprintCaptureDocumentResult
+        do {
+            result = try await provider.present(context)
+        } catch {
+            throw await missingClip.error ?? error
+        }
         return FootprintCaptureDocumentResult(
             uploadedSides: result.uploadedSides,
             canceled: result.canceled,
@@ -240,4 +254,9 @@ private struct CaptureTarget {
 private actor RetryLimitFlag {
     private(set) var isExceeded = false
     func record(_ exceeded: Bool) { isExceeded = exceeded }
+}
+
+private actor MissingClip {
+    private(set) var error: Error?
+    func record(_ error: Error) { self.error = error }
 }
