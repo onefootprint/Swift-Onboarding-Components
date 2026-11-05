@@ -47,6 +47,7 @@ public struct FootprintDocumentCaptureContext: Sendable {
     public let documentKind: DocumentKind
     public let countryCode: Iso3166TwoDigitCountryCode?
     public let shouldCollectSelfie: Bool
+    public let shouldRecordSelfieVideo: Bool
     public let autoCapture: Bool
     public let allowGalleryUpload: Bool
     public let language: String?
@@ -54,7 +55,8 @@ public struct FootprintDocumentCaptureContext: Sendable {
         _ imageBase64: String,
         _ side: DocumentSide,
         _ isManual: Bool,
-        _ fromGallery: Bool
+        _ fromGallery: Bool,
+        _ videoPath: String?
     ) async throws -> FootprintDocumentProcessResult
 
     public init(
@@ -62,15 +64,17 @@ public struct FootprintDocumentCaptureContext: Sendable {
         documentKind: DocumentKind,
         countryCode: Iso3166TwoDigitCountryCode?,
         shouldCollectSelfie: Bool,
+        shouldRecordSelfieVideo: Bool,
         autoCapture: Bool,
         allowGalleryUpload: Bool,
         language: String?,
-        uploadSide: @escaping @Sendable (String, DocumentSide, Bool, Bool) async throws -> FootprintDocumentProcessResult
+        uploadSide: @escaping @Sendable (String, DocumentSide, Bool, Bool, String?) async throws -> FootprintDocumentProcessResult
     ) {
         self.documentId = documentId
         self.documentKind = documentKind
         self.countryCode = countryCode
         self.shouldCollectSelfie = shouldCollectSelfie
+        self.shouldRecordSelfieVideo = shouldRecordSelfieVideo
         self.autoCapture = autoCapture
         self.allowGalleryUpload = allowGalleryUpload
         self.language = language
@@ -153,17 +157,6 @@ extension Footprint {
                     code: nil
                 )
             }
-            // Native capture records no video clip, so the backend would reject every capture until the retry limit.
-            if config.isSelfieVideoRequired {
-                throw FootprintException(
-                    kind: .inlineProcessNotSupported,
-                    message: "This selfie needs a video clip, which native capture does not record yet. Use the hosted flow.",
-                    supportId: nil,
-                    sessionId: nil,
-                    context: nil,
-                    code: "E_SELFIE_VIDEO_REQUIRED"
-                )
-            }
             return CaptureTarget(
                 kind: .selfie,
                 countryCode: nil,
@@ -206,27 +199,43 @@ extension Footprint {
         )
         let language = SwiftOnboardingComponentsShared._Footprint.shared.getL10n().language?.value
         let retryLimit = RetryLimitFlag()
+        // The capture screen reports a failed upload under its own code, so keep this one to rethrow.
+        let missingClip = MissingClip()
         let context = FootprintDocumentCaptureContext(
             documentId: documentId,
             documentKind: target.kind,
             countryCode: target.countryCode,
             shouldCollectSelfie: config.shouldCollectSelfie,
+            shouldRecordSelfieVideo: config.shouldRecordSelfieVideo,
             autoCapture: target.autoCapture,
             allowGalleryUpload: target.allowGalleryUpload,
             language: language,
-            uploadSide: { imageBase64, side, isManual, fromGallery in
-                let result = try await SwiftOnboardingComponentsShared._Footprint.shared.uploadDocumentSide(
-                    documentId: documentId,
-                    side: side,
-                    imageBase64: imageBase64,
-                    isManual: isManual,
-                    fromGallery: fromGallery
-                )
-                await retryLimit.record(result.isRetryLimitExceeded)
-                return result
+            uploadSide: { imageBase64, side, isManual, fromGallery, videoPath in
+                do {
+                    let result = try await SwiftOnboardingComponentsShared._Footprint.shared.uploadDocumentSide(
+                        documentId: documentId,
+                        side: side,
+                        imageBase64: imageBase64,
+                        isManual: isManual,
+                        fromGallery: fromGallery,
+                        videoPath: videoPath
+                    )
+                    await retryLimit.record(result.isRetryLimitExceeded)
+                    return result
+                } catch {
+                    if extractFootprintException(error)?.code == "E_SELFIE_VIDEO_REQUIRED" {
+                        await missingClip.record(error)
+                    }
+                    throw error
+                }
             }
         )
-        let result = try await provider.present(context)
+        let result: FootprintCaptureDocumentResult
+        do {
+            result = try await provider.present(context)
+        } catch {
+            throw await missingClip.error ?? error
+        }
         return FootprintCaptureDocumentResult(
             uploadedSides: result.uploadedSides,
             canceled: result.canceled,
@@ -245,4 +254,9 @@ private struct CaptureTarget {
 private actor RetryLimitFlag {
     private(set) var isExceeded = false
     func record(_ exceeded: Bool) { isExceeded = exceeded }
+}
+
+private actor MissingClip {
+    private(set) var error: Error?
+    func record(_ error: Error) { self.error = error }
 }
