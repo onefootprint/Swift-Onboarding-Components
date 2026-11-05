@@ -12,6 +12,7 @@ extension OnboardingExpressResponseIncomplete: @unchecked Sendable {}
 
 
 public final class Onboarding: Sendable {
+    @available(*, deprecated, message: "Call Onboarding.initialize(onboardingSessionToken:) without .shared.")
     public static let shared = Onboarding()
     
     private init() {}
@@ -21,7 +22,7 @@ public final class Onboarding: Sendable {
         return KotlinBoolean(value: value)
     }
     
-    private func getFingerprintVisitKey(
+    private static func getFingerprintVisitKey(
         authToken: String
     ) async throws -> (visitorId: String, requestId: String)?  {
         let config = try await Footprint.shared.getOnboardingConfig(authToken: authToken)
@@ -29,7 +30,7 @@ public final class Onboarding: Sendable {
         return try await Footprint.shared.deviceIntelligenceCredentials(apiKey: fpPublicKey)
     }
     
-    private func runOnboardingInBackground(
+    private static func runOnboardingInBackground(
         authToken: String
     ) async throws -> OnboardingExpressResponse {
         let fingerprintCredentials = try await getFingerprintVisitKey(
@@ -53,7 +54,7 @@ public final class Onboarding: Sendable {
     }
     
     @MainActor
-    public func initialize(
+    public static func initialize(
         onboardingSessionToken: String,
         l10n: FootprintL10n? = nil,
         sessionId: String? = nil,
@@ -117,5 +118,26 @@ public final class Onboarding: Sendable {
                 launchHostedFlow(authToken: onboardingSessionToken)
             }
         }
+    }
+
+    @MainActor
+    public func initialize(
+        onboardingSessionToken: String,
+        l10n: FootprintL10n? = nil,
+        sessionId: String? = nil,
+        onComplete: ((String) -> Void)? = nil,
+        onCancel: (() -> Void)? = nil,
+        onError: ((FootprintException) -> Void)? = nil,
+        appearance: FootprintAppearance? = nil
+    ) {
+        Self.initialize(
+            onboardingSessionToken: onboardingSessionToken,
+            l10n: l10n,
+            sessionId: sessionId,
+            onComplete: onComplete,
+            onCancel: onCancel,
+            onError: onError,
+            appearance: appearance
+        )
     }
 }
