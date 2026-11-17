@@ -1,6 +1,16 @@
 ### Changelog for Swift onboarding components SDK
 *Updating this file is one of the requirements for GitHub CI/CD for Swift package release*
 
+# 2.4.0
+- The hosted flow reads `FootprintL10n` the way footprint-js does, so a field you leave out no longer falls back to English or en-US. With only `language` set, dates follow the phone's format instead of US order. With only `locale` set, the flow shows that locale's language instead of English. `FootprintSupportedLanguage` gains `pt` and `ja`, and `FootprintSupportedLocale` gains `pt_BR`, `ja_JP` and nine English locales such as `en_GB` and `en_CA`.
+- Record the selfie video in native capture when the playbook asks for one, with an identity document's selfie or a Selfie node, and upload it before the selfie is processed. As in idv2, a required clip that gets no answer or a server error is tried once more, and one that still doesn't upload has the camera ask for another selfie without spending one of its attempts. `captureSelfie` now captures a Selfie node that requires the video, and throws `E_SELFIE_VIDEO_REQUIRED` only when the device records no clip. `uploadDocumentSide` takes an optional `videoPath`, `FootprintDocumentConfig` exposes `shouldRecordSelfieVideo`, and `FootprintDocumentCaptureContext` passes it to capture providers.
+
+  Breaking for custom capture providers: `FootprintDocumentCaptureContext.uploadSide` takes the clip's `videoPath`. This minor release accepts that, since the provider interface is undocumented and only the bundled document capture implements it.
+
+- Launch the onboarding flow with `Onboarding.initialize(onboardingSessionToken:)`, without `.shared`, as on Android. `Onboarding.shared` still works but is deprecated, and the next major version removes it.
+
+- Document image and video uploads get 61 s, like the web flow. On Android they failed after the HTTP engine's 15 s, which every other request keeps; on iOS they had no overall limit.
+
  # 2.3.0
 - The `FootprintDeviceIntelligence` product now uses Fingerprint's v4 SDK (`https://github.com/fingerprintjs/fingerprint-ios`, 4.2 or later) in place of `fingerprintjs-pro-ios`. Apps that opted in pick it up with this update and need no code change.
 
