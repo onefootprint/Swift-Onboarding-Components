@@ -58,7 +58,7 @@ public final class Onboarding: Sendable {
         onboardingSessionToken: String,
         l10n: FootprintL10n? = nil,
         sessionId: String? = nil,
-        onComplete: ((String) -> Void)? = nil,
+        onComplete: ((OnboardingCompleteResult) -> Void)? = nil,
         onCancel: (() -> Void)? = nil,
         onError: ((FootprintException) -> Void)? = nil,
         appearance: FootprintAppearance? = nil
@@ -69,7 +69,8 @@ public final class Onboarding: Sendable {
             FootprintHosted.shared.launchHosted(
                 authToken: authToken,
                 l10n: l10n,
-                onComplete: onComplete ?? {_ in},
+                onComplete: { _ in },
+                onCompleteWithResult: { result in onComplete?(result) },
                 onCancel: onCancel ?? {},
                 onError: { error in
                     onError?(
@@ -99,7 +100,7 @@ public final class Onboarding: Sendable {
                 
                 // If silent onboarding is successful and complete, we can return the validation token
                 if let complete = silentOnboardingResult as? OnboardingExpressResponseComplete {
-                    onComplete?(complete.validationToken)
+                    onComplete?(OnboardingCompleteResult(validationToken: complete.validationToken, onboardingId: complete.onboardingId))
                     return
                 }
                 
@@ -125,7 +126,7 @@ public final class Onboarding: Sendable {
         onboardingSessionToken: String,
         l10n: FootprintL10n? = nil,
         sessionId: String? = nil,
-        onComplete: ((String) -> Void)? = nil,
+        onComplete: ((OnboardingCompleteResult) -> Void)? = nil,
         onCancel: (() -> Void)? = nil,
         onError: ((FootprintException) -> Void)? = nil,
         appearance: FootprintAppearance? = nil
