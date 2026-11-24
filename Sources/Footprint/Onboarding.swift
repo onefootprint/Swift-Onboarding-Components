@@ -66,11 +66,14 @@ public final class Onboarding: Sendable {
         func launchHostedFlow(
             authToken: String
         ){
-            FootprintHosted.shared.launchHosted(
+            // The shared binary's own launcher, since FootprintHosted.launchHosted only hands back the token.
+            // Every argument is passed: SKIE makes no default-argument overloads for this function.
+            SwiftOnboardingComponentsShared._FootprintHosted.shared.launchHostedWithResult(
                 authToken: authToken,
+                publicKey: nil,
                 l10n: l10n,
-                onComplete: { _ in },
-                onCompleteWithResult: { result in onComplete?(result) },
+                sandboxOutcome: nil,
+                onComplete: { result in onComplete?(result) },
                 onCancel: onCancel ?? {},
                 onError: { error in
                     onError?(
@@ -85,7 +88,10 @@ public final class Onboarding: Sendable {
                     )
                 },
                 appearance: appearance,
-                sessionId: sessionId
+                options: nil,
+                sessionId: sessionId,
+                bifrostBaseUrlOverride: nil,
+                apiBaseUrlOverride: nil
             )
         }
         
