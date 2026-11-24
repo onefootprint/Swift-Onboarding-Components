@@ -58,7 +58,7 @@ public final class Onboarding: Sendable {
         onboardingSessionToken: String,
         l10n: FootprintL10n? = nil,
         sessionId: String? = nil,
-        onComplete: ((String) -> Void)? = nil,
+        onComplete: ((OnboardingCompleteResult) -> Void)? = nil,
         onCancel: (() -> Void)? = nil,
         onError: ((FootprintException) -> Void)? = nil,
         appearance: FootprintAppearance? = nil
@@ -66,10 +66,14 @@ public final class Onboarding: Sendable {
         func launchHostedFlow(
             authToken: String
         ){
-            FootprintHosted.shared.launchHosted(
+            // The shared binary's own launcher, since FootprintHosted.launchHosted only hands back the token.
+            // Every argument is passed: SKIE makes no default-argument overloads for this function.
+            SwiftOnboardingComponentsShared._FootprintHosted.shared.launchHostedWithResult(
                 authToken: authToken,
+                publicKey: nil,
                 l10n: l10n,
-                onComplete: onComplete ?? {_ in},
+                sandboxOutcome: nil,
+                onComplete: { result in onComplete?(result) },
                 onCancel: onCancel ?? {},
                 onError: { error in
                     onError?(
@@ -84,7 +88,10 @@ public final class Onboarding: Sendable {
                     )
                 },
                 appearance: appearance,
-                sessionId: sessionId
+                options: nil,
+                sessionId: sessionId,
+                bifrostBaseUrlOverride: nil,
+                apiBaseUrlOverride: nil
             )
         }
         
@@ -99,7 +106,7 @@ public final class Onboarding: Sendable {
                 
                 // If silent onboarding is successful and complete, we can return the validation token
                 if let complete = silentOnboardingResult as? OnboardingExpressResponseComplete {
-                    onComplete?(complete.validationToken)
+                    onComplete?(OnboardingCompleteResult(validationToken: complete.validationToken, onboardingId: complete.onboardingId))
                     return
                 }
                 
@@ -125,7 +132,7 @@ public final class Onboarding: Sendable {
         onboardingSessionToken: String,
         l10n: FootprintL10n? = nil,
         sessionId: String? = nil,
-        onComplete: ((String) -> Void)? = nil,
+        onComplete: ((OnboardingCompleteResult) -> Void)? = nil,
         onCancel: (() -> Void)? = nil,
         onError: ((FootprintException) -> Void)? = nil,
         appearance: FootprintAppearance? = nil
