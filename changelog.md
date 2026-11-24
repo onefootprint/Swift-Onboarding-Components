@@ -1,6 +1,11 @@
 ### Changelog for Swift onboarding components SDK
 *Updating this file is one of the requirements for GitHub CI/CD for Swift package release*
 
+# 3.0.0
+- Android: every hosted `onComplete` (`Onboarding.initialize`, `FootprintHosted.launchHosted`, `resumePendingVerification` and `handoff`) now receives an `OnboardingCompleteResult` with `validationToken` and `onboardingId` instead of the validation token as a string. Read the result right away with `GET /onboardings/{onboardingId}`, after checking the ID matches the one your server got from `POST /onboardings`. To upgrade, change `onComplete = { validationToken -> ... }` to `onComplete = { result -> ... result.validationToken ... }`. `validationToken` is deprecated, and a future major removes it.
+
+  iOS: the Swift package's `Onboarding.initialize` `onComplete` now receives the same `OnboardingCompleteResult` instead of the validation token as a string. To upgrade, change `onComplete: { validationToken in ... }` to `onComplete: { result in ... }`. The binary it builds on gains `_FootprintHosted.launchHostedWithResult`; `launchHosted` and `handoff` are unchanged.
+
 # 2.4.0
 - The hosted flow reads `FootprintL10n` the way footprint-js does, so a field you leave out no longer falls back to English or en-US. With only `language` set, dates follow the phone's format instead of US order. With only `locale` set, the flow shows that locale's language instead of English. `FootprintSupportedLanguage` gains `pt` and `ja`, and `FootprintSupportedLocale` gains `pt_BR`, `ja_JP` and nine English locales such as `en_GB` and `en_CA`.
 - Record the selfie video in native capture when the playbook asks for one, with an identity document's selfie or a Selfie node, and upload it before the selfie is processed. As in idv2, a required clip that gets no answer or a server error is tried once more, and one that still doesn't upload has the camera ask for another selfie without spending one of its attempts. `captureSelfie` now captures a Selfie node that requires the video, and throws `E_SELFIE_VIDEO_REQUIRED` only when the device records no clip. `uploadDocumentSide` takes an optional `videoPath`, `FootprintDocumentConfig` exposes `shouldRecordSelfieVideo`, and `FootprintDocumentCaptureContext` passes it to capture providers.
